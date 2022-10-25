@@ -2,14 +2,9 @@
 
 namespace Drupal\field_suggestion\Form;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
-use Drupal\Core\Entity\EntityFieldManagerInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\StringTranslation\TranslationInterface;
-use Drupal\field_suggestion\Service\FieldSuggestionHelperInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -49,45 +44,17 @@ class FieldSuggestionSettingsForm extends ConfigFormBase {
   protected $hasSuffix = [];
 
   /**
-   * FieldSuggestionSettingsForm constructor.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
-   *   The string translation.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager.
-   * @param \Drupal\field_suggestion\Service\FieldSuggestionHelperInterface $helper
-   *   The helper.
-   */
-  public function __construct(
-    ConfigFactoryInterface $config_factory,
-    TranslationInterface $translation,
-    EntityTypeManagerInterface $entity_type_manager,
-    EntityFieldManagerInterface $entity_field_manager,
-    FieldSuggestionHelperInterface $helper
-  ) {
-    parent::__construct($config_factory);
-
-    $this->setStringTranslation($translation);
-    $this->entityTypeManager = $entity_type_manager;
-    $this->entityFieldManager = $entity_field_manager;
-    $this->helper = $helper;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('config.factory'),
-      $container->get('string_translation'),
-      $container->get('entity_type.manager'),
-      $container->get('entity_field.manager'),
-      $container->get('field_suggestion.helper')
-    );
+    $instance = parent::create($container)
+      ->setStringTranslation($container->get('string_translation'));
+
+    $instance->entityTypeManager = $container->get('entity_type.manager');
+    $instance->entityFieldManager = $container->get('entity_field.manager');
+    $instance->helper = $container->get('field_suggestion.helper');
+
+    return $instance;
   }
 
   /**
@@ -109,6 +76,13 @@ class FieldSuggestionSettingsForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config($this->getEditableConfigNames()[0]);
+
+    $form['collapsible'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Collapsible'),
+      '#description' => $this->t('Display suggestions list in drop-down view.'),
+      '#default_value' => $config->get('collapsible'),
+    ];
 
     $form['limit'] = [
       '#type' => 'number',
@@ -202,16 +176,16 @@ class FieldSuggestionSettingsForm extends ConfigFormBase {
     $storage = $this->entityTypeManager->getStorage('field_suggestion_type');
     $field_types = $storage->getQuery()->execute();
 
-    foreach ($this->hasSuffix as $entity_type_id => $has_suffix) {
+    foreach ($this->hasSuffix as $entity_type => $has_suffix) {
       $fields = array_filter(array_values($form_state->getValue([
-        $entity_type_id . ($has_suffix ? '_' : ''),
+        $entity_type . ($has_suffix ? '_' : ''),
         'fields',
       ])));
 
       foreach ($fields as $field) {
         [$field_name, $field_type] = explode('|', $field);
 
-        $all_fields[$entity_type_id][] = $field_name;
+        $all_fields[$entity_type][] = $field_name;
 
         if (!in_array($field_type, $field_types)) {
           $this->helper->bundle($field_type);
@@ -220,11 +194,14 @@ class FieldSuggestionSettingsForm extends ConfigFormBase {
       }
     }
 
-    $this->config($this->getEditableConfigNames()[0])
-      ->set('limit', $form_state->getValue('limit'))
-      ->set('own', $form_state->getValue('own'))
-      ->set('fields', $all_fields)
-      ->save();
+    $config = $this->config($this->getEditableConfigNames()[0])
+      ->set('fields', $all_fields);
+
+    foreach (['collapsible', 'limit', 'own'] as $field) {
+      $config->set($field, $form_state->getValue($field));
+    }
+
+    $config->save();
 
     parent::submitForm($form, $form_state);
   }

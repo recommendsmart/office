@@ -2,6 +2,7 @@
 
 namespace Drupal\eca_form\Plugin\Action;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -85,7 +86,9 @@ class FormBuildEntity extends ConfigurableActionBase {
       // The form state is being cloned here to not interfere with the regular
       // form processing and to not leak raw or non-validated user input.
       $form_state = clone $form_state;
-      $form_state->setValues($form_state->getUserInput());
+      // Set the values of the form state, taking existing processed values
+      // with higher priority than unprocessed user input.
+      $form_state->setValues(NestedArray::mergeDeep($form_state->getUserInput(), ($form_state->getValues() ?? [])));
     }
 
     $this->tokenServices->addTokenData($this->configuration['token_name'], $form_object->buildEntity($form, $form_state));

@@ -17,7 +17,7 @@ class EntityCloneEntityFormModeTest extends BrowserTestBase {
    *
    * @var array
    */
-  public static $modules = ['entity_clone'];
+  public static $modules = ['entity_clone', 'field_ui'];
 
   /**
    * Theme to enable by default
@@ -32,6 +32,7 @@ class EntityCloneEntityFormModeTest extends BrowserTestBase {
    */
   protected $permissions = [
     'clone entity_form_mode entity',
+    'administer display modes',
   ];
 
   /**

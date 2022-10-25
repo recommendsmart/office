@@ -180,6 +180,7 @@ class PaymentAddForm extends FormBase implements ContainerInjectionInterface {
 
     $form['payment_option'] = [
       '#type' => 'radios',
+      '#required' => TRUE,
       '#title' => $this->t('Payment option'),
       '#options' => $option_labels,
       '#default_value' => $default_option->getId(),

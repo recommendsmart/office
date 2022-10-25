@@ -22,6 +22,8 @@ class WidgetTypeAccessControlHandlerTest extends KernelTestBase {
   protected static $modules = [
     'widget_type',
     'field',
+    'image',
+    'file',
     'text',
     'user',
     'system',

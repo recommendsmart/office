@@ -5,7 +5,7 @@ package: Testing
 dependencies:
   - eca:eca
 
-# Information added by Drupal.org packaging script on 2022-08-26
-version: '1.0.2'
+# Information added by Drupal.org packaging script on 2022-09-30
+version: '1.0.4'
 project: 'eca'
-datestamp: 1661523501
+datestamp: 1664529847

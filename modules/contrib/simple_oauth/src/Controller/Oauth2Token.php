@@ -68,16 +68,16 @@ class Oauth2Token extends ControllerBase {
   public function token(Request $request): ResponseInterface {
     $server_request = $this->httpMessageFactory->createRequest($request);
     $server_response = new Response();
-    $client_uuid = $request->get('client_id');
+    $client_id = $request->get('client_id');
 
     try {
-      if (empty($client_uuid)) {
+      if (empty($client_id)) {
         throw OAuthServerException::invalidRequest('client_id');
       }
       $consumer_storage = $this->entityTypeManager()->getStorage('consumer');
       /** @var \Drupal\consumers\Entity\Consumer[] $clients */
       $clients = $consumer_storage->loadByProperties([
-        'uuid' => $client_uuid,
+        'client_id' => $client_id,
       ]);
       if (empty($clients)) {
         throw OAuthServerException::invalidClient($server_request);

@@ -5,10 +5,12 @@ package: Interactive Components
 core_version_requirement: ^8.8.0 || ^9.0
 dependencies:
   - drupal:text
+  - drupal:image
+  - drupal:file
   - drupal:user
   - drupal:file
 
-# Information added by Drupal.org packaging script on 2022-02-23
-version: '1.5.6'
+# Information added by Drupal.org packaging script on 2022-10-19
+version: '1.5.10'
 project: 'widget_type'
-datestamp: 1645616490
+datestamp: 1666188995

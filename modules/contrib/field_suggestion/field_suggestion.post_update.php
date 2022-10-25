@@ -13,11 +13,11 @@ function field_suggestion_post_update_pinned_to_entities(&$sandbox) {
     $sandbox['pinned'] = [];
     $pinned = \Drupal::state()->get('field_suggestion', []);
 
-    foreach ($pinned as $entity_type_id => $fields) {
+    foreach ($pinned as $entity_type => $fields) {
       foreach ($fields as $field_name => $items) {
         foreach ($items as $item) {
           $sandbox['pinned'][] = [
-            'entity_type' => $entity_type_id,
+            'entity_type' => $entity_type,
             'field_name' => $field_name,
             'field_value' => $item,
           ];
@@ -35,19 +35,19 @@ function field_suggestion_post_update_pinned_to_entities(&$sandbox) {
 
   $values = $sandbox['pinned'][$sandbox['processed']++];
 
-  $entity_type_id = $values['entity_type'];
+  $entity_type = $values['entity_type'];
   $field_name = $values['field_name'];
 
-  if (isset($sandbox['types'][$entity_type_id][$field_name])) {
-    $values['type'] = $sandbox['types'][$entity_type_id][$field_name];
+  if (isset($sandbox['types'][$entity_type][$field_name])) {
+    $values['type'] = $sandbox['types'][$entity_type][$field_name];
   }
   else {
     /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $manager */
     $manager = \Drupal::service('entity_field.manager');
 
-    $definitions = $manager->getBaseFieldDefinitions($entity_type_id);
+    $definitions = $manager->getBaseFieldDefinitions($entity_type);
     $values['type'] = $definitions[$field_name]->getType();
-    $sandbox['types'][$entity_type_id][$field_name] = $values['type'];
+    $sandbox['types'][$entity_type][$field_name] = $values['type'];
   }
 
   /** @var \Drupal\field_suggestion\Service\FieldSuggestionHelperInterface $helper */

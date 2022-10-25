@@ -71,7 +71,7 @@ abstract class CommerceKernelTestBase extends EntityKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function tearDown() {
+  protected function tearDown(): void {
     $this->restoreErrorHandler();
     parent::tearDown();
   }

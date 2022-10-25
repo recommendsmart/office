@@ -1,8 +1,9 @@
 <?php
-/*
+
+/**
  * @file
- * code for personal_notes module
-*/
+ * Code for personal_notes module.
+ */
 
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
@@ -20,27 +21,21 @@ function personal_notes_help($route_name, RouteMatchInterface $route_match) {
         ':addnote' => Url::fromRoute('personalnote.create.form', [
           'user' => Drupal::currentUser()
             ->id(),
-        ])
-          ->toString(),
+        ])->toString(),
         ':dltnote' => Url::fromRoute('personalnote.delete.form')->toString(),
         ':mainmnu' => Url::fromUri('internal:/admin/structure/menu/manage/account')
           ->toString(),
         ':assignblock' => Url::fromRoute('block.admin_display')->toString(),
       ];
       $output .= '<h3>' . t('About') . '</h3>';
-      $output .= '<p>' . t('Personal notes consist of titles and text rendered into a block. The notes are ' .
-          'specific to each authenticated user on the site and can be added and deleted.') . '</p>';
+      $output .= '<p>' . t('Personal notes consist of titles and text rendered into a block. The notes are specific to each authenticated user on the site and can be added and deleted.') . '</p>';
       $output .= '<h3>' . t('Configuring Personal Notes') . '</h3>';
       $output .= '<dl>';
       $output .= '<dt>' . t('Creating Links to Add and Delete Personal Notes') . '</dt>';
-      $output .= '<dd>' . t('Permitted users add and delete their own Personal Notes by going to the ' .
-          'links <a href="' . $variables[':addnote'] . '">Add a Personal Note</a> and <a href="' .
-          $variables[':dltnote'] . '">Delete Personal Note(s)</a> ' .
-          'respectively. We recommend adding these links to your site&apos;s <a href="' .
-          $variables[':mainmnu'] . '">User account menu</a>, but of course they can go anywhere you want.') . '</dd>';
+      $output .= '<dd>' . t('Permitted users add and delete their own Personal Notes by going to the links <a href=":addnote">Add a Personal Note</a> and <a href=":dltnote">Delete Personal Note(s)</a> respectively.', $variables);
+      $output .= t('We recommend adding these links to your site\'s <a href=":mainmnu">User account menu</a>, but of course they can go anywhere you want.', $variables) . '</dd>';
       $output .= '<dt>' . t('Displaying Personal Notes in a Block') . '</dt>';
-      $output .= '<dd>' . t('In order for users to see their Personal Notes you&apos;ll have to <a href="' .
-          $variables[':assignblock'] . '">assign the Personal Notes block to a region</a> on your site.') . '</dd>';
+      $output .= '<dd>' . t('In order for users to see their Personal Notes you\'ll have to <a href=":assignblock">assign the Personal Notes block to a region</a> on your site.', $variables) . '</dd>';
       $output .= '</dl>';
 
       return $output;
@@ -48,12 +43,12 @@ function personal_notes_help($route_name, RouteMatchInterface $route_match) {
 }
 
 /**
- * Implements hook_preprocess_HOOK() for the block template.
+ * Implements hook_preprocess_HOOK().
  *
- * This stops the block from being cached.  Otherwise the personal notes won't
- * update in the display consistently
+ * This stops the block from being cached.  Otherwise, the personal notes won't
+ * update in the display consistently.
  */
-function personal_notes_preprocess_block(&$vars) {
+function personal_notes_preprocess_block(&$vars): void {
   if ($vars['plugin_id'] == 'block_personal_notesblk') {
     $vars['#cache']['max-age'] = 0;
   }
@@ -62,21 +57,21 @@ function personal_notes_preprocess_block(&$vars) {
 /**
  * Retrieve the notes made by the requesting user.
  *
- * @return
- * Result of DB query.
+ * @return array
+ *   Result of DB query.
  */
-function _personal_notes_fetch_content_db() {
-  $user = \Drupal::routeMatch()->getParameter('user');
+function _personal_notes_fetch_content_db(): array {
+  $user = Drupal::routeMatch()->getParameter('user');
   if ($user instanceof UserInterface) {
     $uid = $user->id();
   }
   else {
     $uid = $user;
   }
-  $query = \Drupal::database()->select('personal_notes_notes', 'r')
+  $query = Drupal::database()->select('personal_notes_notes', 'r')
     ->fields('r', ['title', 'note', 'notenum', 'created'])
-    ->condition('uid', $uid, '=')
-    ->orderBy('notenum', 'ASC');
+    ->condition('uid', $uid)
+    ->orderBy('notenum', 'desc');
   return $query->execute()->fetchAll();
 
 }
@@ -84,7 +79,7 @@ function _personal_notes_fetch_content_db() {
 /**
  * Implements hook_theme().
  */
-function personal_notes_theme($existing, $type, $theme, $path) {
+function personal_notes_theme($existing, $type, $theme, $path): array {
   return [
     'block--personal_notes' => [
       'variables' => [
@@ -97,16 +92,15 @@ function personal_notes_theme($existing, $type, $theme, $path) {
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function personal_notes_form_personal_notes_add_content_alter(&$form, $form_state, $form_id) {
+function personal_notes_form_personal_notes_add_content_alter(&$form, FormStateInterface $form_state, $form_id): void {
   $form['#validate'][] = '_personal_note_add_validate';
 }
 
 /**
  * Custom validation for the add note form.
  */
-function _personal_note_add_validate(&$form, $form_state) {
+function _personal_note_add_validate(&$form, FormStateInterface $form_state): void {
   if (strlen($form_state->getValue('note_content')) > 500) {
     $form_state->setErrorByName('note_content', t('The note is too long, keep it under 500 characters.'));
   }
 }
-

@@ -393,13 +393,14 @@ class BuyXGetY extends OrderPromotionOfferBase {
           $order_item->save();
           $order->addItem($order_item);
           $order_items = $order->getItems();
+          $order_item = $this->entityTypeManager->getStorage('commerce_order_item')->load($order_item->id());
         }
         // When the get order item is automatically added, we shouldn't have to
         // look for it via selectOrderItems().
         // For some reason, we have to reload the order item here, otherwise
         // changes are not detected by the order refresh when the promotion
         // adjustment is added later on.
-        $get_order_items[$order_item->id()] = $this->entityTypeManager->getStorage('commerce_order_item')->load($order_item->id());
+        $get_order_items[$order_item->id()] = $order_item;
       }
     }
 
@@ -630,6 +631,9 @@ class BuyXGetY extends OrderPromotionOfferBase {
     $storage = $this->entityTypeManager->getStorage('commerce_order_item');
     $order_item = $storage->createFromPurchasableEntity($get_purchasable_entity, [
       'quantity' => 0,
+      'data' => [
+        'owned_by_promotion' => TRUE,
+      ],
     ]);
 
     return $order_item;
@@ -648,11 +652,12 @@ class BuyXGetY extends OrderPromotionOfferBase {
     if ($order_item->get('data')->isEmpty()) {
       return FALSE;
     }
-    else {
-      $order_item_data_keys = array_keys($order_item->get('data')->first()->getValue());
-      if (!preg_grep('/promotion:\d*:auto_add_quantity/', $order_item_data_keys)) {
-        return FALSE;
-      }
+    if ($order_item->getData('owned_by_promotion')) {
+      return TRUE;
+    }
+    $order_item_data_keys = array_keys($order_item->get('data')->first()->getValue());
+    if (!preg_grep('/promotion:\d*:auto_add_quantity/', $order_item_data_keys)) {
+      return FALSE;
     }
 
     return TRUE;

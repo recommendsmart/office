@@ -35,7 +35,7 @@ class KnownClientsRepository implements KnownClientsRepositoryInterface {
       return FALSE;
     }
 
-    $name = 'client:' . $client->uuid();
+    $name = 'client:' . $client->getClientId();
     $authorized_scopes = $this->userData->get('simple_oauth', $uid, $name);
 
     // Access is allowed if all the requested scopes are part of the already

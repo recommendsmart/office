@@ -4,6 +4,7 @@ namespace Drupal\commerce_order\Entity;
 
 use Drupal\commerce\Entity\CommerceContentEntityBase;
 use Drupal\commerce_order\Adjustment;
+use Drupal\commerce_price\Calculator;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -349,6 +350,9 @@ class OrderItem extends CommerceContentEntityBase implements OrderItemInterface 
    */
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
+    if (Calculator::compare($this->getQuantity(), '0') === 0) {
+      $this->set('adjustments', NULL);
+    }
     $this->recalculateTotalPrice();
   }
 

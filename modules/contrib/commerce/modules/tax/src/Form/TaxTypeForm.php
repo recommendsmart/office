@@ -114,6 +114,23 @@ class TaxTypeForm extends EntityForm {
       '#title' => $this->t('Enabled'),
       '#default_value' => $type->status(),
     ];
+    $form['conditions'] = [
+      '#type' => 'commerce_conditions',
+      '#title' => $this->t('Conditions'),
+      '#entity_types' => ['commerce_order'],
+      '#parent_entity_type' => 'commerce_tax_type',
+      '#default_value' => $type->get('conditions'),
+    ];
+    $form['conditionOperator'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Condition operator'),
+      '#title_display' => 'invisible',
+      '#options' => [
+        'AND' => $this->t('All conditions must pass'),
+        'OR' => $this->t('Only one condition must pass'),
+      ],
+      '#default_value' => $type->getConditionOperator(),
+    ];
 
     return $form;
   }

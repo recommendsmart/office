@@ -6,6 +6,7 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\field_suggestion\FieldSuggestionInterface;
 
 /**
@@ -29,7 +30,7 @@ use Drupal\field_suggestion\FieldSuggestionInterface;
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm",
  *     },
  *     "route_provider" = {
- *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
+ *       "html" = "Drupal\field_suggestion\Entity\FieldSuggestionRouteProvider",
  *     },
  *     "list_builder" = "Drupal\field_suggestion\FieldSuggestionListBuilder",
  *   },
@@ -59,6 +60,20 @@ class FieldSuggestion extends ContentEntityBase implements FieldSuggestionInterf
   use EntityPublishedTrait {
     isPublished as isOnce;
     setPublished as setOnce;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function type() {
+    return $this->get('entity_type')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function field() {
+    return $this->get('field_name')->value;
   }
 
   /**
@@ -101,14 +116,31 @@ class FieldSuggestion extends ContentEntityBase implements FieldSuggestionInterf
   /**
    * {@inheritdoc}
    */
-  public function value() {
+  public function label($original = FALSE) {
     /** @var \Drupal\field_suggestion\Service\FieldSuggestionHelperInterface $helper */
     $helper = \Drupal::service('field_suggestion.helper');
 
-    $items = $this->get($helper->field($this->bundle()))->getValue();
-    $item = reset($items);
+    $field = $this->get($helper->field($this->bundle()));
 
-    return reset($item);
+    $item = $field->first()->getValue();
+    $value = reset($item);
+
+    if (!$original && $field instanceof EntityReferenceFieldItemListInterface) {
+      /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $manager */
+      $manager = \Drupal::service('entity_field.manager');
+
+      $type = $manager->getBaseFieldDefinitions($this->type())[$this->field()]
+        ->getItemDefinition()
+        ->getSetting('target_type');
+
+      $entity = \Drupal::entityTypeManager()->getStorage($type)->load($value);
+
+      if ($entity !== NULL) {
+        $value = $entity->label();
+      }
+    }
+
+    return $value;
   }
 
   /**

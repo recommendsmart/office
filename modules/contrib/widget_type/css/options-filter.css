@@ -1,0 +1,168 @@
+.widget-type-selector--radios .form-radios {
+  width: 100%;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+}
+
+.widget-type-selector--radios .form-type--radio,
+.widget-type-selector--radios .form-type-radio {
+  outline: 1px solid black;
+  border-radius: 3px;
+  min-width: 150px;
+  width: 12%;
+  min-height: 150px;
+  padding: 5px 10px;
+  position: relative;
+  margin-right: 15px;
+}
+
+.widget-type-selector--radios .form-type--radio__selected {
+  outline-color: peru;
+  box-shadow: 0 0 4px orangered;
+}
+
+.widget-type-selector--radios .form-type--radio .form-radio {
+  width: 16px;
+  height: 16px;
+}
+
+.radio-details--wrapper {
+  display: grid;
+  grid-template-columns: 33.3% 33.3% 33.4%;
+  padding: 5px 0;
+  height: 100%;
+  font-weight: normal;
+}
+
+.radio-details--status,
+.radio-details--documentation,
+.radio-details--created,
+.radio-details--updated,
+.radio-details--image,
+.radio-details--preview-url,
+.radio-details--search,
+.radio-details--languages,
+.radio-details--machine-name {
+  display: none;
+}
+
+.currently-selected--image--wrapper .radio-details--image {
+  display: block;
+}
+
+.radio-details--name {
+  grid-area: 2 / 1 / span 1 / span 3;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.radio-details--wrapper .radio-details--description {
+  grid-area: 3 / 1 / span 1 / span 3;
+  font-size: 0.7rem;
+  color: #666;
+  line-height: 1rem;
+  margin-bottom: 1rem;
+  padding-right: 10px;
+}
+
+.radio-details--wrapper .radio-details--thumbnail {
+  grid-area: 1 / 1 / span 1 / span 3;
+  height: 100px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 5px;
+  border: 1px solid #bbb;
+  margin-bottom: 15px;
+  background-image: url("../assets/default-thumbnail.svg");
+  background-color: #cae6ef;
+  background-size: 100%;
+  background-clip: content-box;
+}
+
+.radio-details--wrapper .radio-details--version {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 0 5px;
+  max-width: 35%;
+  font-size: 0.75rem;
+  background: #b5df74a0;
+}
+
+.radio-details--wrapper .radio-details--version.status--disabled {
+  background: #eea0c0;
+}
+
+.radio-details--wrapper .radio-details--source {
+  padding: 0 5px;
+  font-size: 0.75rem;
+  position: absolute;
+  bottom: 0;
+  max-width: 60%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 85%;
+}
+
+.currently-selected {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1em;
+  background-color: #ff00b206;
+}
+
+.currently-selected summary {
+  padding: 0;
+}
+
+.currently-selected .image-table--wrapper {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+.currently-selected img {
+  max-height: 300px;
+  max-width: 500px;
+  margin: 0;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.currently-selected .currently-selected--image--wrapper {
+  align-self: center;
+  background-image: url("../assets/default-thumbnail.svg");
+  background-color: #cae6ef;
+  background-size: 100%;
+  background-clip: content-box;
+  min-width: 500px;
+  min-height: 288px;
+}
+
+.currently-selected table {
+  max-width: 30%;
+  align-self: center;
+  font-size: 0.8em;
+}
+
+.currently-selected table .available-languages li {
+  display: inline;
+  margin: 0;
+}
+
+.currently-selected table .available-languages li code {
+  padding: 1px 4px;
+  background: #EEEE;
+  border-radius: 2px;
+  border: 1px solid #DDD;
+}
+
+.currently-selected .try-now--wrapper {
+  text-align: center;
+}
+
+.currently-selected iframe {
+  width: 100%;
+  height: 600px;
+}

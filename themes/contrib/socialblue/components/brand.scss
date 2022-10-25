@@ -931,6 +931,6 @@ html:not(.js) .navbar-default {
   color: $brand-primary;
 }
 
-.teaser-profile-preview .field--name-uid .field--item a:hover{
-  color: $brand-primary;
+.profile-preview-link:hover:before {
+  border-color: $brand-primary;
 }

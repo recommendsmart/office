@@ -5,6 +5,7 @@ namespace Drupal\commerce_promotion;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\OrderPreprocessorInterface;
 use Drupal\commerce_order\OrderProcessorInterface;
+use Drupal\commerce_price\Calculator;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
@@ -136,6 +137,18 @@ class PromotionOrderProcessor implements OrderPreprocessorInterface, OrderProces
         $promotion = $promotion->getTranslation($content_langcode);
       }
       $promotion->apply($order);
+    }
+    // Cleanup order items added by the BuyXGetY offer in case the promotion
+    // no longer applies.
+    foreach ($order->getItems() as $order_item) {
+      if (!$order_item->getData('owned_by_promotion', FALSE)) {
+        continue;
+      }
+      // Remove order items which had their quantities set to 0.
+      if (Calculator::compare($order_item->getQuantity(), '0') === 0) {
+        $order->removeItem($order_item);
+        $order_item->delete();
+      }
     }
   }
 

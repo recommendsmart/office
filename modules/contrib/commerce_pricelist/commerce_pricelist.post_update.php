@@ -111,8 +111,21 @@ function commerce_pricelist_post_update_4() {
   /** @var \Drupal\commerce\Config\ConfigUpdaterInterface $config_updater */
   $config_updater = \Drupal::service('commerce.config_updater');
   $result = $config_updater->import([
-    'views.view.commerce_pricelist_prices',
+    'views.view.commerce_pricelist_product_prices',
   ]);
 
   return implode('<br>', $result->getFailed());
+}
+
+/**
+ * Import the "commerce_pricelist_product_prices" view if missing.
+ */
+function commerce_pricelist_post_update_5() {
+  /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $view_storage */
+  $view_storage = \Drupal::entityTypeManager()->getStorage('view');
+  /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $view */
+  $view = $view_storage->load('commerce_pricelist_product_prices');
+  if (!$view) {
+    return commerce_pricelist_post_update_4();
+  }
 }

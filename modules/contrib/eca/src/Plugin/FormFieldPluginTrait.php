@@ -177,8 +177,35 @@ trait FormFieldPluginTrait {
     $key = array_pop($name_array);
     foreach ($this->lookupFormElements($form, $key) as &$element) {
       if (empty($name_array) || (isset($element['#parents']) && $name_array === $element['#parents']) || (isset($element['#array_parents']) && $name_array === $element['#array_parents'])) {
+        // Found the element due to defined parents or array_parents.
         return $element;
       }
+
+      if (empty($name_array)) {
+        continue;
+      }
+
+      // For early form builds, parents and array_parents may not be available.
+      // For such a case, have another deep look into the render array.
+      $lookup = NULL;
+      $parents = [];
+      $lookup = static function (array &$elements, array &$name_array) use (&$lookup, &$parents) {
+        if ($parent = &NestedArray::getValue($elements, $name_array)) {
+          $parents[] = &$parent;
+        }
+        else {
+          foreach (Element::children($elements) as $c_key) {
+            $lookup($elements[$c_key], $name_array);
+          }
+        }
+      };
+      $lookup($form, $name_array);
+      foreach ($parents as &$parent) {
+        if (isset($parent[$key]) && ($parent[$key] === $element)) {
+          return $element;
+        }
+      }
+      unset($parent);
     }
 
     return $nothing;

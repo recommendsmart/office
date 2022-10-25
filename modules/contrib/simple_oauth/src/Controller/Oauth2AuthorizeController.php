@@ -87,13 +87,13 @@ class Oauth2AuthorizeController extends ControllerBase {
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function authorize(Request $request) {
-    $client_uuid = $request->get('client_id');
+    $client_id = $request->get('client_id');
     $scopes_query_string = $request->get('scope');
     $server_response = new Response();
 
     try {
       $server_request = $this->httpMessageFactory->createRequest($request);
-      if (empty($client_uuid)) {
+      if (empty($client_id)) {
         throw OAuthServerException::invalidRequest('client_id');
       }
       // Omitting scopes is not allowed.
@@ -102,7 +102,7 @@ class Oauth2AuthorizeController extends ControllerBase {
       }
       $consumer_storage = $this->entityTypeManager()->getStorage('consumer');
       /** @var \Drupal\consumers\Entity\Consumer[] $clients */
-      $clients = $consumer_storage->loadByProperties(['uuid' => $client_uuid]);
+      $clients = $consumer_storage->loadByProperties(['client_id' => $client_id]);
       if (empty($clients)) {
         throw OAuthServerException::invalidClient($server_request);
       }
@@ -167,8 +167,8 @@ class Oauth2AuthorizeController extends ControllerBase {
     $url = Url::fromRoute('user.login', [], [
       'query' => ['destination' => $destination->toString()],
     ]);
-    // Client ID and secret may be passed as Basic Auth. Copy the headers.
-    return RedirectResponse::create($url->toString(), 302, $request->headers->all());
+    // Client ID and secret may be passed as Basic Auth.
+    return RedirectResponse::create($url->toString());
   }
 
 }

@@ -111,6 +111,13 @@ class Store extends ContentEntityBase implements StoreInterface {
   /**
    * {@inheritdoc}
    */
+  public function getEmailFromHeader() {
+    return sprintf('%s <%s>', $this->getName(), $this->getEmail());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function setEmail($mail) {
     $this->set('mail', $mail);
     return $this;

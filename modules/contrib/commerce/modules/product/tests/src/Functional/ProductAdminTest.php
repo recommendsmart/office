@@ -110,6 +110,7 @@ class ProductAdminTest extends ProductBrowserTestBase {
    */
   public function testEditProduct() {
     $product = $this->createEntity('commerce_product', [
+      'title' => $this->randomString(),
       'type' => 'default',
     ]);
 
@@ -344,6 +345,7 @@ class ProductAdminTest extends ProductBrowserTestBase {
    */
   public function testEditVariation() {
     $product = $this->createEntity('commerce_product', [
+      'title' => $this->randomString(),
       'type' => 'default',
     ]);
     $variation = $this->createEntity('commerce_product_variation', [
@@ -381,6 +383,7 @@ class ProductAdminTest extends ProductBrowserTestBase {
   public function testDuplicateVariation() {
     $sku = strtolower($this->randomMachineName());
     $product = $this->createEntity('commerce_product', [
+      'title' => $this->randomString(),
       'type' => 'default',
     ]);
     $variation = $this->createEntity('commerce_product_variation', [

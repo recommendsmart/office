@@ -17,7 +17,7 @@ class EntityCloneViewTest extends BrowserTestBase {
    *
    * @var array
    */
-  public static $modules = ['entity_clone', 'views'];
+  public static $modules = ['entity_clone', 'views', 'views_ui'];
 
   /**
    * Theme to enable by default
@@ -32,6 +32,7 @@ class EntityCloneViewTest extends BrowserTestBase {
    */
   protected $permissions = [
     'clone view entity',
+    'administer views',
   ];
 
   /**

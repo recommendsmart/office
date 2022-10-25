@@ -4,25 +4,22 @@ namespace Drupal\field_suggestion\Service;
 
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\field\Entity\FieldStorageConfig;
 
 /**
- * Class FieldSuggestionHelper.
- *
- * @package Drupal\field_suggestion\Service
+ * Defines the helper service.
  */
 class FieldSuggestionHelper implements FieldSuggestionHelperInterface {
 
   use StringTranslationTrait;
 
   /**
-   * The module handler.
+   * The field values filter.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var \Drupal\field_suggestion\Service\FieldSuggestionValueFilterInterface
    */
-  protected $moduleHandler;
+  protected $filter;
 
   /**
    * The entity type manager.
@@ -42,11 +39,11 @@ class FieldSuggestionHelper implements FieldSuggestionHelperInterface {
    * {@inheritdoc}
    */
   public function __construct(
-    ModuleHandlerInterface $module_handler,
+    FieldSuggestionValueFilterInterface $filter,
     EntityTypeManagerInterface $entity_type_manager,
     EntityDisplayRepositoryInterface $entity_display_repository
   ) {
-    $this->moduleHandler = $module_handler;
+    $this->filter = $filter;
     $this->entityTypeManager = $entity_type_manager;
     $this->entityDisplayRepository = $entity_display_repository;
   }
@@ -54,28 +51,22 @@ class FieldSuggestionHelper implements FieldSuggestionHelperInterface {
   /**
    * {@inheritdoc}
    */
-  public function ignored($entity_type_id, $field_name) {
-    $items = $this->moduleHandler->invokeAll(self::HOOK, [
-      $entity_type_id,
-      $field_name,
-    ]);
-
+  public function ignored($entity_type, $field_name) {
+    $items = $this->filter->items($entity_type, $field_name);
     $storage = $this->entityTypeManager->getStorage('field_suggestion');
 
     $ids = $storage->getQuery()
+      ->accessCheck()
       ->condition('ignore', TRUE)
-      ->condition('entity_type', $entity_type_id)
+      ->condition('entity_type', $entity_type)
       ->condition('field_name', $field_name)
       ->execute();
 
     foreach ($ids as $id) {
-      /** @var \Drupal\field_suggestion\FieldSuggestionInterface $entity */
-      $entity = $storage->load($id);
-
-      $items[] = $entity->value();
+      if (($entity = $storage->load($id)) !== NULL) {
+        $items[] = $entity->label();
+      }
     }
-
-    $this->moduleHandler->alter(self::HOOK, $items, $entity_type_id, $field_name);
 
     return $items;
   }
@@ -121,6 +112,27 @@ class FieldSuggestionHelper implements FieldSuggestionHelperInterface {
     }
 
     return $name;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function encode($data) {
+    return str_replace('_', '-', $data);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function decode($raw) {
+    return str_replace('-', '_', $raw);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getFileExtension() {
+    return '';
   }
 
 }

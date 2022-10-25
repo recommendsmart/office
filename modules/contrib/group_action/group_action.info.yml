@@ -6,7 +6,7 @@ package: 'Group'
 dependencies:
   - group:group
 
-# Information added by Drupal.org packaging script on 2022-08-27
-version: '1.0.0'
+# Information added by Drupal.org packaging script on 2022-09-16
+version: '1.0.1'
 project: 'group_action'
-datestamp: 1661609375
+datestamp: 1663323674

@@ -59,6 +59,7 @@ class EntityFieldIsAccessible extends ConditionBase {
       '#weight' => -20,
     ];
     $form['operation'] = [
+      '#type' => 'select',
       '#title' => $this->t('Operation'),
       '#options' => [
         'view' => $this->t('View'),

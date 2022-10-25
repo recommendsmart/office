@@ -7,7 +7,6 @@
 
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\InvokeCommand;
-use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -48,6 +47,8 @@ function field_suggestion_field_widget_single_element_form_alter(
 
   $config = \Drupal::config('field_suggestion.settings');
   $fields = (array) $config->get('fields');
+
+  /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
   $entity = $items->getEntity();
 
   if (!isset($fields[$entity_type_id = $entity->getEntityTypeId()])) {
@@ -72,7 +73,10 @@ function field_suggestion_field_widget_single_element_form_alter(
       is_subclass_of($entity_type->getClass(), EntityOwnerInterface::class) &&
       $entity_type->hasKey('owner')
     ) {
-      $query->condition($entity_type->getKey('owner'), \Drupal::currentUser()->id());
+      $query->condition(
+        $entity_type->getKey('owner'),
+        \Drupal::currentUser()->id()
+      );
     }
   }
 
@@ -103,21 +107,15 @@ function field_suggestion_field_widget_single_element_form_alter(
       $allow = TRUE;
 
       if ($suggestion_entity->hasExcluded()) {
-        $hook = 'field_suggestion_exclude';
-        $exclude = $suggestion_entity->getExcluded();
+        /** @var \Drupal\field_suggestion\Service\FieldSuggestionPinFilterInterface $filter */
+        $filter = \Drupal::service('field_suggestion.filter.pin');
 
-        foreach (\Drupal::moduleHandler()->getImplementations($hook) as $module) {
-          $function = $module . '_' . $hook;
-
-          if ($function($exclude, $entity)) {
-            $allow = FALSE;
-
-            break;
-          }
+        if ($filter->exclude($suggestion_entity->getExcluded(), $entity)) {
+          $allow = FALSE;
         }
       }
 
-      $value = $suggestion_entity->value();
+      $value = $suggestion_entity->label(TRUE);
 
       if ($allow && $suggestion_entity->isOnce()) {
         $count = (int) \Drupal::entityQuery($entity_type_id)
@@ -128,6 +126,7 @@ function field_suggestion_field_widget_single_element_form_alter(
           ->condition($field_name, $value)
           ->range(0, 1)
           ->count()
+          ->accessCheck()
           ->execute();
 
         if ($count === 1) {
@@ -166,14 +165,30 @@ function field_suggestion_field_widget_single_element_form_alter(
     return;
   }
 
-  $element['suggestion'] = [
-    '#type' => 'radios',
-    '#title' => t('Suggestions'),
-    '#ajax' => [
-      'wrapper' => 'edit-' . $field_name . '-wrapper',
-      'callback' => '_field_suggestion_ajax_callback',
-    ],
-  ];
+  if ($config->get('collapsible')) {
+    $element['suggestion'] = [
+      '#type' => 'dropbutton',
+      '#attached' => ['library' => ['field_suggestion/ajax']],
+      '#links' => [['title' => t('Suggestions')]],
+    ];
+
+    $url = Url::fromRoute('field_suggestion.select')
+      ->setRouteParameters([
+        'entity_type' => $helper->encode($entity_type_id),
+        'field_name' => $field_name,
+      ])
+      ->setOption('attributes', ['class' => ['use-ajax']]);
+  }
+  else {
+    $element['suggestion'] = [
+      '#type' => 'radios',
+      '#title' => t('Suggestions'),
+      '#ajax' => [
+        'wrapper' => 'edit-' . $field_name . '-wrapper',
+        'callback' => '_field_suggestion_ajax_callback',
+      ],
+    ];
+  }
 
   $storage = \Drupal::entityTypeManager()->getStorage($entity_type_id);
   $view_builder = \Drupal::entityTypeManager()->getViewBuilder($entity_type_id);
@@ -191,16 +206,29 @@ function field_suggestion_field_widget_single_element_form_alter(
 
   foreach ($values as $delta => $value) {
     $ids = \Drupal::entityQuery($entity_type_id)
+      ->accessCheck()
       ->condition($field_name, $value)
       ->range(0, 1)
       ->execute();
+
+    if (empty($ids)) {
+      continue;
+    }
 
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $storage->load(reset($ids));
 
     $sub_element = $view_builder->viewFieldItem($entity->$field_name->first());
 
-    $element['suggestion']['#options'][] = $renderer->render($sub_element);
+    if (isset($url)) {
+      $element['suggestion']['#links'][] = [
+        'title' => $sub_element,
+        'url' => (clone $url)->setRouteParameter('delta', $delta),
+      ];
+    }
+    else {
+      $element['suggestion']['#options'][] = $renderer->render($sub_element);
+    }
 
     if (isset($item_storage)) {
       $value = $item_storage->load($value)->label() . ' (' . $value . ')';
@@ -208,27 +236,6 @@ function field_suggestion_field_widget_single_element_form_alter(
 
     $element['suggestion']['#attributes']['data-suggestion-' . $delta] = $value;
   }
-}
-
-/**
- * Implements hook_field_suggestion_exclude().
- */
-function field_suggestion_field_suggestion_exclude(
-  array $excluded_entities,
-  ContentEntityInterface $entity
-) {
-  if (!$entity->isNew()) {
-    foreach ($excluded_entities as $excluded_entity) {
-      if (
-        $excluded_entity['target_type'] === $entity->getEntityTypeId() &&
-        $excluded_entity['target_id'] === $entity->id()
-      ) {
-        return TRUE;
-      }
-    }
-  }
-
-  return FALSE;
 }
 
 /**
@@ -249,11 +256,11 @@ function field_suggestion_entity_base_field_info(EntityTypeInterface $entity_typ
 
   $settings = ['exclude_entity_types' => FALSE];
 
-  foreach (array_keys($items) as $entity_type_id) {
-    $settings['entity_type_ids'][$entity_type_id] = $entity_type_id;
+  foreach (array_keys($items) as $entity_type) {
+    $settings['entity_type_ids'][$entity_type] = $entity_type;
 
-    $settings[$entity_type_id] = [
-      'handler' => 'default:' . $entity_type_id,
+    $settings[$entity_type] = [
+      'handler' => 'default:' . $entity_type,
       'handler_settings' => [
         'target_bundles' => NULL,
       ],
@@ -278,7 +285,7 @@ function field_suggestion_entity_operation(EntityInterface $entity) {
   $operations = [];
   $fields = (array) \Drupal::config('field_suggestion.settings')->get('fields');
 
-  if (empty($fields[$entity_type_id = $entity->getEntityTypeId()])) {
+  if (empty($fields[$entity_type = $entity->getEntityTypeId()])) {
     return $operations;
   }
 
@@ -286,9 +293,9 @@ function field_suggestion_entity_operation(EntityInterface $entity) {
   $manager = \Drupal::service('entity_field.manager');
 
   /** @var \Drupal\Core\Field\BaseFieldDefinition[] $definitions */
-  $definitions = $manager->getBaseFieldDefinitions($entity_type_id);
+  $definitions = $manager->getBaseFieldDefinitions($entity_type);
 
-  $fields = array_flip($fields[$entity_type_id]);
+  $fields = array_flip($fields[$entity_type]);
 
   foreach ($definitions as $field => $definition) {
     if (isset($fields[$field])) {
@@ -313,13 +320,13 @@ function field_suggestion_entity_operation(EntityInterface $entity) {
   $weight = 150;
   $has_suggestions = [];
 
-  $route_parameters = [
-    'entity_type_id' => str_replace('_', '-', $entity_type_id),
-    'entity_id' => $entity->id(),
-  ];
-
   /** @var \Drupal\field_suggestion\Service\FieldSuggestionHelperInterface $helper */
   $helper = \Drupal::service('field_suggestion.helper');
+
+  $route_parameters = [
+    'entity_type' => $helper->encode($entity_type),
+    'entity_id' => $entity->id(),
+  ];
 
   foreach ($fields as $field_name => $field_type) {
     $route_parameters['field_name'] = $field_name;
@@ -328,7 +335,7 @@ function field_suggestion_entity_operation(EntityInterface $entity) {
 
     foreach ($actions as $action_type => $action_labels) {
       $url = Url::fromRoute(
-        'field_suggestion.action',
+        'field_suggestion.operation',
         ['type' => $action_type] + $route_parameters,
         $options
       );
@@ -346,11 +353,12 @@ function field_suggestion_entity_operation(EntityInterface $entity) {
 
       $suggestions_count = \Drupal::entityQuery('field_suggestion')
         ->condition('ignore', $action_type === 'ignore')
-        ->condition('entity_type', $entity_type_id)
+        ->condition('entity_type', $entity_type)
         ->condition('field_name', $field_name)
         ->condition($helper->field($field_type), $entity->$field_name->$property)
         ->range(0, 1)
         ->count()
+        ->accessCheck()
         ->execute();
 
       $has_suggestions[$action_type] = $suggestions_count > 0;

@@ -315,7 +315,7 @@ function permissions_by_term_user_form_submit(array &$form, FormStateInterface $
  */
 function permissions_by_term_form_alter(&$form, FormStateInterface $formState, $form_id) {
   $form['#validate'][] = 'permissions_by_term_validate';
-  if (isNodeEditForm()) {
+  if (_permissions_by_term_is_node_edit_form()) {
     $form['permissions_by_term_info'] = [
       '#type' => 'details',
       '#group' => 'advanced',
@@ -356,13 +356,10 @@ function permissions_by_term_form_alter(&$form, FormStateInterface $formState, $
   }
 }
 
-function isNodeEditForm() {
-  $currentPath = \Drupal::service('path.current')->getPath();
-  if (is_numeric(strpos($currentPath, '/node/'))
-    && (is_numeric(strpos($currentPath, '/edit')) || is_numeric(strpos($currentPath, '/add')))) {
-    return TRUE;
-  }
-  return FALSE;
+function _permissions_by_term_is_node_edit_form(): bool {
+  $route_name = \Drupal::routeMatch()->getRouteName();
+
+  return (in_array($route_name, ['node.add', 'entity.node.edit_form']));
 }
 
 /**

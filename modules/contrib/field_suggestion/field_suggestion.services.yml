@@ -2,6 +2,23 @@ services:
   field_suggestion.helper:
     class: Drupal\field_suggestion\Service\FieldSuggestionHelper
     arguments:
-      - '@module_handler'
+      - '@field_suggestion.filter.value'
       - '@entity_type.manager'
       - '@entity_display.repository'
+
+  field_suggestion.filter.pin:
+    class: Drupal\field_suggestion\Service\FieldSuggestionPinFilter
+    arguments: ['@class_resolver']
+    tags:
+      - { name: service_id_collector, tag: field_suggestion_pin_filter }
+
+  field_suggestion.filter.pin.default:
+    class: Drupal\field_suggestion\Service\FieldSuggestionDefaultPinFilter
+    tags:
+      - { name: field_suggestion_pin_filter }
+
+  field_suggestion.filter.value:
+    class: Drupal\field_suggestion\Service\FieldSuggestionValueFilter
+    arguments: ['@class_resolver']
+    tags:
+      - { name: service_id_collector, tag: field_suggestion_value_filter }

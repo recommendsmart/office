@@ -1,6 +1,6 @@
 field_suggestion.settings:
   title: 'Field suggestion'
-  description: 'Set suggestions list size and select supported fields.'
+  description: 'Set suggestions list settings and select supported fields.'
   parent: system.admin_config_content
   route_name: field_suggestion.settings
 

@@ -1,13 +1,13 @@
 name: 'ECA Core'
 type: module
 description: 'Core module for ECA framework.'
-core_version_requirement: ^9 || ^10
+core_version_requirement: ^9.3 || ^10
 package: ECA
 dependencies:
   - drupal:system
   - drupal:user
 
-# Information added by Drupal.org packaging script on 2022-08-26
-version: '1.0.2'
+# Information added by Drupal.org packaging script on 2022-09-30
+version: '1.0.4'
 project: 'eca'
-datestamp: 1661523501
+datestamp: 1664529847

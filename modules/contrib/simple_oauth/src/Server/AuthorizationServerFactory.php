@@ -154,14 +154,15 @@ class AuthorizationServerFactory implements AuthorizationServerFactoryInterface 
    */
   protected function getPrivateKey(): CryptKey {
     $private_key_path = $this->config->get('private_key');
-    $absolute_file_path = $this->fileSystem->realpath($private_key_path);
+    $file_path = $this->fileSystem->realpath($private_key_path) ?: $private_key_path;
+    $key = file_get_contents($file_path);
 
-    if (!$absolute_file_path || !file_exists($private_key_path)) {
+    if (!$key) {
       throw OAuthServerException::serverError('You need to set the OAuth2 private key.');
     }
 
     return new CryptKey(
-      $absolute_file_path,
+      $key,
       NULL,
       Settings::get('simple_oauth.key_permissions_check', TRUE)
     );

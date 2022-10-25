@@ -12,7 +12,9 @@ use Drupal\eca\Plugin\ECA\EcaPluginBase;
 use Drupal\eca\Plugin\ECA\Modeller\ModellerBase;
 use Drupal\eca\Plugin\ECA\Modeller\ModellerInterface;
 use Drupal\eca\Service\Modellers;
+use Drupal\eca_ui\Service\TokenBrowserService;
 use Mtownsend\XmlToArray\XmlToArray;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -57,6 +59,22 @@ abstract class ModellerBpmnBase extends ModellerBase {
    * @var \DOMXPath
    */
   protected \DOMXPath $xpath;
+
+  /**
+   * ECA token browser service.
+   *
+   * @var \Drupal\eca_ui\Service\TokenBrowserService
+   */
+  protected TokenBrowserService $tokenBrowserService;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): EcaPluginBase {
+    $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
+    $instance->tokenBrowserService = $container->get('eca_ui.service.token_browser');
+    return $instance;
+  }
 
   /**
    * Prepares the data for further updates processes.

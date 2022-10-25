@@ -781,8 +781,8 @@ html:not(.js) .navbar-default .dropdown:hover > button .navbar-nav__icon {
   color: #29abe2;
 }
 
-.teaser-profile-preview .field--name-uid .field--item a:hover {
-  color: #29abe2;
+.profile-preview-link:hover:before {
+  border-color: #29abe2;
 }
 
 @media (min-width: 900px) {

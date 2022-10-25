@@ -12,7 +12,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
-use Drupal\consumers\Entity\Consumer;
+use Drupal\consumers\Entity\ConsumerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Component\Utility\UrlHelper;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -45,7 +45,7 @@ function simple_oauth_entity_update(EntityInterface $entity) {
   if ($entity instanceof AccountInterface) {
     $collector->deleteMultipleTokens($collector->collectForAccount($entity));
   }
-  if ($entity instanceof Consumer) {
+  if ($entity instanceof ConsumerInterface) {
     $collector->deleteMultipleTokens($collector->collectForClient($entity));
   }
 }
@@ -329,7 +329,7 @@ function simple_oauth_form_consumer_form_alter(array &$form, FormStateInterface 
  * @param \Drupal\Core\Form\FormStateInterface $form_state
  *   The state.
  */
-function simple_oauth_form_consumer_form_submit($entity_type_id, Consumer $entity, array &$form, FormStateInterface $form_state) {
+function simple_oauth_form_consumer_form_submit($entity_type_id, ConsumerInterface $entity, array &$form, FormStateInterface $form_state) {
   if ($entity_type_id !== 'consumer') {
     return;
   }

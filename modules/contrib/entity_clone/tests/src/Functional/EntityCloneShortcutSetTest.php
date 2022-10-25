@@ -32,6 +32,7 @@ class EntityCloneShortcutSetTest extends BrowserTestBase {
    */
   protected $permissions = [
     'clone shortcut_set entity',
+    'administer shortcuts',
   ];
 
   /**

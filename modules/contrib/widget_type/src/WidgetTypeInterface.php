@@ -4,6 +4,8 @@ namespace Drupal\widget_type;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
+use Drupal\file\FileInterface;
+use Drupal\widget_type\Entity\WidgetType;
 
 /**
  * Provides an interface defining a widget type entity type.
@@ -284,5 +286,47 @@ interface WidgetTypeInterface extends ContentEntityInterface, EntityChangedInter
    *   The widget type form schema.
    */
   public function getFormSchema(): array;
+
+  /**
+   * Gets the preview link.
+   *
+   * @return string
+   *   The link.
+   */
+  public function getPreviewLink(): string;
+
+  /**
+   * Sets the preview image.
+   *
+   * @param \Drupal\file\FileInterface $file
+   *   The file.
+   * @param string $alt
+   *   The string.
+   * @param string $title
+   *   The title.
+   *
+   * @return $this
+   *   The widget type.
+   */
+  public function setPreviewImage(FileInterface $file, string $alt, string $title): self;
+
+  /**
+   * Sets the preview link.
+   *
+   * @param string $link
+   *   The preview link
+   *
+   * @return $this
+   *   The widget type.
+   */
+  public function setPreviewLink(string $link): self;
+
+  /**
+   * Gets the preview image.
+   *
+   * @return array
+   *   The preview image properties.
+   */
+  public function getPreviewImage(): array;
 
 }

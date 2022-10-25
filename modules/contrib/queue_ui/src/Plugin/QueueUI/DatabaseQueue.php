@@ -4,6 +4,7 @@ namespace Drupal\queue_ui\Plugin\QueueUI;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Queue\DatabaseQueue as CoreDatabaseQueue;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\queue_ui\QueueUIBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -20,12 +21,17 @@ class DatabaseQueue extends QueueUIBase implements ContainerFactoryPluginInterfa
   use StringTranslationTrait;
 
   /**
+   * The database table name.
+   */
+  public const TABLE_NAME = CoreDatabaseQueue::TABLE_NAME;
+
+  /**
    * Database.
    *
    * @var \Drupal\Core\Database\Database
    * It acts to encapsulate all control
    */
-  private $database;
+  protected $database;
 
   /**
    * {@inheritdoc}
@@ -68,7 +74,7 @@ class DatabaseQueue extends QueueUIBase implements ContainerFactoryPluginInterfa
   }
 
   /**
-   * SystemQueue implements all default QueueUI methods.
+   * DatabaseQueue implements all default QueueUI methods.
    *
    * @return array
    *   An array of available QueueUI methods. Array key is system name of the
@@ -92,7 +98,7 @@ class DatabaseQueue extends QueueUIBase implements ContainerFactoryPluginInterfa
    *   Return call the execute method.
    */
   public function getItems($queueName) {
-    $query = $this->database->select('queue', 'q');
+    $query = $this->database->select(static::TABLE_NAME, 'q');
     $query->addField('q', 'item_id');
     $query->addField('q', 'expire');
     $query->addField('q', 'created');
@@ -113,7 +119,7 @@ class DatabaseQueue extends QueueUIBase implements ContainerFactoryPluginInterfa
    *   return the value null
    */
   public function releaseItems($queueName) {
-    return $this->database->update('queue')
+    return $this->database->update(static::TABLE_NAME)
       ->fields([
         'expire' => 0,
       ])
@@ -132,7 +138,7 @@ class DatabaseQueue extends QueueUIBase implements ContainerFactoryPluginInterfa
    */
   public function loadItem($item_id) {
     // Load the specified queue item from the queue table.
-    $query = $this->database->select('queue', 'q')
+    $query = $this->database->select(static::TABLE_NAME, 'q')
       ->fields('q', ['item_id', 'name', 'data', 'expire', 'created'])
       ->condition('q.item_id', $item_id)
     // Item id should be unique.
@@ -148,7 +154,7 @@ class DatabaseQueue extends QueueUIBase implements ContainerFactoryPluginInterfa
    *   The item id to be released.
    */
   public function releaseItem($item_id) {
-    $this->database->update('queue')
+    $this->database->update(static::TABLE_NAME)
       ->condition('item_id', $item_id)
       ->fields(['expire' => 0])
       ->execute();
@@ -161,7 +167,7 @@ class DatabaseQueue extends QueueUIBase implements ContainerFactoryPluginInterfa
    *   The item id to be deleted.
    */
   public function deleteItem($item_id) {
-    $this->database->delete('queue')
+    $this->database->delete(static::TABLE_NAME)
       ->condition('item_id', $item_id)
       ->execute();
   }

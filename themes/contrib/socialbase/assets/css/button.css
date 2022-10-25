@@ -29,6 +29,10 @@
   outline: 0;
 }
 
+.btn:not(.btn-link).form-group {
+  margin-bottom: 0;
+}
+
 .btn + .btn {
   margin-left: 5px;
 }

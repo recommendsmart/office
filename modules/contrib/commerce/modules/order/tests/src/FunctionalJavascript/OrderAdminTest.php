@@ -89,7 +89,7 @@ class OrderAdminTest extends OrderWebDriverTestBase {
       'customer_type' => 'existing',
       'uid' => $user,
     ];
-    $this->submitForm($edit, t('Create'));
+    $this->submitForm($edit, $this->t('Create'));
 
     $this->getSession()->getPage()->pressButton('add_billing_information');
     $this->assertSession()->assertWaitOnAjaxRequest();
@@ -104,6 +104,8 @@ class OrderAdminTest extends OrderWebDriverTestBase {
     // Test creating order items.
     $page = $this->getSession()->getPage();
 
+    $page->pressButton('Add new order item');
+    $this->assertSession()->assertWaitOnAjaxRequest();
     // First item with overriding the price.
     $this->getSession()->getPage()->checkField('Override the unit price');
     $purchased_entity_field = $this->assertSession()->waitForElement('css', '[name="order_items[form][0][purchased_entity][0][target_id]"].ui-autocomplete-input');
@@ -148,7 +150,7 @@ class OrderAdminTest extends OrderWebDriverTestBase {
 
     // There is no adjustment - the order should save successfully.
     $this->submitForm([], 'Save');
-    $this->assertSession()->pageTextContains('The order has been successfully saved.');
+    $this->assertSession()->pageTextContains('Draft 1 saved.');
     $order = Order::load(1);
     $this->assertNull($order->getBillingProfile());
 
@@ -165,7 +167,7 @@ class OrderAdminTest extends OrderWebDriverTestBase {
     $this->assertSession()->pageTextContains('The adjustment label field is required.');
     $edit['adjustments[0][definition][label]'] = 'Test fee';
     $this->submitForm($edit, 'Save');
-    $this->assertSession()->pageTextContains('The order has been successfully saved.');
+    $this->assertSession()->pageTextContains('Draft 1 saved.');
 
     $this->drupalGet('/admin/commerce/orders');
     $order_number = $this->getSession()->getPage()->findAll('css', 'tr td.views-field-order-number');
@@ -212,6 +214,7 @@ class OrderAdminTest extends OrderWebDriverTestBase {
     $order = Order::create([
       'type' => 'default',
       'store_id' => $this->store,
+      'order_number' => 1,
       'uid' => $this->adminUser,
       'billing_profile' => $profile,
       'order_items' => [$order_item],
@@ -300,6 +303,7 @@ class OrderAdminTest extends OrderWebDriverTestBase {
       'type' => 'default',
       'state' => 'completed',
       'uid' => $customer->id(),
+      'order_number' => 1,
       'store_id' => $this->store,
       'billing_profile' => $profile,
       'order_items' => [$order_item],
@@ -309,7 +313,7 @@ class OrderAdminTest extends OrderWebDriverTestBase {
 
     $this->drupalGet($order->toUrl('edit-form'));
     $this->submitForm([], 'Save');
-    $this->assertSession()->pageTextContains('The order has been successfully saved.');
+    $this->assertSession()->pageTextContains('Order 1 saved.');
   }
 
   /**
@@ -324,11 +328,11 @@ class OrderAdminTest extends OrderWebDriverTestBase {
       'store_id' => $this->store,
     ]);
     $this->drupalGet($order->toUrl('delete-form'));
-    $this->assertSession()->pageTextContains(t('Are you sure you want to delete the order @label?', [
+    $this->assertSession()->pageTextContains(t('Are you sure you want to delete @label?', [
       '@label' => $order->label(),
     ]));
     $this->assertSession()->pageTextContains('This action cannot be undone.');
-    $this->submitForm([], t('Delete'));
+    $this->submitForm([], $this->t('Delete'));
 
     $this->container->get('entity_type.manager')->getStorage('commerce_order')->resetCache([$order->id()]);
     $order_exists = (bool) Order::load($order->id());
@@ -348,10 +352,10 @@ class OrderAdminTest extends OrderWebDriverTestBase {
       'locked' => TRUE,
     ]);
     $this->drupalGet($order->toUrl('unlock-form'));
-    $this->assertSession()->pageTextContains(t('Are you sure you want to unlock the order @label?', [
+    $this->assertSession()->pageTextContains(t('Are you sure you want to unlock @label?', [
       '@label' => $order->label(),
     ]));
-    $this->submitForm([], t('Unlock'));
+    $this->submitForm([], $this->t('Unlock'));
 
     $this->container->get('entity_type.manager')->getStorage('commerce_order')->resetCache([$order->id()]);
     $order = Order::load($order->id());
@@ -389,10 +393,10 @@ class OrderAdminTest extends OrderWebDriverTestBase {
     $order->save();
 
     $this->drupalGet($order->toUrl('resend-receipt-form'));
-    $this->assertSession()->pageTextContains(t('Are you sure you want to resend the receipt for order @label?', [
+    $this->assertSession()->pageTextContains(t('Are you sure you want to resend the receipt for @label?', [
       '@label' => $order->label(),
     ]));
-    $this->submitForm([], t('Resend receipt'));
+    $this->submitForm([], $this->t('Resend receipt'));
 
     $emails = $this->getMails();
     $this->assertEquals(2, count($emails));
@@ -480,7 +484,7 @@ class OrderAdminTest extends OrderWebDriverTestBase {
       'customer_type' => 'new',
       'mail' => $email,
     ];
-    $this->submitForm($edit, t('Create'));
+    $this->submitForm($edit, $this->t('Create'));
     $this->assertSession()->pageTextContains('The email address guest@example.com is already taken.');
   }
 

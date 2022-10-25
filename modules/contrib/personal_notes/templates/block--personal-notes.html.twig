@@ -10,8 +10,8 @@
 #}
 
 <dl id="personalnotes-notes-list">
-  {% for title, note in notes %}
-    <dd class="personalnotes-note-title">{{ title|slice(0,-5) }}</dd>  {# Last five chars contain serial# #}
+  {% for note in notes %}
+    <dd class="personalnotes-note-title">{{ note.title }}</dd>
     <dt class="personalnotes-note-created">{{ note.created }}</dt>
     <dt class="personalnotes-note-note">{{ note.note }}</dt>
     <hr class="sep">

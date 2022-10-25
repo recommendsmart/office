@@ -27,13 +27,13 @@ interface QueueUIBatchInterface {
    *
    * @param string $queue_name
    *   The name of the queue being inspected.
-   * @param array $context
-   *   An associative array.
+   * @param array|\DrushBatchContext $context
+   *   An associative array or DrushBatchContext.
    *
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function step(string $queue_name, array &$context);
+  public function step(string $queue_name, &$context);
 
   /**
    * Callback when finishing a batch job.

@@ -48,3 +48,17 @@ function widget_type_library_info_build() {
     $libs
   );
 }
+
+/**
+ * Implements hook_theme().
+ */
+function widget_type_theme($existing, $type, $theme, $path) {
+  return [
+    'widget_type_selector' => [
+      'render element' => 'element',
+    ],
+    'form_element__radio__widget_type' => [
+      'render element' => 'element',
+    ],
+  ];
+}

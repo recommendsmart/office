@@ -64,6 +64,7 @@ class ConsumerEntityTest extends KernelTestBase {
     ]);
     $scope->save();
     $values = [
+      'client_id' => 'test_client',
       'label' => 'test',
       'grant_types' => ['authorization_code', 'client_credentials'],
       'scopes' => [$scope->id()],
@@ -81,6 +82,7 @@ class ConsumerEntityTest extends KernelTestBase {
     $consumer = Consumer::create($values);
     $consumer->save();
 
+    $this->assertEquals($values['client_id'], $consumer->getClientId());
     $this->assertEquals($values['label'], $consumer->label());
     foreach ($values['grant_types'] as $delta => $grant_type) {
       $this->assertEquals($grant_type, $consumer->get('grant_types')->get($delta)->value);
@@ -105,6 +107,7 @@ class ConsumerEntityTest extends KernelTestBase {
    */
   public function testDefaultValues(): void {
     $consumer = Consumer::create([
+      'client_id' => 'test_client',
       'label' => 'test client',
       'grant_types' => ['authorization_code'],
       'redirect' => [

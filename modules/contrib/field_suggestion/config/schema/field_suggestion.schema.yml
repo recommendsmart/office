@@ -4,6 +4,9 @@ field_suggestion.settings:
   type: config_object
   label: 'Field Suggestion settings'
   mapping:
+    collapsible:
+      type: boolean
+      label: 'Display suggestions list in drop-down view.'
     limit:
       type: integer
       label: 'The number of displayed values in a list of suggestions.'
@@ -15,7 +18,7 @@ field_suggestion.settings:
       label: 'Fields split by entity types'
       sequence:
         type: sequence
-        label: 'Entity type IDs'
+        label: 'Entity type identifiers'
         sequence:
           type: string
           label: 'Fields per entity type'

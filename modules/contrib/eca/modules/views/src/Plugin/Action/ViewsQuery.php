@@ -18,7 +18,9 @@ use Drupal\views\ViewExecutable;
  *
  * @Action(
  *   id = "eca_views_query",
- *   label = @Translation("Views: Execute query")
+ *   label = @Translation("Views: Execute query"),
+ *   description = @Translation("Use a View to execute a query and store the results in a token that contains an indexed list of the results.
+ *   Despite the type of view that you use, always get the complete entities obtained by the view. You can access the entity properties using the token style."),
  * )
  */
 class ViewsQuery extends ConfigurableActionBase {
@@ -101,12 +103,14 @@ class ViewsQuery extends ConfigurableActionBase {
       '#type' => 'textfield',
       '#title' => $this->t('Name of token'),
       '#default_value' => $this->configuration['token_name'],
+      '#description' => $this->t('Name of the token available after view execution. Contains an indexed list of elements that the view returns.'),
       '#weight' => -60,
     ];
     $form['view_id'] = [
       '#type' => 'select',
       '#title' => $this->t('View'),
       '#default_value' => $this->configuration['view_id'],
+      '#description' => $this->t('Select the view from the list. The view  will always return a list of complete entities.'),
       '#weight' => -50,
       '#options' => $views,
       '#required' => TRUE,
@@ -115,12 +119,14 @@ class ViewsQuery extends ConfigurableActionBase {
       '#type' => 'textfield',
       '#title' => $this->t('Display'),
       '#default_value' => $this->configuration['display_id'],
+      '#description' => $this->t('Write the view <code>display id</code> to execute. Set as default to use the default view configuration.'),
       '#weight' => -40,
     ];
     $form['arguments'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Arguments'),
       '#default_value' => $this->configuration['arguments'],
+      '#description' => $this->t('Provide the Contextual filters of the view in order and one by line.'),
       '#weight' => -30,
     ];
     return $form;

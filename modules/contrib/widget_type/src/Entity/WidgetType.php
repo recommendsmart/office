@@ -10,6 +10,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\TypedData\Exception\MissingDataException;
+use Drupal\file\FileInterface;
 use Drupal\widget_type\WidgetRegistrySourceInterface;
 use Drupal\widget_type\WidgetTypeInterface;
 
@@ -96,6 +97,45 @@ final class WidgetType extends ContentEntityBase implements WidgetTypeInterface 
   /**
    * {@inheritdoc}
    */
+  public function getPreviewLink(): string {
+    return $this->get('preview_link')->value ?? '';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPreviewLink(string $link): self {
+    $this->set('preview_link', $link);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPreviewImage(): array {
+    $value = $this->get('preview_image');
+    return $value ? [
+      'file' => $value->entity,
+      'alt' => $value->alt,
+      'title' => $value->title,
+    ] : [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPreviewImage(FileInterface $file, string $alt, string $title): self {
+    $this->set('preview_image', [
+      'target_id' => $file->id(),
+      'alt' => $alt,
+      'title' => $title,
+    ]);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isEnabled() {
     return (bool) $this->get('status')->value;
   }
@@ -127,7 +167,7 @@ final class WidgetType extends ContentEntityBase implements WidgetTypeInterface 
    * {@inheritdoc}
    */
   public function getDescription(): string {
-    return $this->get('description')->value;
+    return $this->get('description')->value ?? '';
   }
 
   /**
@@ -471,6 +511,26 @@ final class WidgetType extends ContentEntityBase implements WidgetTypeInterface 
         'label' => 'above',
         'type' => 'entity_reference_label',
         'weight' => 15,
+      ])
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['preview_link'] = BaseFieldDefinition::create('uri')
+      ->setLabel(t('Preview Link'))
+      ->setRevisionable(TRUE)
+      ->setTranslatable(FALSE)
+      ->setDescription(t('The link of the preview.'))
+      ->setDisplayOptions('view', ['region' => 'hidden'])
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['preview_image'] = BaseFieldDefinition::create('image')
+      ->setLabel(t('Preview Image'))
+      ->setDescription(t('The thumbnail of the widget type.'))
+      ->setRevisionable(TRUE)
+      ->setTranslatable(FALSE)
+      ->setDisplayOptions('view', [
+        'type' => 'image',
+        'weight' => 5,
+        'label' => 'hidden',
       ])
       ->setDisplayConfigurable('view', TRUE);
 

@@ -1,15 +1,10 @@
 <?php
-/**
- * @file
- * Contains \Drupal\personal_notes\Form\PersonalNotesDeleteForm.
- */
 
 namespace Drupal\personal_notes\Form;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -23,22 +18,20 @@ class PersonalNotesDeleteForm extends FormBase {
    *
    * @var \Drupal\Core\Session\AccountProxyInterface
    */
-  private $currentUser;
+  private AccountProxyInterface $currentUser;
 
   /**
    * The database connection.
    *
    * @var \Drupal\Core\Database\Connection
    */
-  private $database;
+  private Connection $database;
 
   /**
    * The constructor object of add content.
    *
    * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
    *   The current user.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time info.
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
    */
@@ -60,14 +53,14 @@ class PersonalNotesDeleteForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'personal_notes_dlet_content';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     if ($this->currentUser->isAuthenticated()) {
       $this->messenger()
         ->addWarning($this->t('Select the notes to be deleted and submit - this cannot be reversed.'));
@@ -96,7 +89,8 @@ class PersonalNotesDeleteForm extends FormBase {
     }
     else {
       $this->messenger()
-        ->addMessage($this->t('Please log on in order to delete your notes.'), MessengerInterface::TYPE_STATUS);
+        ->addStatus($this->t('Please log on in order to delete your notes.'));
+      return [];
     }
   }
 

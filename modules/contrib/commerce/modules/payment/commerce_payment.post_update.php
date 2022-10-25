@@ -5,6 +5,8 @@
  * Post update functions for the commerce_payment module.
  */
 
+use Drupal\views\Views;
+
 /**
  * Re-save payment methods to populate the payment_gateway_mode field.
  */
@@ -178,4 +180,17 @@ function commerce_payment_post_update_4() {
     'views.view.commerce_order_payments',
   ]);
   return implode('<br>', $result->getFailed());
+}
+
+/**
+ * Fix the "commerce_order_payments" view path.
+ */
+function commerce_payment_post_update_5() {
+  $view = Views::getView('commerce_order_payments');
+  if ($view) {
+    $displays = $view->storage->get('display');
+    $displays['page_1']['display_options']['path'] = 'admin/commerce/orders/%commerce_order/payments';
+    $view->storage->set('display', $displays);
+    $view->save();
+  }
 }

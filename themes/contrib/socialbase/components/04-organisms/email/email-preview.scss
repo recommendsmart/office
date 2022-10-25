@@ -1,3 +1,5 @@
+@import "settings";
+
 .email-preview {
   margin: 0 -1.25rem 20px;
 
@@ -24,6 +26,16 @@
   &--inside {
     padding: 0 1rem 30px;
     text-align: center;
+
+    table.btn-wrap tr {
+      @include for-phone-only {
+        text-align: center;
+
+        > td {
+          display: inline-block;
+        }
+      }
+    }
   }
 
   table {

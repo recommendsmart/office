@@ -503,7 +503,13 @@ class UserStatisticsManager {
   public function buildBarChart(array $data, string $canvas_id) {
     // Get color palette.
     $theme = \Drupal::theme()->getActiveTheme()->getName();
-    $color_palette = \Drupal::service('color.theme_decorator')->getPalette($theme);
+    $theme_decorator = \Drupal::hasService('color.theme_decorator');
+    if ($theme_decorator) {
+      $color_palette = \Drupal::service('color.theme_decorator')->getPalette($theme);
+    }
+    else {
+      $color_palette = color_get_palette($theme);
+    }
 
     $bar_color = $color_palette['desktop_link'] ?? '#4AD3B0';
 

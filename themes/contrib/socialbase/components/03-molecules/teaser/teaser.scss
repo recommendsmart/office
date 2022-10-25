@@ -32,12 +32,12 @@
 // teaser item in an overview
 .teaser {
   display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
+  flex-wrap: nowrap;
+  flex-direction: column;
   overflow: hidden; // makes sure content doesn't continue outside of teaser
 
   @include for-tablet-portrait-up {
-    flex-wrap: nowrap;
+    flex-direction: row;
     height: 220px; // matches width of image
   }
 
@@ -204,7 +204,7 @@
   flex-grow: 1;
   text-overflow: ellipsis;
   overflow-x: hidden;
-  white-space: nowrap;
+  white-space: normal;
 
   [dir='rtl'] & {
     flex-grow: initial;
@@ -330,6 +330,14 @@
       border-radius: 5px;
     }
 
+    &.teaser--small__media--profile {
+
+      img {
+        // This is not controllable by theme settings on purpose.
+        border-radius: 50%;
+      }
+    }
+
     .teaser--small__type-icon {
       // Matches the image style for the images.
       width: 44px;
@@ -341,6 +349,7 @@
       padding: .75rem;
     }
   }
+
 
   .teaser--small__title {
     font-size: 1rem;

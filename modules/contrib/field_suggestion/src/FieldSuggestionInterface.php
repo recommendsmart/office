@@ -11,6 +11,22 @@ use Drupal\Core\Entity\EntityPublishedInterface;
 interface FieldSuggestionInterface extends ContentEntityInterface, EntityPublishedInterface {
 
   /**
+   * Gets a related entity type.
+   *
+   * @return string
+   *   The entity type identifier.
+   */
+  public function type();
+
+  /**
+   * Gets a related field.
+   *
+   * @return string
+   *   The field name.
+   */
+  public function field();
+
+  /**
    * Check if it's an ignored entity.
    *
    * @return bool
@@ -72,9 +88,13 @@ interface FieldSuggestionInterface extends ContentEntityInterface, EntityPublish
   /**
    * Gets value.
    *
+   * @param bool $original
+   *   (optional) TRUE if the identifier of referenced entity should not be
+   *   replaced by a label. Defaults to FALSE.
+   *
    * @return string
    *   The suggestion.
    */
-  public function value();
+  public function label($original = FALSE);
 
 }

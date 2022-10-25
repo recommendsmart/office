@@ -6,14 +6,25 @@ field_suggestion.settings:
   requirements:
     _permission: 'administer field suggestion'
 
-field_suggestion.action:
-  path: '/field-suggestion/{entity_type_id}/{entity_id}/{field_name}/{type}'
+field_suggestion.select:
+  path: '/field-suggestion/select/{entity_type}/{field_name}/{delta}'
   defaults:
-    _controller: '\Drupal\field_suggestion\Controller\FieldSuggestionController::action'
+    _controller: '\Drupal\field_suggestion\Controller\FieldSuggestionController::select'
+    _title: 'Select'
+  requirements:
+    _custom_access: '\Drupal\field_suggestion\Controller\FieldSuggestionController::selectAccess'
+    entity_type: '[a-z-]+'
+    field_name: '[a-z]+'
+    delta: \d+
+
+field_suggestion.operation:
+  path: '/field-suggestion/operation/{entity_type}/{entity_id}/{field_name}/{type}'
+  defaults:
+    _controller: '\Drupal\field_suggestion\Controller\FieldSuggestionController::operation'
     _title: 'Pin or Ignore'
   requirements:
-    _custom_access: '\Drupal\field_suggestion\Controller\FieldSuggestionController::access'
-    entity_type_id: '[a-z-]+'
+    _custom_access: '\Drupal\field_suggestion\Controller\FieldSuggestionController::operationAccess'
+    entity_type: '[a-z-]+'
     entity_id: \d+
     field_name: '[a-z]+'
     type: '[a-z]+'

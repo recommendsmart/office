@@ -19,6 +19,7 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\group\Entity\GroupContent;
+use Drupal\group\Fields\GroupGroupReferenceItemList;
 use Drupal\group\QueryAccess\EntityQueryAlter;
 use Drupal\user\RoleInterface;
 use Drupal\views\Plugin\views\query\QueryPluginBase;
@@ -771,31 +772,75 @@ function group_view_presave(EntityInterface $view) {
 }
 
 /**
- * Implements hook_entity_base_field_info().
- *
- * Creates computed fields to get the groups related to a entity. There will be
- * a field containing all groups. Each group type will also get a separate
- * field.
+ * Implements hook_group_types().
  *
  * We currently only use this for nodes and users since they can be installed
  * as group content.
  */
+function group_group_types() {
+  return array_fill_keys(['node', 'user'], TRUE);
+}
+
+/**
+ * Implements hook_entity_base_field_info().
+ *
+ * Creates computed fields to get the groups related to an entity. There will be
+ * a field containing all groups. Each group type will also get a separate
+ * field.
+ */
 function group_entity_base_field_info(EntityTypeInterface $entity_type) {
   $fields = [];
 
-  $entity_types = ['node', 'user'];
-  if (in_array($entity_type->id(), $entity_types)) {
-    $fields['groups'] = BaseFieldDefinition::create('entity_reference')
-      ->setName('groups')
+  $entity_types = \Drupal::moduleHandler()->invokeAll('group_types');
+  \Drupal::moduleHandler()->alter('group_types', $entity_types);
+
+  if (!isset($entity_types[$entity_type->id()])) {
+    return $fields;
+  }
+
+  $fields['groups'] = BaseFieldDefinition::create('entity_reference')
+    ->setName('groups')
+    ->setTargetEntityTypeId($entity_type->id())
+    ->setSetting('target_type', 'group')
+    ->setLabel(t('Get the related groups for this entity.'))
+    ->setDescription(t('A list of all the groups referencing this entity.'))
+    ->setTranslatable(FALSE)
+    ->setComputed(TRUE)
+    ->setCustomStorage(TRUE)
+    ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
+    ->setClass(GroupGroupReferenceItemList::class)
+    ->setDisplayConfigurable('form', TRUE)
+    ->setDisplayOptions('form', [
+      'label' => 'hidden',
+      'region' => 'hidden',
+      'weight' => 50,
+    ])
+    ->setDisplayConfigurable('view', TRUE)
+    ->setDisplayOptions('view', [
+      'label' => 'hidden',
+      'region' => 'hidden',
+      'weight' => 50,
+    ]);
+
+  if (!$entity_types[$entity_type->id()]) {
+    return $fields;
+  }
+
+  /** @var \Drupal\group\Entity\GroupTypeInterface $group_type */
+  foreach (\Drupal::entityTypeManager()->getStorage('group_type')->loadMultiple() as $group_type) {
+    $field_name = 'groups_type_' . $group_type->id();
+    $fields[$field_name] = BaseFieldDefinition::create('entity_reference')
+      ->setName($field_name)
       ->setTargetEntityTypeId($entity_type->id())
       ->setSetting('target_type', 'group')
-      ->setLabel(t('Get the related groups for this entity.'))
+      ->setSetting('handler_settings', ['target_bundles' => [$group_type->id() => $group_type->id()]])
+      ->setLabel(t('Get the related @type groups for this entity.', ['@type' => $group_type->label()]))
       ->setDescription(t('A list of all the groups referencing this entity.'))
       ->setTranslatable(FALSE)
       ->setComputed(TRUE)
       ->setCustomStorage(TRUE)
       ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
-      ->setClass('\Drupal\group\Fields\GroupGroupReferenceItemList')
+      ->setClass(GroupGroupReferenceItemList::class)
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayOptions('form', [
         'label' => 'hidden',
@@ -808,35 +853,6 @@ function group_entity_base_field_info(EntityTypeInterface $entity_type) {
         'region' => 'hidden',
         'weight' => 50,
       ]);
-
-    foreach (\Drupal::service('entity_type.manager')->getStorage('group_type')->loadMultiple() as $group_type) {
-      /** @var \Drupal\group\Entity\GroupType $group_type */
-      $field_name = 'groups_type_' . $group_type->id();
-      $fields[$field_name] = BaseFieldDefinition::create('entity_reference')
-        ->setName($field_name)
-        ->setTargetEntityTypeId($entity_type->id())
-        ->setSetting('target_type', 'group')
-        ->setSetting('handler_settings', ['target_bundles' => [$group_type->id() => $group_type->id()]])
-        ->setLabel(t('Get the related @type groups for this entity.', ['@type' => $group_type->label()]))
-        ->setDescription(t('A list of all the groups referencing this entity.'))
-        ->setTranslatable(FALSE)
-        ->setComputed(TRUE)
-        ->setCustomStorage(TRUE)
-        ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
-        ->setClass('\Drupal\group\Fields\GroupGroupReferenceItemList')
-        ->setDisplayConfigurable('form', TRUE)
-        ->setDisplayOptions('form', [
-          'label' => 'hidden',
-          'region' => 'hidden',
-          'weight' => 50,
-        ])
-        ->setDisplayConfigurable('view', TRUE)
-        ->setDisplayOptions('view', [
-          'label' => 'hidden',
-          'region' => 'hidden',
-          'weight' => 50,
-        ]);
-    }
   }
 
   return $fields;

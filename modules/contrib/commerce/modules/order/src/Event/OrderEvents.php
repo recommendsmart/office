@@ -25,6 +25,15 @@ final class OrderEvents {
   const ORDER_ASSIGN = 'commerce_order.order.assign';
 
   /**
+   * Name of the event fired when altering an order label.
+   *
+   * @Event
+   *
+   * @see \Drupal\commerce_order\Event\OrderLabelEvent
+   */
+  const ORDER_LABEL = 'commerce_order.order.label';
+
+  /**
    * Name of the event fired after the order has been fully paid.
    *
    * Guaranteed to only fire once, when the order balance reaches zero.

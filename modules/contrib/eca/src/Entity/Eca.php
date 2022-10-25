@@ -17,6 +17,7 @@ use Drupal\eca\Entity\Objects\EcaAction;
 use Drupal\eca\Entity\Objects\EcaEvent;
 use Drupal\eca\Entity\Objects\EcaGateway;
 use Drupal\eca\Entity\Objects\EcaObject;
+use Drupal\eca\Form\RuntimePluginForm;
 use Drupal\eca\Plugin\ECA\Modeller\ModellerInterface;
 use Drupal\eca\Plugin\PluginUsageInterface;
 
@@ -313,7 +314,7 @@ class Eca extends ConfigEntityBase implements EntityWithPluginCollectionInterfac
    */
   public function addCondition(string $id, string $plugin_id, array $fields): bool {
     $plugin = $this->conditionPluginManager()->createInstance($plugin_id, []);
-    if (($plugin instanceof PluginFormInterface) && !$this->validatePlugin($plugin, $fields, 'action', $plugin_id, $id)) {
+    if (($plugin instanceof PluginFormInterface) && !$this->validatePlugin($plugin, $fields, 'condition', $plugin_id, $id)) {
       return FALSE;
     }
 
@@ -367,7 +368,7 @@ class Eca extends ConfigEntityBase implements EntityWithPluginCollectionInterfac
    */
   public function addEvent(string $id, string $plugin_id, string $label, array $fields, array $successors): bool {
     $plugin = $this->eventPluginManager()->createInstance($plugin_id, []);
-    if (($plugin instanceof PluginFormInterface) && !$this->validatePlugin($plugin, $fields, 'action', $plugin_id, $label)) {
+    if (($plugin instanceof PluginFormInterface) && !$this->validatePlugin($plugin, $fields, 'event', $plugin_id, $label)) {
       return FALSE;
     }
 
@@ -452,28 +453,66 @@ class Eca extends ConfigEntityBase implements EntityWithPluginCollectionInterfac
         }
       }
     }
-    // Build form.
+
+    // Simulate filling and submitting a form for configuring the plugin.
     $form_state = new FormState();
-    $form = $plugin->buildConfigurationForm([], $form_state);
-    // Set form field values, simulating the user filling and submitting
-    // the form.
-    $form_state->setValues($fields);
+    $form_state->setProgrammed();
+    $form_state->setSubmitted();
+
     if (!in_array($plugin_id, self::$ignoreConfigValidationActions, TRUE)) {
-      // Validate the form.
-      $plugin->validateConfigurationForm($form, $form_state);
-    }
-    // Check for errors.
-    if ($errors = $form_state->getErrors()) {
-      foreach ($errors as $error) {
-        $errorMsg = sprintf('%s "%s" (%s): %s', $type, $plugin->getPluginDefinition()['label'], $label, $error);
-        $this->messenger()->addError($errorMsg);
+      // Build a runtime form for validating the plugin.
+      $form_object = new RuntimePluginForm($plugin);
+
+      // Runtime plugin form uses a subform state for the plugin configuration.
+      $form_state->setUserInput(['configuration' => $fields]);
+      $form_state->setValues(['configuration' => $fields]);
+
+      // Keep the currently stored list of messages in mind.
+      // The form build will add messages to the messenger, which we want
+      // to clear from the runtime.
+      $messenger = $this->messenger();
+      $messages_by_type = $messenger->all();
+
+      // Keep the current "has any errors" flag in mind, and reset this flag
+      // for the scope of this operation.
+      $any_errors = FormState::hasAnyErrors();
+      $form_state->clearErrors();
+
+      // Building the form also submits the form, if no errors are there.
+      $form = $this->formBuilder()->buildForm($form_object, $form_state);
+
+      // Now re-add the previously fetched messages.
+      $messenger->deleteAll();
+      foreach ($messages_by_type as $messageType => $messages) {
+        foreach ($messages as $i => $message) {
+          $messenger->addMessage($message, $messageType);
+        }
       }
-      return FALSE;
+
+      // Check for errors.
+      if ($errors = $form_state->getErrors()) {
+        foreach ($errors as $error) {
+          $errorMsg = sprintf('%s "%s" (%s): %s', $type, $plugin->getPluginDefinition()['label'], $label, $error);
+          $messenger->addError($errorMsg);
+        }
+        return FALSE;
+      }
+
+      if ($any_errors) {
+        // Make sure that the form state will have the any errors flag restored.
+        (new FormState())->setErrorByName('');
+      }
     }
-    // Simulate submitting the form.
-    $plugin->submitConfigurationForm($form, $form_state);
+    else {
+      // Build and execute submit handlers. This makes sure that submit handlers
+      // have properly set configuration values.
+      $form_state->setUserInput($fields);
+      $form_state->setValues($fields);
+      $form = $plugin->buildConfigurationForm([], $form_state);
+      $plugin->submitConfigurationForm($form, $form_state);
+    }
     // Collect the resulting form field values.
-    $fields = $plugin->getConfiguration() + $fields;
+    $fields = ($plugin instanceof ConfigurableInterface ? $plugin->getConfiguration() : []) + $fields;
     return TRUE;
   }
 

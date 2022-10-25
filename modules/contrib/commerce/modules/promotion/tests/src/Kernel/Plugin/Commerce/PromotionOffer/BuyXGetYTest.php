@@ -639,10 +639,14 @@ class BuyXGetYTest extends OrderKernelTestBase {
     // The offer automatically added a second order item.
     [$first_order_item, $second_order_item] = $order_items;
 
+    // Store the second order item ID to ensure it doesn't change after each
+    // refresh.
+    $second_order_item_id = $second_order_item->id();
     $this->assertCount(0, $first_order_item->getAdjustments());
     $this->assertCount(1, $second_order_item->getAdjustments());
     $this->assertEquals(1, $second_order_item->getQuantity());
     $this->assertEquals($this->variations[2]->id(), $second_order_item->getPurchasedEntityId());
+    $this->assertTrue($second_order_item->getData('owned_by_promotion'));
     $this->assertAdjustmentPrice($second_order_item->getAdjustments()[0], '-30');
 
     // Increase the quantity of the "buy" product to 4, the quantity of the
@@ -654,6 +658,7 @@ class BuyXGetYTest extends OrderKernelTestBase {
 
     [$first_order_item, $second_order_item] = $this->order->getItems();
 
+    $this->assertEquals($second_order_item_id, $second_order_item->id());
     $this->assertCount(0, $first_order_item->getAdjustments());
     $this->assertEquals(4, $first_order_item->getQuantity());
     $this->assertCount(1, $second_order_item->getAdjustments());
@@ -668,6 +673,7 @@ class BuyXGetYTest extends OrderKernelTestBase {
 
     [$first_order_item, $second_order_item] = $this->order->getItems();
 
+    $this->assertEquals($second_order_item_id, $second_order_item->id());
     $this->assertEquals(6, $first_order_item->getQuantity());
     $this->assertCount(0, $first_order_item->getAdjustments());
     $this->assertEquals(2, $second_order_item->getQuantity());

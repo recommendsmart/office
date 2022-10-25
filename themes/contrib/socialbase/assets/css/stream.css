@@ -20,7 +20,7 @@
 }
 
 .stream-item:first-of-type {
-  z-index: 2;
+  z-index: 4;
 }
 
 .stream-item .pull-right {

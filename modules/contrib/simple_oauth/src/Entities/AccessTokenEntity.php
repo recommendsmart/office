@@ -33,8 +33,7 @@ class AccessTokenEntity implements AccessTokenEntityInterface {
 
     $id = $this->getIdentifier();
     $now = new \DateTimeImmutable('@' . \Drupal::time()->getCurrentTime());
-    $key_path = $this->privateKey->getKeyPath();
-    $key = InMemory::file($key_path);
+    $key = InMemory::plainText($this->privateKey->getKeyContents());
     $config = Configuration::forSymmetricSigner(new Sha256(), $key);
     $user_id = $this->getUserIdentifier();
 

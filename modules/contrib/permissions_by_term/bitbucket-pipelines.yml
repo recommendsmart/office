@@ -23,7 +23,7 @@ pipelines:
           - mv permissions_by_term/ build/
           - cd build
           - composer create-project drupal/recommended-project:~9.0.0 drupal --no-interaction
-          - (cd drupal && composer require behat/behat:^3.0 behat/mink-extension:^2.2 drupal/drupal-extension:^4.1 phpunit/phpunit:^7.0 mikey179/vfsstream:^1.6 drush/drush:^10.0 phpstan/phpstan:~0.12.75 phpstan/extension-installer:~1.1.0 mglaman/phpstan-drupal:~0.12.8 --dev)
+          - (cd drupal && composer require behat/behat:^3.0 behat/mink-extension:^2.2 drupal/drupal-extension:^4.1 phpunit/phpunit:^7.0 mikey179/vfsstream:^1.6 drush/drush:^10.0 phpstan/phpstan:~1.8.5 phpstan/extension-installer:~1.1.0 mglaman/phpstan-drupal:~1.1.25 --dev)
           - mv permissions_by_term drupal/web/modules/
           - (cd drupal && cp web/modules/permissions_by_term/tests/phpstan* . && vendor/bin/phpstan analyse web/modules/permissions_by_term/)
           - (cd drupal/web/modules/permissions_by_term/tests/ && ../../../../vendor/bin/phpunit --testdox)

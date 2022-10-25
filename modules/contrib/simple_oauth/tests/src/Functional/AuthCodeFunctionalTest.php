@@ -65,7 +65,7 @@ class AuthCodeFunctionalTest extends TokenBearerFunctionalTestBase {
     $this->client->set('confidential', FALSE)->save();
     $valid_params = [
       'response_type' => 'code',
-      'client_id' => $this->client->uuid(),
+      'client_id' => $this->client->getClientId(),
       'scope' => $this->scope,
       'redirect_uri' => $this->redirectUri,
     ];
@@ -110,7 +110,7 @@ class AuthCodeFunctionalTest extends TokenBearerFunctionalTestBase {
 
     $valid_params = [
       'response_type' => 'code',
-      'client_id' => $this->client->uuid(),
+      'client_id' => $this->client->getClientId(),
       'scope' => $this->scope,
       'redirect_uri' => $this->redirectUri,
     ];
@@ -148,7 +148,7 @@ class AuthCodeFunctionalTest extends TokenBearerFunctionalTestBase {
   public function testDefaultEnabledRememberApproval(): void {
     $valid_params = [
       'response_type' => 'code',
-      'client_id' => $this->client->uuid(),
+      'client_id' => $this->client->getClientId(),
       'scope' => $this->scope,
       'redirect_uri' => $this->redirectUri,
     ];
@@ -191,7 +191,7 @@ class AuthCodeFunctionalTest extends TokenBearerFunctionalTestBase {
     $this->client->set('confidential', TRUE)->save();
     $valid_params = [
       'response_type' => 'code',
-      'client_id' => $this->client->uuid(),
+      'client_id' => $this->client->getClientId(),
       'client_secret' => $this->clientSecret,
       'scope' => $this->scope,
       'redirect_uri' => $this->redirectUri,
@@ -291,7 +291,7 @@ class AuthCodeFunctionalTest extends TokenBearerFunctionalTestBase {
 
     $valid_params = [
       'response_type' => 'code',
-      'client_id' => $this->client->uuid(),
+      'client_id' => $this->client->getClientId(),
       'code_challenge' => $code_challenge,
       'code_challenge_method' => 'S256',
       'scope' => $this->scope,
@@ -321,7 +321,7 @@ class AuthCodeFunctionalTest extends TokenBearerFunctionalTestBase {
     // Request the access and refresh token.
     $valid_payload = [
       'grant_type' => 'authorization_code',
-      'client_id' => $this->client->uuid(),
+      'client_id' => $this->client->getClientId(),
       'code_verifier' => $code_verifier,
       'scope' => $this->scope . ' ' . $this->extraScope->getName(),
       'code' => $code,
@@ -342,7 +342,7 @@ class AuthCodeFunctionalTest extends TokenBearerFunctionalTestBase {
     // will be used.
     $valid_params = [
       'response_type' => 'code',
-      'client_id' => $this->client->uuid(),
+      'client_id' => $this->client->getClientId(),
       'client_secret' => $this->clientSecret,
       'scope' => $this->scope,
     ];
@@ -398,7 +398,7 @@ class AuthCodeFunctionalTest extends TokenBearerFunctionalTestBase {
     $this->config('user.settings')->set('register', UserInterface::REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL)->save();
     $valid_params = [
       'response_type' => 'code',
-      'client_id' => $this->client->uuid(),
+      'client_id' => $this->client->getClientId(),
       'client_secret' => $this->clientSecret,
       'scope' => $this->scope,
       'redirect_uri' => $this->redirectUri,
@@ -502,7 +502,7 @@ class AuthCodeFunctionalTest extends TokenBearerFunctionalTestBase {
   protected function postGrantedCodeWithScopes(string $code, string $scopes, bool $send_secret = TRUE): ResponseInterface {
     $valid_payload = [
       'grant_type' => 'authorization_code',
-      'client_id' => $this->client->uuid(),
+      'client_id' => $this->client->getClientId(),
       'code' => $code,
       'scope' => $scopes,
       'redirect_uri' => $this->redirectUri,

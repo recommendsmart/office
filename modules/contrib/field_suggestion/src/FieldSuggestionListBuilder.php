@@ -71,39 +71,44 @@ class FieldSuggestionListBuilder extends EntityListBuilder {
   public function buildRow(EntityInterface $entity) {
     $row = [];
 
-    $row['type'] = ($ignore = $entity->ignore->value)
+    /** @var \Drupal\field_suggestion\FieldSuggestionInterface $entity */
+    $row['type'] = ($ignore = $entity->isIgnored())
       ? $this->t('Ignored') : $this->t('Pinned');
 
-    $entity_type_id = $entity->entity_type->value;
-
-    $row['entity_type'] = sprintf(
-      '%s (%s)',
-      $this->entityTypeManager->getDefinition($entity_type_id)->getLabel(),
-      $entity_type_id
+    $row['entity_type'] = $this->label(
+      $this->entityTypeManager->getDefinitions(),
+      $entity_type = $entity->type()
     );
 
-    $definitions = $this->entityFieldManager->getBaseFieldDefinitions($entity_type_id);
-
-    $row['field_name'] = sprintf(
-      '%s (%s)',
-      $definitions[$field_name = $entity->field_name->value]->getLabel(),
-      $field_name
+    $row['field_name'] = $this->label(
+      $this->entityFieldManager->getBaseFieldDefinitions($entity_type),
+      $entity->field()
     );
 
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-    $row['field_value'] = [
-      'data' => $this->entityTypeManager->getViewBuilder($entity_type_id)
-        ->viewFieldItem(
-          $entity->get($this->helper->field($entity->bundle()))->first()
-        ),
-    ];
-
-    /** @var \Drupal\field_suggestion\FieldSuggestionInterface $entity */
+    $row['field_value'] = $entity->label();
     $row['usage'] = $ignore ? '-' : ($entity->isOnce() ? 1 : '∞');
-
     $row['exclude'] = $ignore ? '-' : $entity->countExcluded();
 
     return $row + parent::buildRow($entity);
+  }
+
+  /**
+   * Provide cell text based on a labeled object as a field.
+   *
+   * @param array $definitions
+   *   The definitions of entity types or fields.
+   * @param string $name
+   *   The name of entity type or field.
+   *
+   * @return string
+   *   The label if a definition is found. Otherwise, a received name.
+   */
+  protected function label($definitions, $name) {
+    if (isset($definitions[$name])) {
+      $name = $definitions[$name]->getLabel() . ' (' . $name. ')';
+    }
+
+    return $name;
   }
 
 }

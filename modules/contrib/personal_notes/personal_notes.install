@@ -12,14 +12,14 @@
  *
  * @see hook_install()
  */
-function personal_notes_install() {        //	create a note for the administrator as a demonstration
+function personal_notes_install(): void {
   $fields = [
     'uid' => '1',
     'title' => t('Title One'),
     'note' => t('Here is the first note created for Personal Notes belonging to user 1'),
-    'created' => \Drupal::time()->getCurrentTime(),
+    'created' => Drupal::time()->getCurrentTime(),
   ];
-  \Drupal::database()->insert('personal_notes_notes')
+  Drupal::database()->insert('personal_notes_notes')
     ->fields($fields)
     ->execute();
 }
@@ -31,7 +31,7 @@ function personal_notes_install() {        //	create a note for the administrato
  *
  * @see hook_schema()
  */
-function personal_notes_schema() {
+function personal_notes_schema(): array {
   $schema['personal_notes_notes'] = [
     'description' => 'Stores notes that users write.',
     'fields' => [

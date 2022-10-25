@@ -89,6 +89,10 @@
   text-align: right;
 }
 
+[dir='rtl'] .path-search .cover .page-title {
+  text-align: center;
+}
+
 .hero-footer {
   padding: 1rem 0;
   width: 100%;

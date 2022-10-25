@@ -78,14 +78,15 @@ class ResourceServerFactory implements ResourceServerFactoryInterface {
    */
   protected function getPublicKey(): CryptKey {
     $public_key_path = $this->config->get('public_key');
-    $absolute_file_path = $this->fileSystem->realpath($public_key_path);
+    $file_path = $this->fileSystem->realpath($public_key_path) ?: $public_key_path;
+    $key = file_get_contents($file_path);
 
-    if (!$absolute_file_path || !file_exists($public_key_path)) {
-      throw OAuthServerException::serverError('You need to set the OAuth2 public key.');
+    if (!$key) {
+      throw OAuthServerException::serverError('You need to set the OAuth2 private key.');
     }
 
     return new CryptKey(
-      $absolute_file_path,
+      $key,
       NULL,
       Settings::get('simple_oauth.key_permissions_check', TRUE)
     );

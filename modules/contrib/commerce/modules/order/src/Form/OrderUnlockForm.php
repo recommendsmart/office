@@ -14,7 +14,7 @@ class OrderUnlockForm extends ContentEntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return $this->t('Are you sure you want to unlock the order %label?', [
+    return $this->t('Are you sure you want to unlock %label?', [
       '%label' => $this->entity->label(),
     ]);
   }

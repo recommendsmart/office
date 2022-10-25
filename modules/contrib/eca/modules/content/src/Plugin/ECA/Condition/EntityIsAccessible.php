@@ -47,6 +47,7 @@ class EntityIsAccessible extends ConditionBase {
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
     $form['operation'] = [
+      '#type' => 'select',
       '#title' => $this->t('Operation'),
       '#options' => [
         'create' => $this->t('Create (only for new entity)'),

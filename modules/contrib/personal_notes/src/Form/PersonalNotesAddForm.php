@@ -4,7 +4,6 @@ namespace Drupal\personal_notes\Form;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -12,7 +11,7 @@ use Drupal\Core\Session\AccountProxyInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- *
+ * Add a personal note.
  */
 class PersonalNotesAddForm extends FormBase {
 
@@ -21,21 +20,21 @@ class PersonalNotesAddForm extends FormBase {
    *
    * @var \Drupal\Core\Session\AccountProxyInterface
    */
-  private $currentUser;
+  private AccountProxyInterface $currentUser;
 
   /**
    * The time info.
    *
    * @var \Drupal\Component\Datetime\TimeInterface
    */
-  private $time;
+  private TimeInterface $time;
 
   /**
    * The database connection.
    *
    * @var \Drupal\Core\Database\Connection
    */
-  private $database;
+  private Connection $database;
 
   /**
    * The constructor object of add content.
@@ -67,14 +66,14 @@ class PersonalNotesAddForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'personal_notes_add_content';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, AccountInterface $user = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, AccountInterface $user = NULL): array {
 
     if ($this->currentUser->isAuthenticated() && !empty($user)) {
       $form['note_user'] = [
@@ -110,7 +109,7 @@ class PersonalNotesAddForm extends FormBase {
 
     else {
       $this->messenger()
-        ->addMessage($this->t('Please login to add personal notes.'), MessengerInterface::TYPE_STATUS);
+        ->addStatus($this->t('Please login to add personal notes.'));
     }
     return $form;
   }
@@ -118,8 +117,7 @@ class PersonalNotesAddForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public
-  function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     // Retrieve field data from triggered user.
     $uid = $form_state->getValues()['note_member'];
     $title = $form_state->getValues()['note_title'];
@@ -137,7 +135,7 @@ class PersonalNotesAddForm extends FormBase {
       ->fields($fields)
       ->execute();
     $this->messenger()
-      ->addMessage($this->t('Your note was added.'), MessengerInterface::TYPE_STATUS);
+      ->addStatus($this->t('Your note was added.'));
   }
 
 }

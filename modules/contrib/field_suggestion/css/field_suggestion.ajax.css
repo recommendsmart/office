@@ -1,0 +1,14 @@
+.js .field-suggestion .dropbutton-wrapper {
+  min-height: 2em;
+}
+
+.js .field-suggestion .dropbutton-widget {
+  position: absolute;
+}
+
+.field-suggestion .dropbutton-action:not(.secondary-action) {
+  color: #333;
+  font-weight: 600;
+  line-height: normal;
+  padding: 4px 1.5em;
+}

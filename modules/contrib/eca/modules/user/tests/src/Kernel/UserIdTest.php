@@ -123,6 +123,16 @@ class UserIdTest extends KernelTestBase {
       'account' => '[my_user:id]',
     ]);
     $this->assertFalse($condition->evaluate(), 'User ID 2 and account [my_user:id] must evaluate to false.');
+
+    $token_services->addTokenData('user_uid', '2');
+    $condition = $condition_manager->createInstance('eca_user_id', [
+      'user_id' => '[user_uid]',
+      'account' => '[my_user:uid]',
+    ]);
+    $this->assertTrue($condition->evaluate(), 'Token with value 2 and account [my_user:uid] must evaluate to true.');
+
+    $token_services->addTokenData('user_uid', '3');
+    $this->assertFalse($condition->evaluate(), 'Token with value 3 and account [my_user:uid] must evaluate to false.');
   }
 
 }

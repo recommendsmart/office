@@ -71,7 +71,7 @@ class OrderReceiptMail implements OrderReceiptMailInterface {
 
     $params = [
       'id' => 'order_receipt',
-      'from' => $order->getStore()->getEmail(),
+      'from' => $order->getStore()->getEmailFromHeader(),
       'bcc' => $bcc,
       'order' => $order,
     ];

@@ -1,3 +1,4 @@
+collapsible: false
 limit: 10
 own: true
 fields: {  }

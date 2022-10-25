@@ -127,6 +127,12 @@
     text-align: right;
   }
 
+  .path-search & {
+    [dir='rtl'] & {
+      text-align: center;
+    }
+  }
+
   @include for-tablet-portrait-up {
     max-width: 900px;
   }

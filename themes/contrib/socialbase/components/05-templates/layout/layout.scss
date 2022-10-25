@@ -82,8 +82,10 @@
 }
 
 .region--title {
+  position: relative;
   flex-basis: 100%;
   max-width: 100%;
+  z-index: 1;
 
   @include for-tablet-landscape-up {
     margin-top: 1rem;

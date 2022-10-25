@@ -28,7 +28,7 @@ class ClientEntity implements ClientEntityInterface {
    */
   public function __construct(Consumer $entity) {
     $this->entity = $entity;
-    $this->setIdentifier($entity->uuid());
+    $this->setIdentifier($entity->getClientId());
     $this->setName($entity->label());
     $this->setRedirectUri($entity);
     $this->isConfidential = (bool) $entity->get('confidential')->value;

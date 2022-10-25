@@ -96,7 +96,7 @@ class OrderForm extends ContentEntityForm {
         '#access' => empty($form['store_id']),
       ],
       'date' => NULL,
-      'changed' => $this->fieldAsReadOnly($this->t('Last saved'), $last_saved),
+      'changed' => $this->fieldAsReadOnly($this->t('Changed'), $last_saved),
     ];
     $form['customer'] = [
       '#type' => 'details',
@@ -168,7 +168,13 @@ class OrderForm extends ContentEntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
-    $this->messenger()->addMessage($this->t('The order %label has been successfully saved.', ['%label' => $this->entity->label()]));
+    $label = $this->entity->label();
+    if ($label) {
+      $this->messenger()->addStatus($this->t('%label saved.', ['%label' => $this->entity->label()]));
+    }
+    else {
+      $this->messenger()->addStatus($this->t('Order saved.'));
+    }
     $form_state->setRedirect('entity.commerce_order.canonical', ['commerce_order' => $this->entity->id()]);
   }
 

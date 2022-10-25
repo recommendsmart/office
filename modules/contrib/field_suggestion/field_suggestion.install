@@ -18,9 +18,9 @@ function field_suggestion_update_8001(&$sandbox) {
 
   \Drupal::entityTypeManager()->clearCachedDefinitions();
 
-  foreach (['field_suggestion_type', 'field_suggestion'] as $entity_type_id) {
+  foreach (['field_suggestion_type', 'field_suggestion'] as $entity_type) {
     \Drupal::entityDefinitionUpdateManager()->installEntityType(
-      \Drupal::entityTypeManager()->getDefinition($entity_type_id)
+      \Drupal::entityTypeManager()->getDefinition($entity_type)
     );
   }
 }
@@ -34,9 +34,9 @@ function field_suggestion_update_8002(&$sandbox) {
 
     $config = \Drupal::config('field_suggestion.settings');
 
-    foreach ((array) $config->get('fields') as $entity_type_id => $field_names) {
+    foreach ((array) $config->get('fields') as $entity_type => $field_names) {
       foreach ($field_names as $field_name) {
-        $sandbox['fields'][] = [$entity_type_id, $field_name];
+        $sandbox['fields'][] = [$entity_type, $field_name];
       }
     }
 
@@ -48,12 +48,12 @@ function field_suggestion_update_8002(&$sandbox) {
     $sandbox['bundles'] = [];
   }
 
-  [$entity_type_id, $field_name] = $sandbox['fields'][$sandbox['processed']++];
+  [$entity_type, $field_name] = $sandbox['fields'][$sandbox['processed']++];
 
   /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $manager */
   $manager = \Drupal::service('entity_field.manager');
 
-  $field = $manager->getBaseFieldDefinitions($entity_type_id)[$field_name];
+  $field = $manager->getBaseFieldDefinitions($entity_type)[$field_name];
 
   if (!in_array($field_type = $field->getType(), $sandbox['bundles'])) {
     /** @var \Drupal\field_suggestion\Service\FieldSuggestionHelperInterface $helper */

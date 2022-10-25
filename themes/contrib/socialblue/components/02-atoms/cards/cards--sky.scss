@@ -131,6 +131,7 @@
         &.block-discussion-add-block,
         &.block-group-add-event-block,
         &.block-group-add-topic-block,
+        &.block-group-add-book-block,
         &.block-group-add-idea-block,
         &.block-event-add-block,
         &.block-topic-add-block,
@@ -207,23 +208,40 @@
       }
 
       > * {
-        display: flex;
-        width: 100%;
+        &:not(.btn-group) {
+          display: flex;
+          width: 100%;
+          justify-content: center;
 
-        + * {
-          margin-top: 1rem;
+          + * {
+            margin-top: 1rem;
+          }
+
+          a.btn:nth-child(1):nth-last-child(1) {
+            border-bottom-right-radius: 10px !important;
+            border-top-right-radius: 10px !important;
+          }
         }
 
-        a.btn:nth-child(1):nth-last-child(1) {
-          border-bottom-right-radius: 10px !important;
-          border-top-right-radius: 10px !important;
+        &.btn-group {
+          display: flex;
+
+          a.btn {
+            flex: 1;
+          }
+
+          .btn {
+            &.dropdown-toggle {
+              margin-left: 10px;
+              border-bottom-left-radius: 10px;
+              border-top-left-radius: 10px;
+            }
+          }
         }
       }
 
-      a.btn {
-        flex: 1;
-        border-bottom-right-radius: 0 !important;
-        border-top-right-radius: 0 !important;
+      .btn-group + .btn-group {
+        margin-top: 1rem;
       }
     }
 
@@ -237,6 +255,13 @@
         margin-bottom: 1rem;
       }
 
+      > *:nth-child(1):nth-last-child(1) {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+      }
+
       .flag-follow-user,
       .hero-footer__cta {
         flex: 0 0 100%;
@@ -245,6 +270,16 @@
         @include for-tablet-portrait-up {
           flex: 0 0 calc(50% - 5px);
           max-width: calc(50% - 5px);
+        }
+
+        * {
+          justify-content: center;
+        }
+
+        a.btn {
+          flex: 1;
+          border-bottom-right-radius: 10px !important;
+          border-top-right-radius: 10px !important;
         }
       }
 
@@ -286,13 +321,24 @@
         margin-left: 0;
       }
     }
+  }
 
-    &.block-profile-statistic-block {
-      padding-top: 0;
+  .block-profile-statistic-block {
+    .card__info-user {
+      .hero-avatar {
+        border-color: #fafafa;
+      }
+    }
+  }
 
-      .card__info-user {
-        .hero-avatar {
-          border-color: #fafafa;
+  .block-group-statistic-block {
+    .hero-footer__cta {
+      > *.btn-group {
+        .btn {
+          &,
+          &.dropdown-toggle {
+            margin-left: 0;
+          }
         }
       }
     }

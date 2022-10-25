@@ -57,7 +57,7 @@ class ClientRepository implements ClientRepositoryInterface {
   public function getClientDrupalEntity(string $client_identifier) {
     $client_drupal_entities = $this->entityTypeManager
       ->getStorage('consumer')
-      ->loadByProperties(['uuid' => $client_identifier]);
+      ->loadByProperties(['client_id' => $client_identifier]);
 
     // Check if the client is registered.
     if (empty($client_drupal_entities)) {

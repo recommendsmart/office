@@ -21,6 +21,8 @@
     }
 
     > .region--content {
+      z-index: 1;
+
       @include for-desktop-up {
         padding-left: 1rem;
         padding-right: 0;

@@ -6,7 +6,7 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\queue_ui\QueueUIManager;
 use Drupal\Core\Render\Renderer;
-use Drupal\Core\Extension\ModuleHandler;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -30,10 +30,10 @@ class ItemDetailForm extends FormBase {
    *   The QueueUIManager object.
    * @param \Drupal\Core\Render\Renderer $renderer
    *   The Renderer object.
-   * @param \Drupal\Core\Extension\ModuleHandler $moduleHandler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The ModuleHandler object.
    */
-  public function __construct(QueueUIManager $queueUIManager, Renderer $renderer, ModuleHandler $moduleHandler) {
+  public function __construct(QueueUIManager $queueUIManager, Renderer $renderer, ModuleHandlerInterface $moduleHandler) {
     $this->queueUIManager = $queueUIManager;
     $this->renderer = $renderer;
     $this->moduleHandler = $moduleHandler;

@@ -13,7 +13,8 @@ use Drupal\views\Plugin\views\display\DisplayPluginBase;
  *
  * @Action(
  *   id = "eca_views_export",
- *   label = @Translation("Views: Export query into file")
+ *   label = @Translation("Views: Export query into file"),
+ *   description = @Translation("Use a view to execute a query and save the results to a file. You can also save the results in a token.")
  * )
  */
 class ViewsExport extends ViewsQuery {
@@ -57,7 +58,7 @@ class ViewsExport extends ViewsQuery {
     $result = parent::access($object, $account, TRUE);
     if ($result->isAllowed() && $display = $this->getDisplay()) {
       if (empty($display->getPluginDefinition()['returns_response'])) {
-        $result = AccessResult::forbidden('The given display is not meant to export.');
+        $result = AccessResult::forbidden('The given view display is not meant to export. Please use a display type that supports exporting data.');
       }
       else {
         $this->filename = $this->getFilename($display);
@@ -91,18 +92,21 @@ class ViewsExport extends ViewsQuery {
     $form['load_results_into_token'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Store results also in a token?'),
+      '#description' => $this->t('Check this box to save the results to a token as well'),
       '#default_value' => $this->configuration['load_results_into_token'],
       '#weight' => -70,
     ];
     $form['token_for_filename'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Token name for file name'),
+      '#description' => $this->t('Provide a token name where ECA will store the effectively used filename of the output.'),
       '#default_value' => $this->configuration['token_for_filename'],
       '#weight' => -20,
     ];
     $form['filename'] = [
       '#type' => 'textfield',
       '#title' => $this->t('File name'),
+      '#description' => $this->t('Sets the name of the file where the data will be exported.'),
       '#default_value' => $this->configuration['filename'],
       '#weight' => -10,
     ];

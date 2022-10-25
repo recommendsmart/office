@@ -18,12 +18,12 @@ use Drupal\Core\Config\TypedConfigManager;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Extension\ThemeHandler;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\ProxyClass\Extension\ModuleInstaller;
-use Drupal\Core\ProxyClass\Lock\DatabaseLockBackend;
+use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\config\StorageReplaceDataWrapper;
 use Drupal\eca\Service\Modellers;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -84,11 +84,11 @@ class Import extends FormBase {
   protected ContainerAwareEventDispatcher $eventDispatcher;
 
   /**
-   * Database lock backend.
+   * Lock backend.
    *
-   * @var \Drupal\Core\ProxyClass\Lock\DatabaseLockBackend
+   * @var \Drupal\Core\Lock\LockBackendInterface
    */
-  protected DatabaseLockBackend $lock;
+  protected LockBackendInterface $lock;
 
   /**
    * Typed config manager.
@@ -100,9 +100,9 @@ class Import extends FormBase {
   /**
    * Module installer.
    *
-   * @var \Drupal\Core\ProxyClass\Extension\ModuleInstaller
+   * @var \Drupal\Core\Extension\ModuleInstallerInterface
    */
-  protected ModuleInstaller $moduleInstaller;
+  protected ModuleInstallerInterface $moduleInstaller;
 
   /**
    * Theme handler.

@@ -240,7 +240,7 @@ class EntityCloneForm extends FormBase {
    */
   protected function formSetRedirect(FormStateInterface $form_state, EntityInterface $entity) {
     if ($entity && $entity->hasLinkTemplate('canonical')) {
-      $form_state->setRedirect($entity->toUrl()->getRouteName(), $entity->toUrl()->getRouteParameters());
+      $form_state->setRedirect($entity->toUrl('canonical')->getRouteName(), $entity->toUrl('canonical')->getRouteParameters());
     }
     else {
       $form_state->setRedirect('<front>');

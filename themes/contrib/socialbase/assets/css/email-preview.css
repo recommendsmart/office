@@ -92,3 +92,12 @@
 .email-preview a.btn-link-bg {
   color: #ffffff;
 }
+
+@media (max-width: 599px) {
+  .email-preview--inside table.btn-wrap tr {
+    text-align: center;
+  }
+  .email-preview--inside table.btn-wrap tr > td {
+    display: inline-block;
+  }
+}

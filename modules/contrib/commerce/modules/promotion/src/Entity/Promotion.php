@@ -928,7 +928,7 @@ class Promotion extends CommerceContentEntityBase implements PromotionInterface 
    */
   public static function getDefaultStartDate() {
     $timestamp = \Drupal::time()->getRequestTime();
-    return gmdate(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $timestamp);
+    return date(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $timestamp);
   }
 
   /**

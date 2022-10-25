@@ -32,6 +32,7 @@ class EntityCloneUserTest extends BrowserTestBase {
    */
   protected $permissions = [
     'clone user entity',
+    'administer users',
   ];
 
   /**

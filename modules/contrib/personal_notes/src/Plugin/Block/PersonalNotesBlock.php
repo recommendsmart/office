@@ -16,12 +16,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * )
  */
 class PersonalNotesBlock extends BlockBase implements ContainerFactoryPluginInterface {
+
   /**
    * The current user.
    *
    * @var \Drupal\Core\Session\AccountProxyInterface
    */
-  private $currentUser;
+  private AccountProxyInterface $currentUser;
 
   /**
    * The constructor for Personal Notes Block object.
@@ -55,47 +56,32 @@ class PersonalNotesBlock extends BlockBase implements ContainerFactoryPluginInte
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     // User must be logged on to have personal notes.
     if (!$this->currentUser->isAnonymous()) {
       // Get their notes.
       $results = _personal_notes_fetch_content_db();
-      $notedata = [];
       $notes = [];
       foreach ($results as $result) {
-        foreach ($result as $field => $value) {
-          if (preg_match('/^(title)|(note)|(created)|(notenum)$/', $field)) {
-            // Save note's number, title and message.
-            $notedata[$field] = $value;
-          }
-        }
-        $notes[$notedata['title'] .
-        str_pad(
-          $notedata['notenum'],
-          5,
-          '0',
-          STR_PAD_LEFT
-        // Gives a constant length index display in the title.
-        // Serialize the data.
-        )] =
-          // Store in a twig template friendly array.
-          [
-            'note' => $notedata['note'],
-            'created' => date("F d, Y", $notedata['created']),
-          ];
+        $notes[] = [
+          'title' => $result->title,
+          'note' => $result->note,
+          'notenum' => $result->notenum,
+          'created' => date("F d, Y", $result->created),
+        ];
       }
-      $build = [
+
+      return [
         '#theme' => 'block--personal_notes',
         '#notes' => $notes,
-        // Attach the stylesheet library.
         '#attached' => [
           'library' => [
             'personal_notes/personal_notes',
           ],
         ],
       ];
-      return $build;
-    }                                                            //    end if user is logged in
-  }                                                                //    end build method
+    }
+    return [];
+  }
 
 }

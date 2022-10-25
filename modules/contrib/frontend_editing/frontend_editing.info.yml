@@ -3,13 +3,12 @@ description: This module adds frontend editing functionality.
 package: Content
 type: module
 # version: 1.0
-core: 8.x
-core_version_requirement: ^8 || ^9
+core_version_requirement: ^8 || ^9 || ^10
 configure: frontend_editing.settings_form
 dependencies:
   - paragraphs_edit:paragraphs_edit
 
-# Information added by Drupal.org packaging script on 2021-11-29
-version: '1.1.0-alpha3'
+# Information added by Drupal.org packaging script on 2022-09-28
+version: '1.1.0-alpha4'
 project: 'frontend_editing'
-datestamp: 1638175972
+datestamp: 1664365234

@@ -1,0 +1,13 @@
+status: true
+dependencies: {  }
+name: widget_type_small_16_9
+label: 'Widget Type Small (16:9)'
+effects:
+  6fde8733-9328-4096-8ab9-8c31f49d4acd:
+    uuid: 6fde8733-9328-4096-8ab9-8c31f49d4acd
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 192
+      height: 108
+      anchor: center-center

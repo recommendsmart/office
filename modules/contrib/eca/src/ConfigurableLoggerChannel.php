@@ -241,6 +241,9 @@ class ConfigurableLoggerChannel extends LoggerChannel {
       elseif ($value instanceof TypedDataInterface) {
         $info = $value->getDataDefinition()->getDataType();
       }
+      elseif ($value === NULL) {
+        $info = 'NULL';
+      }
       else {
         $info = get_class($value);
       }

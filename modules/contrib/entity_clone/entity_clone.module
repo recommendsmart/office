@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -121,7 +122,7 @@ function entity_clone_entity_type_build(array &$entity_types) {
  * @see \Drupal\Core\Entity\EntityListBuilderInterface::getOperations()
  */
 function entity_clone_entity_operation(EntityInterface $entity) {
-  if ($entity->hasLinkTemplate('clone-form') && $entity->access('clone')) {
+  if ($entity->hasLinkTemplate('clone-form') && $entity->access('clone') && !$entity->isNew()) {
     return [
       'clone' => [
         'title' => t('Clone'),
@@ -139,8 +140,39 @@ function entity_clone_entity_operation(EntityInterface $entity) {
  * Implements hook_entity_access().
  */
 function entity_clone_entity_access(EntityInterface $entity, $operation, AccountInterface $account) {
-  if ($operation === 'clone') {
-    return AccessResult::allowedIfHasPermission($account, 'clone ' . $entity->getEntityTypeId() . ' entity');
+  if ($operation !== 'clone') {
+    return AccessResult::neutral();
   }
-  return AccessResult::neutral();
+
+  $cache = new CacheableMetadata();
+  $cache->addCacheContexts(['user.permissions']);
+
+  // Deny access if the user cannot clone the entity.
+  $access = AccessResult::forbiddenIf(!$account->hasPermission('clone ' . $entity->getEntityTypeId() . ' entity'));
+  if ($access->isForbidden()) {
+    return $access->addCacheableDependency($cache);
+  }
+
+  // Deny access if the user can clone but cannot create new entities of this
+  // type. However, we have some exceptions in which the access control handler
+  // doesn't have a say in things. In these cases, we go based on the clone
+  // permission only.
+  $exceptions = [
+    'file',
+    'paragraph',
+  ];
+
+  if (in_array($entity->getEntityTypeId(), $exceptions)) {
+    return AccessResult::allowed()->addCacheableDependency($cache);
+  }
+
+  $handler = \Drupal::entityTypeManager()->getAccessControlHandler($entity->getEntityTypeId());
+  $access = $handler->createAccess($entity->bundle(), $account, [], TRUE);
+  if (!$access->isAllowed()) {
+    $cache->addCacheableDependency($access);
+    $forbidden = AccessResult::forbidden();
+    return $forbidden->addCacheableDependency($cache);
+  }
+
+  return AccessResult::allowed()->addCacheableDependency($cache);
 }

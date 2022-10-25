@@ -10,7 +10,6 @@ use Drupal\eca\Plugin\ECA\EcaPluginBase;
 use Drupal\eca\Service\Actions;
 use Drupal\eca\Service\Conditions;
 use Drupal\eca\Service\Modellers;
-use Drupal\eca_ui\Service\TokenBrowserService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -38,13 +37,6 @@ abstract class ModellerBase extends EcaPluginBase implements ModellerInterface {
    * @var \Drupal\eca\Service\Modellers
    */
   protected Modellers $modellerServices;
-
-  /**
-   * ECA token browser service.
-   *
-   * @var \Drupal\eca_ui\Service\TokenBrowserService
-   */
-  protected TokenBrowserService $tokenBrowserService;
 
   /**
    * Logger service.
@@ -96,7 +88,6 @@ abstract class ModellerBase extends EcaPluginBase implements ModellerInterface {
     $instance->actionServices = $container->get('eca.service.action');
     $instance->conditionServices = $container->get('eca.service.condition');
     $instance->modellerServices = $container->get('eca.service.modeller');
-    $instance->tokenBrowserService = $container->get('eca_ui.service.token_browser');
     $instance->logger = $container->get('logger.channel.eca');
     $instance->uuid = $container->get('uuid');
     $instance->extensionPathResolver = $container->get('extension.path.resolver');

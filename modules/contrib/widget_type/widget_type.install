@@ -98,3 +98,54 @@ function widget_type_update_8104(&$sandbox) {
     $registry_source_field
   );
 }
+
+/**
+ * Install field to hold preview data.
+ */
+function widget_type_update_8105(&$sandbox) {
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  $fields = [];
+  $fields['preview_link'] = BaseFieldDefinition::create('uri')
+    ->setLabel(t('Preview Link'))
+    ->setRevisionable(TRUE)
+    ->setTranslatable(FALSE)
+    ->setDescription(t('The link of the preview.'))
+    ->setDisplayOptions('view', ['region' => 'hidden'])
+    ->setDisplayConfigurable('view', TRUE);
+
+  $fields['preview_image'] = BaseFieldDefinition::create('image')
+    ->setLabel(t('Preview Image'))
+    ->setDescription(t('The thumbnail of the widget type.'))
+    ->setRevisionable(TRUE)
+    ->setTranslatable(FALSE)
+    ->setDisplayOptions('view', [
+      'type' => 'image',
+      'weight' => 5,
+      'label' => 'hidden',
+    ])
+    ->setDisplayConfigurable('view', TRUE);
+  foreach ($fields as $name => $definition) {
+    $definition_update_manager->installFieldStorageDefinition(
+      $name,
+      'widget_type',
+      'widget_type',
+      $definition
+    );
+  }
+}
+
+/**
+ * Install image style for new fancy selector.
+ */
+function widget_type_update_8106(&$sandbox) {
+  $path = implode(DIRECTORY_SEPARATOR, [
+    \Drupal::root(),
+    \Drupal::service('extension.list.module')->getPath('widget_type'),
+    \Drupal\Core\Config\InstallStorage::CONFIG_INSTALL_DIRECTORY,
+  ]);
+  $source = new FileStorage($path);
+  $active_storage = \Drupal::service('config.storage');
+  $name = 'image.style.widget_type_small_16_9';
+  $data = $source->read($name);
+  $active_storage->write($name, $data);
+}

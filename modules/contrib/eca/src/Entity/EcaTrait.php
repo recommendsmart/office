@@ -5,6 +5,7 @@ namespace Drupal\eca\Entity;
 use Drupal\Core\Action\ActionManager;
 use Drupal\Core\Cache\MemoryCache\MemoryCache;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Logger\LoggerChannel;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\eca\PluginManager\Action;
@@ -104,6 +105,13 @@ trait EcaTrait {
    * @var \Drupal\Core\Messenger\MessengerInterface|null
    */
   protected ?MessengerInterface $messenger;
+
+  /**
+   * The form builder service.
+   *
+   * @var \Drupal\Core\Form\FormBuilderInterface|null
+   */
+  protected ?FormBuilderInterface $formBuilder;
 
   /**
    * Initializes the modeller plugin manager.
@@ -259,6 +267,19 @@ trait EcaTrait {
       $this->messenger = \Drupal::messenger();
     }
     return $this->messenger;
+  }
+
+  /**
+   * Initializes the form builder service.
+   *
+   * @return \Drupal\Core\Form\FormBuilderInterface
+   *   The form builder service.
+   */
+  protected function formBuilder(): FormBuilderInterface {
+    if (!isset($this->formBuilder)) {
+      $this->formBuilder = \Drupal::formBuilder();
+    }
+    return $this->formBuilder;
   }
 
 }

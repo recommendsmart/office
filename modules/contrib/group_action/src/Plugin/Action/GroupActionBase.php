@@ -17,6 +17,7 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Utility\Token;
 use Drupal\group\Entity\GroupInterface;
 use Drupal\group\Plugin\GroupContentEnablerManagerInterface;
+use Drupal\group_action\Compatibility;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -65,6 +66,13 @@ abstract class GroupActionBase extends ConfigurableActionBase implements Contain
   protected AccountInterface $currentUser;
 
   /**
+   * An instance of a Compatibility object.
+   *
+   * @var \Drupal\group_action\Compatibility
+   */
+  protected Compatibility $compatibility;
+
+  /**
    * Constructs a new GroupActionBase plugin instance.
    *
    * @param array $configuration
@@ -85,8 +93,10 @@ abstract class GroupActionBase extends ConfigurableActionBase implements Contain
    *   The entity repository.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
+   * @param \Drupal\group_action\Compatibility $compatibility
+   *   An instance of a Compatibility object.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, GroupContentEnablerManagerInterface $gce_plugin_manager, Token $token, TranslationInterface $string_translation, EntityRepositoryInterface $entity_repository, AccountInterface $current_user) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, GroupContentEnablerManagerInterface $gce_plugin_manager, Token $token, TranslationInterface $string_translation, EntityRepositoryInterface $entity_repository, AccountInterface $current_user, Compatibility $compatibility) {
     parent::__construct($configuration + ['values' => []], $plugin_id, $plugin_definition);
     $this->entityTypeManager = $entity_type_manager;
     $this->gcePluginManager = $gce_plugin_manager;
@@ -94,6 +104,7 @@ abstract class GroupActionBase extends ConfigurableActionBase implements Contain
     $this->stringTranslation = $string_translation;
     $this->entityRepository = $entity_repository;
     $this->currentUser = $current_user;
+    $this->compatibility = $compatibility;
     if (is_string($this->configuration['values'])) {
       $this->configuration['values'] = $this->decodeValues($this->configuration['values']);
     }
@@ -112,7 +123,8 @@ abstract class GroupActionBase extends ConfigurableActionBase implements Contain
       $container->get('token'),
       $container->get('string_translation'),
       $container->get('entity.repository'),
-      $container->get('current_user')
+      $container->get('current_user'),
+      new Compatibility($container->get('module_handler'))
     );
   }
 
@@ -121,7 +133,7 @@ abstract class GroupActionBase extends ConfigurableActionBase implements Contain
    */
   public function defaultConfiguration() {
     return [
-      'operation' => '', // Either one of "create" or "delete".
+      'operation' => '', // Either one of "create", "update" or "delete".
       'content_plugin' => '', // The group content plugin ID.
       'group_id' => '', // The group ID. Can be numerical or a UUID.
       'entity_id' => '', // The entity ID. Can be numerical or a UUID.
@@ -353,7 +365,9 @@ abstract class GroupActionBase extends ConfigurableActionBase implements Contain
     }
     unset($k, $vs);
 
+    $this->compatibility->beforeOperation();
     $this->executeOperation($operation, $group, $entity, $content_plugin_id, $values);
+    $this->compatibility->afterOperation();
   }
 
   /**

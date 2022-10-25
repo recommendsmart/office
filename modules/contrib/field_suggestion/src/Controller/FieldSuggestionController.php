@@ -3,7 +3,10 @@
 namespace Drupal\field_suggestion\Controller;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\field_suggestion\Ajax\FieldSuggestionCommand;
+use Drupal\field_suggestion\FieldSuggestionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -41,6 +44,13 @@ class FieldSuggestionController extends ControllerBase {
   protected $entityFieldManager;
 
   /**
+   * The field definition.
+   *
+   * @var \Drupal\Core\Field\BaseFieldDefinition
+   */
+  protected $definition;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
@@ -54,12 +64,82 @@ class FieldSuggestionController extends ControllerBase {
   }
 
   /**
+   * Provides a edit title callback.
+   *
+   * @param \Drupal\field_suggestion\FieldSuggestionInterface $field_suggestion
+   *   The field suggestion entity object.
+   *
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   *   The title for the entity edit page.
+   */
+  public function title(FieldSuggestionInterface $field_suggestion) {
+    $definitions = $this->entityFieldManager->getBaseFieldDefinitions(
+      $entity_type = $field_suggestion->type()
+    );
+
+    return $this->t(
+      'Edit a suggestion based on the %value value of the %field field of the
+%type entity type',
+      [
+        '%value' => $field_suggestion->label(),
+        '%field' => $definitions[$field_suggestion->field()]->getLabel(),
+        '%type' => $this->entityTypeManager()->getDefinition($entity_type)->getLabel(),
+      ]
+    );
+  }
+
+  /**
+   * Choose a specific suggestion.
+   *
+   * @param $entity_type
+   *   The entity type identifier.
+   * @param $field_name
+   *   The field name.
+   * @param $delta
+   *   The suggestion offset.
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   *   The AJAX response.
+   */
+  public function select($entity_type, $field_name, $delta) {
+    return (new AjaxResponse())->addCommand(new FieldSuggestionCommand(
+      $field_name,
+      $delta,
+      $this->helper->encode($this->property($entity_type, $field_name))
+    ));
+  }
+
+  /**
+   * Access check based on whether a field is supported or not.
+   *
+   * @param string $entity_type
+   *   The entity type identifier.
+   * @param string $field_name
+   *   The field name.
+   * @param $delta
+   *   The suggestion offset.
+   *
+   * @return \Drupal\Core\Access\AccessResultInterface
+   *   The access result.
+   */
+  public function selectAccess($entity_type, $field_name, $delta) {
+    $config = $this->config('field_suggestion.settings');
+    $field_names = (array) $config->get('fields');
+    $entity_type = $this->helper->decode($entity_type);
+
+    return AccessResult::allowedIf(
+      !empty($field_names[$entity_type]) &&
+      in_array($field_name, $field_names[$entity_type])
+    );
+  }
+
+  /**
    * Pin or ignore values of selected fields.
    *
-   * @param string $entity_type_id
-   *   The entity type ID.
+   * @param string $entity_type
+   *   The entity type identifier.
    * @param int $entity_id
-   *   The entity ID.
+   *   The entity identifier.
    * @param string $field_name
    *   The field name.
    * @param string $type
@@ -68,16 +148,10 @@ class FieldSuggestionController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   A redirect response object that may be returned by the controller.
    */
-  public function action($entity_type_id, $entity_id, $field_name, $type) {
-    $entity_type_id = str_replace('-', '_', $entity_type_id);
+  public function operation($entity_type, $entity_id, $field_name, $type) {
+    $property = $this->property($entity_type, $field_name);
 
-    /** @var \Drupal\Core\Field\BaseFieldDefinition $definition */
-    $definition = $this->entityFieldManager
-      ->getBaseFieldDefinitions($entity_type_id)[$field_name];
-
-    $property = $definition->getMainPropertyName() ?? 'value';
-
-    $value = $this->entityTypeManager()->getStorage($entity_type_id)
+    $value = $this->entityTypeManager()->getStorage($entity_type)
       ->load($entity_id)
       ->$field_name
       ->$property;
@@ -85,9 +159,9 @@ class FieldSuggestionController extends ControllerBase {
     $storage = $this->entityTypeManager()->getStorage('field_suggestion');
 
     $entities = $storage->loadByProperties($values = [
-      'type' => $field_type = $definition->getType(),
+      'type' => $field_type = $this->definition->getType(),
       'ignore' => $type === 'ignore',
-      'entity_type' => $entity_type_id,
+      'entity_type' => $entity_type,
       'field_name' => $field_name,
       $this->helper->field($field_type) => $value,
     ]);
@@ -119,10 +193,10 @@ class FieldSuggestionController extends ControllerBase {
   /**
    * Access check based on whether a field is supported or not.
    *
-   * @param string $entity_type_id
-   *   The entity type ID.
+   * @param string $entity_type
+   *   The entity type identifier.
    * @param int $entity_id
-   *   The entity ID.
+   *   The entity identifier.
    * @param string $field_name
    *   The field name.
    * @param string $type
@@ -131,56 +205,71 @@ class FieldSuggestionController extends ControllerBase {
    * @return \Drupal\Core\Access\AccessResultInterface
    *   The access result.
    */
-  public function access($entity_type_id, $entity_id, $field_name, $type) {
-    if (!(
-      isset(self::PERMISSIONS[$type]) &&
-      (
-        $this->currentUser()->hasPermission('administer field suggestion') ||
-        $this->currentUser()->hasPermission(self::PERMISSIONS[$type])
-      )
-    )) {
+  public function operationAccess($entity_type, $entity_id, $field_name, $type) {
+    if (
+      !(
+        isset(self::PERMISSIONS[$type]) &&
+        (
+          $this->currentUser()->hasPermission('administer field suggestion') ||
+          $this->currentUser()->hasPermission(self::PERMISSIONS[$type])
+        )
+      ) ||
+      !$this->selectAccess($entity_type, $field_name, 0)->isAllowed()
+    ) {
       return AccessResult::neutral();
     }
 
-    $config = $this->config('field_suggestion.settings');
-    $field_names = (array) $config->get('fields');
-    $entity_type_id = str_replace('-', '_', $entity_type_id);
+    $entity_type = $this->helper->decode($entity_type);
 
-    if (
-      !empty($field_names[$entity_type_id]) &&
-      in_array($field_name, $field_names[$entity_type_id])
-    ) {
-      $entity = $this->entityTypeManager()->getStorage($entity_type_id)
-        ->load($entity_id);
+    $entity = $this->entityTypeManager()->getStorage($entity_type)
+      ->load($entity_id);
 
-      if ($entity !== NULL && !($field = $entity->$field_name)->isEmpty()) {
-        /** @var \Drupal\Core\Field\BaseFieldDefinition $definition */
-        $definition = $this->entityFieldManager
-          ->getBaseFieldDefinitions($entity_type_id)[$field_name];
-
-        $field_type = $definition->getType();
-        $property = $definition->getMainPropertyName() ?? 'value';
-
-        $count = $this->entityTypeManager()->getStorage('field_suggestion')
-          ->getQuery()
-          ->condition('entity_type', $entity_type_id)
-          ->condition('field_name', $field_name)
-          ->condition($this->helper->field($field_type), $field->$property)
-          ->range(0, 1)
-          ->count()
-          ->execute();
-
-        return AccessResult::allowedIf(
-          $count > 0 ||
-          !in_array(
-            $field->$property,
-            $this->helper->ignored($entity_type_id, $field_name)
-          )
-        );
-      }
+    if ($entity === NULL || ($field = $entity->$field_name)->isEmpty()) {
+      return AccessResult::neutral();
     }
 
-    return AccessResult::neutral();
+    $property = $this->property($entity_type, $field_name);
+
+    $count = $this->entityTypeManager()->getStorage('field_suggestion')
+      ->getQuery()
+      ->accessCheck()
+      ->condition('entity_type', $entity_type)
+      ->condition('field_name', $field_name)
+      ->condition(
+        $this->helper->field($this->definition->getType()),
+        $field->$property
+      )
+      ->range(0, 1)
+      ->count()
+      ->execute();
+
+    return AccessResult::allowedIf(
+      $count > 0 ||
+      !in_array(
+        $field->$property,
+        $this->helper->ignored($entity_type, $field_name)
+      )
+    );
+  }
+
+  /**
+   * Returns the name of the main property.
+   *
+   * @param $entity_type
+   *   The entity type identifier.
+   * @param $field_name
+   *   The field name.
+   *
+   * @return string
+   *   The name of the value property.
+   */
+  protected function property(&$entity_type, $field_name) {
+    $entity_type = $this->helper->decode($entity_type);
+
+    $this->definition = $this->entityFieldManager
+      ->getBaseFieldDefinitions($entity_type)[$field_name];
+
+    return $this->definition->getMainPropertyName() ?? 'value';
   }
 
 }

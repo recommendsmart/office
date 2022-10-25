@@ -148,6 +148,7 @@ abstract class TokenBearerFunctionalTestBase extends BrowserTestBase {
     $scope_2->save();
 
     $this->client = Consumer::create([
+      'client_id' => $this->getRandomGenerator()->string(),
       'label' => $this->getRandomGenerator()->name(),
       'secret' => $this->clientSecret,
       'grant_types' => [

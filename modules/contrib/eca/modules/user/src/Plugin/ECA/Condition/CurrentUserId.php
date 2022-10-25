@@ -23,8 +23,8 @@ class CurrentUserId extends BaseUser {
     // \Drupal\Core\Session\AccountInterface::id describes that an integer
     // should be returned.
     // We need to cast the ID to string to avoid false positives when an
-    // empty string value get compared to integed 0.
-    $result = (string) $this->configuration['user_id'] === (string) $this->currentUser->id();
+    // empty string value get compared to integer 0.
+    $result = (string) $this->tokenServices->replace($this->configuration['user_id']) === (string) $this->currentUser->id();
     return $this->negationCheck($result);
   }
 

@@ -3,11 +3,16 @@
 namespace Drupal\entity_clone\EntityClone\Content;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\content_moderation\Entity\ContentModerationState;
+use Drupal\content_moderation\Plugin\Field\ModerationStateFieldItemList;
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityHandlerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldConfigInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -35,18 +40,18 @@ class ContentEntityCloneBase implements EntityHandlerInterface, EntityCloneInter
   protected $entityTypeId;
 
   /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountProxyInterface
-   */
-  protected $currentUser;
-
-  /**
    * A service for obtaining the system's time.
    *
    * @var \Drupal\Component\Datetime\TimeInterface
    */
   protected $timeService;
+
+  /**
+   * The current user.
+   *
+   * @var \Drupal\Core\Session\AccountProxyInterface
+   */
+  protected $currentUser;
 
   /**
    * Constructs a new ContentEntityCloneBase.
@@ -55,16 +60,18 @@ class ContentEntityCloneBase implements EntityHandlerInterface, EntityCloneInter
    *   The entity type manager.
    * @param string $entity_type_id
    *   The entity type ID.
-   * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
-   *  The current user.
    * @param \Drupal\Component\Datetime\TimeInterface $time_service
    *   A service for obtaining the system's time.
+   * @param \Drupal\Core\Session\AccountProxyInterface $current_user
+   *   The current user.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, $entity_type_id, TimeInterface $time_service, AccountProxyInterface $currentUser) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, $entity_type_id, TimeInterface $time_service, AccountProxyInterface $current_user) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityTypeId = $entity_type_id;
     $this->timeService = $time_service;
-    $this->currentUser = $currentUser;
+    $this->currentUser = $current_user;
   }
 
   /**
@@ -87,7 +94,6 @@ class ContentEntityCloneBase implements EntityHandlerInterface, EntityCloneInter
       $cloned_entity->setOwnerId($this->currentUser->id());
     }
     // Clone referenced entities.
-    $cloned_entity->save();
     $already_cloned[$entity->getEntityTypeId()][$entity->id()] = $cloned_entity;
     if ($cloned_entity instanceof FieldableEntityInterface && $entity instanceof FieldableEntityInterface) {
       foreach ($cloned_entity->getFieldDefinitions() as $field_id => $field_definition) {
@@ -102,17 +108,30 @@ class ContentEntityCloneBase implements EntityHandlerInterface, EntityCloneInter
     }
 
     $this->setClonedEntityLabel($entity, $cloned_entity);
+    $this->setCreatedAndChangedDates($cloned_entity);
 
-    // For now, check that the cloned entity has a 'setCreatedTime' method, and
-    // if so, try to call it. This condition can be replaced with a more-robust
-    // check whether $cloned_entity is an instance of
-    // Drupal\Core\Entity\EntityCreatedInterface once
-    // https://www.drupal.org/project/drupal/issues/2833378 lands.
-    if (method_exists($cloned_entity, 'setCreatedTime')) {
-      $cloned_entity->setCreatedTime($this->timeService->getRequestTime());
+    if ($this->hasTranslatableModerationState($cloned_entity)) {
+      // If we are using moderation state, ensure that each translation gets
+      // the same moderation state BEFORE we save so that upon save, each
+      // translation gets its publishing status updated according to the
+      // moderation state. After the entity is saved, we kick in the creation
+      // of translations of created moderation state entity.
+      foreach ($cloned_entity->getTranslationLanguages(TRUE) as $language) {
+        $translation = $cloned_entity->getTranslation($language->getId());
+        $translation->set('moderation_state', $cloned_entity->get('moderation_state')->value);
+      }
     }
 
     $cloned_entity->save();
+
+    // If we are using content moderation, make sure the moderation state
+    // entity gets translated to reflect the available translations on the
+    // source entity. Thus, we call this after the save because we need the
+    // original moderation state entity to have been created.
+    if ($this->hasTranslatableModerationState($cloned_entity)) {
+      $this->setTranslationModerationState($entity, $cloned_entity);
+    }
+
     return $cloned_entity;
   }
 
@@ -135,6 +154,7 @@ class ContentEntityCloneBase implements EntityHandlerInterface, EntityCloneInter
     if (($field_definition instanceof FieldConfigInterface) && $type_is_clonable) {
       return TRUE;
     }
+
     return FALSE;
   }
 
@@ -200,6 +220,7 @@ class ContentEntityCloneBase implements EntityHandlerInterface, EntityCloneInter
         $referenced_entities[] = $referenced_entity;
       }
     }
+
     return $referenced_entities;
   }
 
@@ -224,7 +245,121 @@ class ContentEntityCloneBase implements EntityHandlerInterface, EntityCloneInter
     if (!isset($child_properties['children'])) {
       $child_properties['children'] = [];
     }
+
     return $child_properties;
+  }
+
+  /**
+   * Create moderation_state translations for the cloned entities.
+   *
+   * When a new translation is saved, content moderation creates a corresponding
+   * translation to the moderation_state entity as well. However, for this to
+   * happen, the translation itself needs to be saved. When we clone, this
+   * doesn't happen as the original entity gets cloned together with the
+   * translations and a save is called on the original language being cloned. So
+   * we have to do this manually.
+   *
+   * This is doing essentially what
+   * Drupal\content_moderation\EntityOperations::updateOrCreateFromEntity but
+   * we had to replicate it because if a user clones a node translation
+   * directly, updateOrCreateFromEntity() would not create a translation for
+   * the original language but would override the language when passing the
+   * original entity translation.
+   */
+  protected function setTranslationModerationState(ContentEntityInterface $entity, ContentEntityInterface $cloned_entity) {
+    $languages = $cloned_entity->getTranslationLanguages();
+
+    // Load the existing moderation state entity for the cloned entity. This
+    // should exist and have only 1 translation.
+    $needs_save = FALSE;
+    $moderation_state = ContentModerationState::loadFromModeratedEntity($cloned_entity);
+    $original_translation = $cloned_entity->getUntranslated();
+    if ($moderation_state->language()->getId() !== $original_translation->language()->getId()) {
+      // If we are cloning a node while not being in the original translation
+      // language, Drupal core will set the default language of the moderation
+      // state to that language whereas the node is simply duplicated and will
+      // keep the original default language. So we need to change it to that
+      // also in the moderation state to keep things consistent.
+      $moderation_state->set($moderation_state->getEntityType()->getKey('langcode'), $original_translation->language()->getId());
+      $needs_save = TRUE;
+    }
+
+    foreach ($languages as $language) {
+      $translation = $cloned_entity->getTranslation($language->getId());
+      if (!$moderation_state->hasTranslation($translation->language()->getId())) {
+        // We make a 1 to 1 copy of the moderation state entity from the
+        // original created already by the content_moderation module. This is ok
+        // because even if translations can be in different moderation states,
+        // when cloning, the moderation state is reset to whatever the workflow
+        // default is configured to be. So we anyway should end up with the
+        // same state across all languages.
+        $moderation_state->addTranslation($translation->language()->getId(), $moderation_state->toArray());
+        $needs_save = TRUE;
+      }
+    }
+
+    if ($needs_save) {
+      ContentModerationState::updateOrCreateFromEntity($moderation_state);
+    }
+  }
+
+  /**
+   * Checks if the entity has the moderation state field and can be moderated.
+   *
+   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   *   The entity.
+   *
+   * @return bool
+   *   Whether it can be moderated.
+   */
+  protected function hasTranslatableModerationState(ContentEntityInterface $entity): bool {
+    if (!$entity->hasField('moderation_state') || !$entity->get('moderation_state') instanceof ModerationStateFieldItemList) {
+      return FALSE;
+    }
+
+    return !empty($entity->getTranslationLanguages(FALSE));
+  }
+
+  /**
+   * Resets the created and changed dates on the cloned entity.
+   *
+   * Since we don't want the cloned entity to have the old dates (as a new
+   * entity is being created), we need to reset the created and changed dates
+   * for those entities that support it.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The cloned entity.
+   * @param bool $is_translation
+   *   Whether we are recursing over a translation.
+   */
+  protected function setCreatedAndChangedDates(EntityInterface $entity, bool $is_translation = FALSE) {
+    $created_time = $this->timeService->getRequestTime();
+
+    // For now, check that the cloned entity has a 'setCreatedTime' method, and
+    // if so, try to call it. This condition can be replaced with a more-robust
+    // check whether $cloned_entity is an instance of
+    // Drupal\Core\Entity\EntityCreatedInterface once
+    // https://www.drupal.org/project/drupal/issues/2833378 lands.
+    if (method_exists($entity, 'setCreatedTime')) {
+      $entity->setCreatedTime($created_time);
+    }
+
+    // If the entity has a changed time field, we should update it to the
+    // created time we set above as it cannot possibly be before.
+    if ($entity instanceof EntityChangedInterface) {
+      $entity->setChangedTime($created_time);
+    }
+
+    if ($is_translation) {
+      return;
+    }
+
+    if ($entity instanceof TranslatableInterface) {
+      foreach ($entity->getTranslationLanguages(FALSE) as $language) {
+        $translation = $entity->getTranslation($language->getId());
+        $this->setCreatedAndChangedDates($translation, TRUE);
+      }
+    }
   }
 
 }

@@ -12,7 +12,8 @@ use Drupal\eca\Plugin\FormPluginTrait;
  *
  * @EcaCondition(
  *   id = "eca_content_form_display_mode",
- *   label = @Translation("Entity form: compare display mode")
+ *   label = @Translation("Entity form: compare display mode"),
+ *   description = @Translation("Evaluates against the machine name of the entity form display mode."),
  * )
  */
 class EntityFormDisplayMode extends StringComparisonBase {

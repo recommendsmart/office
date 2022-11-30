@@ -58,7 +58,7 @@ function opigno_statistics_install() {
  */
 function opigno_statistics_update_9001() {
   $config_storage = \Drupal::service('config.storage');
-  $opigno_module_path = drupal_get_path('module', 'opigno_module') . '/config/optional/';
+  $opigno_module_path = \Drupal::service('extension.list.module')->getPath('opigno_module') . '/config/optional/';
   $configs = [
     'core.entity_view_display.group.learning_path.list_item' => $opigno_module_path,
     'core.entity_view_display.user.user.compact' => $opigno_module_path,
@@ -124,7 +124,7 @@ function opigno_statistics_update_9002() {
  * Import statistics configs.
  */
 function opigno_statistics_update_9003() {
-  $config_path = drupal_get_path('module', 'opigno_statistics') . '/config/optional/';
+  $config_path = \Drupal::service('extension.list.module')->getPath('opigno_statistics') . '/config/optional/';
   $config_source = new FileStorage($config_path);
   \Drupal::service('config.installer')->installOptionalConfig($config_source);
 }
@@ -134,7 +134,7 @@ function opigno_statistics_update_9003() {
  */
 function opigno_statistics_update_9004() {
   $config_storage = \Drupal::service('config.storage');
-  $config_path = drupal_get_path('module', 'opigno_module') . '/config/optional/';
+  $config_path = \Drupal::service('extension.list.module')->getPath('opigno_module') . '/config/optional/';
   $source = new FileStorage($config_path);
   $config_storage->write('views.view.opigno_score_modules', $source->read('views.view.opigno_score_modules'));
 }

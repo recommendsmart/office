@@ -4,6 +4,6 @@ parameters:
   level: 0
   paths:
     - web/modules/permissions_by_term
-  excludes_analyse:
+  excludePaths:
     - tests/*.php
     - src/Commands/*.php

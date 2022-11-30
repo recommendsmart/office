@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @Action(
  *   id = "eca_new_entity",
  *   label = @Translation("Entity: create new"),
+ *   description = @Translation("Create a new content entity without saving it."),
  *   type = "entity"
  * )
  */
@@ -67,6 +68,7 @@ class NewEntity extends ConfigurableActionBase {
       '#type' => 'textfield',
       '#title' => $this->t('Name of token'),
       '#default_value' => $this->configuration['token_name'],
+      '#description' => $this->t('Provide the name of a token that holds the new entity.'),
       '#weight' => -60,
     ];
     $form['type'] = [
@@ -74,30 +76,35 @@ class NewEntity extends ConfigurableActionBase {
       '#title' => $this->t('Type'),
       '#options' => $this->entityTypes->getTypesAndBundles(FALSE, FALSE),
       '#default_value' => $this->configuration['type'],
+      '#description' => $this->t('The type of the new entity.'),
       '#weight' => -50,
     ];
     $form['langcode'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Language code'),
       '#default_value' => $this->configuration['langcode'],
+      '#description' => $this->t('The language code of the new entity.'),
       '#weight' => -40,
     ];
     $form['label'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Entity label'),
       '#default_value' => $this->configuration['label'],
+      '#description' => $this->t('The label of the new entity.'),
       '#weight' => -30,
     ];
     $form['published'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Published'),
       '#default_value' => $this->shouldPublish(),
+      '#description' => $this->t('Whether the entity should be published or not.'),
       '#weight' => -20,
     ];
     $form['owner'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Owner UID'),
       '#default_value' => $this->configuration['owner'],
+      '#description' => $this->t('The owner UID of the new entity.'),
       '#weight' => -10,
     ];
     return $form;
@@ -111,7 +118,7 @@ class NewEntity extends ConfigurableActionBase {
     $this->configuration['type'] = $form_state->getValue('type');
     $this->configuration['langcode'] = $form_state->getValue('langcode');
     $this->configuration['label'] = $form_state->getValue('label');
-    $this->configuration['published'] = $form_state->getValue('published');
+    $this->configuration['published'] = !empty($form_state->getValue('published'));
     $this->configuration['owner'] = $form_state->getValue('owner');
     parent::submitConfigurationForm($form, $form_state);
   }

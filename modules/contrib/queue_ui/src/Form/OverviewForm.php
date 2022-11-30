@@ -81,6 +81,8 @@ class OverviewForm extends FormBase {
   private $queueUIManager;
 
   /**
+   * The QueueUIBatchInterface.
+   *
    * @var \Drupal\queue_ui\QueueUIBatchInterface
    */
   protected $queueUiBatch;
@@ -268,6 +270,7 @@ class OverviewForm extends FormBase {
           '#name' => 'weight[' . $name . ']',
           // Classify the weight element for #tabledrag.
           '#attributes' => ['class' => ['queue-order-weight']],
+          '#parents' => ['weight', $name],
         ];
       }
 

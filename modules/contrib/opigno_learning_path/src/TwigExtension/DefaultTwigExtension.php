@@ -2,6 +2,7 @@
 
 namespace Drupal\opigno_learning_path\TwigExtension;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
@@ -187,7 +188,7 @@ class DefaultTwigExtension extends AbstractExtension {
           $link = [
             'title' => $joinLabel,
             'route' => 'user.login',
-            'args' => ['destination' => render($url)->toString()],
+            'args' => ['destination' => \Drupal::service('renderer')->render($url)->toString()],
           ];
         }
       }
@@ -204,7 +205,7 @@ class DefaultTwigExtension extends AbstractExtension {
       $link = [
         'title' => t('Create an account and subscribe'),
         'route' => 'user.login',
-        'args' => ['prev_path' => render($url)->toString()],
+        'args' => ['prev_path' => \Drupal::service('renderer')->render($url)->toString()],
       ];
     }
 
@@ -212,7 +213,7 @@ class DefaultTwigExtension extends AbstractExtension {
         $url = Url::fromRoute($link['route'], $link['args'], ['attributes' => $attributes]);
         $l = Link::fromTextAndUrl($link['title'], $url)->toRenderable();
 
-        return render($l);
+        return \Drupal::service('renderer')->render($l);
       }
     }
 
@@ -220,7 +221,7 @@ class DefaultTwigExtension extends AbstractExtension {
   }
 
   /**
-   * Returns group start link.
+   * Returns groupstart link.
    *
    * @param mixed $group
    *   Group.
@@ -344,7 +345,7 @@ class DefaultTwigExtension extends AbstractExtension {
             '#type' => 'inline_template',
             '#template' => '<div class="top-text complete"><i class="fi fi-rr-lock"></i><div>{{"Complete"|t}}<br>{{top_text}}<br>{{"before"|t}}</div></div>',
             '#context' => [
-              'top_text' => render($top_text) ?? '',
+              'top_text' => \Drupal::service('renderer')->render($top_text) ?? '',
             ],
           ];
         }
@@ -426,10 +427,15 @@ class DefaultTwigExtension extends AbstractExtension {
     $args += ['group' => $group->id(), 'type' => $type];
     $url = Url::fromRoute($route, $args, ['attributes' => $attributes]);
     $l = Link::fromTextAndUrl($text, $url)->toRenderable();
-    return [
+    $content = [
       $top_text ?? [],
       $l,
     ];
+    $cache = CacheableMetadata::createFromRenderArray($content);
+    $cache->addCacheableDependency($group);
+    $cache->addCacheableDependency($account);
+    $cache->applyTo($content);
+    return $content;
   }
 
   /**
@@ -462,6 +468,11 @@ class DefaultTwigExtension extends AbstractExtension {
     else {
       $content = $progress_service->getProgressBuild($group->id(), $account->id(), '', $class);
     }
+
+    $cache = CacheableMetadata::createFromRenderArray($content);
+    $cache->addCacheableDependency($group);
+    $cache->addCacheableDependency($account);
+    $cache->applyTo($content);
 
     return ($content);
   }

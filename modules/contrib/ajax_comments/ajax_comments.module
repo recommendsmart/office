@@ -33,6 +33,9 @@ use Symfony\Component\HttpFoundation\Request;
  * Implements hook_entity_view_mode_alter().
  */
 function ajax_comments_entity_view_mode_alter(&$view_mode, Drupal\Core\Entity\EntityInterface $entity, $context) {
+  if (!\Drupal::currentUser()->hasPermission('post comments')) {
+    return;
+  }
 
   /** @var \Drupal\ajax_comments\FieldSettingsHelper $field_settings_helper */
   $field_settings_helper = \Drupal::service('ajax_comments.field_settings_helper');

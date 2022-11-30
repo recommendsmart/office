@@ -117,7 +117,8 @@ trait StatisticsPageTrait {
     $theme = \Drupal::theme()->getActiveTheme()->getName();
     $theme_decorator = \Drupal::hasService('color.theme_decorator');
     if ($theme_decorator) {
-      $color_palette = \Drupal::service('color.theme_decorator')->getPalette($theme);
+      $color_palette = \Drupal::service('color.theme_decorator')
+        ->getPalette($theme);
     }
     else {
       $color_palette = color_get_palette($theme);
@@ -395,7 +396,7 @@ trait StatisticsPageTrait {
         case 'ContentTypeModule':
           if ($opigno_module = OpignoModule::load($id)) {
             $name = $opigno_module->getName();
-            $step_info = opigno_learning_path_get_module_step($gid, $uid, $opigno_module, $latest_cert_date);
+            $step_info = opigno_learning_path_get_module_step($gid, $uid, $opigno_module, $latest_cert_date, FALSE);
             $step_score = $opigno_module->getKeepResultsOption() == 'newest' ? $step_info["current attempt score"] : $step_info["best score"];
           }
           break;

@@ -41,6 +41,10 @@
   position: relative;
   display: block;
   margin-bottom: 8px;
+
+  > .form-wrapper {
+    margin-bottom: 1.1rem;
+  }
 }
 
 .checkbox.form-item-event-all-day {

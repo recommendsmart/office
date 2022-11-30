@@ -241,10 +241,10 @@ class OpignoMessageThread {
       ]);
     }
     else {
-      $path = drupal_get_path('theme', 'aristotle') . '/src/images/content/group_profile.svg';
+      $path = \Drupal::service('extension.list.theme')->getPath('aristotle') . '/src/images/content/group_profile.svg';
       $image = [
         '#theme' => 'image',
-        '#uri' => file_exists($path) ? file_url_transform_relative(base_path() . $path) : '',
+        '#uri' => file_exists($path) ? \Drupal::service('file_url_generator')->transformRelative(base_path() . $path) : '',
         '#alt' => $title,
         '#title' => $title,
       ];

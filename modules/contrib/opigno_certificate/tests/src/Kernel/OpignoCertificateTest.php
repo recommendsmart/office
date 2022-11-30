@@ -32,7 +32,7 @@ class OpignoCertificateTest extends EntityKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->entityTypeManager = $this->container->get('entity_type.manager');
     $this->installConfig(['opigno_certificate_config_test']);

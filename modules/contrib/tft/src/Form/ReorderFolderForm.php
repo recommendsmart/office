@@ -147,7 +147,7 @@ class ReorderFolderForm extends FormBase {
         ],
         [
           '#theme' => 'image',
-          '#uri' => drupal_get_path('module', 'tft') . '/img/folder.png',
+          '#uri' => \Drupal::service('extension.list.module')->getPath('tft') . '/img/folder.png',
           '#attributes' => [
             'class' => 'tft-admin-folder-content-item',
           ],

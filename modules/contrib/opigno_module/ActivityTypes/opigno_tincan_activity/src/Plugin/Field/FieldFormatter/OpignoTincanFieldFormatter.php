@@ -26,7 +26,7 @@ class OpignoTincanFieldFormatter extends EntityReferenceFormatterBase {
     foreach ($this->getEntitiesToView($items, $langcode) as $delta => $file) {
       $tincan_content_service = \Drupal::service('opigno_tincan_activity.tincan');
       $uri = $tincan_content_service->getExtractPath($file);
-      $url = file_create_url($uri);
+      $url = \Drupal::service('file_url_generator')->generateAbsoluteString($uri);
       $package_properties = $tincan_content_service->tincanLoadByFileEntity($file);
       $launch_file = $package_properties->launch_filename;
 

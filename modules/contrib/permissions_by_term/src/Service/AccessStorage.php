@@ -91,6 +91,7 @@ class AccessStorage {
     foreach ($aAllowedUsers as $sUserId) {
       $aUserId = \Drupal::entityQuery('user')
         ->condition('uid', $sUserId)
+        ->accessCheck(FALSE)
         ->execute();
       if (empty($aUserId)) {
         $form_state->setErrorByName('access][user',
@@ -589,6 +590,7 @@ class AccessStorage {
   public function getAllUids()
   {
     $nodes = \Drupal::entityQuery('user')
+      ->accessCheck(FALSE)
       ->execute();
 
     return array_values($nodes);

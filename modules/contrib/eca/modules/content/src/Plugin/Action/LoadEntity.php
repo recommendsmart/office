@@ -104,6 +104,7 @@ class LoadEntity extends ConfigurableActionBase {
       '#type' => 'textfield',
       '#title' => $this->t('Name of token'),
       '#default_value' => $this->configuration['token_name'],
+      '#description' => $this->t('Provide the name of a token that holds the loaded entity.'),
       '#weight' => -90,
     ];
     return $this->entityLoader()->buildConfigurationForm($this->configuration, $form, $form_state);

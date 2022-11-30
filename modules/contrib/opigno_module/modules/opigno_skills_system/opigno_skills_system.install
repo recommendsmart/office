@@ -40,7 +40,7 @@ function opigno_skills_system_install($is_syncing) {
  * Implements hook_uninstall().
  */
 function opigno_skills_system_uninstall() {
-  $config_path = drupal_get_path('module', 'opigno_module') . '/config/optional';
+  $config_path = \Drupal::service('extension.list.module')->getPath('opigno_module') . '/config/optional';
 
   $storage = new FileStorage($config_path);
   $config_storage = \Drupal::service('config.storage');

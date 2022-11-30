@@ -117,7 +117,7 @@ class ViewsExport extends ViewsQuery {
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
-    $this->configuration['load_results_into_token'] = $form_state->getValue('load_results_into_token');
+    $this->configuration['load_results_into_token'] = !empty($form_state->getValue('load_results_into_token'));
     $this->configuration['token_for_filename'] = $form_state->getValue('token_for_filename');
     $this->configuration['filename'] = $form_state->getValue('filename');
     parent::submitConfigurationForm($form, $form_state);

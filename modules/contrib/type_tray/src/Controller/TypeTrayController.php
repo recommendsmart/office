@@ -56,11 +56,19 @@ class TypeTrayController extends NodeController {
   protected $cacheTagsInvalidator;
 
   /**
+   * The module extension list.
+   *
+   * @var \Drupal\Core\Extension\ModuleExtensionList
+   */
+  protected $moduleList;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
     $instance = parent::create($container);
     $instance->cacheTagsInvalidator = $container->get('cache_tags.invalidator');
+    $instance->moduleList = $container->get('extension.list.module');
     return $instance;
   }
 
@@ -178,11 +186,11 @@ class TypeTrayController extends NodeController {
         $build['#items'][$category][$type->id()] = [
           '#theme' => 'type_tray_teaser',
           '#content_type_link' => Link::createFromRoute($type->label(), 'node.add', ['node_type' => $type->id()]),
-          '#thumbnail_url' => !empty($settings['type_thumbnail']) ? $settings['type_thumbnail'] : '/' . drupal_get_path('module', 'type_tray') .  static::TYPE_TRAY_DEFAULT_THUMBNAIL_PATH,
+          '#thumbnail_url' => !empty($settings['type_thumbnail']) ? $settings['type_thumbnail'] : '/' . $this->moduleList->getPath('type_tray') . static::TYPE_TRAY_DEFAULT_THUMBNAIL_PATH,
           '#thumbnail_alt' => $this->t('Thumbnail of a @label content type.', [
             '@label' => $type->label(),
           ]),
-          '#icon_url' => !empty($settings['type_icon']) ? $settings['type_icon'] : '/' . drupal_get_path('module', 'type_tray') . static::TYPE_TRAY_DEFAULT_ICON_PATH,
+          '#icon_url' => !empty($settings['type_icon']) ? $settings['type_icon'] : '/' . $this->moduleList->getPath('type_tray') . static::TYPE_TRAY_DEFAULT_ICON_PATH,
           '#icon_alt' => $this->t('Icon of a @label content type.', [
             '@label' => $type->label(),
           ]),
@@ -194,8 +202,11 @@ class TypeTrayController extends NodeController {
           '#favorite_link_url' => $favorite_link_url,
           '#favorite_link_action' => $favorite_link_action,
         ];
-        if ($config->get('existing_nodes_link')) {
-          $all_nodes_label = $this->t('View existing %type_label nodes', [ '%type_label' => $type->label()]);
+        if (!empty($settings['existing_nodes_link_text'])) {
+          // This avoids having site builders rely on Config Translation to
+          // make this translatable. Not ideal, but worth in this case.
+          // @codingStandardsIgnoreLine
+          $all_nodes_label = $this->t($settings['existing_nodes_link_text']);
           // Since sites could be using a different view to deliver the content
           // overview page, we create the link here based on the actual path,
           // instead of creating from the view route.
@@ -343,7 +354,7 @@ class TypeTrayController extends NodeController {
     $user_favorites[$type->id()] = $op === 'add' ? TRUE : FALSE;
     $collection->set($uid, $user_favorites);
     $this->cacheTagsInvalidator->invalidateTags([
-      'config:node_type_list'
+      'config:node_type_list',
     ]);
 
     // Send the user back to the Type Tray page.

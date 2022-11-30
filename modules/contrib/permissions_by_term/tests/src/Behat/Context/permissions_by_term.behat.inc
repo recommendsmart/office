@@ -64,6 +64,7 @@ class PermissionsByTermDrupalSubContext extends DrupalSubContextBase implements 
   public function createVocabulary($name, $vid) {
     $vocabulary = \Drupal::entityQuery('taxonomy_vocabulary')
       ->condition('vid', $vid)
+      ->accessCheck(FALSE)
       ->execute();
 
     if (empty($vocabulary)) {

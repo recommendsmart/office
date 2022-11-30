@@ -161,7 +161,7 @@ class AjaxCommentsController extends ControllerBase {
     unset($comment_display[0]['comments']['pager']['#route_parameters']['pid']);
 
     /**
-    
+
 	    $entity_type = $entity->getEntityType();
 
 	    // For replies, the passed $entity is the parent comment.
@@ -182,7 +182,7 @@ class AjaxCommentsController extends ControllerBase {
 	      $comment_display[0]['comments']['pager']['#route_parameters'] = $entity_url->getRouteParameters();
 	    }
     */
-    
+
     return $comment_display;
   }
 

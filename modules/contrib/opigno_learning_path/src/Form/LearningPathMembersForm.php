@@ -221,7 +221,7 @@ class LearningPathMembersForm extends FormBase {
         'members_table' => !empty($members_view_renderable) ? [
           '#type' => 'html_tag',
           '#tag' => 'div',
-          '#value' => render($members_view_renderable),
+          '#value' => \Drupal::service('renderer')->render($members_view_renderable),
           '#attributes' => [
             'id' => 'class-' . $class_entity->id(),
             'class' => ['class_members', 'class_members_row'],

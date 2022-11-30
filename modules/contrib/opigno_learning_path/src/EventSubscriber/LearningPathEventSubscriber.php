@@ -6,8 +6,8 @@ use Drupal\Core\Url;
 use Drupal\opigno_learning_path\LearningPathContentTypesManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -54,16 +54,16 @@ class LearningPathEventSubscriber implements EventSubscriberInterface {
   /**
    * Event called when a request is sent.
    */
-  public function onKernelRequest(GetResponseEvent $event) {
+  public function onKernelRequest(RequestEvent $event) {
   }
 
   /**
    * Redirect from canonical module path to module edit.
    *
-   * @param \Symfony\Component\HttpKernel\Event\FilterResponseEvent $event
+   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
    *   The route building event.
    */
-  public function moduleRedirect(FilterResponseEvent $event) {
+  public function moduleRedirect(ResponseEvent $event) {
     $route = \Drupal::routeMatch();
     $route_name = $route->getRouteName();
     if ($route_name == 'entity.opigno_module.canonical') {

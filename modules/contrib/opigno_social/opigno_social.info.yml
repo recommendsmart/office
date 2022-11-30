@@ -2,14 +2,14 @@ name: Opigno Social
 type: module
 description: 'Provides the functionality for the social network implementation: user connections, posts/trainings/badges sharing and commenting'
 package: Opigno
-core_version_requirement: ^8.8 || ^9
+core_version_requirement: ^9 || ^10
 dependencies:
   - opigno_messaging:opigno_messaging
   - opigno_notification:opigno_notification
   - opigno_like:opigno_like
   - drupal:views_infinite_scroll
 
-# Information added by Drupal.org packaging script on 2022-05-31
-version: '3.0.3'
+# Information added by Drupal.org packaging script on 2022-11-13
+version: '3.0.4'
 project: 'opigno_social'
-datestamp: 1654003118
+datestamp: 1668362275

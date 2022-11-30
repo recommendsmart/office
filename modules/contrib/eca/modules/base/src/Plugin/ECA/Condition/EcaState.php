@@ -48,12 +48,14 @@ class EcaState extends StringComparisonBase {
       '#title' => $this->t('Key'),
       '#default_value' => $this->configuration['key'],
       '#weight' => -90,
+      '#description' => $this->t('The key of the state.'),
     ];
     $form['value'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Value'),
       '#default_value' => $this->configuration['value'],
       '#weight' => -70,
+      '#description' => $this->t('The value of the state.'),
     ];
     return parent::buildConfigurationForm($form, $form_state);
   }

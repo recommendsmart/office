@@ -193,7 +193,7 @@ class MatchingProcessor extends TypeProcessor {
         }
       }
 
-      $classes = $tdClass . (count($isCorrectClass) ? ' ' : '') . $isCorrectClass;
+      $classes = $tdClass . (!empty($isCorrectClass) ? ' ' : '') . $isCorrectClass;
       $row .= '<td class="' . $classes . '">' .
                 $responseCellContent .
               '</td>';

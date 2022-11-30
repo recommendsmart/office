@@ -36,14 +36,14 @@ class LearningPathProgressBlock extends BlockBase {
     if ($gid = OpignoGroupContext::getCurrentGroupId()) {
       if ($group = \Drupal::entityTypeManager()->getStorage('group')->load($gid)) {
         $home_link = Link::createFromRoute(t('home'), 'entity.group.canonical', ['group' => $group->id()], ['attributes' => ['class' => ['w-100']]])->toRenderable();
-        $home_link = render($home_link);
+        $home_link = \Drupal::service('renderer')->render($home_link);
       }
     }
 
     if ($user && isset($group)) {
       $progress_service = \Drupal::service('opigno_learning_path.progress');
       $progress = $progress_service->getProgressAjaxContainer($gid, $user->id(), '', 'module-page');
-      $progress = render($progress);
+      $progress = \Drupal::service('renderer')->render($progress);
     }
 
     $build = [

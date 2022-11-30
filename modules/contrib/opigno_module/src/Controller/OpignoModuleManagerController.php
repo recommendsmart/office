@@ -122,7 +122,7 @@ class OpignoModuleManagerController extends ControllerBase {
     if (!empty($_POST['data'])) {
       $data = self::jsonDecodeValidated($_POST['data']);
       $schema = json_decode(file_get_contents(
-        drupal_get_path('module', 'opigno_module') . '/json-schema/schema.json'
+        \Drupal::service('extension.list.module')->getPath('opigno_module') . '/json-schema/schema.json'
       ));
 
       if (empty($data)) {

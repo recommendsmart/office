@@ -140,7 +140,7 @@ class LearningPathCreateUserForm extends FormBase {
     $user = User::create();
     $user->enforceIsNew();
     $user->setUsername($name);
-    $user->setPassword(user_password());
+    $user->setPassword(\Drupal::service('password_generator')->generate());
     $user->setEmail($email);
     $user->set('init', $email);
     $user->set('langcode', $lang);

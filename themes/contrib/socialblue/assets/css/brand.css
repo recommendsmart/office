@@ -785,6 +785,15 @@ html:not(.js) .navbar-default .dropdown:hover > button .navbar-nav__icon {
   border-color: #29abe2;
 }
 
+body.media-directory .dropzone .dz-message,
+body.media-directory .dropzone .dz-preview:not(.dz-error) {
+  border-color: #29abe2;
+}
+
+body.media-directory .dz-preview .dz-progress .dz-upload {
+  background: #29abe2;
+}
+
 @media (min-width: 900px) {
   .search-take-over .form-text {
     color: #ffffff;

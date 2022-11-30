@@ -19,6 +19,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * @Action(
  *   id = "eca_trigger_content_entity_custom_event",
  *   label = @Translation("Trigger a custom event (entity-aware)"),
+ *   description = @Translation("Triggers a custom event which is entity aware."),
  *   type = "entity"
  * )
  */
@@ -95,6 +96,7 @@ class TriggerContentEntityCustomEvent extends ConfigurableActionBase {
       '#type' => 'textfield',
       '#title' => $this->t('Event ID'),
       '#default_value' => $this->configuration['event_id'],
+      '#description' => $this->t('The ID of the event. Leave empty to trigger all custom events.'),
       '#weight' => -20,
     ];
     $form['tokens'] = [

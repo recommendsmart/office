@@ -20,7 +20,7 @@ dependencies:
     - field.field.group.learning_path.field_requires_validation
 #    - field.field.group.learning_path.field_workspace
     - group.type.learning_path
-    - image.style.catalog_thumbnail
+    - image.style.catalog_image
   module:
     - media
     - text
@@ -65,8 +65,8 @@ content:
     weight: 2
     label: hidden
     settings:
-      image_style: catalog_thumbnail
       image_link: ''
+      image_style: catalog_image
     third_party_settings: {  }
     region: content
   label:

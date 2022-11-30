@@ -5,7 +5,7 @@
     "homepage": "http://drupal.org/project/opigno_like",
     "license": "GPL-2.0-or-later",
     "require": {
-        "drupal/core": "^9"
+        "drupal/core": "^9 || ^10"
     }
 }
 

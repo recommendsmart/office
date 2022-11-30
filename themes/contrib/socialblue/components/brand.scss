@@ -934,3 +934,21 @@ html:not(.js) .navbar-default {
 .profile-preview-link:hover:before {
   border-color: $brand-primary;
 }
+
+// Upload file widget on the media library.
+body.media-directory {
+  .dropzone {
+    .dz-message,
+    .dz-preview:not(.dz-error) {
+      border-color: $brand-primary;
+    }
+  }
+
+  .dz-preview {
+    .dz-progress {
+      .dz-upload {
+        background: $brand-primary;
+      }
+    }
+  }
+}

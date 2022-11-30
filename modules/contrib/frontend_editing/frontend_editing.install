@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * @file
+ * Update hooks for the frontend_editing module.
+ */
+
+/**
+ * Set default values for sidebar and full width.
+ */
+function frontend_editing_update_11001() {
+  /** @var \Drupal\Core\Config\Config $config */
+  $config = \Drupal::service('config.factory')
+    ->getEditable('frontend_editing.settings');
+  $config->set('sidebar_width', 30);
+  $config->set('full_width', 70);
+  $config->save(TRUE);
+}

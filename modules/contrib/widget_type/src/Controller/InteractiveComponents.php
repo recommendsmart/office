@@ -81,10 +81,10 @@ class InteractiveComponents extends ControllerBase {
       '#attributes' => ['id' => 'video-thumbnail'],
       [
         '#type' => 'link',
-        '#url' => Url::fromUri('https://video.mateuaguilo.com/videos/watch/playlist/d08e8938-8d52-4cb0-9f34-52f73a0d3cda'),
+        '#url' => Url::fromUri('https://video.mateuaguilo.com/w/u6JoJivsYPmFnm5KYsjxD1'),
         '#title' => [
           '#theme' => 'image',
-          '#uri' => drupal_get_path('module', 'widget_type') . '/assets/video-series.png',
+          '#uri' => \Drupal::service('extension.list.module')->getPath('widget_type') . '/assets/video-series.png',
           '#alt' => 'Image lazy load testing image',
           '#width' => '350',
         ],
@@ -118,7 +118,7 @@ class InteractiveComponents extends ControllerBase {
           [
             '@link' => Link::fromTextAndUrl(
               $this->t('introduction videos'),
-              Url::fromUri('https://video.mateuaguilo.com/videos/watch/playlist/d08e8938-8d52-4cb0-9f34-52f73a0d3cda'
+              Url::fromUri('https://video.mateuaguilo.com/w/u6JoJivsYPmFnm5KYsjxD1'
               )
             )->toString(),
           ]

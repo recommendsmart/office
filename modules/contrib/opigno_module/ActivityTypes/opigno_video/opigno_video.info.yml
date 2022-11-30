@@ -1,13 +1,13 @@
 name: Opigno Video
 type: module
 description: Opigno video (either external or internal) activity type.
-core_version_requirement: ^9
+core_version_requirement: ^9 || ^10
 package: Opigno
 
 dependencies:
   - opigno_module:opigno_module
 
-# Information added by Drupal.org packaging script on 2022-04-01
-version: '3.0.2'
+# Information added by Drupal.org packaging script on 2022-11-13
+version: '3.0.4'
 project: 'opigno_module'
-datestamp: 1648805391
+datestamp: 1668362227

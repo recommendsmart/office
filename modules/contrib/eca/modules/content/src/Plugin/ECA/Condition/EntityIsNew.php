@@ -11,6 +11,7 @@ use Drupal\eca\Plugin\ECA\Condition\ConditionBase;
  * @EcaCondition(
  *   id = "eca_entity_is_new",
  *   label = @Translation("Entity: is new"),
+ *   description = @Translation("Evaluates if an entity is new."),
  *   context_definitions = {
  *     "entity" = @ContextDefinition("entity", label = @Translation("Entity"))
  *   }

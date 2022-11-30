@@ -17,6 +17,7 @@ use Drupal\eca\TypedData\PropertyPathTrait;
  * @EcaCondition(
  *   id = "eca_entity_field_value",
  *   label = @Translation("Entity: compare field value"),
+ *   description = @Translation("Compares a field value with an expected custom value."),
  *   context_definitions = {
  *     "entity" = @ContextDefinition("entity", label = @Translation("Entity"))
  *   }
@@ -201,11 +202,13 @@ class EntityFieldValue extends StringComparisonBase {
       '#type' => 'textfield',
       '#title' => $this->t('Field name'),
       '#default_value' => $this->configuration['field_name'] ?? '',
+      '#description' => $this->t('The name of the field whose value to compare.'),
       '#weight' => -90,
     ];
     $form['expected_value'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Expected field value'),
+      '#description' => $this->t('The expected value.'),
       '#default_value' => $this->configuration['expected_value'] ?? '',
       '#weight' => -70,
     ];

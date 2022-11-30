@@ -13,7 +13,7 @@ config_devel:
     - node.type.entity_version_workflows_example
     - workflows.workflow.example_workflow
 
-# Information added by Drupal.org packaging script on 2022-08-02
-version: '8.x-1.0'
+# Information added by Drupal.org packaging script on 2022-11-04
+version: '8.x-1.1'
 project: 'entity_version'
-datestamp: 1659428856
+datestamp: 1667569667

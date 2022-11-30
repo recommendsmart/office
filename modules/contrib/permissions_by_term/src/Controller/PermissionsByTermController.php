@@ -29,6 +29,7 @@ class PermissionsByTermController extends ControllerBase {
 
     $aUserIds = \Drupal::entityQuery('user')
       ->condition('name', $last_string, 'CONTAINS')
+      ->accessCheck(FALSE)
       ->execute();
 
     $prefix = count($array) ? implode(', ', $array) . ', ' : '';

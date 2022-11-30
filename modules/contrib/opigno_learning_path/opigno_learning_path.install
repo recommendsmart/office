@@ -344,7 +344,7 @@ function opigno_learning_path_update_9001() {
  * Create a step lp block for aristotle theme.
  */
 function opigno_learning_path_update_9002() {
-  $config_path = drupal_get_path('module', 'opigno_learning_path') . '/config/optional';
+  $config_path = \Drupal::service('extension.list.module')->getPath('opigno_learning_path') . '/config/optional';
   /* @var Drupal\Core\Config\CachedStorage $config_storage */
   $storage = new FileStorage($config_path);
   $config_storage = \Drupal::service('config.storage');
@@ -373,7 +373,7 @@ function opigno_learning_path_update_9003() {
   }
 
   // Add taxonomy duration field.
-  $config_path = drupal_get_path('module', 'opigno_learning_path') . '/config/optional';
+  $config_path = \Drupal::service('extension.list.module')->getPath('opigno_learning_path') . '/config/optional';
   $storage = new FileStorage($config_path);
 
   $data = $storage->read('field.storage.group.field_learning_path_duration');
@@ -474,7 +474,7 @@ function _opigno_learning_path_duration_terms_create(): array {
  * Import optional configs.
  */
 function opigno_learning_path_update_9004() {
-  $config_path = drupal_get_path('module', 'opigno_learning_path') . '/config/optional';
+  $config_path = \Drupal::service('extension.list.module')->getPath('opigno_learning_path') . '/config/optional';
   $files = \Drupal::service('file_system')
     ->scanDirectory($config_path, '/\.yml$/');
 
@@ -529,4 +529,15 @@ function opigno_learning_path_update_9007() {
 function opigno_learning_path_update_9008() {
   module_load_include('install', 'opigno_module');
   _opigno_module_apply_update('module', 'opigno_learning_path', 'config/install', ['views.view.opigno_group_members_table']);
+}
+
+/**
+ * Apply an image styles config.
+ */
+function opigno_learning_path_update_9009() {
+  module_load_include('install', 'opigno_module');
+  _opigno_module_apply_update('module', 'opigno_learning_path', 'config/install', [
+    'core.entity_view_display.group.learning_path.default',
+    'image.style.learning_path_thumbnail',
+  ]);
 }

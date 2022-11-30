@@ -5,7 +5,7 @@ post_comment:
   dependencies:
     - core/drupal.ajax
     - core/jquery
-    - core/jquery.once
+    - core/once
 
 post_sharing:
   version: 1.x
@@ -14,7 +14,7 @@ post_sharing:
   dependencies:
     - core/drupal.ajax
     - core/jquery
-    - core/jquery.once
+    - core/once
 
 read_more:
   version: 1.x
@@ -23,4 +23,4 @@ read_more:
   dependencies:
     - core/drupal.ajax
     - core/jquery
-    - core/jquery.once
+    - core/once

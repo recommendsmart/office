@@ -82,7 +82,7 @@ function opigno_group_manager_preprocess_html(&$variables) {
 function opigno_group_manager_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   $lib_type = isset($_REQUEST["library"]) ? urldecode($_REQUEST["library"]) : NULL;
 
-  if ($lib_type && $form_id == 'opigno_activity_opigno_h5p_form' && !empty($lib_type)) {
+  if ($lib_type && $form_id === 'opigno_activity_opigno_h5p_form' && !empty($lib_type)) {
     $query = \Drupal::database()->select('h5p_events', 'e');
     $query->addField('e', 'library_version');
     $query->condition('e.library_name', $lib_type);
@@ -110,7 +110,7 @@ function opigno_group_manager_form_alter(&$form, FormStateInterface $form_state,
   }
 
   // Improve module form display.
-  if ($route_name == 'opigno_group_manager.manager.get_item_form') {
+  if ($route_name === 'opigno_group_manager.manager.get_item_form') {
     $form['uid']['#access'] = FALSE;
     $form['created']['#access'] = FALSE;
     if (isset($form['actions']['delete'])) {
@@ -160,7 +160,7 @@ function opigno_group_manager_form_alter(&$form, FormStateInterface $form_state,
 
     // Ajaxify the buttons.
     foreach (array_keys($form['actions']) as $action) {
-      if ($action != 'preview' && isset($form['actions'][$action]['#type']) && $form['actions'][$action]['#type'] === 'submit') {
+      if ($action !== 'preview' && isset($form['actions'][$action]['#type']) && $form['actions'][$action]['#type'] === 'submit') {
         $form['actions'][$action]['#submit'][] = 'Drupal\opigno_group_manager\Controller\OpignoGroupManagerController::ajaxFormEntityFormSubmit';
       }
     }
@@ -171,7 +171,7 @@ function opigno_group_manager_form_alter(&$form, FormStateInterface $form_state,
       $path_args = explode('/', $current_path);
 
       // Case of edit link.
-      if ($path_args[1] == 'ajax-form-entity') {
+      if ($path_args[1] === 'ajax-form-entity') {
         $view_mode = $path_args[5];
         $reload = FALSE;
       }
@@ -201,7 +201,7 @@ function opigno_group_manager_form_alter(&$form, FormStateInterface $form_state,
   }
 
   // Change submit label on /group/add/opigno_course.
-  if ($form_id == 'group_opigno_course_add_form') {
+  if ($form_id === 'group_opigno_course_add_form') {
     $form['actions']['submit']['#value'] = t('Save');
   }
 }
@@ -209,7 +209,7 @@ function opigno_group_manager_form_alter(&$form, FormStateInterface $form_state,
 /**
  * Implements hook_entity_operation().
  */
-function opigno_group_manager_entity_operation(\Drupal\Core\Entity\EntityInterface $entity) {
+function opigno_group_manager_entity_operation(EntityInterface $entity) {
   if (!(\Drupal::currentUser()->hasPermission('access content'))) {
     return [];
   }
@@ -224,31 +224,31 @@ function opigno_group_manager_entity_operation(\Drupal\Core\Entity\EntityInterfa
 
   switch ($entityBundle) {
     case 'opigno_course':
-      $operations['duplicate'] = array(
+      $operations['duplicate'] = [
         'title' => t('Duplicate'),
         'weight' => 15,
         'url' => Url::fromRoute('opigno_group.course_duplicate', ['group' => $entity->id()]),
-      );
+      ];
 
-      $operations['export_course'] = array(
+      $operations['export_course'] = [
         'title' => t('Export'),
         'weight' => 16,
         'url' => Url::fromRoute('opigno_group.course_export', ['group' => $entity->id()]),
-      );
+      ];
       break;
 
     case 'learning_path':
-      $operations['duplicate'] = array(
+      $operations['duplicate'] = [
         'title' => t('Duplicate'),
         'weight' => 15,
         'url' => Url::fromRoute('opigno_group.training_duplicate', ['group' => $entity->id()]),
-      );
+      ];
 
-      $operations['export_training'] = array(
+      $operations['export_training'] = [
         'title' => t('Export'),
         'weight' => 16,
         'url' => Url::fromRoute('opigno_group.training_export', ['group' => $entity->id()]),
-      );
+      ];
       break;
   }
 

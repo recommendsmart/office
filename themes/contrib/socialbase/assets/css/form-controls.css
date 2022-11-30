@@ -171,6 +171,11 @@ form:not(.layout-builder-configure-block) .checkbox {
   margin-bottom: 8px;
 }
 
+form:not(.layout-builder-configure-block) .radio > .form-wrapper,
+form:not(.layout-builder-configure-block) .checkbox > .form-wrapper {
+  margin-bottom: 1.1rem;
+}
+
 form:not(.layout-builder-configure-block) .checkbox.form-item-event-all-day {
   margin-bottom: 1.5rem;
 }

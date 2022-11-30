@@ -1,6 +1,6 @@
 core: 8.x
 type: theme
-core_version_requirement: ^8 || ^9
+core_version_requirement: ^8 || ^9 || ^10
 base theme: dxpr_theme
 
 name: 'THEMETITLE'
@@ -57,7 +57,7 @@ libraries-override:
   dxpr_theme/dxpr-theme-builder: false
   dxpr_theme/helper-classes: false
 
-# Information added by Drupal.org packaging script on 2022-08-26
-version: '1.2.6'
+# Information added by Drupal.org packaging script on 2022-10-25
+version: '1.2.7'
 project: 'dxpr_theme'
-datestamp: 1661502238
+datestamp: 1666704818

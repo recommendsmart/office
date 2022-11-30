@@ -80,7 +80,7 @@ class LearningPathContentController extends ControllerBase {
       '#learning_path_id' => $gid,
       '#group_type' => $group_type,
       '#view_type' => $view_type,
-      '#next_link' => isset($next_link) ? render($next_link) : NULL,
+      '#next_link' => isset($next_link) ? \Drupal::service('renderer')->render($next_link) : NULL,
       '#user_has_info_card' => $tempstore->get('hide_info_card') ? FALSE : TRUE,
       '#parent_learning_path' => $group_type == 'learning_path' ? '?learning_path=' . $gid : '',
     ];
@@ -106,7 +106,7 @@ class LearningPathContentController extends ControllerBase {
       '#base_href' => $request->getPathInfo(),
       '#learning_path_id' => $group->id(),
       '#module_context' => 'false',
-      '#next_link' => isset($next_link) ? render($next_link) : NULL,
+      '#next_link' => isset($next_link) ? \Drupal::service('renderer')->render($next_link) : NULL,
       '#user_has_info_card' => $tempstore->get('hide_info_card') ? FALSE : TRUE,
     ];
   }

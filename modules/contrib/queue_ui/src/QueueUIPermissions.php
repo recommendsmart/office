@@ -14,6 +14,8 @@ class QueueUIPermissions implements ContainerInjectionInterface {
   use StringTranslationTrait;
 
   /**
+   * The QueueWorkerManager.
+   *
    * @var \Drupal\Core\Queue\QueueWorkerManager
    */
   private $queueWorkerManager;

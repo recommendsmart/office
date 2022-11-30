@@ -126,7 +126,7 @@ class OpignoTftFormatter extends FormatterBase {
       case 'video':
         $source_attributes = new Attribute();
         $source_attributes
-          ->setAttribute('src', file_url_transform_relative(file_create_url($file->getFileUri())))
+          ->setAttribute('src', \Drupal::service('file_url_generator')->transformRelative(\Drupal::service('file_url_generator')->generateAbsoluteString($file->getFileUri())))
           ->setAttribute('type', $file->getMimeType());
         $source_file = [
           'file' => $file,

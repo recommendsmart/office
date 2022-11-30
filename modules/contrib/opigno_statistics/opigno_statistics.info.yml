@@ -1,7 +1,7 @@
 name: Opigno Statistics
 type: module
 description: Opigno Statistics.
-core_version_requirement: ^9
+core_version_requirement: ^9 || ^10
 package: Opigno
 dependencies:
   - drupal:color
@@ -10,7 +10,7 @@ dependencies:
   - opigno_module:opigno_module
   - opigno_social:opigno_social
 
-# Information added by Drupal.org packaging script on 2022-09-30
-version: '3.0.3'
+# Information added by Drupal.org packaging script on 2022-11-13
+version: '3.0.4'
 project: 'opigno_statistics'
-datestamp: 1664528909
+datestamp: 1668362292

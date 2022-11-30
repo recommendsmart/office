@@ -1,16 +1,21 @@
-<label for="{{ element['#id'] }}" class="radio-details--wrapper">
+<label for="{{ element['#id'] }}" class="radio-details--wrapper remote_status--{{ element['#remote_status'] }}">
   <div class="radio-details--thumbnail">
     {{ element['#thumbnail'] }}
     {{ element['#source'] }}
     <div class="radio-details--version">{{ element['#version'] }}</div>
   </div>
-  <div class="radio-details--name">{{ element }} <span class="radio-details--human-name">{{ element['#human_name'] }}</span></div>
+  <div class="radio-details--name">{{ element }} <span
+      class="radio-details--human-name">{{ element['#human_name'] }}</span></div>
   <div class="radio-details--machine-name">{{ element['#machine_name'] }}</div>
-  <div class="radio-details--search">{{ element['#human_name'] }}|{{ element['#source'] }}|{{ element['#version'] }}|{{ element['#machine_name'] }}</div>
+  <div class="radio-details--search">{{ element['#human_name'] }}|{{ element['#source'] }}|{{ element['#version'] }}
+    |{{ element['#machine_name'] }}</div>
   <div class="radio-details--description">{{ element['#remote_description'] }}</div>
   <div class="radio-details--created">{{ element['#updated_date'] }}</div>
   <div class="radio-details--updated">{{ element['#created_date'] }}</div>
   <div class="radio-details--status">{{ element['#status'] }}</div>
+  <div
+    class="radio-details_remote-status radio-details_remote-status--{{ element['#remote_status'] }}">{{ element['#remote_status'] }}
+  </div>
   <div class="radio-details--preview-url">{{ element['#preview_url'] }}</div>
   <div class="radio-details--languages">{{ element['#remote_languages'] }}</div>
   {{ element['#image'] }}

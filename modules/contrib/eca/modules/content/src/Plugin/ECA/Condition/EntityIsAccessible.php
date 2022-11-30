@@ -12,7 +12,7 @@ use Drupal\eca\Plugin\ECA\Condition\ConditionBase;
  * @EcaCondition(
  *   id = "eca_entity_is_accessible",
  *   label = @Translation("Entity: is accessible"),
- *   description = @Translation("Checks whether the current user has operational access on an entity."),
+ *   description = @Translation("Evaluates whether the current user has operational access on an entity."),
  *   context_definitions = {
  *     "entity" = @ContextDefinition("entity", label = @Translation("Entity"))
  *   }
@@ -49,6 +49,7 @@ class EntityIsAccessible extends ConditionBase {
     $form['operation'] = [
       '#type' => 'select',
       '#title' => $this->t('Operation'),
+      '#description' => $this->t('The operation, like view, edit or delete to check accessibility.'),
       '#options' => [
         'create' => $this->t('Create (only for new entity)'),
         'view' => $this->t('View'),

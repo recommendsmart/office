@@ -4,7 +4,7 @@ user:
     js/user.js: {}
   dependencies:
     - core/jquery
-    - core/jquery.once
+    - core/once
     - core/drupalSettings
     - core/drupal.ajax
 
@@ -15,7 +15,7 @@ user_statistics:
   dependencies:
     - core/drupal.ajax
     - core/jquery
-    - core/jquery.once
+    - core/once
     - core/drupalSettings
 
 # External Charts.js library.

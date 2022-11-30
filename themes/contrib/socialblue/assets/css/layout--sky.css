@@ -2,7 +2,7 @@
   z-index: 10;
 }
 
-.socialblue--sky .layout--with-complementary.sidebar-left > .region--content {
+.socialblue--sky .layout--with-complementary.sidebar-left > .region--content.js--z-index {
   z-index: 1;
 }
 

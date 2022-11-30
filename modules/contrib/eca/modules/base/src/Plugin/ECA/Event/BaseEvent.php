@@ -72,7 +72,7 @@ class BaseEvent extends EventBase implements PluginUsageInterface {
         '#type' => 'textfield',
         '#title' => $this->t('Frequency'),
         '#default_value' => $this->configuration['frequency'],
-        '#description' => $this->t('The frequency of a cron job is defined by a cron spcific notation which is best explained at https://en.wikipedia.org/wiki/Cron'),
+        '#description' => $this->t('The frequency of a cron job is defined by a cron spcific notation which is best explained at https://en.wikipedia.org/wiki/Cron.'),
       ];
     }
     elseif ($this->eventClass() === CustomEvent::class) {
@@ -80,6 +80,7 @@ class BaseEvent extends EventBase implements PluginUsageInterface {
         '#type' => 'textfield',
         '#title' => $this->t('Event ID'),
         '#default_value' => $this->configuration['event_id'],
+        '#description' => $this->t('The custom event ID. Leave empty to trigger all custom events.'),
       ];
     }
     return $form;

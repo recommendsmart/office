@@ -10,7 +10,7 @@ tft:
     js/tft.lightbox.js: {}
   dependencies:
     - core/jquery
-    - core/jquery.once
+    - core/once
     - core/drupal
     - core/drupalSettings
 tft.select-folder:
@@ -22,6 +22,6 @@ tft.select-folder:
     js/tft.select-folder.js: {}
   dependencies:
     - core/jquery
-    - core/jquery.once
+    - core/once
     - core/drupal
     - core/drupalSettings

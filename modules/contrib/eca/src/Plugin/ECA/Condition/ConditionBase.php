@@ -181,7 +181,9 @@ abstract class ConditionBase extends PluginBase implements ConditionInterface, C
       '#type' => 'checkbox',
       '#title' => $this->t('Negate the condition'),
       '#default_value' => $this->configuration['negate'],
+      '#description' => $this->t('Negates the condition, e.g. makes TRUE to FALSE and vice versa.'),
       '#weight' => $i,
+      '#description' => $this->t('Negates the condition. Makes TRUE to FALSE and vice versa.'),
     ];
     /** @var \Drupal\Core\Plugin\Context\ContextDefinition $definition */
     foreach ($this->getPluginDefinition()['context_definitions'] ?? [] as $key => $definition) {

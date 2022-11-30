@@ -89,11 +89,12 @@ class EntityVersionWorkflowManager {
 
     // Compute the transition being used in order to get the version actions
     // from its config. For this, we need to load the latest revision of the
-    // entity.
+    // entity. Unless the client specifies to use the current one instead.
+    $use_current_revision = isset($entity->entity_version_use_current_revision) && $entity->entity_version_use_current_revision ?? FALSE;
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
-    $latest_revision_id = $storage->getLatestRevisionId($entity->id());
-    $revision = $storage->loadRevision($latest_revision_id);
+    $revision_id = !$use_current_revision ? $storage->getLatestRevisionId($entity->id()) : $entity->getLoadedRevisionId();
+    $revision = $storage->loadRevision($revision_id);
 
     // Retrieve the configured actions to perform for the version field numbers
     // from the transition.

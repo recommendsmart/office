@@ -107,7 +107,7 @@ class QueueUIBatch implements QueueUIBatchInterface {
     $context['finished'] = 0;
     $context['results']['queueName'] = $info['title'];
 
-    $title = t('Processing queue %name: %count items remaining', [
+    $title = $this->t('Processing queue %name: %count items remaining', [
       '%name' => $info['title'],
       '%count' => $num_of_items,
     ]);

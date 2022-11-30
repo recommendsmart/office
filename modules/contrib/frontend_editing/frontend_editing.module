@@ -5,6 +5,7 @@
  * Functions and hooks for the frontend_editing module.
  */
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityInterface;
@@ -22,7 +23,10 @@ function frontend_editing_entity_view_alter(&$build, EntityInterface $entity, En
     return;
   }
 
-  $supported_entity_types = \Drupal::configFactory()->get('frontend_editing.settings')->get('entity_types');
+  $config = \Drupal::configFactory()->get('frontend_editing.settings');
+  $cacheable_metadata = new CacheableMetadata();
+  $cacheable_metadata->addCacheableDependency($config);
+  $supported_entity_types = $config->get('entity_types');
   // If a value is 0 (for disabled) a search will evaluate to TRUE, e.g.
   // "'key' == 0" evaluates to TRUE, therefore we need to perform strict search.
   if (!in_array($entity->getEntityTypeId(), $supported_entity_types, TRUE)) {
@@ -30,18 +34,22 @@ function frontend_editing_entity_view_alter(&$build, EntityInterface $entity, En
   }
 
   // Only do this, if user has access to frontend editing.
-  $build['#cache']['contexts'][] = 'user.permissions';
+  $cacheable_metadata->addCacheContexts(['user.permissions']);
   if (!\Drupal::currentUser()->hasPermission('access frontend editing') || ($entity instanceof RevisionableInterface && !$entity->isLatestRevision()) || !$entity->access('update')) {
     return;
   }
-
+  $cacheable_metadata->applyTo($build);
   // Add the editing url as a data attribute.
   $url = Url::fromRoute('frontend_editing.form', [
     'type' => $entity->getEntityTypeId(),
     'id' => $entity->id(),
   ])->toString();
+
   $build['#attributes']['data-editing-url'] = $url;
+  $build['#attributes']['data-sidebar-width'] = $config->get('sidebar_width') ?? 30;
+  $build['#attributes']['data-full-width'] = $config->get('full_width') ?? 70;
   $build['#attached']['library'][] = 'frontend_editing/frontend_editing';
+
 }
 
 /**

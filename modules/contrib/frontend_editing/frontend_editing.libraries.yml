@@ -1,5 +1,5 @@
 frontend_editing:
-  version: 1.0
+  version: 1.x
   css:
     theme:
       css/frontend_editing.css: {}

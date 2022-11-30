@@ -5,7 +5,6 @@ namespace Drupal\widget_type;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\file\FileInterface;
-use Drupal\widget_type\Entity\WidgetType;
 
 /**
  * Provides an interface defining a widget type entity type.
@@ -109,6 +108,21 @@ interface WidgetTypeInterface extends ContentEntityInterface, EntityChangedInter
    *   The widget type.
    */
   public function setRemoteLanguages(array $lang_codes): self;
+
+  /**
+   * @param $remote_status
+   *
+   * @return $this
+   */
+  public function setRemoteStatus($remote_status): self;
+
+  /**
+   * Get the remote widget type status.
+   *
+   * @return string
+   *   The widget type description.
+   */
+  public function getRemoteStatus(): string;
 
   /**
    * Get the widget type settings.

@@ -14,7 +14,8 @@ use Symfony\Component\Yaml\Exception\ParseException;
  *
  * @Action(
  *   id = "eca_state_write",
- *   label = @Translation("Persistent state: write")
+ *   label = @Translation("Persistent state: write"),
+ *   description = @Translation("Writes a value into the Drupal state system by the given key.")
  * )
  */
 class EcaStateWrite extends ConfigurableActionBase {
@@ -79,12 +80,14 @@ class EcaStateWrite extends ConfigurableActionBase {
       '#title' => $this->t('State key'),
       '#default_value' => $this->configuration['key'],
       '#weight' => -30,
+      '#description' => $this->t('The key of the Drupal state.'),
     ];
     $form['value'] = [
       '#type' => 'textarea',
-      '#title' => $this->t('Value of the token'),
+      '#title' => $this->t('The value of the state'),
       '#default_value' => $this->configuration['value'],
       '#weight' => -20,
+      '#description' => $this->t('The key, where the value is stored into.'),
     ];
     $form['use_yaml'] = [
       '#type' => 'checkbox',
@@ -102,7 +105,7 @@ class EcaStateWrite extends ConfigurableActionBase {
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     $this->configuration['key'] = $form_state->getValue('key');
     $this->configuration['value'] = $form_state->getValue('value');
-    $this->configuration['use_yaml'] = $form_state->getValue('use_yaml');
+    $this->configuration['use_yaml'] = !empty($form_state->getValue('use_yaml'));
     parent::submitConfigurationForm($form, $form_state);
   }
 

@@ -106,10 +106,10 @@ class Progress {
    *   Attempted activities count / total activities count.
    */
   public function getProgressRound(int $group_id, int $account_id, $latest_cert_date = 0): int {
-    // Firstly check achievements data.
+    // Firstly check achievements' data.
     $query = $this->database
       ->select('opigno_learning_path_achievements', 'a')
-      ->fields('a', ['score'])
+      ->fields('a', ['progress'])
       ->condition('a.gid', $group_id)
       ->condition('a.uid', $account_id)
       ->condition('a.status', 'completed');
@@ -117,7 +117,7 @@ class Progress {
     $achievements_data = $query->execute()->fetchAssoc();
 
     if ($achievements_data) {
-      return $achievements_data['score'];
+      return $achievements_data['progress'];
     }
     if (!$latest_cert_date) {
       $group = Group::load($group_id);
@@ -454,7 +454,7 @@ class Progress {
    */
   public function getProgressBuildModulePage(int $group_id, int $account_id): array {
     $home_link = Link::createFromRoute(Markup::create($this->t('home') . '<i class="icon-home-2"></i>'), 'entity.group.canonical', ['group' => $group_id], ['attributes' => ['class' => ['w-100']]])->toRenderable();
-    $home_link = render($home_link);
+    $home_link = \Drupal::service('renderer')->render($home_link);
 
     $progress = $this->getProgressRound($group_id, $account_id);
 

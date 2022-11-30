@@ -295,7 +295,7 @@ function template_preprocess_opigno_certificate(array &$variables) {
     $variables['content'][$key] = $variables['elements'][$key];
   }
 
-  $variables['style_certificate_edit_form'] = drupal_get_path('module', 'opigno_certificate') . '/css/opigno_certificate_edit_form.css';
+  $variables['style_certificate_edit_form'] = \Drupal::service('extension.list.module')->getPath('opigno_certificate') . '/css/opigno_certificate_edit_form.css';
 
 }
 
@@ -360,5 +360,5 @@ function opigno_certificate_preprocess_filter_tips(&$variables) {
  * Implements hook_ckeditor_css_alter().
  */
 function opigno_certificate_ckeditor_css_alter(array &$css, Editor $editor) {
-  $css[] = drupal_get_path('module', 'opigno_certificate') . '/css/opigno_certificate_edit_form.css';
+  $css[] = \Drupal::service('extension.list.module')->getPath('opigno_certificate') . '/css/opigno_certificate_edit_form.css';
 }

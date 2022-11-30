@@ -60,6 +60,13 @@ function type_tray_form_node_type_form_alter(array &$form, FormStateInterface $f
     // https://www.drupal.org/project/drupal/issues/784672 is applied.
     '#allowed_formats' => [$text_format],
   ];
+  $form['type_tray']['existing_nodes_link_text'] = [
+    '#type' => 'textfield',
+    '#title' => t('Existing content link text'),
+    '#description' => t('Indicate the text to use when building a link to allow quick access to all nodes of a given type, such as "View all Article content". Leave this empty to not display a link to existing content.'),
+    '#default_value' => $settings['existing_nodes_link_text'] ?? '',
+  ];
+
   $form['type_tray']['type_weight'] = [
     '#type' => 'number',
     '#title' => t('Weight'),
@@ -69,7 +76,6 @@ function type_tray_form_node_type_form_alter(array &$form, FormStateInterface $f
 
   $form['#entity_builders'][] = 'type_tray_entity_builder';
 }
-
 
 /**
  * Additional entity builder callback for our node type forms.

@@ -10,7 +10,7 @@ activity:
   dependencies:
     - core/drupal
     - core/jquery
-    - core/jquery.once
+    - core/once
     - core/drupalSettings
     - core/js-cookie
 

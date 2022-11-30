@@ -205,4 +205,70 @@ class EntityVersionWorkflowsTest extends KernelTestBase {
     $node->save();
   }
 
+  /**
+   * Test we can flag entities to use the current entity revision.
+   *
+   * Normally, the very latest entity revision is used to compare the state to
+   * new state. However, there are times in which we need to specify to use the
+   * current, default, revision for this. For this we have a flag.
+   */
+  public function testUsingCurrentEntityRevision() {
+    // Create a validated node.
+    $values = [
+      'title' => 'Workflow node',
+      'type' => 'entity_version_workflows_example',
+      'moderation_state' => 'validated',
+    ];
+    /** @var \Drupal\node\NodeInterface $node */
+    $node = $this->nodeStorage->create($values);
+    $node->set('field_version', [
+      'major' => 0,
+      'minor' => 1,
+      'patch' => 0,
+    ]);
+    $node->save();
+
+    $this->assertEntityVersion($node, 0, 1, 0);
+
+    // Keep track of the published revision ID.
+    $validated_id = $node->getRevisionId();
+
+    // Make a new draft - this will increase the patch.
+    $node->set('title', 'New title');
+    $node->set('moderation_state', 'draft');
+    $node->save();
+    $this->assertEntityVersion($node, 0, 1, 1);
+    $this->assertEquals('draft', $node->get('moderation_state')->value);
+
+    // Load the validated revision and make a change to it. This will trigger
+    // the entity version update by 1 minor because when the version is
+    // calculated, it loads the latest revision of the node (which is a draft
+    // in fact) and it finds a transition from draft to validated which triggers
+    // the increase in minor.
+    $validated = $this->nodeStorage->loadRevision($validated_id);
+    $validated->set('title', 'Update');
+    $validated->set('moderation_state', 'validated');
+    $validated->save();
+    $this->assertEntityVersion($validated, 0, 2, 0);
+
+    $validated_id = $validated->getRevisionId();
+
+    // Make again a new draft - this will increase the patch.
+    $validated->set('title', 'Update 2');
+    $validated->set('moderation_state', 'draft');
+    $validated->save();
+    $this->assertEntityVersion($validated, 0, 2, 1);
+    $this->assertEquals('draft', $validated->get('moderation_state')->value);
+
+    // Now make another change, but this time flag it to use the current and
+    // expect no increase in minor because the current state is validated and
+    // there is no workflow transition from validated to validated.
+    $validated = $this->nodeStorage->loadRevision($validated_id);
+    $validated->set('title', 'Update 3');
+    $validated->set('moderation_state', 'validated');
+    $validated->entity_version_use_current_revision = TRUE;
+    $validated->save();
+    $this->assertEntityVersion($validated, 0, 2, 0);
+  }
+
 }

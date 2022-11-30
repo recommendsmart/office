@@ -14,7 +14,7 @@ class OpignoModuleScoreTest extends LearningPathBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     \Drupal::service('module_installer')->install([
       'opigno_statistics',

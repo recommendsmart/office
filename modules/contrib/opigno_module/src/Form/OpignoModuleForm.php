@@ -80,12 +80,12 @@ class OpignoModuleForm extends ContentEntityForm {
     $form['open_date']['widget'][0]['value']['#validated'] = TRUE;
     $form['close_date']['widget'][0]['value']['#validated'] = TRUE;
 
-    if ($route_name == 'opigno_group_manager.manager.get_item_form') {
-      $route_params = current(\Drupal::routeMatch()->getParameters());
+    if ($route_name === 'opigno_group_manager.manager.get_item_form') {
+      $route_params = \Drupal::routeMatch()->getParameters()->all();
       $module_id = $module->id();
       $group_id = $route_params['group']->id();
       if ($module_id && $group_id) {
-        if ($route_params['group']->getGroupType()->id() == 'opigno_course') {
+        if ($route_params['group']->getGroupType()->id() === 'opigno_course') {
           $build_info = $form_state->getBuildInfo();
           if (!empty($build_info['args'][0]['opigno_group_info']['learning_path'])) {
             $group_id = $build_info['args'][0]['opigno_group_info']['learning_path'];

@@ -283,6 +283,17 @@ trait TokenDecoratorTrait {
     if (isset($data[$type])) {
       $hold_token_data = $data[$type];
       $real_token_type = $this->getTokenType($hold_token_data);
+
+      // The following if-block is a band-aid for menu links when contrib Token
+      // is installed, as it wrongly makes use of the menu link content entity
+      // instead of its according plugin.
+      // @todo Remove this block once #3314427 got fixed.
+      // @see https://www.drupal.org/project/token/issues/3314427
+      // @see https://www.drupal.org/project/eca/issues/3314123
+      if ($type === 'menu-link') {
+        $real_token_type = 'menu-link';
+      }
+
       // Check whether we hold aliased Token data. Exclude the alias mapping if
       // the "token_type" key is set, which comes from the contrib Token module
       // and is set within the scope of generic entity tokens. Otherwise, since

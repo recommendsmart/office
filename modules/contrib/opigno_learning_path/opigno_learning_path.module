@@ -475,7 +475,7 @@ function opigno_learning_path_preprocess_region(&$variables) {
           ],
         ],
       ])->toRenderable();
-      $variables['add_member_link'] = render($link);
+      $variables['add_member_link'] = \Drupal::service('renderer')->render($link);
     }
     else {
       $variables['add_member_link'] = [
@@ -2409,29 +2409,10 @@ function opigno_learning_path_get_module_best_score($id, $uid) {
  *   User ID.
  * @param \Drupal\opigno_module\Entity\OpignoModule $module
  *   Opigno Module entity.
- * @param int $latest_cert_date
+ * @param int|null $latest_cert_date
  *   Latest certification date.
- *
- * @return array
- *   Data array about step in a group for a user.
- *
- * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
- * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
- */
-function opigno_learning_path_get_module_step($group_id, $uid, OpignoModule $module, $latest_cert_date = NULL) {
-  $opigno_lps = Drupal::service('opigno_lps');
-  return $opigno_lps->getModuleStep($group_id, $uid, $module, $latest_cert_date);
-}
-
-/**
- * Builds up a training course step.
- *
- * @param int $group_id
- *   Training group ID.
- * @param int $uid
- *   User ID.
- * @param \Drupal\group\Entity\GroupInterface $course
- *   Group entity of the course.
+ * @param bool $update_group_context
+ *   Set the group context only for the first level of group.
  *
  * @return array
  *   Data array about step in a group for a user.
@@ -2439,9 +2420,41 @@ function opigno_learning_path_get_module_step($group_id, $uid, OpignoModule $mod
  * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
  * @throws \Drupal\Component\Plugin\Exception\PluginException
  * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ * @throws \Drupal\Core\TempStore\TempStoreException
  */
-function opigno_learning_path_get_course_step($group_id, $uid, GroupInterface $course, $latest_cert_date = NULL) {
+function opigno_learning_path_get_module_step($group_id, $uid, OpignoModule $module, ?int $latest_cert_date = NULL, bool $update_group_context = TRUE) {
   $opigno_lps = Drupal::service('opigno_lps');
+  if ($update_group_context) {
+    OpignoGroupContext::setGroupId($group_id, FALSE);
+  }
+  return $opigno_lps->getModuleStep($group_id, $uid, $module, $latest_cert_date);
+}
+
+/**
+ * Builds up a training course step.
+ *
+ * @param numeric $group_id
+ *   Training group ID.
+ * @param numeric $uid
+ *   User ID.
+ * @param \Drupal\group\Entity\GroupInterface $course
+ *   Group entity of the course.
+ * @param bool $update_group_context
+ *   Set the group context only for the first level of group.
+ *
+ * @return array
+ *   Data array about step in a group for a user.
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ * @throws \Drupal\Core\TempStore\TempStoreException
+ */
+function opigno_learning_path_get_course_step($group_id, $uid, GroupInterface $course, $latest_cert_date = NULL, bool $update_group_context = TRUE) {
+  $opigno_lps = Drupal::service('opigno_lps');
+  if ($update_group_context) {
+    OpignoGroupContext::setGroupId($group_id, FALSE);
+  }
   return $opigno_lps->getCourseStep($group_id, $uid, $course, $latest_cert_date);
 }
 
@@ -2541,7 +2554,7 @@ function opigno_learning_path_get_steps($group_id, $uid, $only_modules_and_cours
           $module = $entity_type_manager
             ->getStorage('opigno_module')
             ->load($id);
-          $step_info = opigno_learning_path_get_module_step($group_id, $uid, $module, $latest_cert_date);
+          $step_info = opigno_learning_path_get_module_step($group_id, $uid, $module, $latest_cert_date, FALSE);
 
           /** @var \Drupal\opigno_module\Entity\OpignoModule $module */
           if ($module = OpignoModule::load($id)) {
@@ -2741,13 +2754,13 @@ function opigno_learning_path_get_all_steps($group_id, $uid, $only_modules_and_c
           $module = $entity_type_manager
             ->getStorage('opigno_module')
             ->load($id);
-          $step_info = opigno_learning_path_get_module_step($group_id, $uid, $module, $latest_cert_date);
+          $step_info = opigno_learning_path_get_module_step($group_id, $uid, $module, $latest_cert_date, FALSE);
 
           /** @var \Drupal\opigno_module\Entity\OpignoModule $module */
           if ($module = OpignoModule::load($id)) {
             /** @var \Drupal\opigno_module\Entity\UserModuleStatus[] $attempts */
             $user = \Drupal::currentUser();
-            $attempts = $module->getModuleAttempts($user, NULL, $latest_cert_date);
+            $attempts = $module->getModuleAttempts($user, NULL, $latest_cert_date, FALSE, $group_id);
             $best_attempt = NULL;
 
             if (!empty($attempts)) {
@@ -3183,7 +3196,7 @@ function opigno_learning_path_get_steps_current_attempt($group_id, $uid) {
           $module = $entity_type_manager
             ->getStorage('opigno_module')
             ->load($id);
-          $step_info = opigno_learning_path_get_module_step($group_id, $uid, $module);
+          $step_info = opigno_learning_path_get_module_step($group_id, $uid, $module, NULL, FALSE);
 
           $step_info["best score"] = $step_info["current attempt score"];
 
@@ -3350,7 +3363,7 @@ function opigno_learning_path_save_step_achievements(
   $group = Group::load($gid);
   $latest_cert_date = LPStatus::getTrainingStartDate($group, $uid);
 
-  $status = opigno_learning_path_get_step_status($step, $uid, TRUE, $latest_cert_date);
+  $status = opigno_learning_path_get_step_status($step, $uid, TRUE, $latest_cert_date, $gid);
 
   // Check the absence of the user at the live meeting or at the ILT.
   switch ($step['typology']) {
@@ -3424,8 +3437,7 @@ function opigno_learning_path_save_step_achievements(
   ];
   $query = \Drupal::database()
     ->merge($table_name)
-    ->keys($keys)
-    ->fields($fields);
+    ->keys($keys);
 
   if (isset($step['current attempt time']) && $step['typology'] != 'Meeting' && $step['typology'] != 'ILT') {
     $query = $query->expression('time', 'time + :time', [
@@ -3440,15 +3452,23 @@ function opigno_learning_path_save_step_achievements(
     $moduleHandler = \Drupal::service('module_handler');
 
     if (!$moduleHandler->moduleExists('opigno_skills_system') || !$module->getSkillsActive()) {
-      $fields['score'] = $module->getUserScore($user, $latest_cert_date);
+      $fields['score'] = $module->getUserScore($user, $latest_cert_date, $gid);
     }
+    $query
+      ->fields($fields);
   }
   // Set score for other group contents - only best score.
   elseif (isset($step['current attempt score']) && $step['typology'] != 'Meeting' && $step['typology'] != 'ILT') {
+    $query
+      ->fields($fields);
     $query = $query->expression('score', 'GREATEST(score, :score, :best_score)', [
       ':score' => $step['current attempt score'],
       ':best_score' => $fields['score'],
     ]);
+  }
+  else {
+    $query
+      ->fields($fields);
   }
 
   $query->execute();

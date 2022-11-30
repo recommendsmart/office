@@ -10,3 +10,9 @@ frontend_editing.settings:
       sequence:
         type: string
         label: 'Entity type'
+    sidebar_width:
+      type: integer
+      label: 'Sidebar width'
+    full_width:
+      type: integer
+      label: 'Full width'

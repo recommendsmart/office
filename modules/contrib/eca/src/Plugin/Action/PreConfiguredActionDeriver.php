@@ -3,7 +3,9 @@
 namespace Drupal\eca\Plugin\Action;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
+use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\eca\PluginManager\Action;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -35,12 +37,20 @@ class PreConfiguredActionDeriver extends DeriverBase implements ContainerDeriver
   protected Action $actionPluginManager;
 
   /**
+   * The logger channel.
+   *
+   * @var \Drupal\Core\Logger\LoggerChannelInterface
+   */
+  protected LoggerChannelInterface $logger;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $base_plugin_id) {
     $instance = new static();
     $instance->setActionEntityStorage($container->get('entity_type.manager')->getStorage('action'));
     $instance->setActionPluginManager($container->get('plugin.manager.eca.action'));
+    $instance->setLogger($container->get('logger.channel.eca'));
     return $instance;
   }
 
@@ -58,12 +68,21 @@ class PreConfiguredActionDeriver extends DeriverBase implements ContainerDeriver
     $this->derivatives = [];
     /** @var \Drupal\system\Entity\Action $action */
     foreach ($this->actionEntityStorage->loadMultiple() as $action) {
+      try {
+        $pluginDefinition = $action->getPluginDefinition();
+      }
+      catch (PluginNotFoundException $ex) {
+        $this->logger->error('Preconfigured action with a missing plugin found. You should delete that action with "drush config:delete system.action.@plugin". @msg', [
+          '@plugin' => $action->id(),
+          '@msg' => $ex->getMessage(),
+        ]);
+        continue;
+      }
       $id = $action->id();
       $this->derivatives[$id] = [
         'label' => 'Pre-configured: ' . $action->label(),
         'action_entity_id' => $id,
       ] + $base_plugin_definition;
-      $pluginDefinition = $action->getPluginDefinition();
       foreach (['type', 'confirm_form_route_name'] as $key) {
         if (isset($pluginDefinition[$key])) {
           $this->derivatives[$action->id()][$key] = $pluginDefinition[$key];
@@ -98,6 +117,16 @@ class PreConfiguredActionDeriver extends DeriverBase implements ContainerDeriver
    */
   public function setActionPluginManager(Action $manager): void {
     $this->actionPluginManager = $manager;
+  }
+
+  /**
+   * Set the logger channel.
+   *
+   * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
+   *   The logger channel.
+   */
+  public function setLogger(LoggerChannelInterface $logger): void {
+    $this->logger = $logger;
   }
 
 }

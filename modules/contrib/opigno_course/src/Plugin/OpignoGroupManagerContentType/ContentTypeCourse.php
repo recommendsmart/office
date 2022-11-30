@@ -99,7 +99,7 @@ class ContentTypeCourse extends ContentTypeBase {
       // I use this function `file_create_url` because all the others
       // methods ($file->toUrl(), URL::fromUri($uri)->toString(), ...)
       // doesn't work...
-      $url = file_create_url($uri);
+      $url = \Drupal::service('file_url_generator')->generateAbsoluteString($uri);
 
       $img_url = $url;
       $img_alt = $image[0]['alt'];
@@ -151,7 +151,7 @@ class ContentTypeCourse extends ContentTypeBase {
         // I use this function `file_create_url` because all the others
         // methods ($file->toUrl(), URL::fromUri($uri)->toString(), ...)
         // doesn't work...
-        $url = file_create_url($uri);
+        $url = \Drupal::service('file_url_generator')->generateAbsoluteString($uri);
 
         $img_url = $url;
         $img_alt = $image[0]['alt'];
@@ -205,7 +205,7 @@ class ContentTypeCourse extends ContentTypeBase {
         // I use this function `file_create_url` because all the others
         // methods ($file->toUrl(), URL::fromUri($uri)->toString(), ...)
         // doesn't work...
-        $url = file_create_url($uri);
+        $url = \Drupal::service('file_url_generator')->generateAbsoluteString($uri);
 
         $img_url = $url;
         $img_alt = $image[0]['alt'];
@@ -264,7 +264,7 @@ class ContentTypeCourse extends ContentTypeBase {
       // I use this function `file_create_url` because all the others
       // methods ($file->toUrl(), URL::fromUri($uri)->toString(), ...)
       // doesn't work...
-      $url = file_create_url($uri);
+      $url = \Drupal::service('file_url_generator')->generateAbsoluteString($uri);
 
       $img_url = $url;
       $img_alt = $image[0]['alt'];

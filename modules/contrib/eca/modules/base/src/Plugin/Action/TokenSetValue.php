@@ -14,7 +14,8 @@ use Symfony\Component\Yaml\Exception\ParseException;
  *
  * @Action(
  *   id = "eca_token_set_value",
- *   label = @Translation("Token: set value")
+ *   label = @Translation("Token: set value"),
+ *   description = @Translation("Sets a token onto the token stack by a specific name and value.")
  * )
  */
 class TokenSetValue extends ConfigurableActionBase {
@@ -82,12 +83,14 @@ class TokenSetValue extends ConfigurableActionBase {
       '#title' => $this->t('Name of token'),
       '#default_value' => $this->configuration['token_name'],
       '#weight' => -30,
+      '#description' => $this->t('Provide the name of a token where the value should be stored.'),
     ];
     $form['token_value'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Value of the token'),
       '#default_value' => $this->configuration['token_value'],
       '#weight' => -20,
+      '#description' => $this->t('Provide the value of the token.'),
     ];
     $form['use_yaml'] = [
       '#type' => 'checkbox',
@@ -105,7 +108,7 @@ class TokenSetValue extends ConfigurableActionBase {
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     $this->configuration['token_name'] = $form_state->getValue('token_name');
     $this->configuration['token_value'] = $form_state->getValue('token_value');
-    $this->configuration['use_yaml'] = $form_state->getValue('use_yaml');
+    $this->configuration['use_yaml'] = !empty($form_state->getValue('use_yaml'));
     parent::submitConfigurationForm($form, $form_state);
   }
 

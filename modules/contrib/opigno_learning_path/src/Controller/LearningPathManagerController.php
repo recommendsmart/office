@@ -104,7 +104,7 @@ class LearningPathManagerController extends ControllerBase {
     $item['entityId'] = $entity->id();
     $item['entityBundle'] = \Drupal::routeMatch()->getParameter('type');
     $item['title'] = $entity->get('label')->getString();
-    $item['imageUrl'] = ($file) ? file_create_url($file->getFileUri()) : '';
+    $item['imageUrl'] = ($file) ? \Drupal::service('file_url_generator')->generateAbsoluteString($file->getFileUri()) : '';
 
     $response->addCommand(
       new SettingsCommand([

@@ -48,7 +48,7 @@ function aristotle_theme() {
  * Implements hook_theme_suggestions_alter().
  */
 function aristotle_theme_suggestions_alter(&$suggestions, $variables, $hook) {
-  if ($hook == 'page') {
+  if ($hook === 'page') {
 
     // Node type.
     $node = \Drupal::routeMatch()->getParameter('node');
@@ -162,11 +162,11 @@ function aristotle_preprocess_group__learning_path(&$variables) {
   }
   else {
     $img = $variables['view_mode'] === 'list_item' ? 'svg/fi-rr-book-alt.svg' : 'content/training.svg';
-    $path = drupal_get_path('theme', 'aristotle') . "/src/images/$img";
+    $path = \Drupal::service('extension.list.theme')->getPath('aristotle') . "/src/images/$img";
     $name = $group->label();
     $variables['group_picture'] = [
       '#theme' => 'image',
-      '#uri' => file_exists($path) ? file_url_transform_relative(base_path() . $path) : '',
+      '#uri' => file_exists($path) ? \Drupal::service('file_url_generator')->transformRelative(base_path() . $path) : '',
       '#alt' => $name,
       '#title' => $name,
     ];
@@ -239,7 +239,7 @@ function aristotle_preprocess_html(&$variables) {
   if (isset($variables['node_type']) && $variables['node_type']) {
     $variables['attributes']['class'][] = 'page-node-' . $variables['node_type'];
   }
-  elseif (\Drupal::routeMatch()->getRouteName() == 'opigno_learning_path.manager.index') {
+  elseif (\Drupal::routeMatch()->getRouteName() === 'opigno_learning_path.manager.index') {
     $variables['attributes']['class'][] = 'page-node-learning_path';
   }
 
@@ -266,8 +266,8 @@ function aristotle_preprocess_html(&$variables) {
     $variables['attributes']['class'][] = 'anonymous-menu';
   }
 
-  if (\Drupal::routeMatch()->getRouteName() == 'opigno_module.manager.get_item_form'
-    || \Drupal::routeMatch()->getRouteName() == 'opigno_group_manager.manager.get_item_form'
+  if (\Drupal::routeMatch()->getRouteName() === 'opigno_module.manager.get_item_form'
+    || \Drupal::routeMatch()->getRouteName() === 'opigno_group_manager.manager.get_item_form'
   ) {
     $variables['attributes']['class'][] = 'lp-iframe';
   }
@@ -310,7 +310,7 @@ function aristotle_preprocess_page(&$variables) {
   /* Login form */
   $variables['login_form'] = NULL;
   if (!$account->id()) {
-    if ($route == 'user.login') {
+    if ($route === 'user.login') {
       $variables['login_form'] = $variables['page']['content'];
     }
     else {
@@ -322,7 +322,7 @@ function aristotle_preprocess_page(&$variables) {
   /* Password form */
   $variables['password_form'] = NULL;
   if (!$account->id()) {
-    if ($route == 'user.pass') {
+    if ($route === 'user.pass') {
       $variables['password_form'] = $variables['page']['content'];
     }
     else {
@@ -334,7 +334,7 @@ function aristotle_preprocess_page(&$variables) {
   /* Password form */
   $variables['register_form'] = NULL;
   if (!$account->id()) {
-    if ($route == 'user.register') {
+    if ($route === 'user.register') {
       $variables['register_form'] = $variables['page']['content'];
     }
     else {
@@ -371,7 +371,7 @@ function aristotle_preprocess_page(&$variables) {
     foreach ($aristotle_home_page_settings['aristotle_home_page_slides'] as $slide) {
       if (isset($slide['aristotle_home_page_image_path'])) {
         $background_image_uri = 'public://' . $slide['aristotle_home_page_image_path'];
-        $background_image_url = (ImageStyle::load(ARISTOTLE_HOMEPAGE_IMAGE_STYLE)) ? ImageStyle::load(ARISTOTLE_HOMEPAGE_IMAGE_STYLE)->buildUrl($background_image_uri) : file_create_url($background_image_uri);
+        $background_image_url = (ImageStyle::load(ARISTOTLE_HOMEPAGE_IMAGE_STYLE)) ? ImageStyle::load(ARISTOTLE_HOMEPAGE_IMAGE_STYLE)->buildUrl($background_image_uri) : \Drupal::service('file_url_generator')->generateAbsoluteString($background_image_uri);
 
         $slides[] = [
           'img_path' => Xss::filter($background_image_url),
@@ -381,7 +381,7 @@ function aristotle_preprocess_page(&$variables) {
 
     $variables['page']['content'] = [
       '#theme' => 'aristotle__login_front_slider',
-      '#branding' => $variables["page"]["branding"],
+      '#branding' => $variables['page']['branding'],
       '#items' => $slides,
     ];
   }
@@ -401,12 +401,12 @@ function aristotle_preprocess_page(&$variables) {
  * Implements hook_preprocess_HOOK().
  */
 function aristotle_preprocess_block(&$variables) {
-  if ($variables["base_plugin_id"] == 'system_menu_block') {
-    unset($variables["configuration"]["label_display"]);
+  if ($variables['base_plugin_id'] === 'system_menu_block') {
+    unset($variables['configuration']['label_display']);
   }
-  if ((('system_branding_block' == $variables["elements"]["#plugin_id"] &&
-        \Drupal::currentUser()->isAnonymous()) || (($variables["attributes"]["id"] ?? "") == "block-sitebranding-2")) &&
-    isset($variables["content"]["site_logo"])
+  if ((('system_branding_block' === $variables['elements']['#plugin_id'] &&
+        \Drupal::currentUser()->isAnonymous()) || (($variables['attributes']['id'] ?? "") === "block-sitebranding-2")) &&
+    isset($variables['content']['site_logo'])
   ) {
     $theme_path = \Drupal::theme()->getActiveTheme()->getPath();
     $logo_path = theme_get_setting('logo_path_anonymous');
@@ -415,8 +415,8 @@ function aristotle_preprocess_block(&$variables) {
         $logo_path = $theme_path . '/assets/' . $logo_path;
       }
     }
-    $site_logo = file_url_transform_relative(file_create_url($logo_path));
-    $variables["site_logo"] = $site_logo;
+    $site_logo = \Drupal::service('file_url_generator')->generateString($logo_path);
+    $variables['site_logo'] = $site_logo;
   }
 }
 
@@ -424,7 +424,7 @@ function aristotle_preprocess_block(&$variables) {
  * Implements hook_preprocess_HOOK().
  */
 function aristotle_preprocess_menu(&$variables, $hook) {
-  if ($hook == 'menu__main' && $variables["logged_in"] == TRUE) {
+  if ($hook === 'menu__main' && $variables['logged_in'] === TRUE) {
     // Add management dropdown menu block to the main menu.
     try {
       $block = Block::load('opigno_admin');
@@ -457,6 +457,7 @@ function aristotle_page_attachments_alter(array &$attachments) {
       break;
     }
   }
+  unset($attachment);
 
   if (!$viewport) {
     $attachments['#attached']['html_head'][] = [
@@ -546,15 +547,15 @@ function aristotle_preprocess_menu_local_action(&$variables) {
   $cache->addCacheContexts(['url.path']);
   $cache->applyTo($variables);
 
-  if (isset($variables["link"]["#options"]["attributes"]["class"])) {
-    $variables["link"]["#options"]["attributes"]["class"][] = 'btn';
-    $variables["link"]["#options"]["attributes"]["class"][] = 'btn-rounded';
+  if (isset($variables['link']['#options']['attributes']['class'])) {
+    $variables['link']['#options']['attributes']['class'][] = 'btn';
+    $variables['link']['#options']['attributes']['class'][] = 'btn-rounded';
   }
 
   $current_path = \Drupal::service('path.current')->getPath();
   if (\Drupal::service('path.matcher')->matchPath($current_path, '/forum*')) {
-    if (isset($variables["attributes"]["class"])) {
-      $variables["link"]["#options"]["attributes"]["class"][] = 'forum-action-links';
+    if (isset($variables['attributes']['class'])) {
+      $variables['link']['#options']['attributes']['class'][] = 'forum-action-links';
     }
   }
 }
@@ -565,7 +566,7 @@ function aristotle_preprocess_menu_local_action(&$variables) {
 function aristotle_preprocess_page_title(&$variables) {
   $current_path = \Drupal::service('path.current')->getPath();
   if (\Drupal::service('path.matcher')->matchPath($current_path, '/forum*')) {
-    $variables["title"] = t('Forum');
+    $variables['title'] = t('Forum');
   }
 }
 
@@ -592,9 +593,9 @@ function aristotle_form_system_theme_settings_slide_callback(array &$form, FormS
  */
 function aristotle_anonymous_has_slider() {
   if ((\Drupal::service('path.matcher')->isFrontPage()
-      || \Drupal::routeMatch()->getRouteName() == 'user.login'
-      || \Drupal::routeMatch()->getRouteName() == 'user.pass'
-      || \Drupal::routeMatch()->getRouteName() == 'user.register')
+      || \Drupal::routeMatch()->getRouteName() === 'user.login'
+      || \Drupal::routeMatch()->getRouteName() === 'user.pass'
+      || \Drupal::routeMatch()->getRouteName() === 'user.register')
     && \Drupal::currentUser()->isAnonymous()
   ) {
     $aristotle_home_page_settings = theme_get_setting('aristotle_home_page_settings');
@@ -641,7 +642,7 @@ function aristotle_page_has_faded_background() {
   ];
 
   $faded_form = FALSE;
-  foreach ($faded_form_routes_names as $key => $value) {
+  foreach ($faded_form_routes_names as $value) {
     if (strpos($route, $value) !== FALSE) {
       $faded_form = TRUE;
     }
@@ -666,7 +667,7 @@ function aristotle_page_has_faded_background() {
  * Implements hook_preprocess_HOOK().
  */
 function aristotle_preprocess_select(&$variables) {
-  $variables["attributes"]["class"][] = 'selectpicker';
+  $variables['attributes']['class'][] = 'selectpicker';
 }
 
 /**
@@ -721,7 +722,7 @@ function aristotle_form_user_register_form_alter(&$form, FormStateInterface $for
 function aristotle_form_user_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   $form['account']['name']['#attributes']['placeholder'] = $form['account']['name']['#title'] ?? t('Username');
   $form['account']['mail']['#attributes']['placeholder'] = $form['account']['mail']['#title'] ?? t('Email address');
-  if (isset($form['account']['pass']) && $form['account']['pass']['#type'] == 'password_confirm') {
+  if (isset($form['account']['pass']) && $form['account']['pass']['#type'] === 'password_confirm') {
     $form['account']['pass']['#process'][] = 'user_form_process_password_confirm';
     $form['account']['pass']['#process'][] = 'aristotle_user_form_process_pass';
   }

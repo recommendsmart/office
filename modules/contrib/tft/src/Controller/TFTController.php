@@ -469,7 +469,7 @@ class TFTController extends ControllerBase {
     // Store the current term tid.
     $tempstore->set('root_tid', $tid);
 
-    $path = drupal_get_path('module', 'tft');
+    $path = \Drupal::service('extension.list.module')->getPath('tft');
 
     return [
       // Get the themed title bar.

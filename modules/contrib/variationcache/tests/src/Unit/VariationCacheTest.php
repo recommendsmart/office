@@ -6,7 +6,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\Context\ContextCacheKeys;
 use Drupal\Core\Cache\MemoryBackend;
-use Drupal\Core\Http\RequestStack;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Drupal\Tests\UnitTestCase;
 use Drupal\variationcache\Cache\CacheRedirect;
 use Drupal\variationcache\Cache\VariationCache;
@@ -21,7 +21,7 @@ class VariationCacheTest extends UnitTestCase {
   /**
    * The prophesized request stack.
    *
-   * @var \Drupal\Core\Http\RequestStack|\Prophecy\Prophecy\ProphecyInterface
+   * @var \Symfony\Component\HttpFoundation\RequestStack|\Prophecy\Prophecy\ProphecyInterface
    */
   protected $requestStack;
 

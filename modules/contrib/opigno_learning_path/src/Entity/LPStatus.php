@@ -245,7 +245,7 @@ class LPStatus extends ContentEntityBase implements LPStatusInterface {
    *   True if training certificate expiration set, false otherwise.
    */
   public static function isCertificateExpireSet(Group $group): bool {
-    return (bool) $group->get('field_certificate_expire')->getString();
+    return (bool) ($group->hasField('field_certificate_expire') ? $group->get('field_certificate_expire')->getString() : FALSE);
   }
 
   /**

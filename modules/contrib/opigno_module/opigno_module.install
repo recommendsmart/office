@@ -339,7 +339,8 @@ function opigno_module_update_9001() {
  * Configs update helper function.
  */
 function _opigno_module_apply_update($type, $name, $path, $ymls) {
-  $theme_path = sprintf("%s/%s/", drupal_get_path($type, $name), $path);
+  $module_path = \Drupal::service('extension.list.module')->getPath($name);
+  $theme_path = sprintf("%s/%s/", $module_path, $path);
   $config_factory = \Drupal::configFactory();
   $config_storage = \Drupal::service('config.storage');
   $configs = [];
@@ -354,7 +355,7 @@ function _opigno_module_apply_update($type, $name, $path, $ymls) {
       $config_storage->write($config, $data);
     }
     else {
-      \Drupal::messenger()->addWarning(t('Incorrect data of @config', ['@config'=>$config]));
+      \Drupal::messenger()->addWarning(t('Incorrect data of @config', ['@config' => $config]));
     }
   }
 }

@@ -110,6 +110,7 @@ class LearningPathController extends ControllerBase {
     $user = $this->currentUser();
     $uid = $user->id();
 
+    assert(\Drupal::routeMatch()->getParameter('group'));
     $status = opigno_learning_path_get_step_status($step, $uid, TRUE);
     return [
       'class' => $status,

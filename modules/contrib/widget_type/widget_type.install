@@ -5,6 +5,7 @@
  * Module install file.
  */
 
+use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 
@@ -30,7 +31,12 @@ function widget_type_update_8101(&$sandbox) {
     ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
     ->setTranslatable(FALSE)
     ->setReadOnly(TRUE);
-  $definition_update_manager->installFieldStorageDefinition('remote_widget_dependencies', 'widget_type', 'widget_type', $deps_field);
+  $definition_update_manager->installFieldStorageDefinition(
+    'remote_widget_dependencies',
+    'widget_type',
+    'widget_type',
+    $deps_field
+  );
   $files_field = $definition_update_manager->getFieldStorageDefinition('remote_widget_files', 'widget_type');
   assert($files_field instanceof BaseFieldDefinition);
   $files_field->setDisplayOptions('view', [
@@ -148,4 +154,26 @@ function widget_type_update_8106(&$sandbox) {
   $name = 'image.style.widget_type_small_16_9';
   $data = $source->read($name);
   $active_storage->write($name, $data);
+}
+
+/**
+ * Install field to store the remote widget type status.
+ */
+function widget_type_update_8107(&$sandbox) {
+  $field_definition = BaseFieldDefinition::create('string')
+    ->setLabel(t('Remote Widget status'))
+    ->setDescription(t('The list of files of the widget.'))
+    ->setDisplayOptions('view', [
+      'label' => 'above',
+      'type' => 'string',
+      'weight' => -2,
+    ])
+    ->setDisplayConfigurable('view', FALSE)
+    ->setReadOnly(TRUE);
+  \Drupal::entityDefinitionUpdateManager()->installFieldStorageDefinition(
+    'remote_widget_status',
+    'widget_type',
+    'widget_type',
+    $field_definition
+  );
 }

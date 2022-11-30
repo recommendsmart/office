@@ -13,6 +13,7 @@ use Drupal\eca\TypedData\PropertyPathTrait;
  * @EcaCondition(
  *   id = "eca_entity_field_value_changed",
  *   label = @Translation("Entity: field value changed"),
+ *   description = @Translation("Evaluates against the change of a value field of an entity."),
  *   context_definitions = {
  *     "entity" = @ContextDefinition("entity", label = @Translation("Entity"))
  *   }
@@ -51,6 +52,7 @@ class EntityFieldValueChanged extends ConditionBase {
     $form['field_name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Field name'),
+      '#description' => $this->t('The field name of the entity to check, if its value has changed.'),
       '#default_value' => $this->configuration['field_name'],
       '#weight' => -10,
     ];

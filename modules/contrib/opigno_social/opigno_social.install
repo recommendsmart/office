@@ -5,11 +5,7 @@
  * Contains install and update functions for the module.
  */
 
-use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Config\FileStorage;
-use Drupal\Core\Entity\EntityStorageException;
-use Drupal\user\RoleInterface;
 
 /**
  * Implements hook_install().
@@ -72,7 +68,7 @@ function opigno_social_set_default_layout() {
  */
 function opigno_social_update_9001() {
   // Import configs.
-  $config_path = drupal_get_path('module', 'opigno_social') . '/config/optional/';
+  $config_path = \Drupal::service('extension.list.module')->getPath('opigno_social') . '/config/optional/';
   $config_source = new FileStorage($config_path);
   \Drupal::service('config.installer')->installOptionalConfig($config_source);
 }

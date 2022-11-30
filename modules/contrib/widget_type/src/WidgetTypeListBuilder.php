@@ -2,14 +2,13 @@
 
 namespace Drupal\widget_type;
 
+use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
-use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Routing\RedirectDestinationInterface;
-use Drupal\widget_instance\WidgetInstanceInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
@@ -44,7 +43,12 @@ class WidgetTypeListBuilder extends EntityListBuilder {
    * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirect_destination
    *   The redirect destination service.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, DateFormatterInterface $date_formatter, RedirectDestinationInterface $redirect_destination) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    EntityStorageInterface $storage,
+    DateFormatterInterface $date_formatter,
+    RedirectDestinationInterface $redirect_destination
+  ) {
     parent::__construct($entity_type, $storage);
     $this->dateFormatter = $date_formatter;
     $this->redirectDestination = $redirect_destination;
@@ -102,7 +106,9 @@ class WidgetTypeListBuilder extends EntityListBuilder {
     $build['table'] = [
       '#type' => 'details',
       '#title' => $this->t('Widget Types'),
-      '#description' => $this->t('Widget types are widget definitions. They represent JS applications ready to be configured and embedded in Drupal.'),
+      '#description' => $this->t(
+        'Widget types are widget definitions. They represent JS applications ready to be configured and embedded in Drupal.'
+      ),
       '#open' => TRUE,
       'search' => [
         '#type' => 'search',
@@ -126,9 +132,11 @@ class WidgetTypeListBuilder extends EntityListBuilder {
       $link = Link::createFromRoute($title, 'widget_ingestion.manual', [], [
         'attributes' => ['class' => ['button', 'button--primary']],
       ]);
-      $build['table']['data']['table']['#empty'] = $this->t('There are no widget types yet. @link', ['@link' => $link->toString()]);
-    }
-    catch (RouteNotFoundException $exception) {
+      $build['table']['data']['table']['#empty'] = $this->t(
+        'There are no widget types yet. @link',
+        ['@link' => $link->toString()]
+      );
+    } catch (RouteNotFoundException $exception) {
       // Intentionally left blank.
     }
 
@@ -156,6 +164,7 @@ class WidgetTypeListBuilder extends EntityListBuilder {
       'changed' => $this->t('Updated'),
       'source' => $this->t('Source'),
       'directory' => $this->t('Directory'),
+      'remote_status' => $this->t('Remote status'),
       'version' => $this->t('Version'),
     ];
     return $header + parent::buildHeader();
@@ -198,7 +207,7 @@ class WidgetTypeListBuilder extends EntityListBuilder {
             'style' => 'color: #' . $color . '; background-color: #' . $complementary_color,
           ],
         ],
-        'class' => ['source']
+        'class' => ['source'],
       ],
       'directory' => [
         'data' => [
@@ -208,6 +217,14 @@ class WidgetTypeListBuilder extends EntityListBuilder {
           '#attributes' => ['title' => $entity->getDirectory()],
         ],
         'class' => ['directory-url'],
+      ],
+      'remote_status' => [
+        'data' => [
+          '#type' => 'html_tag',
+          '#tag' => 'span',
+          '#value' => $entity->getRemoteStatus(),
+        ],
+        'class' => ['remote-status'],
       ],
       'version' => [
         'data' => [

@@ -64,11 +64,13 @@ class NodeEntityBundleInfo {
    * @throws \Twig_Error_Runtime
    * @throws \Twig_Error_Syntax
    */
-  public function renderNodeDetails($viewFilePath, $langcode, $nid = null) {
+  public function renderNodeDetails($viewFilePath, $langcode, $nid = FALSE) {
     $roles = null;
     $users = null;
+    $rids = null;
+    $uids = null;
 
-    if (!empty($nid)) {
+    if ($nid !== null) {
       $tids = $this->term->getTidsByNid($nid);
       if (!empty($tids)) {
         $uids = $this->accessStorage->getUserTermPermissionsByTids($tids, $langcode);
@@ -76,11 +78,11 @@ class NodeEntityBundleInfo {
       }
     }
 
-    if (!empty($rids)) {
+    if ($rids !== null) {
       $roles = Role::loadMultiple($rids);
     }
 
-    if (!empty($uids)) {
+    if ($uids !== null) {
       $users = User::loadMultiple($uids);
     }
 

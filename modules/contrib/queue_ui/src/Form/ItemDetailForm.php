@@ -51,7 +51,7 @@ class ItemDetailForm extends FormBase {
     return new static(
       $container->get('plugin.manager.queue_ui'),
       $container->get('renderer'),
-      $container->get('module_handler'),
+      $container->get('module_handler')
     );
   }
 

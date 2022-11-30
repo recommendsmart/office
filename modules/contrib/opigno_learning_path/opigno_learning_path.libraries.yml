@@ -16,7 +16,7 @@ global:
     js/opigno_learning_path_global.js: {}
   dependencies:
     - core/jquery
-    - core/jquery.once
+    - core/once
     - core/drupalSettings
   css:
     theme:
@@ -28,7 +28,7 @@ ajax_form:
     js/opigno_learning_path_iframe.js: {}
   dependencies:
     - core/jquery
-    - core/jquery.once
+    - core/once
     - core/drupalSettings
 
 member_add:
@@ -40,7 +40,7 @@ member_add:
     js/opigno_learning_path_member_add.js: {}
   dependencies:
     - core/jquery
-    - core/jquery.once
+    - core/once
     - core/drupalSettings
 
 create_member:
@@ -52,7 +52,7 @@ create_member:
     js/opigno_learning_path_create_member.js: {}
   dependencies:
     - core/jquery
-    - core/jquery.once
+    - core/once
     - core/drupalSettings
 
 member_overview:
@@ -64,7 +64,7 @@ member_overview:
     js/opigno_learning_path_member_overview.js: {}
   dependencies:
     - core/jquery
-    - core/jquery.once
+    - core/once
     - core/drupalSettings
 
 training_content:
@@ -76,7 +76,7 @@ training_content:
     js/opigno_learning_path_training_content.js: {}
   dependencies:
     - core/jquery
-    - core/jquery.once
+    - core/once
     - core/drupalSettings
 
 achievements:
@@ -92,7 +92,7 @@ achievements:
     /libraries/slick/slick/slick.min.js: { minified: true }
   dependencies:
     - core/jquery
-    - core/jquery.once
+    - core/once
     - core/drupalSettings
     - core/drupal.ajax
 
@@ -125,7 +125,7 @@ opigno_dropzonejs_widgets:
     js/opigno_dropzonejs_widgets.js: {}
   dependencies:
     - core/jquery
-    - core/jquery.once
+    - core/once
     - core/drupalSettings
 
 iframe_opigno_lp_manager:
@@ -139,7 +139,7 @@ run_force:
     js/opigno_learning_path_run.js: {}
   dependencies:
     - core/jquery
-    - core/jquery.once
+    - core/once
 
 progress:
   version: VERSION
@@ -150,7 +150,7 @@ progress:
     js/opigno_learning_path_progress.js: {}
   dependencies:
     - core/jquery
-    - core/jquery.once
+    - core/once
     - core/drupalSettings
     - core/drupal.ajax
 

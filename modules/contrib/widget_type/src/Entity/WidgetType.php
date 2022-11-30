@@ -233,8 +233,7 @@ final class WidgetType extends ContentEntityBase implements WidgetTypeInterface 
         return [];
       }
       return $first->getValue();
-    }
-    catch (MissingDataException $exception) {
+    } catch (MissingDataException $exception) {
       return [];
     }
   }
@@ -249,8 +248,7 @@ final class WidgetType extends ContentEntityBase implements WidgetTypeInterface 
         return [];
       }
       return $first->getValue();
-    }
-    catch (MissingDataException $exception) {
+    } catch (MissingDataException $exception) {
       return [];
     }
   }
@@ -328,6 +326,21 @@ final class WidgetType extends ContentEntityBase implements WidgetTypeInterface 
    */
   public function setRemoteLanguages(array $lang_codes): WidgetTypeInterface {
     $this->set('available_translation_languages', $lang_codes);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRemoteStatus(): string {
+    return $this->get('remote_widget_status')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRemoteStatus($remote_status): WidgetTypeInterface {
+    $this->set('remote_widget_status', $remote_status);
     return $this;
   }
 
@@ -450,6 +463,17 @@ final class WidgetType extends ContentEntityBase implements WidgetTypeInterface 
         'weight' => -8,
       ])
       ->setDisplayConfigurable('view', TRUE)
+      ->setReadOnly(TRUE);
+
+    $fields['remote_widget_status'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Remote Widget status'))
+      ->setDescription(t('The list of files of the widget.'))
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'string',
+        'weight' => -2,
+      ])
+      ->setDisplayConfigurable('view', FALSE)
       ->setReadOnly(TRUE);
 
     $fields['remote_widget_settings'] = BaseFieldDefinition::create('map')

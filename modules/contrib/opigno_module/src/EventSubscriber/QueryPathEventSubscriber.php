@@ -5,13 +5,13 @@ namespace Drupal\opigno_module\EventSubscriber;
 use Drupal\Core\Url;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 class QueryPathEventSubscriber implements EventSubscriberInterface {
 
   // Remember query string (with table sort) as session variable and reload page with it
-  public function checkRedirection(FilterResponseEvent $event) {
+  public function checkRedirection(ResponseEvent $event) {
     // Add new routes for enable logic
     $available_routes = [
       'entity.opigno_activity.collection',

@@ -241,6 +241,7 @@ class ContentEntityEvent extends EventBase implements CleanupInterface {
         '#type' => 'textfield',
         '#title' => $this->t('Event ID'),
         '#default_value' => $this->configuration['event_id'],
+        '#description' => $this->t('The id of the custom event (entity aware). Leave empty to trigger all entity aware events.'),
       ];
     }
     else {
@@ -255,11 +256,13 @@ class ContentEntityEvent extends EventBase implements CleanupInterface {
           '#type' => 'textfield',
           '#title' => $this->t('Restrict by field (machine name)'),
           '#default_value' => $this->configuration['field_name'],
+          '#description' => $this->t('The machine name of the field to restrict the event trigger.'),
         ];
         $form['token_name'] = [
           '#type' => 'textfield',
           '#title' => $this->t('Token name holding the selection'),
           '#default_value' => $this->configuration['token_name'],
+          '#description' => $this->t('The name of the token to hold the selection.'),
         ];
       }
     }

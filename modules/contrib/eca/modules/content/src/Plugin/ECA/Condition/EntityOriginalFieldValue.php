@@ -13,6 +13,7 @@ use Drupal\Core\Entity\EntityInterface;
  * @EcaCondition(
  *   id = "eca_entity_original_field_value",
  *   label = @Translation("Entity: original has field value"),
+ *   description = @Translation("Compares a field value of an entities <em>original</em>  by specific properties."),
  *   context_definitions = {
  *     "entity" = @ContextDefinition("entity", label = @Translation("Entity"))
  *   }

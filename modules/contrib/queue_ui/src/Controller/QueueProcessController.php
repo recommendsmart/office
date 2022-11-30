@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 class QueueProcessController implements ContainerInjectionInterface {
 
   /**
+   * The QueueUIBatchInterface.
+   *
    * @var \Drupal\queue_ui\QueueUIBatchInterface
    */
   protected $batch;
@@ -30,7 +32,7 @@ class QueueProcessController implements ContainerInjectionInterface {
   }
 
   /**
-   * Process a certain queue
+   * Process a certain queue.
    */
   public function process(string $queueName): ?RedirectResponse {
     $this->batch->batch([$queueName]);
@@ -39,7 +41,7 @@ class QueueProcessController implements ContainerInjectionInterface {
   }
 
   /**
-   * Checks access for processing a certain queue
+   * Checks access for processing a certain queue.
    */
   public function access(AccountProxyInterface $account, string $queueName): AccessResultInterface {
     return AccessResult::allowedIfHasPermission($account, sprintf('process %s queue', $queueName));

@@ -11,7 +11,8 @@ use Drupal\eca_base\Plugin\ListCountTrait;
  *
  * @Action(
  *   id = "eca_count",
- *   label = @Translation("Count list items")
+ *   label = @Translation("List: count items"),
+ *   description = @Translation("Counts the items in a list based on several properties.")
  * )
  */
 class ListCount extends ConfigurableActionBase {

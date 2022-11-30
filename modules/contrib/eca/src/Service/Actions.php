@@ -155,6 +155,8 @@ class Actions {
           '#weight' => 2,
         ];
       }
+      // Important: When adding checkbox fields, the extra field must be added
+      // in Drupal\eca\Entity\Eca::validatePlugin().
       if (!($action instanceof ActionInterface) && ($action instanceof ConfigurableInterface)) {
         // @todo Consider a form validate and submit method for this service.
         $form['replace_tokens'] = [

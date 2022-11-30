@@ -10,7 +10,8 @@ use Drupal\eca\Plugin\ECA\Condition\StringComparisonBase;
  *
  * @EcaCondition(
  *   id = "eca_scalar",
- *   label = @Translation("Compare two scalar values")
+ *   label = @Translation("Compare two scalar values"),
+ *   description = @Translation("Compares two scalar values based on several conditions.")
  * )
  */
 class ScalarComparison extends StringComparisonBase {
@@ -48,12 +49,14 @@ class ScalarComparison extends StringComparisonBase {
       '#title' => $this->t('First value'),
       '#default_value' => $this->getLeftValue(),
       '#weight' => -90,
+      '#description' => $this->t('The first value to be compared.'),
     ];
     $form['right'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Second value'),
       '#default_value' => $this->getRightValue(),
       '#weight' => -70,
+      '#description' => $this->t('The second value to be compared.'),
     ];
     return parent::buildConfigurationForm($form, $form_state);
   }

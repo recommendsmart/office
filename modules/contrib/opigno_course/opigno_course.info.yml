@@ -1,7 +1,7 @@
 name: Opigno Course
 type: module
 description: Adds course feature to your Opigno instance.
-core_version_requirement: ^9
+core_version_requirement: ^9 || ^10
 package: Opigno
 dependencies:
   - group:group
@@ -9,7 +9,7 @@ dependencies:
   - opigno_module:opigno_module_group
   - opigno_class:opigno_class
 
-# Information added by Drupal.org packaging script on 2022-04-01
-version: '3.0.2'
+# Information added by Drupal.org packaging script on 2022-11-13
+version: '3.0.3'
 project: 'opigno_course'
-datestamp: 1648805964
+datestamp: 1668361464

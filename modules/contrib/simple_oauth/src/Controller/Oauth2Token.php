@@ -4,6 +4,7 @@ namespace Drupal\simple_oauth\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\simple_oauth\Server\AuthorizationServerFactoryInterface;
+use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Psr7\Response;
 use League\OAuth2\Server\Exception\OAuthServerException;
@@ -31,16 +32,30 @@ class Oauth2Token extends ControllerBase {
   protected HttpMessageFactoryInterface $httpMessageFactory;
 
   /**
+   * The client repository.
+   *
+   * @var \League\OAuth2\Server\Repositories\ClientRepositoryInterface
+   */
+  protected ClientRepositoryInterface $clientRepository;
+
+  /**
    * Oauth2Token constructor.
    *
    * @param \Drupal\simple_oauth\Server\AuthorizationServerFactoryInterface $authorization_server_factory
    *   The authorization server factory.
    * @param \Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface $http_message_factory
    *   The PSR-7 converter.
+   * @param \League\OAuth2\Server\Repositories\ClientRepositoryInterface $client_repository
+   *   The client repository service.
    */
-  public function __construct(AuthorizationServerFactoryInterface $authorization_server_factory, HttpMessageFactoryInterface $http_message_factory) {
+  public function __construct(
+    AuthorizationServerFactoryInterface $authorization_server_factory,
+    HttpMessageFactoryInterface $http_message_factory,
+    ClientRepositoryInterface $client_repository
+  ) {
     $this->authorizationServerFactory = $authorization_server_factory;
     $this->httpMessageFactory = $http_message_factory;
+    $this->clientRepository = $client_repository;
   }
 
   /**
@@ -49,7 +64,8 @@ class Oauth2Token extends ControllerBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('simple_oauth.server.authorization_server.factory'),
-      $container->get('psr7.http_message_factory')
+      $container->get('psr7.http_message_factory'),
+      $container->get('simple_oauth.repositories.client')
     );
   }
 
@@ -62,8 +78,7 @@ class Oauth2Token extends ControllerBase {
    * @return \Psr\Http\Message\ResponseInterface
    *   The response.
    *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Exception
    */
   public function token(Request $request): ResponseInterface {
     $server_request = $this->httpMessageFactory->createRequest($request);
@@ -74,18 +89,14 @@ class Oauth2Token extends ControllerBase {
       if (empty($client_id)) {
         throw OAuthServerException::invalidRequest('client_id');
       }
-      $consumer_storage = $this->entityTypeManager()->getStorage('consumer');
-      /** @var \Drupal\consumers\Entity\Consumer[] $clients */
-      $clients = $consumer_storage->loadByProperties([
-        'client_id' => $client_id,
-      ]);
-      if (empty($clients)) {
+      $client_entity = $this->clientRepository->getClientEntity($client_id);
+      if (empty($client_entity)) {
         throw OAuthServerException::invalidClient($server_request);
       }
-      $client = reset($clients);
+      $client_drupal_entity = $client_entity->getDrupalEntity();
 
       // Respond to the incoming request and fill in the response.
-      $server = $this->authorizationServerFactory->get($client);
+      $server = $this->authorizationServerFactory->get($client_drupal_entity);
       $response = $server->respondToAccessTokenRequest($server_request, $server_response);
     }
     catch (OAuthServerException $exception) {

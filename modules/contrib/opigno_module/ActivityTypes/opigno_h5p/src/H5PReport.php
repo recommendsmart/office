@@ -42,7 +42,8 @@ class H5PReport {
 
     if (!isset($this->processors[$interactionType])) {
       // Not used before. Initialize new processor.
-      $this->processors[$interactionType] = new self::$processorMap[$interactionType]();
+      $processor = self::$processorMap[$interactionType];
+      $this->processors[$interactionType] = new $processor();
     }
 
     // Generate and return report from xAPI data.

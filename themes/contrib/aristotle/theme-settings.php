@@ -9,6 +9,7 @@ use Drupal\aristotle\ThemeSettingsPreRender;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\file\Entity\File;
+use Drupal\system\Entity\Menu;
 
 /**
  * Implements hook_form_system_theme_settings_alter().
@@ -24,8 +25,9 @@ function aristotle_form_system_theme_settings_alter(&$form, FormStateInterface $
   // Load file before running process (prevent not found on ajax,
   // validate and submit handlers).
   $build_info = $form_state->getBuildInfo();
-  $theme_settings_files[] = drupal_get_path('theme', 'aristotle') . '/theme-settings.php';
-  $theme_settings_files[] = drupal_get_path('theme', 'aristotle') . '/aristotle.theme';
+  $theme_settings_files = [];
+  $theme_settings_files[] = \Drupal::service('extension.list.theme')->getPath('aristotle') . '/theme-settings.php';
+  $theme_settings_files[] = \Drupal::service('extension.list.theme')->getPath('aristotle') . '/aristotle.theme';
   foreach ($theme_settings_files as $theme_settings_file) {
     if (!in_array($theme_settings_file, $build_info['files'])) {
       $build_info['files'][] = $theme_settings_file;
@@ -181,7 +183,7 @@ function aristotle_form_system_theme_settings_alter(&$form, FormStateInterface $
       '#type' => 'textfield',
       '#title' => t('The path to the home page background image.'),
       '#description' => t('The path to the image file you would like to use as your custom home page background (relative to sites/default/files).'),
-      '#default_value' => isset($aristotle_home_page_settings['aristotle_home_page_slides'][$i]['aristotle_home_page_image_path']) ? $aristotle_home_page_settings['aristotle_home_page_slides'][$i]['aristotle_home_page_image_path'] : NULL,
+      '#default_value' => $aristotle_home_page_settings['aristotle_home_page_slides'][$i]['aristotle_home_page_image_path'] ?? NULL,
     ];
 
     $form['aristotle_home_page_settings']['aristotle_home_page_slides'][$i]['aristotle_home_page_image_upload'] = [
@@ -235,10 +237,15 @@ function aristotle_form_system_theme_settings_alter(&$form, FormStateInterface $
       '#open' => TRUE,
     ];
 
+    $custom_menus = Menu::loadMultiple();
+    foreach ($custom_menus as $menu_name => $menu) {
+      $custom_menus[$menu_name] = $menu->label();
+    }
+    asort($custom_menus);
     $form['aristotle_menu_settings']['aristotle_menu_source'] = [
       '#type' => 'select',
       '#title' => t('Main menu source'),
-      '#options' => [0 => t('None')] + menu_ui_get_menus(),
+      '#options' => [0 => t('None')] + $custom_menus,
       '#description' => t("The menu source to use for the tile navigation. If 'none', Aristotle will use a default list of tiles."),
       '#default_value' => theme_get_setting('aristotle_menu_source'),
     ];
@@ -372,15 +379,6 @@ function aristotle_form_system_theme_settings_alter_submit($form, FormStateInter
       $form_state->setValue('aristotle_home_page_settings', $aristotle_home_page_settings);
     }
   }
-}
-
-/**
- * Submission callback for aristotle_form_system_theme_settings_alter().
- *
- * Specific logic for color integration. Remove white from the images to make
- * them transparent.
- */
-function aristotle_form_system_theme_settings_alter_color_submit($form, $form_state) {
 }
 
 /**

@@ -446,10 +446,22 @@ class Eca extends ConfigEntityBase implements EntityWithPluginCollectionInterfac
    */
   protected function validatePlugin(PluginFormInterface $plugin, array &$fields, string $type, string $plugin_id, string $label): bool {
     if ($plugin instanceof ConfigurableInterface) {
-      // Convert potential strings from pseudo-checkboxes back to boolean.
-      foreach ($plugin->defaultConfiguration() as $key => $value) {
-        if (is_bool($value) && isset($fields[$key]) && !is_bool($fields[$key])) {
-          $fields[$key] = mb_strtolower($fields[$key]) === 'yes';
+      foreach ($plugin->defaultConfiguration() + ['replace_tokens' => FALSE] as $key => $value) {
+        // Convert potential strings from pseudo-checkboxes (for example a
+        // dropdown with "yes" or "no" options).
+        if (is_bool($value) && isset($fields[$key]) && is_string($fields[$key]) && in_array(mb_strtolower($fields[$key]), ['yes', 'no'], TRUE)) {
+          if (mb_strtolower($fields[$key]) === 'yes') {
+            $fields[$key] = TRUE;
+          }
+          else {
+            // Unset from the fields array. An unchecked checkbox is like
+            // no value is provided on form submission.
+            unset($fields[$key]);
+            // When plugin configuration is being used on form building,
+            // the default value will be used. This makes sure, that the
+            // default value is treated like an unchecked checkbox.
+            $plugin->setConfiguration([$key => FALSE] + $plugin->getConfiguration());
+          }
         }
       }
     }

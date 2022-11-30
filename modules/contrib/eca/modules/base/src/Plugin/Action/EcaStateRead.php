@@ -10,7 +10,8 @@ use Drupal\eca\Plugin\Action\ConfigurableActionBase;
  *
  * @Action(
  *   id = "eca_state_read",
- *   label = @Translation("Persistent state: read")
+ *   label = @Translation("Persistent state: read"),
+ *   description = @Translation("Reads a value from the Drupal state by the given key. The result is stored in a token.")
  * )
  */
 class EcaStateRead extends ConfigurableActionBase {
@@ -43,12 +44,14 @@ class EcaStateRead extends ConfigurableActionBase {
       '#title' => $this->t('State key'),
       '#default_value' => $this->configuration['key'],
       '#weight' => -20,
+      '#description' => $this->t('The key of the Drupal state.'),
     ];
     $form['token_name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Name of token'),
       '#default_value' => $this->configuration['token_name'],
       '#weight' => -10,
+      '#description' => $this->t('The name of the token, the value is stored into.'),
     ];
     return $form;
   }

@@ -14,6 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @EcaCondition(
  *   id = "eca_entity_type_bundle",
  *   label = "Entity type and bundle",
+ *   description = @Translation("Evaluates against the entity type and bundle."),
  *   context_definitions = {
  *     "entity" = @ContextDefinition("entity", label = @Translation("Entity"))
  *   }

@@ -83,7 +83,7 @@ class OpignoUserSelectionController extends ControllerBase {
    * @opigno_deprecated
    */
   public function getUserAvatar($user) {
-    $default_image = file_create_url(drupal_get_path('module', 'opigno_user_selection') . '/assets/profile.svg');
+    $default_image = \Drupal::service('file_url_generator')->generateAbsoluteString(\Drupal::service('extension.list.module')->getPath('opigno_user_selection') . '/assets/profile.svg');
     $image_style = ImageStyle::load('thumbnail');
     if (!($image_style instanceof ImageStyle)) {
       return $default_image;
@@ -101,7 +101,7 @@ class OpignoUserSelectionController extends ControllerBase {
    * @opigno_deprecated
    */
   public function getGroupImage($type, $group) {
-    $default_image = file_create_url(drupal_get_path('module', 'opigno_user_selection') . '/assets/' . $type . '.svg');
+    $default_image = \Drupal::service('file_url_generator')->generateAbsoluteString(\Drupal::service('extension.list.module')->getPath('opigno_user_selection') . '/assets/' . $type . '.svg');
 
     $image_style = ImageStyle::load('thumbnail');
     if (!($image_style instanceof ImageStyle)) {

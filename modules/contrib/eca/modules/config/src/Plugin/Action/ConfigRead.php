@@ -109,7 +109,7 @@ class ConfigRead extends ConfigActionBase {
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     $this->configuration['token_name'] = $form_state->getValue('token_name');
-    $this->configuration['include_overridden'] = $form_state->getValue('include_overridden');
+    $this->configuration['include_overridden'] = !empty($form_state->getValue('include_overridden'));
     parent::submitConfigurationForm($form, $form_state);
   }
 

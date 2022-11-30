@@ -1,2 +1,4 @@
 entity_types:
   - paragraph
+sidebar_width: 30
+full_width: 70

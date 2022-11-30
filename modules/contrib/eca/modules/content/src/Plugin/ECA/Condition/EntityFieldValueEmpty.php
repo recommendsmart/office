@@ -13,6 +13,7 @@ use Drupal\eca\TypedData\PropertyPathTrait;
  * @EcaCondition(
  *   id = "eca_entity_field_value_empty",
  *   label = @Translation("Entity: field value is empty"),
+ *   description = @Translation("Evaluates if a value field of an entity is empty."),
  *   context_definitions = {
  *     "entity" = @ContextDefinition("entity", label = @Translation("Entity"))
  *   }
@@ -52,6 +53,7 @@ class EntityFieldValueEmpty extends ConditionBase {
     $form['field_name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Field name'),
+      '#description' => $this->t('The field name of the entity to check, if its value is empty.'),
       '#default_value' => $this->configuration['field_name'],
       '#weight' => -10,
     ];

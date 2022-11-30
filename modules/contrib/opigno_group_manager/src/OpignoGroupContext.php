@@ -3,6 +3,7 @@
 namespace Drupal\opigno_group_manager;
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Entity\EntityInterface;
 
 // TODO: Not sure the learning path ID is very useful... Maybe can be removed.
 /**
@@ -17,6 +18,13 @@ final class OpignoGroupContext {
   const ACTIVITY_LINK_TYPE = 'activity_link_type';
 
   /**
+   * The static temporary id.
+   *
+   * @var numeric
+   */
+  private static $contextGroupId;
+
+  /**
    * Start session for anonymous.
    */
   protected static function ensureSession() {
@@ -28,28 +36,37 @@ final class OpignoGroupContext {
   }
 
   /**
-   * Get the group ID. Can be empty.
+   * Get the group ID.
    *
-   * @return int
-   *   The group context NID.
+   * @return int|null
+   *   The group context NID. Return Null if not exist.
    */
   public static function getCurrentGroupId() {
-    static::ensureSession();
+    self::ensureSession();
 
-    $group = \Drupal::routeMatch()->getParameter('group');
-    if (!empty($group)) {
-      if (is_object($group)) {
-        return $group->id();
-      }
-      else {
-        return $group;
+    /*
+     * Priority of group context.
+     * 1. Try to receive the group id from the route.
+     * 2. Probably, the static and temporary context are redundant,
+     *    but for backward compatibility, in some cases we use just to set
+     *    the group id to the static variable.
+     *  a. If the static is available it has a priority on the temp storage.
+     *  b. If we have no any context to return the temp storage.
+     */
+
+    $group_id = \Drupal::routeMatch()->getParameter('group');
+    if (!empty($group_id)) {
+      if ($group_id instanceof EntityInterface) {
+        $group_id = (int) $group_id->id();
       }
     }
-
-    /* @var \Drupal\Core\TempStore\PrivateTempStore $store */
-    $store = \Drupal::service('tempstore.private')
-      ->get('opigno_group_manager');
-    return $store->get(self::GROUP_ID);
+    elseif (!($group_id = self::getStaticGroupId())) {
+      /** @var \Drupal\Core\TempStore\PrivateTempStore $store */
+      $store = \Drupal::service('tempstore.private')
+        ->get('opigno_group_manager');
+      $group_id = $store->get(self::GROUP_ID);
+    }
+    return (!empty($group_id) && is_numeric($group_id)) ? (int) $group_id : NULL;
   }
 
   /**
@@ -59,7 +76,7 @@ final class OpignoGroupContext {
    *   The Content ID. Can be empty.
    */
   public static function getCurrentGroupContentId() {
-    static::ensureSession();
+    self::ensureSession();
 
     /* @var \Drupal\Core\TempStore\PrivateTempStore $store */
     $store = \Drupal::service('tempstore.private')
@@ -74,7 +91,7 @@ final class OpignoGroupContext {
    *   Context activity link type. Can be empty.
    */
   public static function getActivityLinkType() {
-    static::ensureSession();
+    self::ensureSession();
 
     /* @var \Drupal\Core\TempStore\PrivateTempStore $store */
     $store = \Drupal::service('tempstore.private')->get('opigno_group_manager');
@@ -84,18 +101,41 @@ final class OpignoGroupContext {
   /**
    * Set the context Group ID.
    *
-   * @param int $group_id
+   * @param numeric $group_id
+   *   Group ID.
+   * @param bool $permanent
    *   Group ID.
    *
    * @throws \Drupal\Core\TempStore\TempStoreException
    */
-  public static function setGroupId($group_id) {
-    static::ensureSession();
+  public static function setGroupId($group_id, bool $permanent = TRUE) {
+    self::ensureSession();
 
-    /** @var \Drupal\Core\TempStore\PrivateTempStore $store */
-    $store = \Drupal::service('tempstore.private')
-      ->get('opigno_group_manager');
-    $store->set(self::GROUP_ID, $group_id);
+    if (!$permanent) {
+      self::setStaticGroupId($group_id);
+    }
+    else {
+      /** @var \Drupal\Core\TempStore\PrivateTempStore $store */
+      $store = \Drupal::service('tempstore.private')
+        ->get('opigno_group_manager');
+      $store->set(self::GROUP_ID, $group_id);
+    }
+  }
+
+  /**
+   * Getter for private static variable.
+   */
+  public static function getStaticGroupId() {
+    return self::$contextGroupId;
+  }
+
+  /**
+   * Setter for protected static variable.
+   *
+   * @param numeric $group_id
+   */
+  public static function setStaticGroupId($group_id) {
+    self::$contextGroupId = $group_id;
   }
 
   /**
@@ -109,7 +149,7 @@ final class OpignoGroupContext {
    * @throws \Drupal\Core\TempStore\TempStoreException
    */
   public static function setCurrentContentId($current_content_id) {
-    static::ensureSession();
+    self::ensureSession();
 
     /** @var \Drupal\Core\TempStore\PrivateTempStore $store */
     $store = \Drupal::service('tempstore.private')
@@ -129,7 +169,7 @@ final class OpignoGroupContext {
    * @throws \Drupal\Core\TempStore\TempStoreException
    */
   public static function setActivityLinkType($activity_link_type) {
-    static::ensureSession();
+    self::ensureSession();
 
     /** @var \Drupal\Core\TempStore\PrivateTempStore $store */
     $store = \Drupal::service('tempstore.private')->get('opigno_group_manager');
@@ -142,7 +182,7 @@ final class OpignoGroupContext {
    * Refresh the local actions as well.
    */
   public static function removeContext() {
-    static::ensureSession();
+    self::ensureSession();
 
     /** @var \Drupal\Core\TempStore\PrivateTempStore $store */
     $store = \Drupal::service('tempstore.private')
@@ -159,7 +199,7 @@ final class OpignoGroupContext {
    * Refresh the local actions as well.
    */
   public static function removeActivityLinkType() {
-    static::ensureSession();
+    self::ensureSession();
 
     /** @var \Drupal\Core\TempStore\PrivateTempStore $store */
     $store = \Drupal::service('tempstore.private')->get('opigno_group_manager');

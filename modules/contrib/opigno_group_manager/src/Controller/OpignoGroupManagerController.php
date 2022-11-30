@@ -106,7 +106,7 @@ class OpignoGroupManagerController extends ControllerBase {
       '#base_path' => $request->getBasePath(),
       '#base_href' => $request->getPathInfo(),
       '#group_id' => $group->id(),
-      '#next_link' => isset($next_link) ? render($next_link) : NULL,
+      '#next_link' => isset($next_link) ? \Drupal::service('renderer')->render($next_link) : NULL,
       '#user_has_info_card' => $tempstore->get('hide_info_card') ? FALSE : TRUE,
       '#text_add_a_link' => $this->t('add a link')->render(),
       '#text_add_your_first_item' => $this->t('Add your first item')->render(),
@@ -195,7 +195,7 @@ class OpignoGroupManagerController extends ControllerBase {
       'opigno_group_info' => [
         'group_id' => ($group) ? $group->id() : NULL,
         'opigno_group_content_type' => $type,
-        'learning_path' => isset($learning_path) ? $learning_path : NULL,
+        'learning_path' => $learning_path ?? NULL,
       ],
     ]);
 
@@ -230,7 +230,7 @@ class OpignoGroupManagerController extends ControllerBase {
       $file = isset($media)
         ? File::load($media->get('field_media_image')->target_id)
         : NULL;
-    };
+    }
 
     $item = [];
     $item['cid'] = $entity->id();
@@ -238,12 +238,13 @@ class OpignoGroupManagerController extends ControllerBase {
     $item['entityId'] = $entity->id();
     $item['entityBundle'] = \Drupal::routeMatch()->getParameter('type');
     $item['title'] = $entity->label();
-    $item['imageUrl'] = (isset($file) && $file) ? file_create_url($file->getFileUri()) :
-      self::getDefaultBundleImageUrl($entity->bundle());
+    $item['imageUrl'] = $file
+      ? \Drupal::service('file_url_generator')->generateAbsoluteString($file->getFileUri())
+      : self::getDefaultBundleImageUrl($entity->bundle());
     $item['in_skills_system'] = FALSE;
     $item['isMandatory'] = FALSE;
 
-    if ($item['contentType'] == 'ContentTypeModule') {
+    if ($item['contentType'] === 'ContentTypeModule') {
       $item['in_skills_system'] = $entity->getSkillsActive();
       $group = \Drupal::routeMatch()->getParameter('group');
 
@@ -1495,7 +1496,7 @@ class OpignoGroupManagerController extends ControllerBase {
         $content = $serializer->serialize($data_structure, $format);
         $filename_path = "{$dir}/{$filename}";
 
-        \Drupal::service('file_system')->saveData($content, $filename_path, \Drupal\Core\File\FileSystemInterface::EXISTS_REPLACE);
+        \Drupal::service('file_system')->saveData($content, $filename_path, FileSystemInterface::EXISTS_REPLACE);
 
         $zip->addFile($filename_path, $filename);
 
@@ -1609,7 +1610,7 @@ class OpignoGroupManagerController extends ControllerBase {
               break;
           }
 
-          if ($opigno_activity->bundle() == 'opigno_h5p') {
+          if ($opigno_activity->bundle() === 'opigno_h5p') {
             $hp5_id = $data_structure[$eid . '-' . $aid]['opigno_h5p'][0]['h5p_content_id'] ?? FALSE;
             $h5p_content = $hp5_id ? H5PContent::load($hp5_id) : FALSE;
             if ($h5p_content instanceof H5PContent) {
@@ -1625,7 +1626,7 @@ class OpignoGroupManagerController extends ControllerBase {
           }
 
           $content = $serializer->serialize($data_structure, $format);
-          $context['results']['file'] = \Drupal::service('file_system')->saveData($content, $filename_path, \Drupal\Core\File\FileSystemInterface::EXISTS_REPLACE);
+          $context['results']['file'] = \Drupal::service('file_system')->saveData($content, $filename_path, FileSystemInterface::EXISTS_REPLACE);
 
           $zip->addFile($filename_path, $filename);
         }
@@ -1642,7 +1643,7 @@ class OpignoGroupManagerController extends ControllerBase {
     $zip->addEmptyDir('library');
 
     foreach ($items_list as $item) {
-      if ($item['type'] == 'file') {
+      if ($item['type'] === 'file') {
         $media = Media::load($item['id']);
 
         $filename = $media->id() . '_media_' . $media->label() . '.' . $format;
@@ -1650,7 +1651,7 @@ class OpignoGroupManagerController extends ControllerBase {
         $files_to_export['files'][$item['id']]['media'] = $filename;
 
         $content = $serializer->serialize($media, $format);
-        $context['results']['file'] = \Drupal::service('file_system')->saveData($content, $filename_path, \Drupal\Core\File\FileSystemInterface::EXISTS_REPLACE);
+        $context['results']['file'] = \Drupal::service('file_system')->saveData($content, $filename_path, FileSystemInterface::EXISTS_REPLACE);
         $zip->addFile($filename_path, 'library/' . $filename);
 
         $file_id = $media->get('tft_file')->getValue()[0]['target_id'];
@@ -1667,7 +1668,7 @@ class OpignoGroupManagerController extends ControllerBase {
           $files_to_export['files'][$item['id']]['file'] = $filename;
           $filename_path = "{$folder_library}/{$filename}";
           $content = $serializer->serialize($file, $format);
-          $context['results']['file'] = \Drupal::service('file_system')->saveData($content, $filename_path, \Drupal\Core\File\FileSystemInterface::EXISTS_REPLACE);
+          $context['results']['file'] = \Drupal::service('file_system')->saveData($content, $filename_path, FileSystemInterface::EXISTS_REPLACE);
           $zip->addFile($filename_path, 'library/' . $filename);
         }
       }
@@ -1680,7 +1681,7 @@ class OpignoGroupManagerController extends ControllerBase {
           $files_to_export['terms'][] = $filename;
 
           $content = $serializer->serialize($term, $format);
-          $context['results']['file'] = \Drupal::service('file_system')->saveData($content, $filename_path, \Drupal\Core\File\FileSystemInterface::EXISTS_REPLACE);
+          $context['results']['file'] = \Drupal::service('file_system')->saveData($content, $filename_path, FileSystemInterface::EXISTS_REPLACE);
 
           $zip->addFile($filename_path, 'library/' . $filename);
         }
@@ -1692,7 +1693,7 @@ class OpignoGroupManagerController extends ControllerBase {
     $filename_path = "{$dir}/{$filename}";
     $files_to_export['activities'][] = $filename;
 
-    \Drupal::service('file_system')->saveData($content, $filename_path, \Drupal\Core\File\FileSystemInterface::EXISTS_REPLACE);
+    \Drupal::service('file_system')->saveData($content, $filename_path, FileSystemInterface::EXISTS_REPLACE);
 
     $zip->addFile($filename_path, $filename);
 
@@ -1793,7 +1794,7 @@ class OpignoGroupManagerController extends ControllerBase {
         $file = File::load($file_id);
         if ($file) {
           $file_copy = $file->createDuplicate();
-          $new_name = $file->id(). '-' . $file->label();
+          $new_name = $file->id() . '-' . $file->label();
           $new_name = substr($new_name, 0, 200);
           $new_uri = str_replace($file->label(), $new_name, $file->getFileUri());
           $file_copy->setFilename($new_name);
@@ -1815,7 +1816,7 @@ class OpignoGroupManagerController extends ControllerBase {
           $media_copy->save();
         }
       }
-      elseif($item['type'] == 'term') {
+      elseif($item['type'] === 'term') {
         $old_term = Term::load($item['id']);
 
         if ($old_term) {
@@ -1884,8 +1885,8 @@ class OpignoGroupManagerController extends ControllerBase {
         try {
           $parent_links = $managed_content->getParentsLinks();
         }
-        catch (InvalidPluginDefinitionException | PluginNotFoundException $exception){
-          watchdog_exception($exception);
+        catch (InvalidPluginDefinitionException | PluginNotFoundException $exception) {
+          watchdog_exception('error', $exception);
         }
 
         foreach ($parent_links as $link) {
@@ -1932,7 +1933,7 @@ class OpignoGroupManagerController extends ControllerBase {
     foreach ($main_content as $content) {
       $all_content[] = $content;
 
-      if ($content['type'] == 'term') {
+      if ($content['type'] === 'term') {
         $term_content = $this->documentsLibraryList($content['id']);
         $all_content = array_merge($all_content, $term_content);
       }

@@ -7,7 +7,7 @@ use Drupal\group\Entity\Group;
 use Drupal\opigno_certificate\Entity\OpignoCertificate;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Dompdf\Autoloader;
 

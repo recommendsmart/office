@@ -10,7 +10,8 @@ use Drupal\eca_base\Plugin\ListCountTrait;
  *
  * @EcaCondition(
  *   id = "eca_count",
- *   label = @Translation("Compare number of list items")
+ *   label = @Translation("Compare number of list items"),
+ *   description = @Translation("Condition to compare the number of list items.")
  * )
  */
 class ListCountComparison extends ScalarComparison {

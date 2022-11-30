@@ -26,7 +26,7 @@ abstract class TypeTrayWebDriverTestBase extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'block',
     'node',
     'filter',
@@ -45,7 +45,7 @@ abstract class TypeTrayWebDriverTestBase extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Place some blocks to make our lives easier down the road.

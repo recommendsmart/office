@@ -209,7 +209,7 @@ class AccessCheck {
    *
    * @return bool
    */
-  public function isAnyPermissionSetForTerm($tid, $langcode = '') {
+  public function isAnyPermissionSetForTerm($tid, $langcode = ''): bool {
 		$langcode = ($langcode === '') ? \Drupal::languageManager()->getCurrentLanguage()->getId() : $langcode;
 
     $iUserTableResults = (int)$this->database->query("SELECT COUNT(1) FROM {permissions_by_term_user} WHERE tid = :tid AND langcode = :langcode",
@@ -223,6 +223,7 @@ class AccessCheck {
       return TRUE;
     }
 
+    return FALSE;
   }
 
   public function handleNode(Node $node, string $langcode): AccessResult {

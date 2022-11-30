@@ -12,6 +12,7 @@ use Drupal\simple_oauth\KnownClientsRepositoryInterface;
 use Drupal\simple_oauth\Server\AuthorizationServerFactoryInterface;
 use GuzzleHttp\Psr7\Response;
 use League\OAuth2\Server\Exception\OAuthServerException;
+use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -44,6 +45,13 @@ class Oauth2AuthorizeController extends ControllerBase {
   protected KnownClientsRepositoryInterface $knownClientRepository;
 
   /**
+   * The client repository.
+   *
+   * @var \League\OAuth2\Server\Repositories\ClientRepositoryInterface
+   */
+  protected ClientRepositoryInterface $clientRepository;
+
+  /**
    * Oauth2AuthorizeController construct.
    *
    * @param \Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface $http_message_factory
@@ -52,15 +60,19 @@ class Oauth2AuthorizeController extends ControllerBase {
    *   The authorization server factory.
    * @param \Drupal\simple_oauth\KnownClientsRepositoryInterface $known_clients_repository
    *   The known client repository service.
+   * @param \League\OAuth2\Server\Repositories\ClientRepositoryInterface $client_repository
+   *   The client repository service.
    */
   public function __construct(
     HttpMessageFactoryInterface $http_message_factory,
     AuthorizationServerFactoryInterface $authorization_server_factory,
-    KnownClientsRepositoryInterface $known_clients_repository
+    KnownClientsRepositoryInterface $known_clients_repository,
+    ClientRepositoryInterface $client_repository
   ) {
     $this->httpMessageFactory = $http_message_factory;
     $this->authorizationServerFactory = $authorization_server_factory;
     $this->knownClientRepository = $known_clients_repository;
+    $this->clientRepository = $client_repository;
   }
 
   /**
@@ -70,7 +82,8 @@ class Oauth2AuthorizeController extends ControllerBase {
     return new static(
       $container->get('psr7.http_message_factory'),
       $container->get('simple_oauth.server.authorization_server.factory'),
-      $container->get('simple_oauth.known_clients')
+      $container->get('simple_oauth.known_clients'),
+      $container->get('simple_oauth.repositories.client')
     );
   }
 
@@ -100,16 +113,14 @@ class Oauth2AuthorizeController extends ControllerBase {
       if (empty($scopes_query_string)) {
         throw OAuthServerException::invalidRequest('scope');
       }
-      $consumer_storage = $this->entityTypeManager()->getStorage('consumer');
-      /** @var \Drupal\consumers\Entity\Consumer[] $clients */
-      $clients = $consumer_storage->loadByProperties(['client_id' => $client_id]);
-      if (empty($clients)) {
+      $client_entity = $this->clientRepository->getClientEntity($client_id);
+      if (empty($client_entity)) {
         throw OAuthServerException::invalidClient($server_request);
       }
-      $client = reset($clients);
-      $automatic_authorization = (bool) $client->get('automatic_authorization')->value;
+      $client_drupal_entity = $client_entity->getDrupalEntity();
+      $automatic_authorization = (bool) $client_drupal_entity->get('automatic_authorization')->value;
 
-      $server = $this->authorizationServerFactory->get($client);
+      $server = $this->authorizationServerFactory->get($client_drupal_entity);
       $auth_request = $server->validateAuthorizationRequest($server_request);
 
       // Validate scopes.
@@ -131,7 +142,7 @@ class Oauth2AuthorizeController extends ControllerBase {
 
       // User may skip the grant step if the client has automatic authorization
       // enabled or is known.
-      if ($automatic_authorization || $this->knownClientRepository->isAuthorized($this->currentUser()->id(), $client, $scope_names)) {
+      if ($automatic_authorization || $this->knownClientRepository->isAuthorized($this->currentUser()->id(), $client_drupal_entity, $scope_names)) {
         $can_grant = $this->currentUser()->hasPermission('grant simple_oauth codes');
         $auth_request->setAuthorizationApproved($can_grant);
         $response = $server->completeAuthorizationRequest($auth_request, $server_response);

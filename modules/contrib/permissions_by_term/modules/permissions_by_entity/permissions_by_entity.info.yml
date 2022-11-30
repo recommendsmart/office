@@ -6,7 +6,7 @@ dependencies:
   - permissions_by_term
 package: 'Permissions by Term (Experimental)'
 
-# Information added by Drupal.org packaging script on 2022-10-17
-version: '3.1.20'
+# Information added by Drupal.org packaging script on 2022-11-09
+version: '3.1.21'
 project: 'permissions_by_term'
-datestamp: 1665991093
+datestamp: 1668009537

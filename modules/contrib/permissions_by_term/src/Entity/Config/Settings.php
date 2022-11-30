@@ -39,6 +39,10 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   entity_keys = {
  *     "id" = "id",
  *     "value" = "value"
+ *   },
+ *   config_export = {
+ *     "id" = "id",
+ *     "value" = "value"
  *   }
  * )
  */

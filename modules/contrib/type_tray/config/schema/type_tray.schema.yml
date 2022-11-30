@@ -12,9 +12,6 @@ type_tray.settings:
     text_format:
       label: 'Text format to be used on extended descriptions'
       type: string
-    existing_nodes_link:
-      label: 'Whether a link to existing nodes of a given type should be displayed in cards'
-      type: integer
 node.type.*.third_party.type_tray:
   type: mapping
   label: 'Per node-type Type Tray third party settings'
@@ -31,6 +28,9 @@ node.type.*.third_party.type_tray:
     type_description:
       type: string
       label: 'Extended description'
+    existing_nodes_link_text:
+      type: string
+      label: 'Text to be used when building links to existing content'
     type_weight:
       type: integer
       label: 'Weight to be used when sorting types in a given category'

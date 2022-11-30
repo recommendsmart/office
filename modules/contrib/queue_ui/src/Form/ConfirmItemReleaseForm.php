@@ -90,7 +90,7 @@ class ConfirmItemReleaseForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'queue_ui_confirm_item_delete_form';
+    return 'queue_ui_confirm_item_release_form';
   }
 
   /**

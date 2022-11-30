@@ -788,7 +788,7 @@ function opigno_module_preprocess_page(&$variables) {
     if ($gid = OpignoGroupContext::getCurrentGroupId()) {
       if ($group = \Drupal::entityTypeManager()->getStorage('group')->load($gid)) {
         $home_link = Link::createFromRoute(t('home'), 'entity.group.canonical', ['group' => $group->id()], ['attributes' => ['class' => ['w-100']]])->toRenderable();
-        $variables['home_link'] = render($home_link);
+        $variables['home_link'] = \Drupal::service('renderer')->render($home_link);
       }
     }
 
@@ -854,8 +854,8 @@ function opigno_module_page_top(array &$page_top) {
     $temporary_file_path = 'public://' . $h5p_default_path . '/temp/' . uniqid('h5p-');
     \Drupal::service('file_system')->prepareDirectory($temporary_file_path, FileSystemInterface::MODIFY_PERMISSIONS | FileSystemInterface::CREATE_DIRECTORY);
     // Load libraries.h5p.
-    $file_content = file_get_contents(drupal_get_path("module", "opigno_module") . "/h5plib/libraries.h5p");
-    $file = file_save_data($file_content, $temporary_file_path . '.h5p', FileSystemInterface::EXISTS_REPLACE);
+    $file_content = file_get_contents(\Drupal::service('extension.list.module')->getPath('opigno_module') . "/h5plib/libraries.h5p");
+    $file = \Drupal::service('file.repository')->writeData($file_content, $temporary_file_path . '.h5p', FileSystemInterface::EXISTS_REPLACE);
     if ($file) {
       $uri = $file->getFileUri();
       $interface->getUploadedH5pPath(\Drupal::service('file_system')->realpath($uri));

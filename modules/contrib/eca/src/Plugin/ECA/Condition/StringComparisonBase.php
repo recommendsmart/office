@@ -185,14 +185,18 @@ abstract class StringComparisonBase extends ConditionBase {
     $form['type'] = [
       '#type' => 'select',
       '#title' => $this->t('Comparison type'),
+      '#description' => $this->t('The type of the comparison.'),
       '#default_value' => $this->getType(),
       '#options' => $this->getOptions('type'),
       '#weight' => -60,
+      '#description' => $this->t('The type of the comparison.'),
     ];
     $form['case'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Case sensitive comparison'),
+      '#description' => $this->t('Compare the values based on case sensitivity.'),
       '#default_value' => $this->caseSensitive(),
+      '#description' => $this->t('Compares the values based on case sensitivity.'),
       '#weight' => -50,
     ];
     return $form;
@@ -204,7 +208,7 @@ abstract class StringComparisonBase extends ConditionBase {
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     $this->configuration['operator'] = $form_state->getValue('operator');
     $this->configuration['type'] = $form_state->getValue('type');
-    $this->configuration['case'] = $form_state->getValue('case');
+    $this->configuration['case'] = !empty($form_state->getValue('case'));
     parent::submitConfigurationForm($form, $form_state);
   }
 

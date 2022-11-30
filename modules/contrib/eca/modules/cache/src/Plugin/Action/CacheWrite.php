@@ -120,7 +120,7 @@ class CacheWrite extends CacheActionBase {
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     $this->configuration['value'] = $form_state->getValue('value');
-    $this->configuration['use_yaml'] = $form_state->getValue('use_yaml');
+    $this->configuration['use_yaml'] = !empty($form_state->getValue('use_yaml'));
     $this->configuration['expire'] = $form_state->getValue('expire');
     $this->configuration['tags'] = $form_state->getValue('tags');
     parent::submitConfigurationForm($form, $form_state);

@@ -66,6 +66,7 @@ abstract class FieldUpdateActionBase extends ActionBase implements ConfigurableI
       '#type' => 'select',
       '#title' => $this->t('Method'),
       '#default_value' => $this->configuration['method'],
+      '#description' => $this->t('The method to set an entity, like cleaning the old one, etc..'),
       '#weight' => -40,
       '#options' => [
         'set:clear' => $this->t('Set and clear previous value'),
@@ -83,18 +84,21 @@ abstract class FieldUpdateActionBase extends ActionBase implements ConfigurableI
       '#type' => 'checkbox',
       '#title' => $this->t('Strip tags'),
       '#default_value' => $this->configuration['strip_tags'],
+      '#description' => $this->t('Remove the tags or not.'),
       '#weight' => -30,
     ];
     $form['trim'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Trim'),
       '#default_value' => $this->configuration['trim'],
+      '#description' => $this->t('Trims the field value or not.'),
       '#weight' => -20,
     ];
     $form['save_entity'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Save entity'),
       '#default_value' => $this->configuration['save_entity'],
+      '#description' => $this->t('Saves the entity or not after setting the value.'),
       '#weight' => -10,
     ];
     return $form;
@@ -109,9 +113,9 @@ abstract class FieldUpdateActionBase extends ActionBase implements ConfigurableI
     }
 
     $this->configuration['method'] = $form_state->getValue('method');
-    $this->configuration['strip_tags'] = $form_state->getValue('strip_tags');
-    $this->configuration['trim'] = $form_state->getValue('trim');
-    $this->configuration['save_entity'] = $form_state->getValue('save_entity');
+    $this->configuration['strip_tags'] = !empty($form_state->getValue('strip_tags'));
+    $this->configuration['trim'] = !empty($form_state->getValue('trim'));
+    $this->configuration['save_entity'] = !empty($form_state->getValue('save_entity'));
   }
 
   /**

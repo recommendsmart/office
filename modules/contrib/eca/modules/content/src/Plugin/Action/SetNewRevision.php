@@ -39,6 +39,7 @@ class SetNewRevision extends ConfigurableActionBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Create new revision'),
       '#default_value' => $this->configuration['new_revision'],
+      '#description' => $this->t('Whether to create a new revision or not'),
     ];
     return $form;
   }
@@ -47,7 +48,7 @@ class SetNewRevision extends ConfigurableActionBase {
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
-    $this->configuration['new_revision'] = $form_state->getValue('new_revision');
+    $this->configuration['new_revision'] = !empty($form_state->getValue('new_revision'));
     parent::submitConfigurationForm($form, $form_state);
   }
 

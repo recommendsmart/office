@@ -9,17 +9,23 @@
    */
   Drupal.behaviors.frontendEditingAjax = {
     attach: function (context, settings) {
-
       // Callback for click function on an editable element
       const editingClick = function (e) {
         e.preventDefault();
         // Setup container
+          //Frontend-editing sidebar and full widths
+          const wideClassWidth = document.querySelector('.frontend-editing')
+              .getAttribute('data-full-width') + '%';
+          const sidebarClassWidth = document.querySelector('.frontend-editing')
+              .getAttribute('data-sidebar-width') + '%';
+
         let editContainer = document.getElementById('editing-container');
         if (!editContainer) {
           editContainer = document.createElement('div');
           editContainer.id = 'editing-container';
           editContainer.classList.add('editing-container', 'editing-container--loading');
           document.body.append(editContainer);
+          editContainer.style.width = sidebarClassWidth;
         }
         else {
           editContainer.innerHTML = '';
@@ -31,9 +37,11 @@
         widthToggle.addEventListener('click', function (e) {
           if (editContainer.classList.contains(editWideClass)) {
             editContainer.classList.remove(editWideClass);
+            editContainer.style.width = sidebarClassWidth;
           }
           else {
-            editContainer.classList.add(editWideClass)
+            editContainer.classList.add(editWideClass);
+            editContainer.style.width = wideClassWidth;
           }
         });
         // Setup close button

@@ -241,7 +241,9 @@ class LearningPathAchievementController extends ControllerBase {
     $latest_cert_date = LPStatus::getTrainingStartDate($training, $user->id());
 
     $parent = isset($course) ? $course : $training;
-    $step = opigno_learning_path_get_module_step($parent->id(), $user->id(), $module, $latest_cert_date);
+    // It will keep the parent id (training) as the group context for the course page.
+    $update_group_context = !isset($course);
+    $step = opigno_learning_path_get_module_step($parent->id(), $user->id(), $module, $latest_cert_date, $update_group_context);
     $completed_on = $step['completed on'];
     $completed_on = $completed_on > 0
       ? $date_formatter->format($completed_on, 'custom', 'F d, Y')
@@ -585,8 +587,8 @@ class LearningPathAchievementController extends ControllerBase {
    * @return array
    *   Course passed steps.
    */
-  protected function course_steps_passed(GroupInterface $training, GroupInterface $course, $latest_cert_date = NULL) {
-    $user = $this->currentUser();
+  protected function course_steps_passed(GroupInterface $training, GroupInterface $course, $latest_cert_date = NULL, $user = NULL) {
+    $user = $user ?: $this->currentUser();
     $steps = opigno_learning_path_get_steps($course->id(), $user->id(), NULL, $latest_cert_date);
 
     $passed = 0;
@@ -661,8 +663,8 @@ class LearningPathAchievementController extends ControllerBase {
    *
    * Copy of legacy code.
    */
-  public function getStatusPercentCourseByStep($step, $latest_cert_date, $group): array {
-    $course_steps = $this->course_steps_passed($group, Group::load($step['id']), $latest_cert_date);
+  public function getStatusPercentCourseByStep($step, $latest_cert_date, $group, $user): array {
+    $course_steps = $this->course_steps_passed($group, Group::load($step['id']), $latest_cert_date, $user);
     $passed = $course_steps['passed'] . '/' . $course_steps['total'];
     $passed_percent = round(($course_steps['passed'] / $course_steps['total']) * 100);
     $score = $step['best score'];
@@ -1246,7 +1248,7 @@ class LearningPathAchievementController extends ControllerBase {
     $time_spent = $time_spent ? $this->dateFormatter->formatInterval($time_spent) : 0;
     $completed = $completed ? $this->dateFormatter->format($completed, 'custom', 'm/d/Y') : '';
     $badges = $this->getModulesStatusBadges($step, $group, $user->id());
-    list($passed, $passed_percent, $score_percent) = $this->getStatusPercentCourseByStep($step, $latest_cert_date, $group);
+    list($passed, $passed_percent, $score_percent) = $this->getStatusPercentCourseByStep($step, $latest_cert_date, $group, $user);
     return [
       '#type' => 'container',
       '#attributes' => [],

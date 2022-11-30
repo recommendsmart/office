@@ -205,9 +205,9 @@ class UserController extends ControllerBase {
    *   Path to the image in theme.
    */
   private function getAchievementImagePath(string $image): string {
-    $path = drupal_get_path('theme', 'aristotle') . "/src/images/design/$image";
+    $path = \Drupal::service('extension.list.theme')->getPath('aristotle') . "/src/images/design/$image";
 
-    return file_exists($path) ? file_url_transform_relative(base_path() . $path) : '';
+    return file_exists($path) ? \Drupal::service('file_url_generator')->transformRelative(base_path() . $path) : '';
   }
 
   /**

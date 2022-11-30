@@ -505,7 +505,8 @@ class UserStatisticsManager {
     $theme = \Drupal::theme()->getActiveTheme()->getName();
     $theme_decorator = \Drupal::hasService('color.theme_decorator');
     if ($theme_decorator) {
-      $color_palette = \Drupal::service('color.theme_decorator')->getPalette($theme);
+      $color_palette = \Drupal::service('color.theme_decorator')
+        ->getPalette($theme);
     }
     else {
       $color_palette = color_get_palette($theme);
@@ -608,12 +609,12 @@ class UserStatisticsManager {
    *   Render array to display the default user image.
    */
   public static function getDefaultUserPicture(?UserInterface $user = NULL): array {
-    $path = drupal_get_path('theme', 'aristotle') . '/src/images/content/profil.svg';
+    $path = \Drupal::service('extension.list.theme')->getPath('aristotle') . '/src/images/content/profil.svg';
     $name = $user instanceof UserInterface ? $user->getDisplayName() : t('User');
 
     return [
       '#theme' => 'image',
-      '#uri' => file_exists($path) ? file_url_transform_relative(base_path() . $path) : '',
+      '#uri' => file_exists($path) ? \Drupal::service('file_url_generator')->transformRelative(base_path() . $path) : '',
       '#alt' => $name,
       '#title' => $name,
     ];

@@ -105,13 +105,6 @@ class TypeTraySettingsForm extends ConfigFormBase {
       '#required' => TRUE,
     ];
 
-    $form['existing_nodes_link'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Display existing nodes link'),
-      '#description' => $this->t('If checked, a link (such as "View existing _Article_ nodes") will be displayed in cards to allow quick access to all nodes of a given type.'),
-      '#default_value' => $config->get('existing_nodes_link'),
-    ];
-
     return parent::buildForm($form, $form_state);
   }
 
@@ -154,12 +147,11 @@ class TypeTraySettingsForm extends ConfigFormBase {
 
     $config->set('fallback_label', Xss::filter($form_state->getValue('fallback_label', TypeTrayController::UNCATEGORIZED_LABEL)));
     $config->set('text_format', $form_state->getValue('text_format', 'plain_text'));
-    $config->set('existing_nodes_link', $form_state->getValue('existing_nodes_link'));
 
     $config->save();
 
     $this->cacheTagsInvalidator->invalidateTags([
-      'config:node_type_list'
+      'config:node_type_list',
     ]);
 
     parent::submitForm($form, $form_state);
@@ -179,7 +171,7 @@ class TypeTraySettingsForm extends ConfigFormBase {
    *    - Values are separated by a carriage return.
    *    - Each value is in the format "value|label" or "value".
    */
-  public static function buildStringFromCategories($values) {
+  public static function buildStringFromCategories(array $values) {
     $lines = [];
     foreach ($values as $key => $value) {
       $lines[] = "$key|$value";

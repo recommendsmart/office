@@ -157,7 +157,7 @@ class SimpleOauthAuthenticationProvider implements AuthenticationProviderInterfa
     $request->files->add($auth_request->files->all());
     // Set consumer ID header on successful authentication, so negotiators
     // will trigger correctly.
-    $request->headers->set('X-Consumer-ID', $account->getConsumer()->uuid());
+    $request->headers->set('X-Consumer-ID', $account->getConsumer()->getClientId());
 
     return $account;
   }

@@ -90,11 +90,10 @@ class FrontendEditingController extends ControllerBase {
     if (!$entity->access('update')) {
       throw new AccessDeniedHttpException();
     }
+
     if ($entity instanceof ParagraphInterface) {
       $display = 'entity_edit';
-    }
-    $form_state_additions = [];
-    if ($entity instanceof ParagraphInterface) {
+
       // Paragraphs cannot be saved through frontend editing when before the
       // save the user has interacted with the form in a way that it was cached
       // - e.g. by using AJAX to exchange an element or to add a new element. An
@@ -132,6 +131,7 @@ class FrontendEditingController extends ControllerBase {
       ]);
     }
     else {
+      $form_state_additions = [];
       $url = Url::fromRoute('entity.' . $type . '.edit_form', [$type => $id]);
     }
 

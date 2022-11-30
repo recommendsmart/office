@@ -59,7 +59,7 @@ class PrivateMessageForm extends PrivateMessageFormBase {
 
     // Enable honeypot protection.
     if ($this->moduleHandler->moduleExists('honeypot')) {
-      honeypot_add_form_protection($form, $form_state, [
+      \Drupal::service('honeypot')->addFormProtection($form, $form_state, [
         'honeypot',
         'time_restriction',
       ]);

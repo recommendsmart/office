@@ -597,7 +597,7 @@ class UserConnectionManager {
     }
 
     $uid = $uid ?: $this->currentUid;
-    $img_path = drupal_get_path('theme', 'aristotle') . '/src/images/design/connections.svg';
+    $img_path = \Drupal::service('extension.list.theme')->getPath('aristotle') . '/src/images/design/connections.svg';
     $connections = count($this->getUserNetwork($uid));
 
     return [
@@ -605,7 +605,7 @@ class UserConnectionManager {
       '#count' => $connections,
       '#text' => $this->formatPlural($connections, 'Connection', 'Connections'),
       '#subtitle' => $uid === $this->currentUid ? $this->t('Manage connections') : '',
-      '#img' => file_exists($img_path) ? file_url_transform_relative(base_path() . $img_path) : '',
+      '#img' => file_exists($img_path) ? \Drupal::service('file_url_generator')->transformRelative(base_path() . $img_path) : '',
       '#url' => $uid === $this->currentUid ? Url::fromRoute('opigno_social.manage_connections')->toString() : '',
     ] + $build;
   }

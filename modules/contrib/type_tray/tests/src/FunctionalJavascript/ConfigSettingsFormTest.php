@@ -14,7 +14,7 @@ class ConfigSettingsFormTest extends TypeTrayWebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Create a content type to be used in the test.
@@ -41,9 +41,6 @@ class ConfigSettingsFormTest extends TypeTrayWebDriverTestBase {
     $this->drupalGet('/node/add');
     $assert_session->pageTextContains('GRID | LIST');
     $assert_session->pageTextContains(TypeTrayController::UNCATEGORIZED_LABEL);
-    // By default we have the existing nodes link enabled.
-    $assert_session->elementExists('css', '.type-tray__node-link');
-    $assert_session->pageTextContains('View existing Basic Page nodes');
 
     // Visit the settings form and define some new values.
     $this->drupalGet('/admin/config/content/type-tray/settings');
@@ -59,15 +56,12 @@ class ConfigSettingsFormTest extends TypeTrayWebDriverTestBase {
     $categories_value = "categ1|Category One\ncateg2|Category Two";
     $page->fillField('Categories', $categories_value);
     $page->fillField('Fallback category', 'Miscellaneous');
-    $assert_session->checkboxChecked('existing_nodes_link');
-    $page->uncheckField('existing_nodes_link');
     $page->pressButton('Save configuration');
     $assert_session->pageTextContains('The configuration options have been saved');
     $categories_element = $assert_session->elementExists('css', '#edit-categories');
     $this->assertSame($categories_value, $categories_element->getValue());
     $fallback_label_element = $assert_session->elementExists('css', '#edit-fallback-label');
     $this->assertSame('Miscellaneous', $fallback_label_element->getValue());
-    $assert_session->checkboxNotChecked('existing_nodes_link');
 
     // Check these settings are properly reflected elsewhere.
     $this->drupalGet('/admin/structure/types/manage/page');
@@ -80,8 +74,6 @@ class ConfigSettingsFormTest extends TypeTrayWebDriverTestBase {
     $assert_session->pageTextContains('GRID | LIST');
     $assert_session->pageTextNotContains(TypeTrayController::UNCATEGORIZED_LABEL);
     $assert_session->pageTextContains('Miscellaneous');
-    $assert_session->elementNotExists('css', '.type-tray__node-link');
-    $assert_session->pageTextNotContains('View existing Basic Page nodes');
   }
 
 }

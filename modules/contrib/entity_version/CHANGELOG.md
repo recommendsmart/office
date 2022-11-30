@@ -1,11 +1,20 @@
 # Changelog
 
-## [8.x-1.0](https://github.com/openeuropa/entity_version/tree/8.x-1.0) (2022-07-29)
+## [8.x-1.1](https://github.com/openeuropa/entity_version/tree/8.x-1.1) (2022-11-04)
+
+[Full Changelog](https://github.com/openeuropa/entity_version/compare/8.x-1.0...8.x-1.1)
+
+**Merged pull requests:**
+
+- EWPP-2619: Flag for using loaded revision to calculate current-next state in version transition. [\#53](https://github.com/openeuropa/entity_version/pull/53) ([upchuk](https://github.com/upchuk))
+
+## [8.x-1.0](https://github.com/openeuropa/entity_version/tree/8.x-1.0) (2022-08-02)
 
 [Full Changelog](https://github.com/openeuropa/entity_version/compare/8.x-1.0-beta8...8.x-1.0)
 
 **Merged pull requests:**
 
+- Prepare release 8.x-1.0. [\#52](https://github.com/openeuropa/entity_version/pull/52) ([imanoleguskiza](https://github.com/imanoleguskiza))
 - EWPP-2358: Drupal 9.4 support. [\#51](https://github.com/openeuropa/entity_version/pull/51) ([yenyasinn](https://github.com/yenyasinn))
 
 ## [8.x-1.0-beta8](https://github.com/openeuropa/entity_version/tree/8.x-1.0-beta8) (2022-02-07)

@@ -53,7 +53,7 @@ function opigno_messaging_install($is_syncing) {
  * Import configs.
  */
 function opigno_messaging_update_9001() {
-  $path = drupal_get_path('module', 'opigno_messaging') . '/config/optional/';
+  $path = \Drupal::service('extension.list.module')->getPath('opigno_messaging') . '/config/optional/';
   $source = new FileStorage($path);
 
   // Import new fields configs.

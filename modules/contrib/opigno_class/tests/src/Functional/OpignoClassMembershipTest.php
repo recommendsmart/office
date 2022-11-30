@@ -59,7 +59,7 @@ class OpignoClassMembershipTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     \Drupal::service('module_installer')->install([
       'opigno_learning_path',

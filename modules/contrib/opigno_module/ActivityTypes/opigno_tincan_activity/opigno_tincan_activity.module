@@ -40,7 +40,7 @@ function opigno_tincan_activity_form_opigno_activity_opigno_tincan_add_form_vali
   $has_library = opigno_tincan_api_tincanphp_is_installed();
   if (!$has_library) {
     $form_state->setError($form, t('Impossible to create a new TinCan Package activity.'));
-    $messenger->addWarning(Markup::create("Please install the TinCanPHP library using Composer, with the command: <em>composer require rusticisoftware/tincan:@stable</em>"));
+    $messenger->addWarning(Markup::create('Please install the TinCanPHP library using Composer, with the command: <em>"composer require opigno/tincan:^1.1"</em>'));
   }
   else {
     // Check if the LRS settings are set.

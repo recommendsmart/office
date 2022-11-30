@@ -1,76 +1,268 @@
 (function(once) {
 
-  function toggleRadioButtons(inputQuery, fieldset) {
-    if (inputQuery.length === 0) {
-      for (var radio of fieldset.querySelectorAll('input[type="radio"]')) {
-        radio.parentElement.parentElement.parentElement.hidden = false;
+  const deprecatedMessage = 'The selected widget is deprecated and will be removed. Evaluate migrating to a stable widget.';
+
+  window.optionsFilter = {
+    states: [],
+
+    initIndex: function(index = 0) {
+      optionsFilter.states[index] = {};
+    },
+
+    setContainer: function(container, index = 0) {
+      optionsFilter.states[index].container = container;
+      optionsFilter.states[index].widgets = Array.from(container.querySelectorAll('.js-form-type-radio'));
+      var deprecationCheckbox = container.querySelector('input.deprecation-checkbox');
+      optionsFilter.states[index].deprecatedFilterValue = true;
+      if (deprecationCheckbox !== null) {
+        optionsFilter.states[index].deprecatedFilterValue = container.querySelector(
+          'input.deprecation-checkbox').checked;
       }
-      return;
-    }
-    var matching = Array.from(fieldset.querySelectorAll('.radio-details--search'))
-      .filter(e => e.innerText.search(inputQuery) !== -1);
-    // Hide all inputs, then show the matching and selected.
-    for (var radio of fieldset.querySelectorAll('input[type="radio"]')) {
-      // Always show the checked option.
-      radio.parentElement.parentElement.parentElement.hidden = !radio.checked;
-    }
-    for (var matchingElement of matching) {
-      matchingElement.parentElement.parentElement.hidden = false;
-    }
-  }
+      optionsFilter.states[index].infoLayer = container.querySelector('.currently-selected');
+      optionsFilter.states[index].infoLayer.hidden = true;
+      optionsFilter.states[index].warningLayer = container.querySelector('.warning');
+      optionsFilter.states[index].warningLayer.hidden = true;
 
-  function subscribeToChanges(fieldset) {
-    var search = fieldset.querySelector('input[type="search"]');
-    var changeSearchText = (event) => toggleRadioButtons(event.target.value, fieldset);
-    search.addEventListener('input', changeSearchText);
-  }
+      optionsFilter.setDefaultWidgetInDOM(index);
+    },
 
-  var renderCurrentlySelected = (info, selectedContainer) => {
-    var id = selectedContainer.querySelector('input[type="radio"]').value;
-    var name = selectedContainer.querySelector('.radio-details--human-name').innerText;
-    var description = selectedContainer.querySelector('.radio-details--description').innerText;
-    var status = selectedContainer.querySelector('.radio-details--status').innerText;
-    var languages = selectedContainer.querySelector('.radio-details--languages').innerHTML;
-    var source = selectedContainer.querySelector('.radio-details--source').innerText;
-    var version = selectedContainer.querySelector('.radio-details--version').innerText;
-    var createdDate = selectedContainer.querySelector('.radio-details--created').innerText;
-    var updatedDate = selectedContainer.querySelector('.radio-details--updated').innerText;
-    const imgElement = selectedContainer.querySelector('.radio-details--image');
-    var img = imgElement ? imgElement.outerHTML : '';
-    var previewUrl = selectedContainer.querySelector('.radio-details--preview-url').innerText;
-    info.innerHTML = Drupal.theme('currentlySelectedClComponent', id, name, description, status, languages, version, source, createdDate, updatedDate, img, previewUrl);
-    if (previewUrl) {
-      info.querySelector('a.button').addEventListener('click', (event) => {
-        var button = event.target;
-        var iframe = document.createElement('iframe');
-        iframe.src = previewUrl;
-        button.replaceWith(iframe);
-        return false;
+    getContainer: function(index = 0) {
+      return optionsFilter.states[index].container;
+    },
+
+    getInfoLayer: function(index = 0) {
+      return optionsFilter.states[index].infoLayer;
+    },
+
+    setSearchboxValue: function(value, index = 0) {
+      optionsFilter.states[index].searchboxValue = value;
+    },
+
+    getSearchboxValue: function(index = 0) {
+      return optionsFilter.states[index].searchboxValue;
+    },
+
+    setDeprecatedFilterValue: function(value, index = 0) {
+      optionsFilter.states[index].deprecatedFilterValue = value;
+    },
+
+    getDeprecatedFilterValue: function(index = 0) {
+      return optionsFilter.states[index].deprecatedFilterValue;
+    },
+
+    setSelectedWidget: function(selectedWidget, index = 0) {
+      optionsFilter.states[index].selectedWidget = selectedWidget;
+    },
+
+    getSelectedWidget: function(index = 0) {
+      return optionsFilter.states[index].selectedWidget;
+    },
+
+    setDefaultWidgetInDOM: function(index = 0) {
+      const container = optionsFilter.getContainer(index);
+      const selectedWidget = container.querySelector('input[type="radio"]:checked');
+      if (selectedWidget === null) {
+        return null;
+      }
+      optionsFilter.selectWidget(selectedWidget, index);
+    },
+
+    setSearchboxValueInDOM: function(value, index = 0) {
+      const container = optionsFilter.getContainer(index);
+      const searchBox = container.querySelector('input.search-box');
+      searchBox.value = value;
+      optionsFilter.setSearchboxValue(value);
+    },
+
+    selectWidget: function(selectedWidget, index = 0) {
+      var widgetWrapper = selectedWidget.closest('.js-form-type-radio');
+      optionsFilter.setSelectedWidget(widgetWrapper, index);
+      optionsFilter.states[index].widgets.map(function(element) {
+        element.classList.remove('form-type--radio__selected');
       });
-    }
-    info.hidden = false;
-  };
+      widgetWrapper.classList.add('form-type--radio__selected');
+      optionsFilter.showWarningMessageIfNeeded(index);
+      optionsFilter.setSearchboxValueInDOM(widgetWrapper.querySelector('.radio-details--machine-name').innerText);
+    },
 
-  /**
-   * Set up options filter
-   */
-  Drupal.behaviors.optionsFilter = {
-    attach: (context, settings) => {
-      var fieldsets = once('options-filter', '.widget-type--selector', context);
-      for (var fieldset of fieldsets) {
-        var search = fieldset.querySelector('input[type="search"]');
-        if (!search.value) {
-          var selected = fieldset.querySelector('input[type="radio"][checked]');
-          search.value = selected ? selected.parentElement.parentElement.querySelector('.radio-details--machine-name').innerText : '';
-        }
-        toggleRadioButtons(search.value, fieldset);
-        subscribeToChanges(fieldset);
+    showAllWidgets: function(index = 0) {
+      optionsFilter.states[index].widgets.map(function(element) {
+        element.hidden = false;
+      });
+    },
+
+    showSelectedWidget: function(index = 0) {
+      optionsFilter.getSelectedWidget(index).hidden = false;
+    },
+
+    hideAllWidgets: function(index = 0) {
+      optionsFilter.states[index].widgets.map(function(element) {
+        element.hidden = true;
+      });
+    },
+
+    hideAllWidgetsBut: function(widgetsToShow, index = 0) {
+      optionsFilter.hideAllWidgets(index);
+      for (const matchingElement of widgetsToShow) {
+        matchingElement.parentElement.parentElement.hidden = false;
       }
+    },
+
+    filterWidgetsSearched: function(index = 0) {
+      const container = optionsFilter.getContainer(index);
+      const searchboxValue = optionsFilter.getSearchboxValue(index);
+      const matchingWidgets = Array.from(
+        container.querySelectorAll('.radio-details--search')).
+        filter(e => e.innerText.search(searchboxValue) !== -1);
+      optionsFilter.hideAllWidgetsBut(matchingWidgets, index);
+    },
+
+    isWidgetDeprecated: function(widget) {
+      return widget.innerText.search('deprecated') >= 0;
+    },
+
+    getDeprecatedWidgets: function(index = 0) {
+      return optionsFilter.states[index].widgets.filter(function(widget) {
+        return optionsFilter.isWidgetDeprecated(widget);
+      });
+    },
+
+    filterWidgetsDeprecated: function(index = 0) {
+      var showDeprecated = optionsFilter.getDeprecatedFilterValue(index);
+      optionsFilter.getDeprecatedWidgets(index).map(function(widget) {
+        if (!showDeprecated) {
+          widget.hidden = true;
+        }
+      });
+    },
+
+    showWarningMessageIfNeeded: function(index = 0) {
+      var selectedWidget = optionsFilter.getSelectedWidget(index);
+      optionsFilter.states[index].warningLayer.hidden = true;
+      optionsFilter.states[index].warningLayer.innerText = '';
+      if (optionsFilter.isWidgetDeprecated(selectedWidget)) {
+        optionsFilter.states[index].warningLayer.hidden = false;
+        optionsFilter.states[index].warningLayer.innerText = deprecatedMessage;
+      }
+    },
+
+    refreshWidgets: function(index = 0) {
+      optionsFilter.showAllWidgets(index);
+      optionsFilter.filterWidgetsSearched(index);
+      optionsFilter.filterWidgetsDeprecated(index);
+      optionsFilter.showSelectedWidget(index);
+    },
+
+    renderSelectedWidget: function(index = 0) {
+      var info = optionsFilter.getInfoLayer(index);
+      var selectedWidget = optionsFilter.getSelectedWidget(index);
+
+      var id = selectedWidget.querySelector('input[type="radio"]').value;
+      var name = selectedWidget.querySelector('.radio-details--human-name').innerText;
+      var description = selectedWidget.querySelector('.radio-details--description').innerText;
+      var status = selectedWidget.querySelector('.radio-details_remote-status').innerText;
+      var languages = selectedWidget.querySelector('.radio-details--languages').innerHTML;
+      var source = selectedWidget.querySelector('.radio-details--source').innerText;
+      var version = selectedWidget.querySelector('.radio-details--version').innerText;
+      var createdDate = selectedWidget.querySelector('.radio-details--created').innerText;
+      var updatedDate = selectedWidget.querySelector('.radio-details--updated').innerText;
+      const imgElement = selectedWidget.querySelector('.radio-details--image');
+      var img = imgElement ? imgElement.outerHTML : '';
+      var previewUrl = selectedWidget.querySelector('.radio-details--preview-url').innerText;
+      info.innerHTML = Drupal.theme('currentlySelectedWidget', id, name, description, status, languages, version,
+        source, createdDate, updatedDate, img, previewUrl);
+      if (previewUrl) {
+        info.querySelector('a.button').addEventListener('click', (event) => {
+          var button = event.target;
+          var iframe = document.createElement('iframe');
+          iframe.src = previewUrl;
+          button.replaceWith(iframe);
+          return false;
+        });
+      }
+      info.hidden = false;
     },
   };
 
-  Drupal.theme.currentlySelectedClComponent = (id, name, description, status, languages, version, source, createdDate, updatedDate, img, previewUrl) => `
-    <summary>${Drupal.t('ℹ️ More information about <em>@name</em>', { '@name': name })}</summary>
+  const subscribeSearchboxToChanges = function(index = 0) {
+    const container = optionsFilter.getContainer(index);
+    const searchBox = container.querySelector('input.search-box');
+    if (searchBox === null) {
+      return;
+    }
+    searchBox.addEventListener('input', function(event) {
+      optionsFilter.setSearchboxValue(event.target.value, index);
+      optionsFilter.refreshWidgets(index);
+    });
+  };
+
+  const includeResetButton = function(index) {
+    const container = optionsFilter.getContainer(index);
+    const searchBox = container.querySelector('input.search-box');
+    if (searchBox === null) {
+      return;
+    }
+    var resetButton = document.createElement('button');
+    resetButton.classList.add('reset-search-box');
+    resetButton.innerText = '⨯';
+    resetButton.title = 'Reset filter';
+    resetButton.addEventListener('click', function(event) {
+      event.preventDefault();
+      container.querySelector('input.search-box').value = '';
+      optionsFilter.setSearchboxValue('', index);
+      optionsFilter.refreshWidgets(index);
+      event.target.blur();
+    });
+
+    searchBox.parentElement.insertBefore(resetButton, searchBox.nextSibling);
+  };
+
+  const subscribeDeprecatedSearchboxToChanges = function(index = 0) {
+    const container = optionsFilter.getContainer(index);
+    const deprecationCheckbox = container.querySelector('input.deprecation-checkbox');
+    if (deprecationCheckbox === null) {
+      return;
+    }
+    deprecationCheckbox.addEventListener('change', function(event) {
+      optionsFilter.setDeprecatedFilterValue(event.target.checked, index);
+      optionsFilter.refreshWidgets(index);
+    });
+  };
+
+  const subscribeRadiosToChanges = function(index = 0) {
+    const container = optionsFilter.getContainer(index);
+    var radios = once('radio-change-subscribed', 'input[type="radio"]', container);
+    radios.map(function(radio) {
+      radio.addEventListener('change', function(event) {
+        optionsFilter.selectWidget(event.target, index);
+        optionsFilter.refreshWidgets(index);
+        optionsFilter.renderSelectedWidget(index);
+      });
+    });
+  };
+
+  Drupal.behaviors.optionsFilter = {
+    attach: (context, settings) => {
+      once('options-filter', '.widget-type--selector', context).map(function(container, index) {
+        optionsFilter.initIndex(index);
+        optionsFilter.setContainer(container, index);
+        subscribeSearchboxToChanges(index);
+        subscribeDeprecatedSearchboxToChanges(index);
+        subscribeRadiosToChanges(index);
+        includeResetButton(index);
+        optionsFilter.refreshWidgets(index);
+        if (optionsFilter.getSelectedWidget(index) !== undefined) {
+          optionsFilter.renderSelectedWidget(index);
+        }
+      });
+    },
+  };
+
+  Drupal.theme.currentlySelectedWidget = (
+    id, name, description, status, languages, version, source, createdDate,
+    updatedDate, img, previewUrl) => `
+    <summary>${Drupal.t('ℹ️ More information about <em>@name</em>',
+    {'@name': name})}</summary>
     <p>${description}</p>
     <div class='image-table--wrapper'>
       <table>
@@ -81,49 +273,16 @@
         <tr><th>${Drupal.t('Status')}</th><td>${status}</td></tr>
         <tr><th>${Drupal.t('Available Languages')}</th><td>${languages}</td></tr>
       </table>
-      <div class='currently-selected--image--wrapper${img ? '' : ' currently-selected--image--wrapper__empty'}'>
+      <div class='currently-selected--image--wrapper${img
+    ? ''
+    : ' currently-selected--image--wrapper__empty'}'>
         ${img ? img : ''}
       </div>
     </div>
     ${previewUrl
-      ? `<div style='display: none' id='preview-url'>${previewUrl}</div>
-      <div class="try-now--wrapper"><a href="#preview-url" class='try-now button button--primary'>${Drupal.t('Try now')}</a></div>`
-      : ''
-    }`;
-
-  /**
-   * Render more info about the currently selected component.
-   */
-  Drupal.behaviors.currentlySelected = {
-    attach: (context, settings) => {
-      var fieldsets = once('currently-selected', '.widget-type--selector', context);
-      for (var fieldset of fieldsets) {
-        var info = fieldset.querySelector('.currently-selected');
-        info.hidden = true;
-        var selected = fieldset.querySelector('input[type="radio"][checked]');
-        if (selected) {
-          selected.parentElement.parentElement.parentElement.classList.add('form-type--radio__selected');
-          renderCurrentlySelected(info, selected.parentElement.parentElement);
-        }
-        var radios = once('radio-change-subscribed', 'input[type="radio"]', fieldset);
-        for (var radio of radios) {
-          radio.addEventListener('change', (event) => {
-            if (event.target.checked) {
-              var all = event.target.parentElement.parentElement.parentElement.parentElement.querySelectorAll('input[type="radio"]');
-              for (var item of all) {
-                item.parentElement.parentElement.parentElement.classList.remove('form-type--radio__selected');
-              }
-              event.target.parentElement.parentElement.parentElement.classList.add('form-type--radio__selected');
-              renderCurrentlySelected(info, event.target.parentElement.parentElement);
-              var searchElement = fieldset.querySelector('input[type="search"]');
-              var machineName = event.target.parentElement.parentElement.querySelector('.radio-details--machine-name').innerText;
-              searchElement.value = machineName;
-              toggleRadioButtons(machineName, fieldset);
-            }
-          });
-        }
-      }
-    },
-  };
-
+    ? `<div style='display: none' id='preview-url'>${previewUrl}</div>
+      <div class="try-now--wrapper"><a href="#preview-url" class='try-now button button--primary'>${Drupal.t(
+      'Try now')}</a></div>`
+    : ''
+  }`;
 }(once));

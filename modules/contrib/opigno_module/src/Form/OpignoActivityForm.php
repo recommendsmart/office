@@ -315,7 +315,8 @@ class OpignoActivityForm extends ContentEntityForm {
       $filename_new = preg_replace('/[^a-zA-Z0-9-_\.]/', '-', $filename);
       $file->setFilename($filename_new);
       $file->save();
-      file_move($file, $stream_wrapper . '://' . $filename_new);
+      \Drupal::service('file.repository')->move($file, $stream_wrapper . '://' . $filename_new);
     }
   }
+
 }

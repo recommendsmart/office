@@ -10,7 +10,6 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\group\Entity\Group;
-use Drupal\group\Entity\GroupInterface;
 use Drupal\opigno_group_manager\OpignoGroupContext;
 use Drupal\opigno_learning_path\Entity\LPModuleAvailability;
 use Drupal\opigno_learning_path\LearningPathAccess;
@@ -505,9 +504,9 @@ class OpignoModule extends RevisionableContentEntityBase implements OpignoModule
    */
   public function getModuleActiveAttempt(AccountInterface $user, $activity_link_type = NULL, $group_id = NULL) {
     $key = $this->id() . '_' . $user->id();
-    $group_id = OpignoGroupContext::getCurrentGroupId() ?: $group_id;
-    if(!$group_id) {
-      throw new \Exception('Group context empty');
+    $group_id = $this->getGroupIdCurrentTraining($group_id);
+    if (!$group_id) {
+      return NULL;
     }
     $key .= '_' . $group_id;
 
@@ -549,6 +548,7 @@ class OpignoModule extends RevisionableContentEntityBase implements OpignoModule
    *
    * @param \Drupal\user\Entity\User $user
    *   User entity.
+   *
    * @return numeric
    *   Best score result.
    */
@@ -581,7 +581,7 @@ class OpignoModule extends RevisionableContentEntityBase implements OpignoModule
    * @return int
    *   Score in percents depends of OpignoModule keep_results option.
    */
-  function getUserScore(AccountInterface $account, $latest_cert_date = NULL, $group_id = NULL) {
+  public function getUserScore(AccountInterface $account, $latest_cert_date = NULL, $group_id = NULL) {
     $group_id = $this->getGroupIdCurrentTraining($group_id);
     $attempts = $this->getModuleAttempts($account, 'last', $latest_cert_date, FALSE, $group_id);
     if (!$attempts) {
@@ -613,7 +613,7 @@ class OpignoModule extends RevisionableContentEntityBase implements OpignoModule
   /**
    * Returns group id given group type - a training or a course.
    *
-   * @param int|null $group_id
+   * @param numeric|null $group_id
    *   Group Id.
    *
    * @return int
@@ -622,12 +622,18 @@ class OpignoModule extends RevisionableContentEntityBase implements OpignoModule
   public function getGroupIdCurrentTraining($group_id) {
     $context_id = OpignoGroupContext::getCurrentGroupId();
     $group = $group_id ? Group::load($group_id) : NULL;
-    if ($group instanceof Group && $group->getGroupType()->id() == 'opigno_course' && !empty($context_id) && $group_id != $context_id) {
-      // If group is opipgno_course, get parent training id.
+    if (
+      $group instanceof Group &&
+      $group->getGroupType()->id() == 'opigno_course' &&
+      !empty($context_id) &&
+      $group_id != $context_id
+    ) {
+      // If group is opigno_course, get parent training id.
       $group_id = $context_id;
     }
-
-    return $group_id ?: $context_id;
+    $result = $group_id ?: $context_id;
+    assert(is_numeric($result) && !empty($result));
+    return $result;
   }
 
   /**
@@ -667,7 +673,7 @@ class OpignoModule extends RevisionableContentEntityBase implements OpignoModule
   /**
    * Get activities related to specific module.
    *
-   * @return ?OpignoActivity[]
+   * @return OpignoActivity[]|null
    */
   public function getModuleActivities($full = FALSE) {
     if (empty($this->activities)) {

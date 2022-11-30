@@ -3,6 +3,7 @@
 namespace Drupal\queue_ui\Commands;
 
 use Drupal\Core\Batch\BatchBuilder;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Queue\QueueWorkerManagerInterface;
 use Drupal\queue_ui\QueueUIBatchInterface;
 use Drupal\queue_ui\QueueUIManager;
@@ -18,6 +19,8 @@ use Drush\Commands\DrushCommands;
  *   - http://cgit.drupalcode.org/devel/tree/drush.services.yml
  */
 class QueueUiCommands extends DrushCommands {
+
+  use StringTranslationTrait;
 
   /**
    * Queue worker manager.
@@ -162,7 +165,7 @@ class QueueUiCommands extends DrushCommands {
     // Remove leases.
     $num_updated = $queue_ui->releaseItems($queueName);
 
-    $this->logger()->info(t('@count lease reset in queue @name', [
+    $this->logger()->info($this->t('@count lease reset in queue @name', [
       '@count' => $num_updated,
       '@name' => $queueName,
     ]));
@@ -193,7 +196,7 @@ class QueueUiCommands extends DrushCommands {
 
       // Show a list of all defined queues.
       $queueName = $this->io()
-        ->choice(t('Which queue do you want to process?'), $queueNames);
+        ->choice($this->t('Which queue do you want to process?'), $queueNames);
     }
 
     return $queueName;

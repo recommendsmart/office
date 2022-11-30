@@ -36,6 +36,7 @@ class ScopeEntity implements ScopeEntityInterface, CacheableDependencyInterface 
   /**
    * {@inheritdoc}
    */
+  #[\ReturnTypeWillChange]
   public function jsonSerialize() {
     return $this->getIdentifier();
   }

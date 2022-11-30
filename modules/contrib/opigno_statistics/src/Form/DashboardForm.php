@@ -173,7 +173,8 @@ class DashboardForm extends FormBase {
     $theme = \Drupal::theme()->getActiveTheme()->getName();
     $theme_decorator = \Drupal::hasService('color.theme_decorator');
     if ($theme_decorator) {
-      $color_palette = \Drupal::service('color.theme_decorator')->getPalette($theme);
+      $color_palette = \Drupal::service('color.theme_decorator')
+        ->getPalette($theme);
     }
     else {
       $color_palette = color_get_palette($theme);

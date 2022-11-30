@@ -5,7 +5,6 @@ namespace Drupal\Tests\widget_type\Kernel;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Link;
 use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\widget_type\Entity\WidgetType;
@@ -68,6 +67,7 @@ class WidgetTypeListBuilderTest extends KernelTestBase {
       'remote_widget_id' => 'remote-id',
       'remote_widget_version' => 'v1.2.3',
       'remote_widget_directory' => 'https://the-s3/path',
+      'remote_widget_status' => 'stable',
     ]);
     $this->entity->save();
   }
@@ -84,6 +84,7 @@ class WidgetTypeListBuilderTest extends KernelTestBase {
     self::assertSame('Enabled', $row['status']['data']['#value']->render());
     self::assertSame('https://the-s3/path', $row['directory']['data']['#value']);
     self::assertSame('v1.2.3', $row['version']['data']['#value']);
+    self::assertSame('stable', $row['remote_status']['data']['#value']);
   }
 
   /**
@@ -97,6 +98,7 @@ class WidgetTypeListBuilderTest extends KernelTestBase {
       'changed',
       'source',
       'directory',
+      'remote_status',
       'version',
       'operations',
     ], array_keys($header));

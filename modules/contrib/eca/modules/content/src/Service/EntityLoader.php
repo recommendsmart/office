@@ -100,6 +100,7 @@ class EntityLoader {
       '#title' => $this->t('Load entity from'),
       '#options' => $this->getOptions('from'),
       '#default_value' => $plugin_configuration['from'],
+      '#description' => $this->t('Loads the entity from the given list and/or properties below.'),
       '#weight' => -70,
     ];
     $form['entity_type'] = [
@@ -107,18 +108,21 @@ class EntityLoader {
       '#title' => $this->t('Entity type'),
       '#options' => $this->getOptions('entity_type'),
       '#default_value' => $plugin_configuration['entity_type'],
+      '#description' => $this->t('The type of the entity to be loaded.'),
       '#weight' => -60,
     ];
     $form['entity_id'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Entity ID'),
       '#default_value' => $plugin_configuration['entity_id'],
+      '#description' => $this->t('The ID of the entity to be loaded.'),
       '#weight' => -50,
     ];
     $form['revision_id'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Revision ID'),
       '#default_value' => $plugin_configuration['revision_id'],
+      '#description' => $this->t('The revision ID of the entity to be loaded.'),
       '#weight' => -40,
     ];
     $form['properties'] = [
@@ -132,18 +136,21 @@ class EntityLoader {
       '#title' => $this->t('Language'),
       '#options' => $this->getOptions('langcode'),
       '#default_value' => $plugin_configuration['langcode'],
+      '#description' => $this->t('The language code of the entity to be loaded.'),
       '#weight' => -30,
     ];
     $form['latest_revision'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Load latest revision'),
       '#default_value' => $plugin_configuration['latest_revision'],
+      '#description' => $this->t('Whether loading the latest revision or not.'),
       '#weight' => -20,
     ];
     $form['unchanged'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Load unchanged values'),
       '#default_value' => $plugin_configuration['unchanged'],
+      '#description' => $this->t('Whether loading the unchanged values of fields or not.'),
       '#weight' => -10,
     ];
     return $form;
@@ -178,8 +185,8 @@ class EntityLoader {
     $plugin_configuration['revision_id'] = $form_state->getValue('revision_id');
     $plugin_configuration['properties'] = $form_state->getValue('properties');
     $plugin_configuration['langcode'] = $form_state->getValue('langcode');
-    $plugin_configuration['latest_revision'] = $form_state->getValue('latest_revision');
-    $plugin_configuration['unchanged'] = $form_state->getValue('unchanged');
+    $plugin_configuration['latest_revision'] = !empty($form_state->getValue('latest_revision'));
+    $plugin_configuration['unchanged'] = !empty($form_state->getValue('unchanged'));
   }
 
   /**
@@ -291,7 +298,7 @@ class EntityLoader {
 
     }
 
-    if ($config['unchanged']) {
+    if ($entity !== NULL && $config['unchanged']) {
       if (!isset($entity->original) && !$entity->isNew()) {
         /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
         $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());

@@ -115,7 +115,7 @@ class EcaController extends ControllerBase {
       '#theme' => 'entity_add_list',
       '#bundles' => $modellers,
       '#add_bundle_message' => $this->t('There are no modellers available yet. Install at least one module that integrates a modeller. A list of available integrations can be found on the <a href=":url" target="_blank" rel="nofollow noreferrer">ECA project page</a>.', [
-        ':url' => 'https://www.drupal.org/project/eca',
+        ':url' => 'https://www.drupal.org/project/eca#modellers',
       ]),
     ];
   }

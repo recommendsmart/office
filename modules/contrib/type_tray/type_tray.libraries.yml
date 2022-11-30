@@ -8,5 +8,4 @@ type_tray:
     - core/jquery
     - core/drupal
     - core/drupalSettings
-    - core/jquery.once
     - core/drupal.debounce

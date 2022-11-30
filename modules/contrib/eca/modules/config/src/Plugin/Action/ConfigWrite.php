@@ -132,8 +132,8 @@ class ConfigWrite extends ConfigActionBase {
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     $this->configuration['config_value'] = $form_state->getValue('config_value');
-    $this->configuration['use_yaml'] = $form_state->getValue('use_yaml');
-    $this->configuration['save_config'] = $form_state->getValue('save_config');
+    $this->configuration['use_yaml'] = !empty($form_state->getValue('use_yaml'));
+    $this->configuration['save_config'] = !empty($form_state->getValue('save_config'));
     parent::submitConfigurationForm($form, $form_state);
   }
 

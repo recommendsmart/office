@@ -54,6 +54,7 @@ class TriggerCustomEvent extends ConfigurableActionBase {
       '#title' => $this->t('Event ID'),
       '#default_value' => $this->configuration['event_id'],
       '#weight' => -20,
+      '#description' => $this->t('The ID of the event to be triggered.'),
     ];
     $form['tokens'] = [
       '#type' => 'textarea',

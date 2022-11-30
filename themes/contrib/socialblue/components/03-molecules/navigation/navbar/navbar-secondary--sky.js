@@ -32,6 +32,7 @@
         var items = navSecondary.find('li', context);
         var navScrollWidth = navScroll.width();
         var navSecondaryWidth = navSecondary.width();
+        var regionContent = $('.region--content');
 
           // Secondary navigation behaviour,
           function secondaryNavBehaviour() {
@@ -76,7 +77,15 @@
                   var cart = $this.find('.caret');
 
                   cart.on('click', function () {
-                    hiddenList.slideToggle(300);
+                    if (hiddenList.is(":hidden")) {
+                      regionContent.addClass('js--z-index');
+                      hiddenList.slideDown('300');
+                    } else {
+                      hiddenList.slideUp('300', function() {
+                        regionContent.removeClass('js--z-index');
+                      });
+                    }
+
                     $(this).toggleClass('active');
                   });
 
@@ -84,7 +93,9 @@
                     event.stopPropagation();
 
                     if ($(event.target).closest('.navbar-secondary').length) return;
-                    hiddenList.slideUp(300);
+                    hiddenList.slideUp(300, function() {
+                      regionContent.removeClass('js--z-index');
+                    });
                     cart.removeClass('active');
                   });
                 });

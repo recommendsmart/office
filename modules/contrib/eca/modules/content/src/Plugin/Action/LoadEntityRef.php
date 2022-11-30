@@ -78,6 +78,7 @@ class LoadEntityRef extends LoadEntity {
       '#type' => 'textfield',
       '#title' => $this->t('Field name entity reference'),
       '#default_value' => $this->configuration['field_name_entity_ref'],
+      '#description' => $this->t('The field name of the entity reference.'),
       '#weight' => -80,
     ];
     return $form;

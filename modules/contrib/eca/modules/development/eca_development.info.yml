@@ -6,7 +6,7 @@ hidden: true
 dependencies:
   - eca:eca
 
-# Information added by Drupal.org packaging script on 2022-09-30
-version: '1.0.4'
+# Information added by Drupal.org packaging script on 2022-11-25
+version: '1.0.7'
 project: 'eca'
-datestamp: 1664529847
+datestamp: 1669368781

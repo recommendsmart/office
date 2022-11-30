@@ -2,9 +2,9 @@ name: Opigno Like
 type: module
 description: 'Provides the functionality for the entity likes'
 package: Opigno
-core_version_requirement: ^8.8 || ^9
+core_version_requirement: ^9 || ^10
 
-# Information added by Drupal.org packaging script on 2022-04-01
-version: '3.0.2'
+# Information added by Drupal.org packaging script on 2022-11-13
+version: '3.0.3'
 project: 'opigno_like'
-datestamp: 1648805737
+datestamp: 1668362190

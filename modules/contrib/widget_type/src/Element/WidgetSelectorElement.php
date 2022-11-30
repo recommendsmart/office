@@ -106,32 +106,54 @@ class WidgetSelectorElement extends FormElement implements ContainerFactoryPlugi
     $default_widget_type = ($default_id ? $widget_types[$default_id] : NULL) ?? NULL;
     $element += [
       '#attached' => ['library' => ['widget_type/selector']],
-      'search' => [
+    ];
+
+    // Widgets types can't be change once created, so hide search and deprecated searchbox
+    if (!$default_widget_type) {
+      $element['search'] = [
         '#title' => $this->t('Search'),
         '#title_display' => 'hidden',
         '#type' => 'search',
-        '#default_value' => $default_widget_type instanceof WidgetTypeInterface ? $default_widget_type->getRemoteId() : NULL,
+        '#default_value' => $default_widget_type instanceof WidgetTypeInterface ? $default_widget_type->getRemoteId(
+        ) : NULL,
         '#placeholder' => $this->t('Search for a widget type'),
         '#size' => 50,
         '#description' => $this->t('Start typing to search for a widget type.'),
         '#input' => FALSE,
-      ],
-      'target_id' => [
-        '#type' => 'radios',
-        '#options' => $options,
-        '#title' => $this->t('Widgets'),
-        '#title_display' => 'invisible',
-        '#default_value' => $default_widget_type ? $default_widget_type->id() : NULL,
-        '#process' => [
-          [Radios::class, 'processRadios'],
-          [$this, 'processRadios'],
-        ],
         '#attributes' => [
-          'class' => ['widget-type-selector--radios'],
+          'class' => [
+            'search-box',
+          ],
         ],
-        '#ajax' => $element['#ajax'] ?? FALSE,
-        '#input' => FALSE,
+      ];
+      $element['show_deprecated'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Show deprecated widgets'),
+        '#default_value' => FALSE,
+        '#attributes' => [
+          'class' => [
+            'deprecation-checkbox',
+          ],
+        ],
+      ];
+    }
+
+    $element['target_id'] = [
+      '#type' => 'radios',
+      '#options' => $options,
+      '#title' => $this->t('Widgets'),
+      '#title_display' => 'invisible',
+      '#default_value' => $default_widget_type ? $default_widget_type->id() : NULL,
+      '#process' => [
+        [Radios::class, 'processRadios'],
+        [$this, 'processRadios'],
       ],
+      '#weight' => 1,
+      '#attributes' => [
+        'class' => ['widget-type-selector--radios'],
+      ],
+      '#ajax' => $element['#ajax'] ?? FALSE,
+      '#input' => FALSE,
     ];
     $classes = $element['#attributes']['class'] ?? [];
     $classes[] = 'widget-type--selector';
@@ -172,6 +194,7 @@ class WidgetSelectorElement extends FormElement implements ContainerFactoryPlugi
       $element[$key]['#human_name'] = $widget_type->getName();
       $element[$key]['#machine_name'] = $widget_type->getRemoteId();
       $element[$key]['#remote_description'] = $widget_type->getDescription();
+      $element[$key]['#remote_status'] = $widget_type->getRemoteStatus();
       $field_image = $widget_type->getPreviewImage();
       $thumbnail = ['#markup' => ''];
       $image = ['#markup' => ''];
@@ -194,7 +217,7 @@ class WidgetSelectorElement extends FormElement implements ContainerFactoryPlugi
           '#uri' => $uri,
           '#attributes' => [
             'loading' => 'lazy',
-            'class' => ['radio-details--image']
+            'class' => ['radio-details--image'],
           ],
         ];
       }
@@ -230,11 +253,11 @@ class WidgetSelectorElement extends FormElement implements ContainerFactoryPlugi
             return [
               '#type' => 'html_tag',
               '#tag' => 'code',
-              '#value' => $langcode
+              '#value' => $langcode,
             ];
           },
           $widget_type->getRemoteLanguages()
-        )
+        ),
       ];
     }
     return $element;

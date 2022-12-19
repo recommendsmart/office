@@ -178,6 +178,11 @@ function eca_content_entity_field_values_init(FieldableEntityInterface $entity) 
  * @throws \Drupal\Core\Entity\EntityStorageException
  */
 function eca_content_field_config_insert(EntityInterface $entity) {
+  if (!in_array('new_field_config', \Drupal::config('eca.settings')->get('dependency_calculation') ?? [], TRUE)) {
+    // Nothing to do.
+    return;
+  }
+
   $eca_configs = \Drupal::entityTypeManager()->getStorage('eca')->loadMultiple();
   if (empty($eca_configs)) {
     // No ECA config present, thus nothing to do here.

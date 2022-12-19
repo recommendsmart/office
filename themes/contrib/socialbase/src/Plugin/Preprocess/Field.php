@@ -22,7 +22,7 @@ class Field extends PreprocessBase {
   /**
    * {@inheritdoc}
    */
-  protected function preprocessElement(Element $element, Variables $variables) {
+  protected function preprocessElement(Element $element, Variables $variables): void {
     // For each field that doesn't need a div to wrap the content in.
     switch ($element['#field_name']) {
       case 'field_profile_image':
@@ -59,6 +59,15 @@ class Field extends PreprocessBase {
 
     if ($element['#view_mode'] == 'teaser') {
       $variables['part_of_teaser'] = TRUE;
+
+      // Add line clamp to our summary / intro fields. These get rendered
+      // in templates/profile/profile--profile--teaser.html.twig
+      // but aren't taking into account the height.
+      // See https://github.com/goalgorilla/open_social/pull/2846 and #3272691.
+      if ($element['#field_name'] === 'field_profile_self_introduction' ||
+          $element['#field_name'] === 'field_profile_summary') {
+          $variables['items'][0]['attributes']->addClass('line-clamp');
+      }
     }
 
     // Adds the comment title with the amount of comments, done in here

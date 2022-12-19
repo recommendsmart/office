@@ -22,7 +22,7 @@ class ImageWidget extends BaseImageWidget {
   /**
    * {@inheritdoc}
    */
-  public function preprocessElement(Element $element, Variables $variables) {
+  public function preprocessElement(Element $element, Variables $variables): void {
 
     if (isset($variables['element']['#id']) &&  $variables['element']['#id'] == 'edit-field-post-image-0-upload') {
       $variables['in_post'] = TRUE;

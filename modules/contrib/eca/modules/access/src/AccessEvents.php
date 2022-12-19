@@ -25,4 +25,13 @@ final class AccessEvents {
    */
   public const FIELD = 'eca_access.field';
 
+  /**
+   * Dispatches when being asked for access to create an entity.
+   *
+   * @Event
+   *
+   * @var string
+   */
+  public const CREATE = 'eca_access.create';
+
 }

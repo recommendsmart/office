@@ -126,11 +126,12 @@ class GetFieldValue extends ConfigurableActionBase {
     $path_items = explode('.', $property_path);
     $last_item = end($path_items);
     $delta_defined = FALSE;
-    while (($path_item = array_pop($path_items)) !== NULL) {
+    while (!$delta_defined && ($path_item = array_pop($path_items)) !== NULL) {
       if (ctype_digit($path_item)) {
         $delta_defined = TRUE;
+        $path_item = (int) $path_item;
       }
-      while(!$delta_defined && $read_target && $read_target->getName() !== $path_item) {
+      while ($read_target && $read_target->getName() !== $path_item) {
         $read_target = $read_target->getParent();
       }
     }
@@ -141,9 +142,22 @@ class GetFieldValue extends ConfigurableActionBase {
         $token_data = reset($token_data);
       }
     }
-    elseif (($read_target instanceof EntityReferenceItem) && isset($read_target->entity)) {
+    elseif ($read_target instanceof EntityReferenceItem) {
       // User input targets a reference item, use the contained entity.
-      $token_data = $read_target->entity;
+      if (isset($read_target->entity)) {
+        $token_data = $read_target->entity;
+      }
+      else {
+        $items = $read_target->getParent();
+        if (($items instanceof EntityReferenceFieldItemListInterface) && ($entities = $items->referencedEntities())) {
+          foreach ($items as $delta => $item) {
+            if (($item === $read_target) || ($item && ($item->getValue() === $read_target->getValue()))) {
+              $token_data = $entities[$delta] ?? NULL;
+              break;
+            }
+          }
+        }
+      }
     }
     elseif ($read_target && $read_target->getValue() instanceof EntityInterface) {
       // User input targets an entity, use it.

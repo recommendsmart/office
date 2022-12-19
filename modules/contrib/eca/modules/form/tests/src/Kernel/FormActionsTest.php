@@ -6,6 +6,7 @@ use Drupal\Core\Action\ActionManager;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Form\FormState;
+use Drupal\Core\Url;
 use Drupal\eca\Token\TokenInterface;
 use Drupal\eca_form\Event\FormBuild;
 use Drupal\eca_form\Event\FormEvents;
@@ -829,6 +830,25 @@ class FormActionsTest extends KernelTestBase {
     $this->assertTrue($access_result);
     $this->assertTrue(isset($form['created']['widget'][0]['value']['#default_value']) && $form['created']['widget'][0]['value']['#default_value'] instanceof DrupalDateTime);
     $this->assertSame(1657884192976, $form['created']['widget'][0]['value']['#default_value']->getTimestamp());
+
+    // Test renaming the default submit button.
+    /** @var \Drupal\eca_form\Plugin\Action\FormFieldDefaultValue $action */
+    $action = $this->actionManager->createInstance('eca_form_field_default_value', [
+      'value' => 'Renamed',
+      'field_name' => 'submit',
+      'strip_tags' => FALSE,
+      'trim' => FALSE,
+      'xss_filter' => FALSE,
+    ]);
+
+    $form_object = \Drupal::entityTypeManager()->getFormObject('node', 'default');
+    $form_object->setEntity($node1);
+    $form_state = new FormState();
+    $form_builder->buildForm($form_object, $form_state);
+
+    $this->assertTrue($access_result);
+    $this->assertTrue(isset($form['actions']['submit']['#value']));
+    $this->assertSame("Renamed", $form['actions']['submit']['#value']);
   }
 
   /**
@@ -1192,6 +1212,45 @@ YAML;
     $this->assertTrue($access_result);
     $this->assertEquals('Hello from the outside!',
       $form_state->get(['eca', 'someprop']));
+  }
+
+  /**
+   * Tests the action plugin "eca_form_state_set_redirect".
+   */
+  public function testFormStateSetRedirect(): void {
+    /** @var \Drupal\eca_form\Plugin\Action\FormStateSetRedirect $action */
+    $action = $this->actionManager->createInstance('eca_form_state_set_redirect', [
+      'destination' => '/admin/structure',
+    ]);
+
+    /** @var \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher */
+    $event_dispatcher = \Drupal::service('event_dispatcher');
+    $form_builder = \Drupal::formBuilder();
+
+    $access_result = NULL;
+    $event_dispatcher->addListener(FormEvents::SUBMIT, function (FormSubmit $event) use (&$access_result, $action) {
+      $action->setEvent($event);
+      $access_result = $access_result ?? $action->access(NULL);
+      if ($action->access(NULL)) {
+        $action->execute();
+      }
+    });
+
+    $form_object = \Drupal::entityTypeManager()->getFormObject('node', 'default');
+    $form_object->setEntity(Node::create([
+      'type' => 'article',
+      'title' => $this->randomMachineName(),
+    ]));
+    $form_state = new FormState();
+    $form_builder->buildForm($form_object, $form_state);
+    $form_builder->submitForm($form_object, $form_state);
+
+    $redirect = \Closure::fromCallable(function() {
+      return $this->redirect ?? NULL;
+    })->call($form_state);
+    $this->assertTrue($redirect instanceof Url);
+    /** @var \Drupal\Core\Url $redirect */
+    $this->assertSame("/admin/structure", $redirect->toString());
   }
 
 }

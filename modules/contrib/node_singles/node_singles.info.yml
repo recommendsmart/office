@@ -1,12 +1,12 @@
 name: Node Singles
 type: module
 description: Singles are node types used for one-off pages that have unique content requirements
-core_version_requirement: ^8.8 || ^9
+core_version_requirement: ^8.8 || ^9 || ^10
 php: 7.1
 dependencies:
   - drupal:node
 
-# Information added by Drupal.org packaging script on 2022-08-25
-version: '3.2.0'
+# Information added by Drupal.org packaging script on 2022-12-06
+version: '3.3.0'
 project: 'node_singles'
-datestamp: 1661431241
+datestamp: 1670332258

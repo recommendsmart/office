@@ -12,7 +12,8 @@
   transition: .3s background-color ease;
 }
 
-.joyride-close-tip:focus, .joyride-close-tip:hover {
+.joyride-close-tip:focus,
+.joyride-close-tip:hover {
   background-color: black;
 }
 
@@ -88,7 +89,7 @@
   background: white;
   color: #343434;
   -webkit-box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-          box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
   padding: 20px 50px 35px 20px;
 }
 

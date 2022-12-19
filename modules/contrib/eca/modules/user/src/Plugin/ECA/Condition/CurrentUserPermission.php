@@ -39,7 +39,7 @@ class CurrentUserPermission extends BaseUser {
     /** @var \Drupal\user\PermissionHandler $handler */
     $handler = \Drupal::service('user.permissions');
     foreach ($handler->getPermissions() as $permission => $def) {
-      $permissions[$permission] = strip_tags($def['title']);
+      $permissions[$permission] = strip_tags((string) $def['title']);
     }
     $form['permission'] = [
       '#type' => 'select',

@@ -3,8 +3,11 @@
 namespace Drupal\socialbase\Plugin\Preprocess;
 
 use Drupal\bootstrap\Plugin\Preprocess\PreprocessBase;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Pre-processes variables for the "page_title" theme hook.
@@ -13,18 +16,50 @@ use Drupal\Core\Url;
  *
  * @BootstrapPreprocess("page_title")
  */
-class PageTitle extends PreprocessBase {
+class PageTitle extends PreprocessBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * Route Match service.
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface
+   */
+  protected RouteMatchInterface $routeMatch;
+
+  /**
+   * {@inheritDoc}
+   */
+  public function __construct(
+    array $configuration,
+          $plugin_id,
+          $plugin_definition,
+    RouteMatchInterface $route_match
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->routeMatch = $route_match;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('current_route_match')
+    );
+  }
 
   /**
    * {@inheritdoc}
    */
-  public function preprocess(array &$variables, $hook, array $info) {
+  public function preprocess(array &$variables, $hook, array $info): void {
     parent::preprocess($variables, $hook, $info);
 
     // Get the current path and if is it stream return a variable.
     $current_url = Url::fromRoute('<current>');
     $current_path = $current_url->toString();
-    $route_name = \Drupal::routeMatch()->getRouteName();
+    $route_name = $this->routeMatch->getRouteName();
 
     if ($route_name === 'profile.user_page.single') {
       if ($variables['title'] instanceof TranslatableMarkup) {

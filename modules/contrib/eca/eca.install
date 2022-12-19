@@ -161,3 +161,28 @@ function eca_update_8006() {
       ->save();
   }
 }
+
+/**
+ * Update global configuration with new user setting.
+ */
+function eca_update_8007() {
+  \Drupal::configFactory()
+    ->getEditable('eca.settings')
+    ->set('user', '')
+    ->save();
+}
+
+/**
+ * Update global configuration with new dependency calculation settings.
+ */
+function eca_update_8008() {
+  \Drupal::configFactory()
+    ->getEditable('eca.settings')
+    ->set('dependency_calculation', [
+      'bundle',
+      'field_storage',
+      'field_config',
+      'new_field_config',
+    ])
+    ->save();
+}

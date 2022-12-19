@@ -135,6 +135,7 @@ class MaestroIfTask extends PluginBase implements MaestroEngineTaskInterface {
         $pointers = MaestroEngine::getTaskPointersFromTemplate($templateMachineName, $taskMachineName);
         // Pointers now holds the task machine names (taskIDs).  we fetch these from the queue now.
         $query = \Drupal::entityQuery('maestro_queue');
+        $query->accessCheck(FALSE);
         $andMainConditions = $query->andConditionGroup()
           ->condition('process_id', $this->processID)
           // We need to also ignore any statuses that are not 1's

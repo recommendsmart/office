@@ -7,8 +7,9 @@ configure: oauth2_token.settings
 dependencies:
   - drupal:serialization
   - consumers:consumers
+  - drupal:options
 
-# Information added by Drupal.org packaging script on 2022-11-17
-version: '6.0.0-beta2'
+# Information added by Drupal.org packaging script on 2022-12-02
+version: '6.0.0-beta3'
 project: 'simple_oauth'
-datestamp: 1668704531
+datestamp: 1669990930

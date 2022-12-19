@@ -15,7 +15,7 @@ use Symfony\Component\Yaml\Exception\ParseException;
  * @Action(
  *   id = "eca_token_set_value",
  *   label = @Translation("Token: set value"),
- *   description = @Translation("Sets a token onto the token stack by a specific name and value.")
+ *   description = @Translation("Define a locally available token by a specific name and value.")
  * )
  */
 class TokenSetValue extends ConfigurableActionBase {
@@ -31,7 +31,7 @@ class TokenSetValue extends ConfigurableActionBase {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): ActionBase {
-    /** @var \Drupal\eca_config\Plugin\Action\ConfigWrite $instance */
+    /** @var \Drupal\eca_base\Plugin\Action\TokenSetValue $instance */
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->setYamlParser($container->get('eca.service.yaml_parser'));
     return $instance;
@@ -41,7 +41,6 @@ class TokenSetValue extends ConfigurableActionBase {
    * {@inheritdoc}
    */
   public function execute(): void {
-    $token = $this->tokenServices;
     $name = $this->configuration['token_name'];
     $value = $this->configuration['token_value'];
 
@@ -56,10 +55,22 @@ class TokenSetValue extends ConfigurableActionBase {
     }
     else {
       // Allow direct assignment of available data from the Token environment.
-      $value = $token->getOrReplace($value);
+      $value = $this->tokenServices->getOrReplace($value);
     }
 
-    $token->addTokenData($name, $value);
+    $this->setToken($name, $value);
+  }
+
+  /**
+   * Sets the token.
+   *
+   * @param string $name
+   *   The token name.
+   * @param mixed $value
+   *   The token value.
+   */
+  protected function setToken(string $name, $value): void {
+    $this->tokenServices->addTokenData($name, $value);
   }
 
   /**
@@ -90,7 +101,7 @@ class TokenSetValue extends ConfigurableActionBase {
       '#title' => $this->t('Value of the token'),
       '#default_value' => $this->configuration['token_value'],
       '#weight' => -20,
-      '#description' => $this->t('Provide the value of the token.'),
+      '#description' => $this->t('The value of the token. Other tokens can be reused here, for example <em>[node]</em> will directly assign the node entity, if available.'),
     ];
     $form['use_yaml'] = [
       '#type' => 'checkbox',

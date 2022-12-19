@@ -29,7 +29,7 @@ class FieldBundleTranslationRouteSubscriber extends RouteSubscriberBase {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     $events = parent::getSubscribedEvents();
     // Should run after ContentTranslationRouteSubscriber.
     // Therefore priority -220.

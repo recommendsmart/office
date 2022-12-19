@@ -750,6 +750,7 @@ abstract class ModellerBpmnBase extends ModellerBase {
    *   The array to which the fields should be added.
    */
   protected function prepareConfigFields(array $form): array {
+    // @todo Add support for nested form fields like e.g. in container/fieldset.
     $fields = [];
     foreach ($form as $key => $definition) {
       $label = $definition['#title'] ?? Modellers::convertKeyToLabel($key);

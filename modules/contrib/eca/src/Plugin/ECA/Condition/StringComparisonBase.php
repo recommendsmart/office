@@ -82,8 +82,8 @@ abstract class StringComparisonBase extends ConditionBase {
    */
   final public function evaluate(): bool {
     if (static::$replaceTokens) {
-      $leftValue = $this->tokenServices->replaceClear($this->getLeftValue());
-      $rightValue = $this->tokenServices->replaceClear($this->getRightValue());
+      $leftValue = $this->tokenServices->replace($this->getLeftValue());
+      $rightValue = $this->tokenServices->replace($this->getRightValue());
     }
     else {
       $leftValue = $this->getLeftValue();

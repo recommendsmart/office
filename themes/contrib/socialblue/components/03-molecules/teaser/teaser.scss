@@ -60,4 +60,19 @@
   .badge__label {
     color: $default-color;
   }
+
+  // Follow user button.
+  .flag-follow-user {
+    position: relative;
+
+    .js-flag-message {
+      display: none;
+    }
+
+    .ajax-throbber {
+      position: absolute;
+      top: 4px;
+      right: 10px;
+    }
+  }
 }

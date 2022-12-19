@@ -3,7 +3,7 @@
 namespace Drupal\Tests\eca_misc\Kernel;
 
 use Drupal\eca\Entity\Eca;
-use Drupal\eca_array\Plugin\Action\ArrayIncrement;
+use Drupal\eca_test_array\Plugin\Action\ArrayIncrement;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
@@ -22,7 +22,7 @@ class RoutingEventTest extends KernelTestBase {
     'user',
     'eca',
     'eca_misc',
-    'eca_array',
+    'eca_test_array',
   ];
 
   /**
@@ -93,7 +93,7 @@ class RoutingEventTest extends KernelTestBase {
       'gateways' => [],
       'actions' => [
         'increment_alter' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'alter',
           'configuration' => [
             'key' => 'alter',
@@ -101,7 +101,7 @@ class RoutingEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_dynamic' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'dynamic',
           'configuration' => [
             'key' => 'dynamic',
@@ -109,7 +109,7 @@ class RoutingEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_finished' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'finished',
           'configuration' => [
             'key' => 'finished',

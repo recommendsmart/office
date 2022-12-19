@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Form\BaseFormIdInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\eca\Event\ConditionalApplianceInterface;
+use Drupal\eca\Event\EntityApplianceTrait;
 use Drupal\eca\Event\FormEventInterface;
 
 /**
@@ -19,6 +20,8 @@ use Drupal\eca\Event\FormEventInterface;
  * @package Drupal\eca_form\Event
  */
 abstract class FormBase extends Event implements ConditionalApplianceInterface, FormEventInterface {
+
+  use EntityApplianceTrait;
 
   /**
    * The form array.
@@ -74,27 +77,27 @@ abstract class FormBase extends Event implements ConditionalApplianceInterface, 
       if (!$is_entity_form) {
         return FALSE;
       }
-      if (!in_array($form_object->getEntity()->getEntityTypeId(), explode(',', $w_entity_type_ids))) {
+      if (!in_array($form_object->getEntity()->getEntityTypeId(), explode(',', $w_entity_type_ids), TRUE)) {
         return FALSE;
-      };
+      }
     }
 
     if ($w_bundles !== '*') {
       if (!$is_entity_form) {
         return FALSE;
       }
-      if (!in_array($form_object->getEntity()->bundle(), explode(',', $w_bundles))) {
+      if (!in_array($form_object->getEntity()->bundle(), explode(',', $w_bundles), TRUE)) {
         return FALSE;
-      };
+      }
     }
 
     if ($w_operations !== '*') {
       if (!$is_entity_form) {
         return FALSE;
       }
-      if (!in_array($form_object->getOperation(), explode(',', $w_operations))) {
+      if (!in_array($form_object->getOperation(), explode(',', $w_operations), TRUE)) {
         return FALSE;
-      };
+      }
     }
 
     return TRUE;
@@ -115,7 +118,7 @@ abstract class FormBase extends Event implements ConditionalApplianceInterface, 
       $contains_form_id = FALSE;
       foreach (explode(',', $arguments['form_id']) as $c_form_id) {
         $c_form_id = strtolower(trim(str_replace('-', '_', $c_form_id)));
-        if ($contains_form_id = in_array($c_form_id, $form_ids)) {
+        if ($contains_form_id = in_array($c_form_id, $form_ids, TRUE)) {
           break;
         }
       }
@@ -127,38 +130,16 @@ abstract class FormBase extends Event implements ConditionalApplianceInterface, 
     /** @var \Drupal\Core\Entity\EntityFormInterface $form_object */
     $is_entity_form = ($form_object instanceof EntityFormInterface);
 
-    if (!empty($arguments['entity_type_id']) && $arguments['entity_type_id'] !== '*') {
-      if (!$is_entity_form) {
-        return FALSE;
-      }
-
-      $contains_entity_type_id = FALSE;
-      foreach (explode(',', $arguments['entity_type_id']) as $c_entity_type_id) {
-        $c_entity_type_id = strtolower(trim($c_entity_type_id));
-        if ($contains_entity_type_id = ($c_entity_type_id === $form_object->getEntity()->getEntityTypeId())) {
-          break;
-        }
-      }
-      if (!$contains_entity_type_id) {
-        return FALSE;
-      }
+    if (!$is_entity_form && !empty($arguments['entity_type_id']) && $arguments['entity_type_id'] !== '*') {
+      return FALSE;
     }
 
-    if (!empty($arguments['bundle']) && $arguments['bundle'] !== '*') {
-      if (!$is_entity_form) {
-        return FALSE;
-      }
+    if (!$is_entity_form && !empty($arguments['bundle']) && $arguments['bundle'] !== '*') {
+      return FALSE;
+    }
 
-      $contains_bundle = FALSE;
-      foreach (explode(',', $arguments['bundle']) as $c_bundle) {
-        $c_bundle = strtolower(trim($c_bundle));
-        if ($contains_bundle = ($c_bundle === $form_object->getEntity()->bundle())) {
-          break;
-        }
-      }
-      if (!$contains_bundle) {
-        return FALSE;
-      }
+    if ($is_entity_form && !$this->appliesForEntityTypeOrBundle($form_object->getEntity(), $arguments)) {
+      return FALSE;
     }
 
     if (!empty($arguments['operation']) && $arguments['operation'] !== '*') {

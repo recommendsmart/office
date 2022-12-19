@@ -418,7 +418,7 @@ class GroupContentAccessControlHandlerTest extends UnitTestCase {
     }
 
     $result = $access_control_handler->entityAccess($entity, $operation, $account, TRUE);
-    $this->assertEquals($expected(), $result);
+    $this->assertEqualsCanonicalizing($expected(), $result);
   }
 
   /**

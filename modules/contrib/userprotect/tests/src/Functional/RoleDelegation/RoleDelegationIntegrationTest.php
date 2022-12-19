@@ -17,7 +17,7 @@ class RoleDelegationIntegrationTest extends BrowserTestBase {
    *
    * @var array
    */
-  public static $modules = ['userprotect', 'user', 'role_delegation'];
+  protected static $modules = ['userprotect', 'user', 'role_delegation'];
 
   /**
    * {@inheritdoc}
@@ -62,7 +62,7 @@ class RoleDelegationIntegrationTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $admin_role = $this->createAdminRole();

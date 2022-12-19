@@ -107,7 +107,7 @@ modeldata: |
           <camunda:field name="message">
             <camunda:string>User [entity:name]</camunda:string>
           </camunda:field>
-        <camunda:field name="replace_tokens"><camunda:string/></camunda:field></bpmn2:extensionElements>
+        <camunda:field name="replace_tokens"><camunda:string>yes</camunda:string></camunda:field></bpmn2:extensionElements>
         <bpmn2:incoming>Flow_1yl6zrs</bpmn2:incoming>
       </bpmn2:task>
       <bpmn2:sequenceFlow id="Flow_1yl6zrs" sourceRef="Event_1asjw3k" targetRef="Activity_0xpew34"/>

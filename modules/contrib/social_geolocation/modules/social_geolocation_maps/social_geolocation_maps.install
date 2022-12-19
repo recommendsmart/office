@@ -61,3 +61,70 @@ function social_geolocation_maps_update_8002(&$sandbox): void {
     }
   }
 }
+
+/**
+ * Change upcoming events filtration on events map.
+ *
+ * Replace filter "field_event_date" with "field_event_date_end".
+ */
+function social_geolocation_maps_update_9001(&$sandbox): void {
+
+  $config = \Drupal::configFactory()
+    ->getEditable('views.view.social_geolocation_leaflet_commonmap_with_marker_icons');
+
+  $data = $config->getRawData();
+
+  $displays_to_change = [
+    'block_community_events_map',
+    'block_upcomming_events_map'
+  ];
+
+  foreach ($displays_to_change as $display_to_change) {
+
+    if (isset($data['display'][$display_to_change]['display_options']['filters']['field_event_date_value'])) {
+      $date_field_config = $data['display'][$display_to_change]['display_options']['filters']['field_event_date_value'];
+
+      // Change field_event_date to field_event_date_end.
+
+      // Old value: 'field_event_date_value'.
+      $date_field_config['id'] = 'field_event_date_end_value';
+      // Old value: 'node__field_event_date'.
+      $date_field_config['table'] = 'node__field_event_date_end';
+      // Old value: 'field_event_date_value'.
+      $date_field_config['field'] = 'field_event_date_end_value';
+
+      // Change exposed filter settings for block_community_events_map
+      if ($display_to_change === 'block_community_events_map') {
+
+        // Old value: 'field_event_date_value_op'.
+        $date_field_config['expose']['operator_id'] = 'field_event_date_end_value_op';
+        // Old value: 'Start (field_event_date)'.
+        $date_field_config['expose']['label'] = 'End (field_event_date_end)';
+        // Old value: 'field_event_date_value_op'.
+        $date_field_config['expose']['operator'] = 'field_event_date_end_value_op';
+        // Old value: 'field_event_date_value'.
+        $date_field_config['expose']['identifier'] = 'field_event_date_end_value';
+        // Old value: 'Start (field_event_date)'.
+        $date_field_config['group_info']['label'] = '';
+        // Old value: 'Upcoming events'.
+        $date_field_config['group_info']['group_items']['1']['title'] = 'Ongoing and upcoming events';
+        // Old value: 'Events that have started or are finished'.
+        $date_field_config['group_info']['group_items']['2']['title'] = 'Past events';
+      }
+
+      // Change field_event_date_value key and replace it with field_event_date_end
+      $filters = $data['display'][$display_to_change]['display_options']['filters'];
+      foreach ($filters as $key => $filter) {
+        if ($key === 'field_event_date_value') {
+          $updated_filters['field_event_date_end_value'] = $date_field_config;
+        } else {
+          $updated_filters[$key] = $filter;
+        }
+      }
+      $data['display'][$display_to_change]['display_options']['filters'] = $updated_filters;
+    }
+  }
+
+  $config->setData($data)->save(TRUE);
+
+}

@@ -15,11 +15,11 @@ use Drupal\bootstrap\Utility\Variables;
 class InputButtonSplit extends InputButton implements PreprocessInterface {
 
   /**
-   * {@inheritdoc}
-   */
+     * {@inheritdoc}
+     */
   public function preprocessElement(Element $element, Variables $variables) {
-    $variables['default_button'] = $element->getProperty('default_button');
-    parent::preprocessElement($element, $variables);
-  }
+        $variables['default_button'] = $element->getProperty('default_button');
+        parent::preprocessElement($element, $variables);
+      }
 
 }

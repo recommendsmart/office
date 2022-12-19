@@ -1,7 +1,7 @@
 name: Maestro Interactive Plugin Task Example
 description: Example of a simple bare-bones INTERACTIVE task plugin.
 # core: 8.x
-core_version_requirement: ^8 || ^9
+core_version_requirement: ^9.4 || ^10
 package: Maestro Examples
 type: module
 scripts:
@@ -9,7 +9,7 @@ dependencies:
   - maestro:maestro
   - maestro:maestro_taskconsole
 
-# Information added by Drupal.org packaging script on 2022-07-06
-version: '3.0.1-rc4'
+# Information added by Drupal.org packaging script on 2022-12-16
+version: '3.1.0-rc1'
 project: 'maestro'
-datestamp: 1657119075
+datestamp: 1671216494

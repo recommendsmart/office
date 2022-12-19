@@ -5,6 +5,7 @@ namespace Drupal\image_effects\Plugin\ImageEffect;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Image\ImageInterface;
 use Drupal\image\Plugin\ImageEffect\CropImageEffect;
+use Drupal\image_effects\Component\ImageUtility;
 
 /**
  * Provides an image effect that crops images to a ratio.
@@ -37,20 +38,12 @@ class RelativeCropImageEffect extends CropImageEffect {
     // Pick the right anchor depending on whether the image is being cropped in
     // width or in height.
     if ($dimensions['width'] !== $original_dimensions['width']) {
-      $x = image_filter_keyword(
-        $this->configuration['anchor']['width'],
-        $original_dimensions['width'],
-        $dimensions['width']
-      );
+      $x = ImageUtility::getKeywordOffset($this->configuration['anchor']['width'], $original_dimensions['width'], $dimensions['width']);
       $y = 0;
     }
     elseif ($dimensions['height'] !== $original_dimensions['height']) {
       $x = 0;
-      $y = image_filter_keyword(
-        $this->configuration['anchor']['height'],
-        $original_dimensions['height'],
-        $dimensions['height']
-      );
+      $y = ImageUtility::getKeywordOffset($this->configuration['anchor']['height'], $original_dimensions['height'], $dimensions['height']);
     }
     else {
       // If the image already has the correct dimensions, do not do anything.

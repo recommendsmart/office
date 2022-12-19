@@ -3,7 +3,7 @@
 namespace Drupal\Tests\eca_migrate\Kernel;
 
 use Drupal\eca\Entity\Eca;
-use Drupal\eca_array\Plugin\Action\ArrayIncrement;
+use Drupal\eca_test_array\Plugin\Action\ArrayIncrement;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\user\Entity\User;
@@ -26,7 +26,7 @@ class MigrateEventTest extends KernelTestBase {
     'user',
     'eca',
     'eca_migrate',
-    'eca_array',
+    'eca_test_array',
   ];
 
   /**
@@ -164,7 +164,7 @@ class MigrateEventTest extends KernelTestBase {
       'gateways' => [],
       'actions' => [
         'increment_idmap_message' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'Increment idmap_message',
           'configuration' => [
             'key' => 'idmap_message_inc',
@@ -172,7 +172,7 @@ class MigrateEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_map_delete' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'Increment',
           'configuration' => [
             'key' => 'map_delete_inc',
@@ -180,7 +180,7 @@ class MigrateEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_map_save' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'Increment',
           'configuration' => [
             'key' => 'map_save_inc',
@@ -188,7 +188,7 @@ class MigrateEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_post_import' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'Increment',
           'configuration' => [
             'key' => 'post_import_inc',
@@ -196,7 +196,7 @@ class MigrateEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_post_rollback' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'Increment',
           'configuration' => [
             'key' => 'post_rollback_inc',
@@ -204,7 +204,7 @@ class MigrateEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_post_row_delete' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'Increment',
           'configuration' => [
             'key' => 'row_delete_inc',
@@ -212,7 +212,7 @@ class MigrateEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_post_row_save' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'Increment',
           'configuration' => [
             'key' => 'row_save_inc',
@@ -220,7 +220,7 @@ class MigrateEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_pre_import' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'Increment',
           'configuration' => [
             'key' => 'pre_import_inc',
@@ -228,7 +228,7 @@ class MigrateEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_pre_rollback' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'Increment',
           'configuration' => [
             'key' => 'pre_rollback_inc',
@@ -236,7 +236,7 @@ class MigrateEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_pre_row_delete' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'Increment',
           'configuration' => [
             'key' => 'pre_row_delete_inc',
@@ -244,7 +244,7 @@ class MigrateEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_pre_row_save' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'Increment',
           'configuration' => [
             'key' => 'pre_row_save_inc',

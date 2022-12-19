@@ -12,6 +12,5 @@ services:
 
   eca.token_data.current_form:
     class: Drupal\eca_form\Token\CurrentFormDataProvider
-    arguments: ['@eca.execution.form_subscriber']
     tags:
       - { name: eca.token_data_provider }

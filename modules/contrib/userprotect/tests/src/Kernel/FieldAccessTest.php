@@ -19,7 +19,7 @@ class FieldAccessTest extends UserProtectKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Create an user who administer users. Explicitly set user ID to '2'

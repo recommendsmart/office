@@ -41,6 +41,8 @@ class QueueEvent extends EventBase {
       $values = [
         'task_name' => '',
         'task_value' => '',
+        'distribute' => FALSE,
+        'cron' => '',
       ];
     }
     else {
@@ -58,12 +60,27 @@ class QueueEvent extends EventBase {
       $form['task_name'] = [
         '#type' => 'textfield',
         '#title' => $this->t('Task name'),
+        '#description' => $this->t('The task name will be used to identify, what type of task is to be processed. When multiple tasks are created that are of the same nature, they should share the same task name.'),
         '#default_value' => $this->configuration['task_name'],
+        '#required' => TRUE,
       ];
       $form['task_value'] = [
         '#type' => 'textfield',
-        '#title' => $this->t('Task value (optional'),
+        '#title' => $this->t('Task value (optional)'),
         '#default_value' => $this->configuration['task_value'],
+      ];
+      $form['distribute'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Distribute: Process tasks of this name in their own queue.'),
+        '#default_value' => $this->configuration['distribute'],
+      ];
+      $form['cron'] = [
+        '#type' => 'number',
+        '#title' => $this->t('Cron run time (seconds)'),
+        '#description' => $this->t('<strong>Please note:</strong> This option is only available when the <em>Distribute</em> option is enabled above. Leave empty to disable processing when running cron.'),
+        '#min' => 1,
+        '#required' => FALSE,
+        '#default_value' => $this->configuration['cron'],
       ];
     }
     return $form;
@@ -77,6 +94,8 @@ class QueueEvent extends EventBase {
     if ($this->eventClass() === ProcessingTaskEvent::class) {
       $this->configuration['task_name'] = $form_state->getValue('task_name');
       $this->configuration['task_value'] = $form_state->getValue('task_value');
+      $this->configuration['distribute'] = !empty($form_state->getValue('distribute'));
+      $this->configuration['cron'] = $form_state->getValue('cron', '');
     }
   }
 

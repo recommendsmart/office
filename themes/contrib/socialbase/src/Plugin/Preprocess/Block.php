@@ -4,11 +4,15 @@ namespace Drupal\socialbase\Plugin\Preprocess;
 
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\bootstrap\Plugin\Preprocess\PreprocessBase;
-use Drupal\block\Entity\Block as BlockEntity;
 use Drupal\Component\Utility\Html;
-use Drupal\file\Entity\File;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\image\Plugin\Field\FieldType\ImageItem;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Pre-processes variables for the "block" theme hook.
@@ -17,12 +21,74 @@ use Drupal\image\Plugin\Field\FieldType\ImageItem;
  *
  * @BootstrapPreprocess("block")
  */
-class Block extends PreprocessBase {
+class Block extends PreprocessBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * Route Match service.
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface
+   */
+  protected RouteMatchInterface $routeMatch;
+
+  /**
+   * Module handler service.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected ModuleHandlerInterface $moduleHander;
+
+  /**
+   * Entity type manager service.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected EntityTypeManagerInterface $entityTypeManager;
+
+  /**
+   * The theme manager service.
+   *
+   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   */
+  protected ThemeManagerInterface $themeManager;
+
+  /**
+   * {@inheritDoc}
+   */
+  public function __construct(
+    array $configuration,
+          $plugin_id,
+          $plugin_definition,
+    RouteMatchInterface $route_match,
+    ModuleHandlerInterface $module_handler,
+    EntityTypeManagerInterface $entity_type_manager,
+    ThemeManagerInterface $theme_manager
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->routeMatch = $route_match;
+    $this->moduleHander = $module_handler;
+    $this->entityTypeManager = $entity_type_manager;
+    $this->themeManager = $theme_manager;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('current_route_match'),
+      $container->get('module_handler'),
+      $container->get('entity_type.manager'),
+      $container->get('theme.manager')
+    );
+  }
 
   /**
    * {@inheritdoc}
    */
-  public function preprocess(array &$variables, $hook, array $info) {
+  public function preprocess(array &$variables, $hook, array $info): void {
     parent::preprocess($variables, $hook, $info);
 
     $region = '';
@@ -43,12 +109,12 @@ class Block extends PreprocessBase {
     }
 
     // Find out what the active theme is first.
-    $theme = \Drupal::theme()->getActiveTheme();
+    $theme = $this->themeManager->getActiveTheme();
 
-    $route_name = \Drupal::routeMatch()->getRouteName();
+    $route_name = $this->routeMatch->getRouteName();
 
     // Get the region of a block.
-    $block_entity = BlockEntity::load($variables['elements']['#id']);
+    $block_entity = $this->entityTypeManager->getStorage('block')->load($variables['elements']['#id']);
     if ($block_entity) {
       $region = $block_entity->getRegion();
     }
@@ -146,11 +212,11 @@ class Block extends PreprocessBase {
     }
 
     // Add search_block to main menu.
-    if (\Drupal::moduleHandler()->moduleExists('social_search') && ($variables['elements']['#id'] == 'mainnavigation' || $variables['elements']['#id'] == $prefix . '_mainnavigation')) {
-      $block = BlockEntity::load('search_content_block_header');
+    if ($this->moduleHander->moduleExists('social_search') && ($variables['elements']['#id'] == 'mainnavigation' || $variables['elements']['#id'] == $prefix . '_mainnavigation')) {
+      $block = $this->entityTypeManager->getStorage('block')->load('search_content_block_header');
 
       if (!empty($block)) {
-        $block_output = \Drupal::service('entity_type.manager')
+        $block_output = $this->entityTypeManager
           ->getViewBuilder('block')
           ->view($block);
 
@@ -170,7 +236,7 @@ class Block extends PreprocessBase {
       }
       elseif ($region == 'content_top') {
         $variables['content']['search_form']['#region'] = 'content-top';
-        $variables['content']['search_form']['search_input_content']['#attributes']['placeholder'] = t('What are you looking for ?');
+        $variables['content']['search_form']['search_input_content']['#attributes']['placeholder'] = $this->t('What are you looking for ?');
         $variables['content']['search_form']['search_input_content']['#attributes']['autocomplete'] = 'off';
       }
       else {
@@ -180,7 +246,7 @@ class Block extends PreprocessBase {
 
     // Add Group ID for "See all groups link".
     if ($variables['attributes']['id'] === 'block-views-block-group-members-block-newest-members') {
-      $group = \Drupal::routeMatch()->getParameter('group');
+      $group = $this->routeMatch->getParameter('group');
       $variables['group_id'] = $group->id();
     }
 
@@ -190,8 +256,8 @@ class Block extends PreprocessBase {
       $variables['attributes']['id'] === 'block-views-block-topics-block-user-topics' ||
       $variables['attributes']['id'] === 'block-views-block-groups-block-user-groups'
     ) {
-      $profile_user_id = \Drupal::routeMatch()->getParameter('user');
-      if (!is_null($profile_user_id) && is_object($profile_user_id)) {
+      $profile_user_id = $this->routeMatch->getParameter('user');
+      if (is_object($profile_user_id)) {
         $profile_user_id = $profile_user_id->id();
       }
       $variables['profile_user_id'] = $profile_user_id;
@@ -201,14 +267,12 @@ class Block extends PreprocessBase {
     if (isset($variables['elements']['content']['#block_content'])) {
       if ($variables['elements']['content']['#block_content']->bundle() == 'hero_call_to_action_block') {
         if (isset($variables['elements']['content']['field_hero_image']) && isset($variables['elements']['content']['field_hero_image'][0])) {
-          /** @var \Drupal\image\Plugin\Field\FieldType\ImageItem $image_item */
           $image_item = $variables['elements']['content']['field_hero_image'][0]['#item'];
           $file_id = NULL;
 
-          if ($image_item && $image_item instanceof ImageItem) {
-            /** @var \Drupal\block_content\Entity\BlockContent $block_content */
+          if ($image_item instanceof ImageItem) {
             $block_content = $image_item->getEntity();
-            if ($block_content && $block_content instanceof BlockContent) {
+            if ($block_content instanceof BlockContent) {
               $file_id = $block_content->get('field_hero_image')->target_id;
             }
           }
@@ -218,11 +282,12 @@ class Block extends PreprocessBase {
           // So responsive image module doesn't break.
           if (isset($image_style)) {
             // If it's an existing file.
-            if ($file = File::load($file_id)) {
+            if ($file = $this->entityTypeManager->getStorage('file')->load($file_id)) {
               // Style and set it in the content.
-              $styled_image_url = ImageStyle::load($image_style)
-                ->buildUrl($file->getFileUri());
-              $variables['image_url'] = $styled_image_url;
+              $styled_image = $this->entityTypeManager->getStorage('image_style')->load($image_style);
+              if ($styled_image instanceof ImageStyle) {
+                $variables['image_url'] = $styled_image->buildUrl($file->getFileUri());
+              }
 
               // Add extra class.
               $variables['has_image'] = TRUE;

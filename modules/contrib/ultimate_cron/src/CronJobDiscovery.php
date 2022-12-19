@@ -180,7 +180,13 @@ class CronJobDiscovery {
     $items = array();
 
     // Add hook_cron() if applicable.
-    if ($this->moduleHandler->implementsHook($module, 'cron')) {
+    if (method_exists($this->moduleHandler, 'hasImplementations')) {
+      $has_implementations = $this->moduleHandler->hasImplementations('cron', $module);
+    }
+    else {
+      $has_implementations = $this->moduleHandler->implementsHook($module, 'cron');
+    }
+    if ($has_implementations) {
       $info = $this->moduleExtensionList->getExtensionInfo($module);
       $callback = "{$module}_cron";
       $items[$callback] = array(

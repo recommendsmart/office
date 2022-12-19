@@ -8,7 +8,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\user\UserInterface;
 
 /**
- * Class UserProtectRoleAccessCheck.
+ * Defines an access control handler for user roles.
  *
  * @package Drupal\userprotect\Access
  */

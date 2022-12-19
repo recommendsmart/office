@@ -1,16 +1,16 @@
 <?php
 
-namespace Drupal\eca_array\Plugin\ECA\Condition;
+namespace Drupal\eca_test_array\Plugin\ECA\Condition;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\eca\Plugin\ECA\Condition\StringComparisonBase;
-use Drupal\eca_array\Plugin\Action\ArrayWrite;
+use Drupal\eca_test_array\Plugin\Action\ArrayWrite;
 
 /**
  * Evaluates whether a certain key-value pair exists in a static array.
  *
  * @EcaCondition(
- *   id = "eca_array_has_key_and_value",
+ *   id = "eca_test_array_has_key_and_value",
  *   label = @Translation("Static array: has key-value pair")
  * )
  */

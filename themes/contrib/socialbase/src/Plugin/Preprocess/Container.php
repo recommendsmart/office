@@ -3,7 +3,10 @@
 namespace Drupal\socialbase\Plugin\Preprocess;
 
 use Drupal\bootstrap\Plugin\Preprocess\PreprocessBase;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Pre-processes variables for the "container" theme hook.
@@ -12,16 +15,48 @@ use Symfony\Cmf\Component\Routing\RouteObjectInterface;
  *
  * @BootstrapPreprocess("container")
  */
-class Container extends PreprocessBase {
+class Container extends PreprocessBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * Request object.
+   *
+   * @var \Symfony\Component\HttpFoundation\Request
+   */
+  protected Request $request;
+
+  /**
+   * {@inheritDoc}
+   */
+  public function __construct(
+    array $configuration,
+          $plugin_id,
+          $plugin_definition,
+    Request $request
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->request = $request;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('request_stack')->getCurrentRequest()
+    );
+  }
 
   /**
    * {@inheritdoc}
    */
-  public function preprocess(array &$variables, $hook, array $info) {
+  public function preprocess(array &$variables, $hook, array $info): void {
     parent::preprocess($variables, $hook, $info);
 
     // For pages in search we would like to render containers without divs.
-    $routename = \Drupal::request()
+    $routename = $this->request
       ->get(RouteObjectInterface::ROUTE_NAME);
     if (strpos($routename, 'search') !== FALSE) {
 
@@ -34,7 +69,7 @@ class Container extends PreprocessBase {
     // Remove extra wrapper for container of post image form.
     if (isset($variables['element']['#id']) && $variables['element']['#id'] == 'edit-field-comment-files-wrapper') {
       $variables['bare'] = TRUE;
-    };
+    }
 
     if (isset($variables['element']['#inline'])) {
       $variables['bare'] = TRUE;

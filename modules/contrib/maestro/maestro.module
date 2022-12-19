@@ -63,6 +63,7 @@ function maestro_user_update($account) {
   if ($old_account->getAccountName() != $account->getAccountName()) {
     // We have to update our production assignments.
     $query = \Drupal::entityQuery('maestro_production_assignments')
+      ->accessCheck(FALSE)
       ->condition('assign_id', $old_name);
     $assignmentIDs = $query->execute();
     foreach ($assignmentIDs as $assignmentID) {
@@ -177,6 +178,7 @@ function maestro_form_alter(&$form, FormStateInterface $form_state, $form_id) {
     $type = $node->getType();
     $query = \Drupal::entityTypeManager()->getStorage('maestro_entity_identifiers')->getQuery();
     $query ->condition('entity_type', $bundle)
+      ->accessCheck(FALSE)
       ->condition('bundle', $type)
       ->condition('entity_id', $node->id());
     $entity_ids = $query->execute();
@@ -759,7 +761,7 @@ function maestro_theme_registry_alter(&$theme_registry) {
 
   // Now, we actually want to use our own template, which is inside of our Maestro module templates folder.
   $theme_registry['maestro_views_view_table']['template'] = 'maestro-views-view-table';
-  $path = drupal_get_path('module', 'maestro');
+  $path = \Drupal::service('extension.list.module')->getPath('maestro');
   $theme_registry['maestro_views_view_table']['path'] = $path . '/templates';
 }
 

@@ -9,7 +9,7 @@ dependencies:
   - file_mdm:file_mdm_exif
   - file_mdm:file_mdm_font
 
-# Information added by Drupal.org packaging script on 2021-12-19
-version: '8.x-3.2'
+# Information added by Drupal.org packaging script on 2022-07-02
+version: '8.x-3.3'
 project: 'image_effects'
-datestamp: 1639923534
+datestamp: 1656755135

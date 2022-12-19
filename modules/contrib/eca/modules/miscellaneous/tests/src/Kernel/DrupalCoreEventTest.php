@@ -12,7 +12,7 @@ use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Render\PageDisplayVariantSelectionEvent;
 use Drupal\Core\Render\RenderEvents;
 use Drupal\eca\Entity\Eca;
-use Drupal\eca_array\Plugin\Action\ArrayIncrement;
+use Drupal\eca_test_array\Plugin\Action\ArrayIncrement;
 use Drupal\jsonapi\ResourceType\ResourceTypeBuildEvent;
 use Drupal\jsonapi\ResourceType\ResourceTypeBuildEvents;
 use Drupal\KernelTests\KernelTestBase;
@@ -53,7 +53,7 @@ class DrupalCoreEventTest extends KernelTestBase {
     'serialization',
     'eca',
     'eca_misc',
-    'eca_array',
+    'eca_test_array',
   ];
 
   /**
@@ -145,7 +145,7 @@ class DrupalCoreEventTest extends KernelTestBase {
       'gateways' => [],
       'actions' => [
         'increment_block_content' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'block_content_get_dependency',
           'configuration' => [
             'key' => 'block_content_get_dependency',
@@ -153,7 +153,7 @@ class DrupalCoreEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_file_upload' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'file_upload_sanitize_name_event',
           'configuration' => [
             'key' => 'file_upload_sanitize_name_event',
@@ -161,7 +161,7 @@ class DrupalCoreEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_select_page' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'select_page_display_variant',
           'configuration' => [
             'key' => 'select_page_display_variant',
@@ -169,7 +169,7 @@ class DrupalCoreEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_build' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'build',
           'configuration' => [
             'key' => 'build',
@@ -177,7 +177,7 @@ class DrupalCoreEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_prepare_layout' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'prepare_layout',
           'configuration' => [
             'key' => 'prepare_layout',
@@ -185,7 +185,7 @@ class DrupalCoreEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_section_component' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'section_component_build_render_array',
           'configuration' => [
             'key' => 'section_component_build_render_array',
@@ -193,7 +193,7 @@ class DrupalCoreEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_save_translation' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'save_translation',
           'configuration' => [
             'key' => 'save_translation',

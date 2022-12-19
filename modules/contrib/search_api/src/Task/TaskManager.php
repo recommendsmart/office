@@ -11,7 +11,7 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\search_api\IndexInterface;
 use Drupal\search_api\SearchApiException;
 use Drupal\search_api\ServerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Provides a service for managing pending tasks.
@@ -55,7 +55,7 @@ class TaskManager implements TaskManagerInterface {
   /**
    * The event dispatcher.
    *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
    */
   protected $eventDispatcher;
 
@@ -71,7 +71,7 @@ class TaskManager implements TaskManagerInterface {
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
    *   The string translation service.
@@ -124,7 +124,10 @@ class TaskManager implements TaskManagerInterface {
    * {@inheritdoc}
    */
   public function getTasksCount(array $conditions = []) {
-    return $this->getTasksQuery($conditions)->count()->execute();
+    return $this->getTasksQuery($conditions)
+      ->count()
+      ->accessCheck(FALSE)
+      ->execute();
   }
 
   /**

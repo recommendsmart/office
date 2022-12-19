@@ -8,6 +8,8 @@ use Drupal\eca\Plugin\Action\ActionInterface;
 use Drupal\eca\Entity\Eca;
 use Drupal\Core\Action\ActionInterface as CoreActionInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\EnforcedResponseException;
+use Drupal\Core\Form\FormAjaxException;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\eca\EcaEvents;
 use Drupal\eca\Event\AfterActionExecutionEvent;
@@ -107,6 +109,14 @@ class EcaAction extends EcaObject implements ObjectWithPluginInterface {
         }
       }
       catch (\Exception $ex) {
+        // @todo Remove in https://www.drupal.org/project/drupal/issues/2367555.
+        if ($ex instanceof EnforcedResponseException) {
+          throw $ex;
+        }
+        if ($ex instanceof FormAjaxException) {
+          throw $ex;
+        }
+
         $context['%exmsg'] = $ex->getMessage();
         $context['%extrace'] = $ex->getTraceAsString();
         $this->logger()->error('Failed execution of %actionlabel (%actionid) from ECA %ecalabel (%ecaid) for event %event: %exmsg.\n\n%extrace', $context);

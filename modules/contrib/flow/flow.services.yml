@@ -43,3 +43,6 @@ services:
     calls:
       - [setDecoratedNormalizer, ['@serializer.normalizer.flow__entity_reference_field_item.inner']]
       - [setEntityTypeManager, ['@entity_type.manager']]
+  flow.normalizer_container:
+    class: Drupal\flow\Internals\NormalizerContainer
+    arguments: ['@serializer.normalizer.flow__content_entity', '@serializer.normalizer.flow__entity_reference_field_item']

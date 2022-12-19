@@ -2,11 +2,14 @@
 
 namespace Drupal\eca\Plugin\DataType;
 
+use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ImmutableConfig;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Entity\TypedData\EntityDataDefinition;
 use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\DataDefinitionInterface;
@@ -37,7 +40,7 @@ class DataTransferObject extends Map {
    *
    * @var string|null
    */
-  protected ?string $stringRepresentation;
+  protected ?string $stringRepresentation = NULL;
 
   /**
    * Creates a new instance of a DTO.
@@ -260,7 +263,7 @@ class DataTransferObject extends Map {
       $this->properties = [];
       $this->values = [];
     }
-    elseif (is_scalar($values)) {
+    elseif (is_scalar($values) || ($values instanceof MarkupInterface)) {
       // Internally forward this argument to set it as string representation.
       // This is not officially allowed by this method, but included here
       // to reduce possible hurdles when working with a DTO.
@@ -289,6 +292,9 @@ class DataTransferObject extends Map {
             elseif (is_null($value)) {
               unset($values[$name]);
             }
+            elseif ($value instanceof MarkupInterface) {
+              $values[$name] = $this->wrapScalarValue($name, (string) $value);
+            }
             else {
               throw new \InvalidArgumentException("Invalid values given. Values must be of scalar types, entities or typed data objects.");
             }
@@ -304,7 +310,7 @@ class DataTransferObject extends Map {
             'name' => $name,
             'parent' => $this,
           ]);
-          $instance->setValue($values[$name], FALSE);
+          $instance->setValue($values['values'][$name], FALSE);
           $instances[$name] = $instance;
         }
         $values = $instances;
@@ -464,7 +470,7 @@ class DataTransferObject extends Map {
   /**
    * Magic method: Gets a property value.
    *
-   * @param string $name
+   * @param string|int $name
    *   The name of the property to get; e.g., 'title' or 'name'.
    *
    * @return mixed
@@ -484,7 +490,7 @@ class DataTransferObject extends Map {
   /**
    * Magic method: Sets a property value.
    *
-   * @param string $name
+   * @param string|int $name
    *   The name of the property to set; e.g., 'title' or 'name'.
    * @param mixed $value
    *   The value as typed data object to set, or NULL to unset the property.
@@ -499,7 +505,7 @@ class DataTransferObject extends Map {
   /**
    * Magic method: Determines whether a property is set.
    *
-   * @param string $name
+   * @param string|int $name
    *   The name of the property to get; e.g., 'title' or 'name'.
    *
    * @return bool
@@ -515,7 +521,7 @@ class DataTransferObject extends Map {
   /**
    * Magic method: Unsets a property.
    *
-   * @param string $name
+   * @param string|int $name
    *   The name of the property to get; e.g., 'title' or 'name'.
    */
   public function __unset($name) {
@@ -530,9 +536,56 @@ class DataTransferObject extends Map {
   }
 
   /**
-   * Saves contained data that belongs to a saveable resource.
+   * Saves contained data, that belongs to a saveable resource.
+   *
+   * This operation is being performed as one database transaction.
    */
   public function saveData(): void {
+    if (!($saveables = $this->getSaveables())) {
+      return;
+    }
+
+    $transaction = static::databaseConnection()->startTransaction();
+    foreach ($saveables as $saveable) {
+      try {
+        $saveable->save();
+      }
+      catch (\Exception $e) {
+        $transaction->rollBack();
+        throw $e;
+      }
+    }
+  }
+
+  /**
+   * Deletes contained data, that belongs to a saveable resource.
+   *
+   * This operation is being performed as one database transaction.
+   */
+  public function deleteData(): void {
+    if (!($saveables = $this->getSaveables())) {
+      return;
+    }
+
+    $transaction = static::databaseConnection()->startTransaction();
+    foreach ($saveables as $saveable) {
+      try {
+        $saveable->delete();
+      }
+      catch (\Exception $e) {
+        $transaction->rollBack();
+        throw $e;
+      }
+    }
+  }
+
+  /**
+   * Get contained data items, that can be saved.
+   *
+   * @return array
+   *   The saveable data items.
+   */
+  public function getSaveables(): array {
     $saveables = [];
     foreach ($this->properties as $property) {
       $value = $property->getValue();
@@ -549,15 +602,155 @@ class DataTransferObject extends Map {
         }
       }
     }
-    foreach ($saveables as $saveable) {
-      $saveable->save();
+    return $saveables;
+  }
+
+  /**
+   * Shift the first item from the beginning of the object's list of properties.
+   *
+   * @return \Drupal\Core\TypedData\TypedDataInterface|null
+   *   The removed item, or NULL if the DTO is empty.
+   */
+  public function shift(): ?TypedDataInterface {
+    $properties = $this->properties;
+    reset($properties);
+    $key = key($properties);
+    $item = array_shift($this->properties);
+    if (is_int($key) || ctype_digit(strval($key))) {
+      $this->rekey($key);
     }
+    return $item;
+  }
+
+  /**
+   * Pop the last item from the end of the object's list of properties.
+   *
+   * @return \Drupal\Core\TypedData\TypedDataInterface|null
+   *   The removed item, or NULL if the DTO is empty.
+   */
+  public function pop(): ?TypedDataInterface {
+    return array_pop($this->properties);
+  }
+
+  /**
+   * Remove the given value from the object's list of properties.
+   *
+   * @param mixed $value
+   *   The value to remove.
+   *
+   * @return \Drupal\Core\TypedData\TypedDataInterface|null
+   *   The removed item, or NULL if the DTO does not contain the given value.
+   */
+  public function remove($value): ?TypedDataInterface {
+    $item = NULL;
+    foreach ($this->properties as $name => $property) {
+      $property_value = $property->getValue();
+      $value_matches = ($property_value === $value || $property === $value);
+      if (!$value_matches && ($value instanceof EntityInterface) && ($property_value instanceof EntityInterface)) {
+        // Many times, entity objects are cloned. Take another look, whether the
+        // identifier matches.
+        $identifier = $identifier ?? ($value->uuid() ?? $value->id());
+        $value_matches = isset($identifier) && ($identifier === ($property_value->uuid() ?? $property_value->id()))
+          && ($value->language()->getId() === $property_value->language()->getId())
+          && (!($value instanceof RevisionableInterface) || ($value->getRevisionId() === $property_value->getRevisionId()))
+          && ($value->getEntityTypeId() === $property_value->getEntityTypeId());
+      }
+      if ($value_matches) {
+        $item = $this->properties[$name];
+        unset($this->properties[$name]);
+        if (is_int($name) || ctype_digit(strval($name))) {
+          $this->rekey($name);
+        }
+      }
+    }
+    return $item;
+  }
+
+  /**
+   * Remove an item from the object's list of properties by the given name.
+   *
+   * @param int|string $name
+   *   The property name.
+   *
+   * @return \Drupal\Core\TypedData\TypedDataInterface|null
+   *   The removed item, or NULL if the DTO does not contain an item by the
+   *   given property name.
+   */
+  public function removeByName($name): ?TypedDataInterface {
+    $item = NULL;
+    if (isset($this->properties[$name])) {
+      $item = $this->properties[$name];
+      unset($this->properties[$name]);
+      if (is_int($name) || ctype_digit(strval($name))) {
+        $this->rekey($name);
+      }
+    }
+    return $item;
+  }
+
+  /**
+   * Adds a value to the beginning of the object's list of properties.
+   *
+   * @param mixed $value
+   *   The value to add, preferable as typed data or an entity.
+   *
+   * @return int
+   *   The index of the added value.
+   */
+  public function unshift($value): int {
+    $index = $this->push($value);
+    $property = $this->properties[$index];
+    unset($this->properties[$index]);
+    array_unshift($this->properties, $property);
+    $properties = $this->properties;
+    reset($properties);
+    $index = key($properties);
+    $this->rekey();
+    return $index;
+  }
+
+  /**
+   * Pushes a value to the end of the object's list of properties.
+   *
+   * @param mixed $value
+   *   The value to add, preferable as typed data or an entity.
+   *
+   * @return int
+   *   The index of the added value.
+   */
+  public function push($value): int {
+    $properties = $this->properties;
+    array_push($properties, $value);
+    end($properties);
+    $index = key($properties);
+    $this->writePropertyValue($index, $value);
+    $this->rekey();
+    return $index;
+  }
+
+  /**
+   * Returns the number of property items.
+   *
+   * @return int
+   *   The number of property items.
+   */
+  public function count(): int {
+    return count($this->properties);
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Also considers the string representation for being empty.
+   */
+  public function isEmpty() {
+    return (is_null($this->stringRepresentation) || $this->stringRepresentation === '') && parent::isEmpty();
   }
 
   /**
    * Wraps the scalar value by a Typed Data object.
    *
-   * @param string $name
+   * @param string|int $name
    *   The property name.
    * @param mixed $value
    *   The scalar value.
@@ -586,7 +779,7 @@ class DataTransferObject extends Map {
   /**
    * Wraps the entity by a Typed Data object.
    *
-   * @param string $name
+   * @param string|int $name
    *   The property name.
    * @param \Drupal\Core\Entity\EntityInterface $value
    *   The entity.
@@ -608,7 +801,7 @@ class DataTransferObject extends Map {
   /**
    * Wraps the config by a Typed Data object.
    *
-   * @param string $name
+   * @param string|int $name
    *   The property name.
    * @param \Drupal\Core\Config\Config $value
    *   The config.
@@ -627,7 +820,7 @@ class DataTransferObject extends Map {
   /**
    * Wraps an iterable value by a Typed Data object.
    *
-   * @param string $name
+   * @param string|int $name
    *   The property name.
    * @param mixed $value
    *   The iterable value.
@@ -685,6 +878,16 @@ class DataTransferObject extends Map {
       $elements[$key] = $element;
     }
     return $elements;
+  }
+
+  /**
+   * Get the database connection.
+   *
+   * @return \Drupal\Core\Database\Connection
+   *   The database connection.
+   */
+  protected static function databaseConnection(): Connection {
+    return \Drupal::database();
   }
 
 }

@@ -1,4 +1,4 @@
-@api @group @notifications @TB-6072 @DS-3428 @DS-4211 @stability @stability-1 @group-create-closed
+@api @group @notifications @javascript @TB-6072 @DS-3428 @DS-4211 @stability @stability-1 @group-create-closed
 Feature: Create Closed Group
   Benefit: I want to create a closed group, where only group members can see the content.
   Role: As a Verified
@@ -173,6 +173,7 @@ Feature: Create Closed Group
     And I click "Test closed group"
     And I click "Edit group"
     And I click "Delete"
+    And I wait for "3" seconds
     And I should see "Are you sure you want to delete your group"
     And I should see the button "Cancel"
     And I should see the button "Delete"

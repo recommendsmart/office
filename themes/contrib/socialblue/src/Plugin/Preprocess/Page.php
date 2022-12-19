@@ -33,14 +33,14 @@ class Page extends PageBase {
   /**
    * {@inheritdoc}
    */
-  public function preprocess(array &$variables, $hook, array $info) {
+  public function preprocess(array &$variables, $hook, array $info): void {
     parent::preprocess($variables, $hook, $info);
 
     if (theme_get_setting('style') !== 'sky') {
       return;
     }
 
-    $route_match = \Drupal::routeMatch();
+    $route_match = $this->routeMatch;
 
     foreach (self::ROUTE_NAMES as $parameter_name => $route_names) {
       if (

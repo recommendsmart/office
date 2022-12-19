@@ -18,7 +18,7 @@ class FormElement extends BaseFormElement {
   /**
    * {@inheritdoc}
    */
-  public function preprocessElement(Element $element, Variables $variables) {
+  public function preprocessElement(Element $element, Variables $variables): void {
 
     // Check if form element is part of
     // email_notifications and add class to label.

@@ -91,4 +91,38 @@ abstract class ImageUtility {
     return $dimensions;
   }
 
+  /**
+   * Returns the offset in pixels from the anchor.
+   *
+   * @param string $anchor
+   *   The anchor ('top', 'left', 'bottom', 'right', 'center').
+   * @param int $current_size
+   *   The current size, in pixels.
+   * @param int $new_size
+   *   The new size, in pixels.
+   *
+   * @return int
+   *   The offset from the anchor, in pixels.
+   *
+   * @throws \InvalidArgumentException
+   *   When the $anchor argument is not valid.
+   */
+  public static function getKeywordOffset(string $anchor, int $current_size, int $new_size): int {
+    switch ($anchor) {
+      case 'bottom':
+      case 'right':
+        return $current_size - $new_size;
+
+      case 'center':
+        return (int) round($current_size / 2 - $new_size / 2);
+
+      case 'top':
+      case 'left':
+        return 0;
+
+    }
+
+    throw new \InvalidArgumentException("Invalid anchor '{$anchor}' provided to getKeywordOffset()");
+  }
+
 }

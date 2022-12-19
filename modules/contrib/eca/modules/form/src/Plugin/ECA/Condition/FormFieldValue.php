@@ -3,11 +3,12 @@
 namespace Drupal\eca_form\Plugin\ECA\Condition;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\eca\Plugin\ECA\Condition\ConditionInterface;
 use Drupal\eca\Plugin\ECA\Condition\StringComparisonBase;
 use Drupal\eca\Plugin\FormFieldPluginTrait;
 
 /**
- * Compares a form field value.
+ * Compares a submitted form field value.
  *
  * @EcaCondition(
  *   id = "eca_form_field_value",
@@ -17,6 +18,20 @@ use Drupal\eca\Plugin\FormFieldPluginTrait;
 class FormFieldValue extends StringComparisonBase {
 
   use FormFieldPluginTrait;
+
+  /**
+   * The configured and expected field value.
+   *
+   * @var string|null
+   */
+  protected ?string $expectedValue = NULL;
+
+  /**
+   * The current value in the form.
+   *
+   * @var mixed
+   */
+  protected ?string $currentValue = NULL;
 
   /**
    * {@inheritdoc}
@@ -29,7 +44,46 @@ class FormFieldValue extends StringComparisonBase {
   /**
    * {@inheritdoc}
    */
+  public function reset(): ConditionInterface {
+    $this->expectedValue = NULL;
+    $this->currentValue = NULL;
+    return parent::reset();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function getLeftValue(): string {
+    return $this->currentValue ?? $this->getCurrentValue();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getRightValue(): string {
+    return $this->getExpectedValue();
+  }
+
+  /**
+   * Get the configured and tokenized value as expected field value.
+   *
+   * @return string
+   *   The expected field value.
+   */
+  protected function getExpectedValue(): string {
+    if (!isset($this->expectedValue)) {
+      $this->expectedValue = (string) $this->tokenServices->replaceClear($this->configuration['field_value']);
+    }
+    return $this->expectedValue;
+  }
+
+  /**
+   * Get the current form value.
+   *
+   * @return mixed
+   *   The current value. May be NULL if no value exists.
+   */
+  protected function getCurrentValue(): string {
     if (!$this->getCurrentFormState()) {
       // Since the StringComparisonBase always compares string values, we want
       // to make sure, that the evaluation will return FALSE when there is no
@@ -38,13 +92,32 @@ class FormFieldValue extends StringComparisonBase {
     }
     $value = $this->getSubmittedValue();
     if (is_array($value)) {
+      // When the field contains multiple values, we evaluate against
+      // every single item and stick with the first match found. If no match
+      // was found, we stick with the first found value, that mostly would then
+      // finally evaluate to be false.
       $first_val = NULL;
-      array_walk_recursive($value, function ($v) use (&$first_val) {
-        if (!isset($first_val) && is_scalar($v) && trim((string) $v) !== '') {
-          $first_val = $v;
+      $matched_val = NULL;
+      $negated = $this->isNegated();
+      $this->configuration['negate'] = FALSE;
+      array_walk_recursive($value, function ($v, $k) use (&$first_val, &$matched_val) {
+        // This check includes a considering of integer 0 as unchecked checkbox.
+        // @see \Drupal\Core\Render\Element\Checkboxes::getCheckedCheckboxes()
+        if (is_scalar($v) && ($v !== 0) && trim((string) $v) !== '') {
+          if (!isset($first_val)) {
+            $first_val = $v;
+          }
+          if (!isset($matched_val)) {
+            $this->currentValue = $v;
+            if ($this->evaluate()) {
+              $matched_val = $v;
+            }
+          }
         }
       });
-      $value = $first_val;
+      $this->expectedValue = NULL;
+      $this->configuration['negate'] = $negated;
+      $value = $matched_val ?? $first_val;
     }
     if (is_scalar($value) || is_null($value)) {
       $value = trim((string) $value);
@@ -53,13 +126,6 @@ class FormFieldValue extends StringComparisonBase {
       return '_VALUE_NOT_RESOLVABLE_TO_STRING_';
     }
     return $value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getRightValue(): string {
-    return $this->tokenServices->replaceClear($this->configuration['field_value']);
   }
 
   /**

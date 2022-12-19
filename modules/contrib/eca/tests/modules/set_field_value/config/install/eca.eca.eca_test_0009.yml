@@ -40,12 +40,12 @@ conditions:
   Flow_0j7r2le:
     plugin: eca_entity_field_value
     configuration:
+      negate: false
+      case: false
       expected_value: Append
       field_name: title
       operator: contains
       type: value
-      case: false
-      negate: false
       entity: ''
   Flow_1eoahw0:
     plugin: eca_entity_is_new
@@ -55,32 +55,32 @@ conditions:
   Flow_0e3yjwm:
     plugin: eca_entity_field_value
     configuration:
+      negate: false
+      case: false
       expected_value: 'Drop First'
       field_name: title
       operator: contains
       type: value
-      case: false
-      negate: false
       entity: ''
   Flow_0wind58:
     plugin: eca_entity_field_value
     configuration:
+      negate: false
+      case: false
       expected_value: Reset
       field_name: title
       operator: contains
       type: value
-      case: false
-      negate: false
       entity: ''
   Flow_0iwzr0t:
     plugin: eca_entity_field_value
     configuration:
+      negate: false
+      case: false
       expected_value: 'Drop last'
       field_name: title
       operator: contains
       type: value
-      case: false
-      negate: false
       entity: ''
 gateways:
   Gateway_113xj72:

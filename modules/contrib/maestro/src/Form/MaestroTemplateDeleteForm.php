@@ -23,6 +23,7 @@ class MaestroTemplateDeleteForm extends EntityConfirmFormBase {
     // let's see if there's any open processes using this template and tell the user that there's open processes that will be jettisoned.
     $count_warning = '';
     $query = \Drupal::entityQuery('maestro_process')
+      ->accessCheck(FALSE)
       ->condition('template_id', $this->entity->id);
     $res = $query->execute();
     $count = count($res);
@@ -85,6 +86,7 @@ class MaestroTemplateDeleteForm extends EntityConfirmFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // Delete all open processes with this template.
     $query = \Drupal::entityQuery('maestro_process')
+      ->accessCheck(FALSE)
       ->condition('template_id', $this->entity->id);
     $entityIDs = $query->execute();
     foreach ($entityIDs as $processID) {

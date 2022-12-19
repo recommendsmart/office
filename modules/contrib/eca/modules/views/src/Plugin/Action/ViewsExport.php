@@ -30,14 +30,15 @@ class ViewsExport extends ViewsQuery {
    * {@inheritdoc}
    */
   public function execute($object = NULL): void {
-    if (!($display = $this->getDisplay())) {
+    if (!$this->getDisplay() || !isset($this->view)) {
       return;
     }
     if ($this->configuration['load_results_into_token']) {
       parent::execute();
     }
     else {
-      $display->execute();
+      $this->view->preExecute();
+      $this->view->execute();
     }
     $this->view->display_handler->buildRenderable($this->view->args, FALSE);
     /** @var \Drupal\Core\Render\RendererInterface $renderer */

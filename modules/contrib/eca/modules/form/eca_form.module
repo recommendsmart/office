@@ -24,3 +24,10 @@ function _eca_form_hook_handler(): HookHandler {
 function eca_form_form_alter(&$form, FormStateInterface $form_state) {
   _eca_form_hook_handler()->alter($form, $form_state);
 }
+
+/**
+ * Implements hook_inline_entity_form_entity_form_alter().
+ */
+function eca_form_inline_entity_form_entity_form_alter(array &$entity_form, FormStateInterface $form_state) {
+  _eca_form_hook_handler()->alter($entity_form, $form_state);
+}

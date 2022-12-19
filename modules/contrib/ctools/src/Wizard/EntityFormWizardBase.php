@@ -6,10 +6,11 @@ use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\ctools\Event\WizardEvent;
 use Drupal\Core\TempStore\SharedTempStoreFactory;
-use Drupal\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * The base class for all entity form wizards.
@@ -42,9 +43,9 @@ abstract class EntityFormWizardBase extends FormWizardBase implements EntityForm
    * @param null $step
    *   The current active step of the wizard.
    */
-  public function __construct(SharedTempStoreFactory $tempstore, FormBuilderInterface $builder, ClassResolverInterface $class_resolver, EventDispatcherInterface $event_dispatcher, EntityTypeManagerInterface $entity_type_manager, RouteMatchInterface $route_match, $tempstore_id, $machine_name = NULL, $step = NULL) {
+  public function __construct(SharedTempStoreFactory $tempstore, FormBuilderInterface $builder, ClassResolverInterface $class_resolver, EventDispatcherInterface $event_dispatcher, RouteMatchInterface $route_match, RendererInterface $renderer, $tempstore_id, EntityTypeManagerInterface $entity_type_manager, $machine_name = NULL, $step = NULL) {
+    parent::__construct($tempstore, $builder, $class_resolver, $event_dispatcher, $route_match, $renderer, $tempstore_id, $machine_name, $step);
     $this->entityTypeManager = $entity_type_manager;
-    parent::__construct($tempstore, $builder, $class_resolver, $event_dispatcher, $route_match, $tempstore_id, $machine_name, $step);
   }
 
   /**
@@ -57,6 +58,7 @@ abstract class EntityFormWizardBase extends FormWizardBase implements EntityForm
       'class_resolver' => \Drupal::service('class_resolver'),
       'event_dispatcher' => \Drupal::service('event_dispatcher'),
       'entity_type_manager' => \Drupal::service('entity_type.manager'),
+      'renderer' => \Drupal::service('renderer'),
     ];
     // Keep the deprecated entity manager service as a parameter as well for
     // BC, so that subclasses still work.

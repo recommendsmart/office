@@ -119,8 +119,10 @@ class ConfigurableLoggerChannel extends LoggerChannel {
     if (!isset($this->webprofilerEnabled)) {
       $this->webprofilerEnabled = FALSE;
       if ($this->moduleHandler->moduleExists('webprofiler')) {
-        $items = $this->configFactory->get('webprofiler.config')->get('active_toolbar_items');
-        $this->webprofilerEnabled = (bool) ($items['eca'] ?? FALSE);
+        if (($items = $this->configFactory->get('webprofiler.config')->get('active_toolbar_items')) ||
+          ($items = $this->configFactory->get('webprofiler.settings')->get('active_toolbar_items'))) {
+          $this->webprofilerEnabled = (bool) ($items['eca'] ?? FALSE);
+        }
       }
     }
     return $this->webprofilerEnabled;
@@ -144,16 +146,29 @@ class ConfigurableLoggerChannel extends LoggerChannel {
       // Convert to integer equivalent for consistency with RFC 5424.
       $level = $this->levelTranslation[$level];
     }
-    if ($level <= $this->maximumLogLevel) {
+    if (($level <= $this->maximumLogLevel) || $this->webprofilerEnabled()) {
       $tokens = [];
       $fullMessage = $this->webprofilerEnabled() ?
         new FormattableMarkup($message, $context) :
         '';
-      if ($level === RfcLogLevel::DEBUG && $data = $this->token()->getTokenData()) {
-        $this->getTokenInfo($context, $tokens, $data, 'eca_token', 0);
-        $message .= '<br>' . implode('<br>', $tokens);
+      if (($level === RfcLogLevel::DEBUG) || $this->webprofilerEnabled()) {
+        $token = $this->token();
+        $data = $token->getTokenData();
+        // Explicitly lookup for some often but ambiguously used token names
+        // that a data provider only provides if explicitly requested.
+        foreach (['entity', 'user', 'event', 'form'] as $ambiguous) {
+          if (!isset($data[$ambiguous]) && $token->hasTokenData($ambiguous)) {
+            $data[$ambiguous] = $token->getTokenData($ambiguous);
+          }
+        }
+        if ($data) {
+          $this->getTokenInfo($context, $tokens, $data, 'eca_token', 0);
+          $message .= '<br>' . implode('<br>', $tokens);
+        }
       }
-      $this->loggerChannel->log($level, $message, $context);
+      if ($level <= $this->maximumLogLevel) {
+        $this->loggerChannel->log($level, $message, $context);
+      }
       if ($this->webprofilerEnabled()) {
         $this->dataCurrentRequest[] = [$level, $fullMessage, $tokens, $context];
       }
@@ -211,15 +226,16 @@ class ConfigurableLoggerChannel extends LoggerChannel {
         $value = $value->getEntity();
       }
       if ($value instanceof EntityInterface) {
+        $info = 'Entity ';
         if ($value->getEntityTypeId() === $value->bundle()) {
-          $info = $value->getEntityTypeId();
+          $info .= $value->getEntityTypeId();
         }
         else {
-          $info = $value->getEntityTypeId() . '/' . $value->bundle();
+          $info .= $value->getEntityTypeId() . '/' . $value->bundle();
         }
         $info .= '/' . $value->id() . '/' . $value->label();
       }
-      elseif ($value instanceof DataTransferObject || $value instanceof EntityAdapter) {
+      elseif ($value instanceof DataTransferObject) {
         $info = NULL;
         $level++;
         try {
@@ -230,13 +246,18 @@ class ConfigurableLoggerChannel extends LoggerChannel {
           $properties = [];
           $context[$id] = 'DTO - properties not available';
         }
+        if (empty($properties)) {
+          if (($dto_string = $value->getString()) !== '') {
+            $context[$id] .= ' "' . $dto_string . '"';
+          }
+        }
         $this->getTokenInfo($context, $tokens, $properties, $prefix . '_' . $key, $level);
       }
       elseif (is_scalar($value)) {
-        $info = (string) $value;
+        $info = gettype($value) . ' "' . (string) $value . '"';
       }
       elseif ($value instanceof PrimitiveInterface) {
-        $info = (string) $value->getValue();
+        $info = gettype($value->getValue()) . ' "' . (string) $value->getValue() . '"';
       }
       elseif ($value instanceof TypedDataInterface) {
         $info = $value->getDataDefinition()->getDataType();

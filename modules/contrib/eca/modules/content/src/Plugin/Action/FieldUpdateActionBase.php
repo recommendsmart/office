@@ -15,6 +15,7 @@ use Drupal\Core\TypedData\ListInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\eca\Plugin\Action\ActionBase;
 use Drupal\eca\Plugin\Action\ConfigurableActionTrait;
+use Drupal\eca\Plugin\DataType\DataTransferObject;
 use Drupal\eca\TypedData\PropertyPathTrait;
 use Drupal\field\FieldStorageConfigInterface;
 
@@ -172,6 +173,17 @@ abstract class FieldUpdateActionBase extends ActionBase implements ConfigurableI
       }
       if ($values instanceof ListInterface) {
         $values = $values->getValue();
+      }
+      elseif ($values instanceof DataTransferObject) {
+        if ($properties = $values->getProperties()) {
+          $values = [];
+          foreach ($properties as $k => $v) {
+            $values[$k] = $v instanceof DataTransferObject ? $v->toArray() : $v->getValue();
+          }
+        }
+        else {
+          $values = [$delta => $values->getString()];
+        }
       }
       elseif (!is_array($values)) {
         $values = [$delta => $values];

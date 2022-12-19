@@ -71,13 +71,13 @@ actions:
     plugin: action_message_action
     label: Msg
     configuration:
-      message: 'From CE1: we received user ''[some_user:account-name]'' and node ''[entity:title]'''
       replace_tokens: false
+      message: 'From CE1: we received user ''[some_user:account-name]'' and node ''[entity:title]'''
     successors: {  }
   Activity_0gs2ia6:
     plugin: action_message_action
     label: Msg
     configuration:
-      message: 'From CE2: we received user ''[some_user:account-name]'' and node ''[entity:title]'''
       replace_tokens: false
+      message: 'From CE2: we received user ''[some_user:account-name]'' and node ''[entity:title]'''
     successors: {  }

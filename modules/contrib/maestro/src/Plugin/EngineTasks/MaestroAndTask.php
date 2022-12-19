@@ -86,7 +86,8 @@ class MaestroAndTask extends PluginBase implements MaestroEngineTaskInterface {
     $pointers = MaestroEngine::getTaskPointersFromTemplate($templateMachineName, $taskMachineName);
     // Now that we have pointers, let's determine if they're all complete
     // otherwise, return false.
-    $query = \Drupal::entityQuery('maestro_queue');
+    $query = \Drupal::entityQuery('maestro_queue')
+      ->accessCheck(FALSE);
 
     $andMainConditions = $query->andConditionGroup()
       ->condition('status', '1')

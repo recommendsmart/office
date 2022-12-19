@@ -22,7 +22,7 @@ class ProtectionRuleCrudTest extends UserProtectBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->account = $this->drupalCreateUser(['userprotect.administer']);
@@ -44,7 +44,8 @@ class ProtectionRuleCrudTest extends UserProtectBrowserTestBase {
       'entity_id' => $rid,
       'protection[user_mail]' => TRUE,
     ];
-    $this->drupalPostForm('admin/config/people/userprotect/add', $edit, t('Save'));
+    $this->drupalGet('admin/config/people/userprotect/add');
+    $this->submitForm($edit, 'Save');
 
     // Assert that the rule was created.
     $protection_rule = ProtectionRule::load($rule_id);
@@ -65,7 +66,8 @@ class ProtectionRuleCrudTest extends UserProtectBrowserTestBase {
       'protection[user_name]' => TRUE,
       'protection[user_mail]' => FALSE,
     ];
-    $this->drupalPostForm('admin/config/people/userprotect/manage/' . $rule_id, $edit, t('Save'));
+    $this->drupalGet('admin/config/people/userprotect/manage/' . $rule_id);
+    $this->submitForm($edit, 'Save');
 
     // Assert that the rule was updated with the expected values.
     $protection_rule = ProtectionRule::load($rule_id);
@@ -85,15 +87,17 @@ class ProtectionRuleCrudTest extends UserProtectBrowserTestBase {
       'entity_id' => $rid,
       'protection[user_mail]' => TRUE,
     ];
-    $this->drupalPostForm('admin/config/people/userprotect/add', $edit, t('Save'));
+    $this->drupalGet('admin/config/people/userprotect/add');
+    $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains('The machine-readable name is already in use. It must be unique.');
 
     // Assert only one protection rule exists.
     $entities = ProtectionRule::loadMultiple(NULL);
     $this->assertCount(1, $entities, 'Only one protection rule exists.');
+    $this->drupalGet('admin/config/people/userprotect/manage/' . $rule_id . '/delete');
 
     // Delete rule.
-    $this->drupalPostForm('admin/config/people/userprotect/manage/' . $rule_id . '/delete', [], t('Delete'));
+    $this->submitForm([], 'Delete');
     // Assert the rule no longer exists.
     $protection_rule = ProtectionRule::load($rule_id);
     $this->assertEmpty($protection_rule, 'The protection rule was deleted.');
@@ -114,7 +118,8 @@ class ProtectionRuleCrudTest extends UserProtectBrowserTestBase {
       'entity_id' => $account->getAccountName(),
       'protection[user_mail]' => TRUE,
     ];
-    $this->drupalPostForm('admin/config/people/userprotect/add/user', $edit, t('Save'));
+    $this->drupalGet('admin/config/people/userprotect/add/user');
+    $this->submitForm($edit, 'Save');
 
     // Assert that the rule was created.
     $protection_rule = ProtectionRule::load($rule_id);
@@ -135,7 +140,8 @@ class ProtectionRuleCrudTest extends UserProtectBrowserTestBase {
       'protection[user_name]' => TRUE,
       'protection[user_mail]' => FALSE,
     ];
-    $this->drupalPostForm('admin/config/people/userprotect/manage/' . $rule_id, $edit, t('Save'));
+    $this->drupalGet('admin/config/people/userprotect/manage/' . $rule_id);
+    $this->submitForm($edit, 'Save');
 
     // Assert that the rule was updated with the expected values.
     $protection_rule = ProtectionRule::load($rule_id);
@@ -155,7 +161,8 @@ class ProtectionRuleCrudTest extends UserProtectBrowserTestBase {
       'entity_id' => $account->getAccountName(),
       'protection[user_mail]' => TRUE,
     ];
-    $this->drupalPostForm('admin/config/people/userprotect/add/user', $edit, t('Save'));
+    $this->drupalGet('admin/config/people/userprotect/add/user');
+    $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains('The machine-readable name is already in use. It must be unique.');
 
     // Assert only one protection rule exists.
@@ -163,7 +170,8 @@ class ProtectionRuleCrudTest extends UserProtectBrowserTestBase {
     $this->assertCount(1, $entities, 'Only one protection rule exists.');
 
     // Delete rule.
-    $this->drupalPostForm('admin/config/people/userprotect/manage/' . $rule_id . '/delete', [], t('Delete'));
+    $this->drupalGet('admin/config/people/userprotect/manage/' . $rule_id . '/delete');
+    $this->submitForm([], 'Delete');
     // Assert the rule no longer exists.
     $protection_rule = ProtectionRule::load($rule_id);
     $this->assertEmpty($protection_rule, 'The protection rule was deleted.');

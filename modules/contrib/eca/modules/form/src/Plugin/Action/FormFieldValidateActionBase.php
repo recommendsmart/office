@@ -24,12 +24,23 @@ abstract class FormFieldValidateActionBase extends FormFieldActionBase {
     if (!($form_state = $this->getCurrentFormState())) {
       return;
     }
-    // Convert the field name to the bracket syntax as required by
-    // FormStateInterface::setErrorByName().
-    $name = str_replace(']', '', $this->configuration['field_name']);
-    $name = str_replace('[', '][', $name);
+    if ($target_element = &$this->getTargetElement()) {
+      if (isset($target_element['#parents'])) {
+        $form_state->setErrorByName(implode('][', $target_element['#parents']), $message);
+        return;
+      }
+    }
+    if (($name = trim((string) $this->configuration['field_name'])) !== '') {
+      // Convert the field name to the bracket syntax as required by
+      // FormStateInterface::setErrorByName().
+      $name = str_replace(']', '', $name);
+      $name = str_replace('[', '][', $name);
 
-    $form_state->setErrorByName($name, $message);
+      $form_state->setErrorByName($name, $message);
+    }
+    elseif ($form = &$this->getCurrentForm()) {
+      $form_state->setError($form, $message);
+    }
   }
 
 }

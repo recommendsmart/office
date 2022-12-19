@@ -1,6 +1,0 @@
-services:
-  webprofiler.eca_development:
-    class: Drupal\eca_development\DataCollector\EcaDataCollector
-    arguments: ['@logger.channel.eca']
-    tags:
-      - { name: data_collector, template: '@eca_development/Collector/eca.html.twig', id: 'eca', title: 'ECA', priority: 12 }

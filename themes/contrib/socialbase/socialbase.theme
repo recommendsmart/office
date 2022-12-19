@@ -5,8 +5,8 @@
  * The primary PHP file for the Social base theme.
  */
 
+use Drupal\Core\GeneratedLink;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\node\NodeInterface;
 use Drupal\Component\Utility\Html;
 
 // Include all files from the includes directory.
@@ -18,7 +18,7 @@ foreach (glob($includes_path) as $filename) {
 /**
  * Implements hook_library_info_alter().
  */
-function socialbase_library_info_alter(&$libraries, $extension) {
+function socialbase_library_info_alter(&$libraries, $extension): void {
   // When the social_comment_upload module is enabled we want to load the
   // photoswipe styling with the comment styling.
   if ($extension === 'socialbase' && isset($libraries['comment']) && \Drupal::moduleHandler()->moduleExists('social_comment_upload')) {
@@ -29,27 +29,45 @@ function socialbase_library_info_alter(&$libraries, $extension) {
 
 /**
  * Prepare group link when an event or topic belongs to one group.
+ *
+ * @param mixed $node
+ *   Node object.
+ *
+ * @return \Drupal\Core\GeneratedLink|null
+ *   The group links.
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ * @throws \Drupal\Core\Entity\EntityMalformedException
  */
-function socialbase_group_link($node) {
+function socialbase_group_link($node) : ?GeneratedLink {
   $group = _social_group_get_current_group($node);
-  $group_link = NULL;
 
-  // Exclude nodes without ids (Preview).
-  if (!empty($node->id()) && !empty($group)) {
-    $group_content = \Drupal::entityTypeManager()
-      ->getStorage('group_content')
-      ->loadByProperties([
-        'entity_id' => $node->id(),
-      ]);
-    if (!empty($group_content)) {
-      $curr_langcode = \Drupal::languageManager()->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
-      if ($group->isTranslatable() && $group->hasTranslation($curr_langcode)) {
-        $group = $group->getTranslation($curr_langcode);
-      }
-      $group_link = $group->toLink()->toString();
-    }
+  // We can't load a group for previews yet because it's not associated yet.
+  if ($node->isNew() || $node->id() === 0) {
+    return NULL;
   }
-  return $group_link;
+
+  if ($group === NULL || !$group->access('view')) {
+    return NULL;
+  }
+
+  $group_content = \Drupal::entityTypeManager()
+    ->getStorage('group_content')
+    ->loadByProperties([
+      'entity_id' => $node->id(),
+    ]);
+
+  if (empty($group_content)) {
+    return NULL;
+  }
+
+  $curr_langcode = \Drupal::languageManager()->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
+  if ($group->isTranslatable() && $group->hasTranslation($curr_langcode)) {
+    $group = $group->getTranslation($curr_langcode);
+  }
+
+  return $group->toLink()->toString();
 }
 
 /**
@@ -58,10 +76,8 @@ function socialbase_group_link($node) {
  * @param string $title
  *   The title for the icon.
  *
- * @return string
- *   The icon connected to the title.
- */
-function _socialbase_get_visibility_icon($title) {
+ *   The icon connected to the title.*/
+function _socialbase_get_visibility_icon(string $title): string {
   // Set the materialize icon.
   switch ($title) {
     case 'Community':
@@ -84,6 +100,9 @@ function _socialbase_get_visibility_icon($title) {
   return $icon;
 }
 
+/**
+ * Provides the join method icon.
+ */
 function _socialbase_get_join_method_icon($title) {
   // Set the materialize icon.
   switch ($title) {
@@ -107,68 +126,9 @@ function _socialbase_get_join_method_icon($title) {
 }
 
 /**
- * Get comment count for a node.
- *
- * @deprecated
- * Use $entity->get(<comment_field_name>)->comment_count instead this function.
- */
-function _socialbase_node_get_comment_count(NodeInterface $node) {
-  $comment_count = &drupal_static(__FUNCTION__ . $node->id());
-
-  // Calculate the comment_count for this page request.
-  if (is_null($comment_count)) {
-    $count = 0;
-    $comment_storage = \Drupal::entityTypeManager()->getStorage('comment');
-    $current_user = \Drupal::currentUser();
-
-    $cids = $comment_storage->getQuery()
-      ->condition('entity_id', $node->id())
-      ->condition('entity_type', 'node')
-      ->sort('cid', 'DESC')
-      ->accessCheck(TRUE)
-      ->execute();
-
-    $pid_query = $comment_field_data_query = \Drupal::database()->select('comment_field_data', 'cfd');
-
-    foreach ($cids as $cid) {
-      // Published main comments or published replies on published main comments
-      // are counted for users without 'administer comments' permission.
-      $query = $comment_storage->getQuery()->condition('cid', $cid)->condition('status', TRUE);
-      // Check if comment is published.
-      if (!empty($query->execute())) {
-        $comment_field_data_query->addField('cfd', 'pid');
-        $comment_field_data_query->condition('cid', $cid);
-        $pid = $comment_field_data_query->execute()->fetchField();
-
-        // Check if comment has parent comment.
-        if ($pid === '0' || $pid_query->condition('cid', $pid)->condition('status', TRUE)) {
-          $count++;
-        }
-        elseif ($current_user->hasPermission('administer comments')) {
-          // User with 'administer comments' permission can also see the comment
-          // as being unpublished, so let's count it.
-          $count++;
-        }
-      }
-      elseif ($current_user->hasPermission('administer comments')) {
-        // User with 'administer comments' permission can also see the comment
-        // as being unpublished, so let's count it.
-        $count++;
-      }
-    }
-
-    // Make sure our static cache knows it doesnt have to recalculate it this
-    // request.
-    $comment_count = $count;
-  }
-
-  return $comment_count;
-}
-
-/**
  * Get like count for a node.
  */
-function _socialbase_node_get_like_count($type, $id) {
+function _socialbase_node_get_like_count($type, $id): int {
   $count = 0;
 
   // The result function service needs entity type and entity id in order
@@ -177,7 +137,7 @@ function _socialbase_node_get_like_count($type, $id) {
     $manager = Drupal::service('plugin.manager.votingapi.resultfunction');
     $results = $manager->getResults($type, $id);
 
-    // Lets see if our results carry the sum of all votes.
+    // Let's see if our results carry the sum of all votes.
     if (!empty($results['like']['vote_sum'])) {
       $count = $results['like']['vote_sum'];
     }
@@ -207,7 +167,7 @@ function socialbase_theme($existing, $type, $theme, $path) {
 /**
  * Implements hook_theme_suggestions_HOOK_alter().
  */
-function socialbase_theme_suggestions_image_formatter_alter(array &$suggestions, array $variables) {
+function socialbase_theme_suggestions_image_formatter_alter(array &$suggestions, array $variables): void {
   // We wanted to add our classes to default template.
   // @see image-formatter--node--field-files.html.twig
   $entity = $variables['item']->getEntity();

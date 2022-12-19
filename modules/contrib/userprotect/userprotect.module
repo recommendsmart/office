@@ -29,6 +29,12 @@ function userprotect_rule_load($name) {
  * Implements hook_ENTITY_TYPE_access() for entity type "user".
  */
 function userprotect_user_access(UserInterface $entity, $op, AccountInterface $account) {
+  // User Protect doesn't limit view access in any way, so bail out early to
+  // save time.
+  if (in_array($op, ['view', 'view label'])) {
+    return AccessResult::neutral();
+  }
+
   // Check if the account has the permission "userprotect.bypass_all".
   // If so, all protections rules should be ignored.
   if (!$account->hasPermission('userprotect.bypass_all')) {

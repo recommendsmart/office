@@ -3,6 +3,7 @@
  * Don't style form controls in the layout builder as that breaks a lot of
  * things.
  */
+
 form:not(.layout-builder-configure-block) {
   /* Remove default Radio Buttons */
   /* Unchecked styles */
@@ -50,10 +51,8 @@ form:not(.layout-builder-configure-block) .form-control:disabled,
 fieldset[disabled] form:not(.layout-builder-configure-block) .form-control,
 .form-disabled form:not(.layout-builder-configure-block) .form-control,
 form:not(.layout-builder-configure-block) .select2-container .select2-selection:disabled,
-fieldset[disabled]
-form:not(.layout-builder-configure-block) .select2-container .select2-selection,
-.form-disabled
-form:not(.layout-builder-configure-block) .select2-container .select2-selection {
+fieldset[disabled] form:not(.layout-builder-configure-block) .select2-container .select2-selection,
+.form-disabled form:not(.layout-builder-configure-block) .select2-container .select2-selection {
   cursor: not-allowed;
   color: rgba(0, 0, 0, 0.26);
 }
@@ -125,7 +124,7 @@ form:not(.layout-builder-configure-block) fieldset fieldset {
 
 form:not(.layout-builder-configure-block) input[type="search"] {
   -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 form:not(.layout-builder-configure-block) input[type="radio"],
@@ -194,7 +193,8 @@ form:not(.layout-builder-configure-block) [type="checkbox"]:checked {
   opacity: 0;
 }
 
-form:not(.layout-builder-configure-block) .form-no-label.checkbox [type="radio"], form:not(.layout-builder-configure-block) .form-no-label.checkbox [type="checkbox"] {
+form:not(.layout-builder-configure-block) .form-no-label.checkbox [type="radio"],
+form:not(.layout-builder-configure-block) .form-no-label.checkbox [type="checkbox"] {
   opacity: 1;
   left: 0;
   margin: 0;
@@ -213,14 +213,14 @@ form:not(.layout-builder-configure-block) .radio label {
   -webkit-transition: .28s ease;
   transition: .28s ease;
   -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   margin-bottom: 0;
 }
 
-[dir='rtl'] form:not(.layout-builder-configure-block) .checkbox label, [dir='rtl']
-form:not(.layout-builder-configure-block) .radio label {
+[dir='rtl'] form:not(.layout-builder-configure-block) .checkbox label,
+[dir='rtl'] form:not(.layout-builder-configure-block) .radio label {
   padding-left: 0;
   padding-right: 30px;
 }
@@ -239,8 +239,8 @@ form:not(.layout-builder-configure-block) .radio label:after {
   transition: .28s ease;
 }
 
-[dir='rtl'] form:not(.layout-builder-configure-block) .radio label:before, [dir='rtl']
-form:not(.layout-builder-configure-block) .radio label:after {
+[dir='rtl'] form:not(.layout-builder-configure-block) .radio label:before,
+[dir='rtl'] form:not(.layout-builder-configure-block) .radio label:after {
   left: auto;
   right: 0;
 }
@@ -255,7 +255,7 @@ form:not(.layout-builder-configure-block) [type="radio"]:not(:checked) + label:a
   border: 2px solid #555555;
   z-index: -1;
   -webkit-transform: scale(0);
-          transform: scale(0);
+  transform: scale(0);
 }
 
 form:not(.layout-builder-configure-block) [type="radio"]:checked + label {
@@ -270,7 +270,7 @@ form:not(.layout-builder-configure-block) [type="radio"]:checked + label:after {
   border-radius: 50%;
   z-index: 0;
   -webkit-transform: scale(0.5);
-          transform: scale(0.5);
+  transform: scale(0.5);
 }
 
 form:not(.layout-builder-configure-block) [type="radio"]:disabled + label:before,
@@ -312,8 +312,8 @@ form:not(.layout-builder-configure-block) [type="checkbox"] + label:after {
   z-index: 1;
 }
 
-[dir='rtl'] form:not(.layout-builder-configure-block) [type="checkbox"] + label:before, [dir='rtl']
-form:not(.layout-builder-configure-block) [type="checkbox"] + label:after {
+[dir='rtl'] form:not(.layout-builder-configure-block) [type="checkbox"] + label:before,
+[dir='rtl'] form:not(.layout-builder-configure-block) [type="checkbox"] + label:after {
   left: auto;
   right: 0;
 }
@@ -325,7 +325,7 @@ form:not(.layout-builder-configure-block) [type="checkbox"]:not(:checked) + labe
   left: 6px;
   top: 10px;
   -webkit-transform: rotateZ(37deg);
-          transform: rotateZ(37deg);
+  transform: rotateZ(37deg);
   -webkit-transform-origin: 20% 40%;
   transform-origin: 100% 100%;
 }
@@ -357,12 +357,12 @@ form:not(.layout-builder-configure-block) [type="checkbox"]:checked + label:befo
   border-right: 2px solid white;
   border-bottom: 2px solid white;
   -webkit-transform: rotateZ(37deg);
-          transform: rotateZ(37deg);
+  transform: rotateZ(37deg);
   margin-top: 2px;
   -webkit-transition: .2s;
   transition: .2s;
   -webkit-transform-origin: 100% 100%;
-          transform-origin: 100% 100%;
+  transform-origin: 100% 100%;
 }
 
 [dir='rtl'] form:not(.layout-builder-configure-block) [type="checkbox"]:checked + label:before {
@@ -399,7 +399,7 @@ form:not(.layout-builder-configure-block) [type="checkbox"]:disabled:not(:checke
 
 form:not(.layout-builder-configure-block) [type="checkbox"]:disabled:not(:checked) + label:after {
   border-color: transparent;
-  background-color: #BDBDBD;
+  background-color: #bdbdbd;
 }
 
 form:not(.layout-builder-configure-block) [type="checkbox"]:disabled:checked + label:before {
@@ -407,26 +407,29 @@ form:not(.layout-builder-configure-block) [type="checkbox"]:disabled:checked + l
 }
 
 form:not(.layout-builder-configure-block) [type="checkbox"]:disabled:checked + label:after {
-  background-color: #BDBDBD;
-  border-color: #BDBDBD;
+  background-color: #bdbdbd;
+  border-color: #bdbdbd;
 }
 
 form:not(.layout-builder-configure-block) .form-inline {
   margin-bottom: 1rem;
 }
 
-form:not(.layout-builder-configure-block).group-form .field--widget-options-buttons .fieldgroup .fieldset-wrapper, form:not(.layout-builder-configure-block).node-form .field--widget-options-buttons .fieldgroup .fieldset-wrapper {
+form:not(.layout-builder-configure-block).group-form .field--widget-options-buttons .fieldgroup .fieldset-wrapper,
+form:not(.layout-builder-configure-block).node-form .field--widget-options-buttons .fieldgroup .fieldset-wrapper {
   margin: 5px -.75rem -8px;
 }
 
-form:not(.layout-builder-configure-block).group-form .field--widget-options-buttons .fieldgroup .fieldset-wrapper > .radio, form:not(.layout-builder-configure-block).node-form .field--widget-options-buttons .fieldgroup .fieldset-wrapper > .radio {
+form:not(.layout-builder-configure-block).group-form .field--widget-options-buttons .fieldgroup .fieldset-wrapper > .radio,
+form:not(.layout-builder-configure-block).node-form .field--widget-options-buttons .fieldgroup .fieldset-wrapper > .radio {
   padding: 0 .75rem;
   margin-top: -5px;
 }
 
 form:not(.layout-builder-configure-block).group-form .field--widget-options-buttons .fieldgroup#edit-field-group-allowed-visibility--wrapper #edit-field-group-allowed-visibility,
 form:not(.layout-builder-configure-block).group-form .field--widget-options-buttons .fieldgroup#edit-field-social-idea-phases--wrapper #edit-field-social-idea-phases,
-form:not(.layout-builder-configure-block).group-form .field--widget-options-buttons .fieldgroup#edit-field-topic-type--wrapper #edit-field-topic-type, form:not(.layout-builder-configure-block).node-form .field--widget-options-buttons .fieldgroup#edit-field-group-allowed-visibility--wrapper #edit-field-group-allowed-visibility,
+form:not(.layout-builder-configure-block).group-form .field--widget-options-buttons .fieldgroup#edit-field-topic-type--wrapper #edit-field-topic-type,
+form:not(.layout-builder-configure-block).node-form .field--widget-options-buttons .fieldgroup#edit-field-group-allowed-visibility--wrapper #edit-field-group-allowed-visibility,
 form:not(.layout-builder-configure-block).node-form .field--widget-options-buttons .fieldgroup#edit-field-social-idea-phases--wrapper #edit-field-social-idea-phases,
 form:not(.layout-builder-configure-block).node-form .field--widget-options-buttons .fieldgroup#edit-field-topic-type--wrapper #edit-field-topic-type {
   margin: 5px -.75rem -8px;
@@ -435,25 +438,27 @@ form:not(.layout-builder-configure-block).node-form .field--widget-options-butto
 
 form:not(.layout-builder-configure-block).group-form .field--widget-options-buttons .fieldgroup#edit-field-group-allowed-visibility--wrapper #edit-field-group-allowed-visibility > .checkbox,
 form:not(.layout-builder-configure-block).group-form .field--widget-options-buttons .fieldgroup#edit-field-social-idea-phases--wrapper #edit-field-social-idea-phases > .checkbox,
-form:not(.layout-builder-configure-block).group-form .field--widget-options-buttons .fieldgroup#edit-field-topic-type--wrapper #edit-field-topic-type > .checkbox, form:not(.layout-builder-configure-block).node-form .field--widget-options-buttons .fieldgroup#edit-field-group-allowed-visibility--wrapper #edit-field-group-allowed-visibility > .checkbox,
+form:not(.layout-builder-configure-block).group-form .field--widget-options-buttons .fieldgroup#edit-field-topic-type--wrapper #edit-field-topic-type > .checkbox,
+form:not(.layout-builder-configure-block).node-form .field--widget-options-buttons .fieldgroup#edit-field-group-allowed-visibility--wrapper #edit-field-group-allowed-visibility > .checkbox,
 form:not(.layout-builder-configure-block).node-form .field--widget-options-buttons .fieldgroup#edit-field-social-idea-phases--wrapper #edit-field-social-idea-phases > .checkbox,
 form:not(.layout-builder-configure-block).node-form .field--widget-options-buttons .fieldgroup#edit-field-topic-type--wrapper #edit-field-topic-type > .checkbox {
   padding: 0 .75rem;
   margin-top: -5px;
 }
 
-form:not(.layout-builder-configure-block).group-form .field--widget-options-buttons .fieldgroup#edit-field-social-idea-phases--wrapper #edit-field-social-idea-phases, form:not(.layout-builder-configure-block).node-form .field--widget-options-buttons .fieldgroup#edit-field-social-idea-phases--wrapper #edit-field-social-idea-phases {
+form:not(.layout-builder-configure-block).group-form .field--widget-options-buttons .fieldgroup#edit-field-social-idea-phases--wrapper #edit-field-social-idea-phases,
+form:not(.layout-builder-configure-block).node-form .field--widget-options-buttons .fieldgroup#edit-field-social-idea-phases--wrapper #edit-field-social-idea-phases {
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
 }
 
 form:not(.layout-builder-configure-block) .switch * {
   -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   cursor: pointer;
 }
 
@@ -466,14 +471,14 @@ form:not(.layout-builder-configure-block) .switch {
 
 form:not(.layout-builder-configure-block) .switch__label {
   -webkit-box-flex: 1;
-      -ms-flex: 1 1 auto;
-          flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
 }
 
 form:not(.layout-builder-configure-block) .switch__options {
   -webkit-box-flex: 1;
-      -ms-flex: 1 0 150px;
-          flex: 1 0 150px;
+  -ms-flex: 1 0 150px;
+  flex: 1 0 150px;
   text-align: right;
 }
 
@@ -504,7 +509,7 @@ form:not(.layout-builder-configure-block) .switch .lever {
 
 form:not(.layout-builder-configure-block) .switch .lever:after {
   -webkit-box-shadow: 0 0 1px rgba(0, 0, 0, 0.11), 0 1px 2px rgba(0, 0, 0, 0.22);
-          box-shadow: 0 0 1px rgba(0, 0, 0, 0.11), 0 1px 2px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.11), 0 1px 2px rgba(0, 0, 0, 0.22);
   content: "";
   position: absolute;
   display: inline-block;
@@ -522,7 +527,7 @@ form:not(.layout-builder-configure-block) .switch .lever:after {
 
 form:not(.layout-builder-configure-block) input[type=checkbox]:not(:disabled) ~ .lever:active:after {
   -webkit-box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.4), 0 0 0 15px rgba(0, 0, 0, 0.08);
-          box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.4), 0 0 0 15px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.4), 0 0 0 15px rgba(0, 0, 0, 0.08);
 }
 
 form:not(.layout-builder-configure-block) .switch input[type=checkbox]:checked + .lever:after {
@@ -535,7 +540,7 @@ form:not(.layout-builder-configure-block) .switch input[type=checkbox][disabled]
 
 form:not(.layout-builder-configure-block) .switch input[type=checkbox][disabled] + .lever:after,
 form:not(.layout-builder-configure-block) .switch input[type=checkbox][disabled]:checked + .lever:after {
-  background-color: #BDBDBD;
+  background-color: #bdbdbd;
 }
 
 form:not(.layout-builder-configure-block) .select-wrapper {
@@ -606,10 +611,12 @@ form:not(.layout-builder-configure-block) .form-disabled .select-wrapper::after 
 }
 
 @media all and (-ms-high-contrast: none) {
-  form:not(.layout-builder-configure-block) *::-ms-backdrop, form:not(.layout-builder-configure-block) .select-wrapper:after {
+  form:not(.layout-builder-configure-block) *::-ms-backdrop,
+  form:not(.layout-builder-configure-block) .select-wrapper:after {
     display: none;
   }
-  form:not(.layout-builder-configure-block) *::-ms-backdrop, form:not(.layout-builder-configure-block) .select-wrapper select {
+  form:not(.layout-builder-configure-block) *::-ms-backdrop,
+  form:not(.layout-builder-configure-block) .select-wrapper select {
     padding-right: 12px;
   }
 }

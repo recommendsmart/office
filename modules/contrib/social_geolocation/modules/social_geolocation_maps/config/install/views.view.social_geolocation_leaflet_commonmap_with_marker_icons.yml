@@ -923,10 +923,10 @@ display:
             default_group_multiple: {  }
             group_items: {  }
           plugin_id: node_access
-        field_event_date_value:
-          id: field_event_date_value
-          table: node__field_event_date
-          field: field_event_date_value
+        field_event_date_end_value:
+          id: field_event_date_end_value
+          table: node__field_event_date_end
+          field: field_event_date_end_value
           relationship: none
           group_type: group
           admin_label: ''
@@ -939,12 +939,12 @@ display:
           group: 1
           exposed: true
           expose:
-            operator_id: field_event_date_value_op
-            label: 'Start (field_event_date)'
+            operator_id: field_event_date_end_value_op
+            label: 'End (field_event_date_end)'
             description: ''
             use_operator: false
-            operator: field_event_date_value_op
-            identifier: field_event_date_value
+            operator: field_event_date_end_value_op
+            identifier: field_event_date_end_value
             required: false
             remember: false
             multiple: false
@@ -961,7 +961,7 @@ display:
             operator_list: {  }
           is_grouped: true
           group_info:
-            label: 'Start (field_event_date)'
+            label: ''
             description: ''
             identifier: field_event_date_value
             optional: true
@@ -972,7 +972,7 @@ display:
             default_group_multiple: {  }
             group_items:
               1:
-                title: 'Upcoming events'
+                title: 'Ongoing and upcoming events'
                 operator: '>='
                 value:
                   type: offset
@@ -980,7 +980,7 @@ display:
                   min: ''
                   max: ''
               2:
-                title: 'Events that have started or are finished'
+                title: 'Past events'
                 operator: '<'
                 value:
                   type: offset
@@ -1327,10 +1327,10 @@ display:
           entity_type: node
           entity_field: type
           plugin_id: bundle
-        field_event_date_value:
-          id: field_event_date_value
-          table: node__field_event_date
-          field: field_event_date_value
+        field_event_date_end_value:
+          id: field_event_date_end_value
+          table: node__field_event_date_end
+          field: field_event_date_end_value
           relationship: none
           group_type: group
           admin_label: ''

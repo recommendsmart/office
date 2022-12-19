@@ -35,7 +35,7 @@ class ProcessorIntegrationTest extends SearchApiBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->drupalLogin($this->adminUser);
 
@@ -456,6 +456,7 @@ class ProcessorIntegrationTest extends SearchApiBrowserTestBase {
     $form_values['boosts']['entity:node']['bundle_boosts']['page'] = '';
 
     $this->editSettingsForm($configuration, 'type_boost', $form_values);
+    $this->editSettingsForm($configuration, 'type_boost', []);
   }
 
   /**

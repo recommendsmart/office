@@ -4,6 +4,7 @@ namespace Drupal\eca_user\Event;
 
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Component\EventDispatcher\Event;
+use Drupal\eca\Event\AccountEventInterface;
 
 /**
  * Abstract base class for user related events.
@@ -14,7 +15,7 @@ use Drupal\Component\EventDispatcher\Event;
  *
  * @package Drupal\eca_user\Event
  */
-abstract class UserBase extends Event {
+abstract class UserBase extends Event implements AccountEventInterface {
 
   /**
    * The account for the current event.
@@ -34,10 +35,7 @@ abstract class UserBase extends Event {
   }
 
   /**
-   * Return the account for the current event.
-   *
-   * @return \Drupal\Core\Session\AccountInterface
-   *   The account for the current event.
+   * {@inheritdoc}
    */
   public function getAccount(): AccountInterface {
     return $this->account;

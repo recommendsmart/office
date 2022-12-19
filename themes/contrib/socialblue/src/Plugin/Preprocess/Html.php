@@ -17,7 +17,7 @@ class Html extends HtmlBase {
   /**
    * {@inheritdoc}
    */
-  public function preprocess(array &$variables, $hook, array $info) {
+  public function preprocess(array &$variables, $hook, array $info): void {
     parent::preprocess($variables, $hook, $info);
 
     $variables['colors'] = [];
@@ -39,7 +39,7 @@ class Html extends HtmlBase {
     $style = theme_get_setting('style');
     if (!empty($style)) {
       $variables['attributes']['class'][] = 'socialblue--' . $style;
-      $route_match = \Drupal::routeMatch();
+      $route_match = $this->routeMatch;
       // For SKY when we are on edit user or edit profile
       // we want to distinct the root_path with a better class name
       // this is used in html.html.twig.

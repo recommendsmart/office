@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\eca_array\Plugin\ECA\Event;
+namespace Drupal\eca_test_array\Plugin\ECA\Event;
 
 use Drupal\eca\Plugin\ECA\Event\EventDeriverBase;
 

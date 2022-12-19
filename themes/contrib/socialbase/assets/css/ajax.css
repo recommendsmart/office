@@ -21,7 +21,7 @@
 .glyphicon-spin {
   display: inline-block;
   -webkit-animation: glyphicon-spin 1s infinite linear;
-          animation: glyphicon-spin 1s infinite linear;
+  animation: glyphicon-spin 1s infinite linear;
 }
 
 a .glyphicon-spin {

@@ -5,12 +5,12 @@
     "type": "drupal-theme",
     "minimum-stability": "dev",
     "require": {
-        "drupal/bootstrap": "3.23"
+        "drupal/bootstrap": "3.25"
     },
     "extra": {
         "patches": {
             "drupal/bootstrap": {
-                "'Show row weight' text is miissing": "https://www.drupal.org/files/issues/2021-08-24/bootstrap-toggle_undefined-3209773-8.patch"
+                "Dropdown toggle variable ignored when using links__dropbutton": "https://www.drupal.org/files/issues/2022-10-11/dropdown-without-default-button-3021413-3x-5.patch"
             }
         }
     }

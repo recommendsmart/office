@@ -8,7 +8,8 @@ namespace Drupal\group_action\Plugin\Action;
  * @Action(
  *   id = "group_update_content",
  *   label = "Group: update content",
- *   type = "node"
+ *   type = "node",
+ *   deriver = "Drupal\group_action\Plugin\Action\GroupActionDeriver"
  * )
  *
  * @TODO, support multiple entity types once core is fixed.

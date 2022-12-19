@@ -499,6 +499,7 @@ class MaestroWebformTask extends PluginBase implements MaestroEngineTaskInterfac
           $or->condition($field_name . '.target_id', $webform_machine_name);
         }
         $query->condition($or);
+        $query->accessCheck(FALSE);
         $result = $query->execute();
         // The result are now node IDs we can use to add to the options.
         $entities = \Drupal::entityTypeManager()->getStorage('node')->loadMultiple($result);

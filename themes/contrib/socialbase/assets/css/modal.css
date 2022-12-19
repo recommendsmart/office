@@ -20,12 +20,12 @@
   from {
     opacity: 0;
     -webkit-transform: translateY(-30px);
-            transform: translateY(-30px);
+    transform: translateY(-30px);
   }
   to {
     opacity: 1;
     -webkit-transform: translateY(0);
-            transform: translateY(0);
+    transform: translateY(0);
   }
 }
 
@@ -33,12 +33,12 @@
   from {
     opacity: 0;
     -webkit-transform: translateY(-30px);
-            transform: translateY(-30px);
+    transform: translateY(-30px);
   }
   to {
     opacity: 1;
     -webkit-transform: translateY(0);
-            transform: translateY(0);
+    transform: translateY(0);
   }
 }
 
@@ -57,7 +57,7 @@
   background-color: #edeff5;
   opacity: .9;
   -webkit-animation: fadein 0.3s;
-          animation: fadein 0.3s;
+  animation: fadein 0.3s;
 }
 
 .ui-helper-hidden-accessible {
@@ -79,15 +79,15 @@
   background-color: #fff;
   background-clip: padding-box;
   -webkit-backface-visibility: hidden;
-          backface-visibility: hidden;
+  backface-visibility: hidden;
   -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
-          box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
   overflow-x: hidden;
   overflow-y: auto;
   z-index: 1050;
   font-family: 'montserrat', sans-serif;
   -webkit-animation: fadein_scale 0.5s ease-out;
-          animation: fadein_scale 0.5s ease-out;
+  animation: fadein_scale 0.5s ease-out;
 }
 
 .ui-dialog:not(.ui-dialog-off-canvas)[role='dialog'] .ui-dialog-titlebar {
@@ -120,10 +120,10 @@
   opacity: 1;
   cursor: pointer;
   -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
+  -moz-appearance: none;
+  appearance: none;
   -webkit-transform: translateY(-50%);
-          transform: translateY(-50%);
+  transform: translateY(-50%);
 }
 
 .ui-dialog:not(.ui-dialog-off-canvas)[role='dialog'] .ui-dialog-titlebar .ui-dialog-titlebar-close > span {
@@ -144,14 +144,14 @@
   background-image: url("../images/icons/icon-close_white.svg");
   text-indent: 0;
   -webkit-transform: scale(1);
-          transform: scale(1);
+  transform: scale(1);
   -webkit-transition: 0.3s;
   transition: 0.3s;
 }
 
 .ui-dialog:not(.ui-dialog-off-canvas)[role='dialog'] .ui-dialog-titlebar .ui-dialog-titlebar-close:hover:before {
   -webkit-transform: scale(1.2);
-          transform: scale(1.2);
+  transform: scale(1.2);
 }
 
 .ui-dialog:not(.ui-dialog-off-canvas)[role='dialog'] .ui-button-icon-only {
@@ -162,13 +162,14 @@
 .ui-dialog:not(.ui-dialog-off-canvas)[role='dialog'] .ui-dialog-content {
   position: relative;
   -webkit-box-flex: 1;
-      -ms-flex: 1 1 auto;
-          flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
   height: auto !important;
   padding: 1rem 1.25rem;
   -webkit-box-shadow: none;
-          box-shadow: none;
+  box-shadow: none;
   overflow: auto;
+  max-height: 70vh !important;
 }
 
 .ui-dialog:not(.ui-dialog-off-canvas)[role='dialog'] .btn {
@@ -194,15 +195,15 @@
   border: none;
   outline: none;
   -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
+  -moz-appearance: none;
+  appearance: none;
   opacity: 1;
   margin: 0;
   width: 1.75rem;
   height: 1.75rem;
   top: 50%;
   -webkit-transform: translateY(-50%);
-          transform: translateY(-50%);
+  transform: translateY(-50%);
 }
 
 .ui-dialog:not(.ui-dialog-off-canvas)[role='dialog'] .ui-dialog-titlebar .ui-dialog-titlebar-close > span {
@@ -223,14 +224,14 @@
   background-image: url("../images/icons/icon-close_white.svg");
   text-indent: 0;
   -webkit-transform: scale(1);
-          transform: scale(1);
+  transform: scale(1);
   -webkit-transition: 0.3s;
   transition: 0.3s;
 }
 
 .ui-dialog:not(.ui-dialog-off-canvas)[role='dialog'] .ui-dialog-titlebar .ui-dialog-titlebar-close:hover:before {
   -webkit-transform: scale(1.2);
-          transform: scale(1.2);
+  transform: scale(1.2);
 }
 
 .ui-dialog-titlebar {
@@ -238,11 +239,11 @@
   display: -ms-flexbox;
   display: flex;
   -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
   -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
   padding: 12px 1rem;
   border-bottom: 1px solid #e6e6e6;
 }
@@ -267,10 +268,10 @@
   position: relative;
   overflow: auto;
   -webkit-box-shadow: none;
-          box-shadow: none;
+  box-shadow: none;
   -webkit-box-flex: 1;
-      -ms-flex: 1 1 auto;
-          flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
   padding: 1rem;
 }
 
@@ -293,7 +294,7 @@
 
 .modal.fade .modal-dialog {
   -webkit-transform: translate(0, -25%);
-          transform: translate(0, -25%);
+  transform: translate(0, -25%);
   -webkit-transition: -webkit-transform 0.3s ease-out;
   transition: -webkit-transform 0.3s ease-out;
   transition: transform 0.3s ease-out;
@@ -302,7 +303,7 @@
 
 .modal.in .modal-dialog {
   -webkit-transform: translate(0, 0);
-          transform: translate(0, 0);
+  transform: translate(0, 0);
 }
 
 .modal-open .modal {
@@ -323,7 +324,7 @@
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 12px;
   -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
-          box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
   background-clip: padding-box;
   outline: 0;
 }
@@ -364,11 +365,11 @@
   display: -ms-flexbox;
   display: flex;
   -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
   -webkit-box-flex: 0;
-      -ms-flex: 0 0 50%;
-          flex: 0 0 50%;
+  -ms-flex: 0 0 50%;
+  flex: 0 0 50%;
   margin-bottom: 0;
 }
 
@@ -384,8 +385,8 @@
 
 .social-dialog .pull-left {
   -webkit-box-ordinal-group: 0;
-      -ms-flex-order: -1;
-          order: -1;
+  -ms-flex-order: -1;
+  order: -1;
   margin-left: 0 !important;
   margin-right: 1rem;
 }

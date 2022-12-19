@@ -29,7 +29,7 @@ class RedirectToProtectedFrontPageTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Set the front page as a protected page.

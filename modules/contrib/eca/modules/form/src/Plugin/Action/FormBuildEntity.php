@@ -2,7 +2,6 @@
 
 namespace Drupal\eca_form\Plugin\Action;
 
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -86,9 +85,28 @@ class FormBuildEntity extends ConfigurableActionBase {
       // The form state is being cloned here to not interfere with the regular
       // form processing and to not leak raw or non-validated user input.
       $form_state = clone $form_state;
-      // Set the values of the form state, taking existing processed values
-      // with higher priority than unprocessed user input.
-      $form_state->setValues(NestedArray::mergeDeep($form_state->getUserInput(), ($form_state->getValues() ?? [])));
+
+      // Merge the values of the form state, taking existing processed values
+      // with higher priority than unprocessed user input. Using a custom
+      // merge callback here, because common merge callbacks append arrays
+      // on numeric index keys, which is not what we want here. Instead,
+      // also numeric keys must be overwritten.
+      $merge = function (&$array1, &$array2) use (&$merge) {
+        foreach ($array2 as $k => &$v) {
+          if (isset($array1[$k]) && is_array($array1[$k]) && is_array($v)) {
+            $merge($array1[$k], $v);
+          }
+          else {
+            $array1[$k] = &$v;
+          }
+        }
+        unset($v);
+      };
+      $merged = $form_state->getUserInput() ?? [];
+      $values = $form_state->getValues() ?? [];
+      $merge($merged, $values);
+      $form_state->setValues($merged);
+      $form_state->cleanValues();
     }
 
     $this->tokenServices->addTokenData($this->configuration['token_name'], $form_object->buildEntity($form, $form_state));

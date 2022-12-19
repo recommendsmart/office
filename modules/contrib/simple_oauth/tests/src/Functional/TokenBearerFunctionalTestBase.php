@@ -100,7 +100,7 @@ abstract class TokenBearerFunctionalTestBase extends BrowserTestBase {
     $this->httpClient = $this->container->get('http_client_factory')
       ->fromOptions(['base_uri' => $this->baseUrl]);
 
-    $this->clientSecret = $this->getRandomGenerator()->string();
+    $this->clientSecret = $this->randomString();
 
     $this->redirectUri = Url::fromRoute('oauth2_token.test_token', [], [
       'absolute' => TRUE,
@@ -148,7 +148,7 @@ abstract class TokenBearerFunctionalTestBase extends BrowserTestBase {
     $scope_2->save();
 
     $this->client = Consumer::create([
-      'client_id' => $this->getRandomGenerator()->string(),
+      'client_id' => $this->randomString(),
       'label' => $this->getRandomGenerator()->name(),
       'secret' => $this->clientSecret,
       'grant_types' => [

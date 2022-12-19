@@ -16,7 +16,7 @@ class DropdownActions extends Dropdown {
   /**
    * Function to preprocess the links.
    */
-  protected function preprocessLinks(Variables $variables) {
+  protected function preprocessLinks(Variables $variables): void {
     parent::preprocessLinks($variables);
 
     $variables['btn_context'] = 'actions';

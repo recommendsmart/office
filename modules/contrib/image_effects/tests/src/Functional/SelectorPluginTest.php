@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\image_effects\Functional;
 
-use Drupal\Core\File\FileSystemInterface;
-
 /**
  * Selector plugins test.
  *

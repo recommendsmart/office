@@ -3,9 +3,9 @@
 namespace Drupal\Tests\eca_base\Kernel;
 
 use Drupal\eca\Entity\Eca;
-use Drupal\eca_array\Plugin\Action\ArrayIncrement;
 use Drupal\eca_base\BaseEvents;
 use Drupal\eca_base\Event\CustomEvent;
+use Drupal\eca_test_array\Plugin\Action\ArrayIncrement;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
 
@@ -25,7 +25,7 @@ class BaseEventsTest extends KernelTestBase {
     'user',
     'field',
     'eca',
-    'eca_array',
+    'eca_test_array',
     'eca_base',
   ];
 
@@ -101,7 +101,7 @@ class BaseEventsTest extends KernelTestBase {
       'gateways' => [],
       'actions' => [
         'increment' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'Increment',
           'configuration' => [
             'key' => 'base_inc',

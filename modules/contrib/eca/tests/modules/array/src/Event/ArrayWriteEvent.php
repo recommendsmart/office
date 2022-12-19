@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\eca_array\Event;
+namespace Drupal\eca_test_array\Event;
 
 use Drupal\Component\EventDispatcher\Event;
 use Drupal\eca\Event\ConditionalApplianceInterface;
@@ -12,7 +12,7 @@ use Drupal\eca\Event\ConditionalApplianceInterface;
  *   This class is not meant to be used as a public API. It is subject for name
  *   change or may be removed completely, also on minor version updates.
  *
- * @package eca_array
+ * @package eca_test_array
  */
 class ArrayWriteEvent extends Event implements ConditionalApplianceInterface {
 

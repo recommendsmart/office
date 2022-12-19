@@ -1,14 +1,14 @@
 <?php
 
-namespace Drupal\eca_array\Plugin\Action;
+namespace Drupal\eca_test_array\Plugin\Action;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\eca\Plugin\Action\ActionBase;
 use Drupal\eca\Plugin\Action\ConfigurableActionBase;
-use Drupal\eca_array\Event\ArrayEvents;
-use Drupal\eca_array\Event\ArrayWriteEvent;
+use Drupal\eca_test_array\Event\ArrayEvents;
+use Drupal\eca_test_array\Event\ArrayWriteEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -16,7 +16,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * An action that writes into a static array.
  *
  * @Action(
- *   id = "eca_array_write",
+ *   id = "eca_test_array_write",
  *   label = @Translation("Static array: write"),
  *   description = @Translation("This action writes into a static array."),
  *   nodocs = true

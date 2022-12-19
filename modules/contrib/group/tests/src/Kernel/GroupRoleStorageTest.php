@@ -63,7 +63,9 @@ class GroupRoleStorageTest extends GroupKernelTestBase {
     $this->compareMemberRoles(['default-outsider'], TRUE, 'User initially has implicit outsider role.');
 
     // Grant the user a new site role and check the storage.
-    $this->entityTypeManager->getStorage('user_role')->create(['id' => 'publisher'])->save();
+    $this->entityTypeManager->getStorage('user_role')
+      ->create(['id' => 'publisher', 'label' => 'Publisher'])
+      ->save();
     $this->account->addRole('publisher');
     $this->account->save();
     $group_role_id = $this->groupRoleSynchronizer->getGroupRoleId('default', 'publisher');

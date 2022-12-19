@@ -12,7 +12,7 @@ use Drupal\social_font\Entity\Font;
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function socialblue_form_system_theme_settings_alter(&$form, FormStateInterface &$form_state, $form_id = NULL) {
+function socialblue_form_system_theme_settings_alter(&$form, FormStateInterface &$form_state, $form_id = NULL): void {
   // Work-around for a core bug affecting admin themes. See issue #943212.
   if (isset($form_id)) {
     return;
@@ -212,7 +212,7 @@ function socialblue_form_system_theme_settings_alter(&$form, FormStateInterface 
  *
  * @throws \Drupal\Core\Entity\EntityStorageException
  */
-function socialblue_update_gin_color_settings(array $form, FormStateInterface $form_state) {
+function socialblue_update_gin_color_settings(array $form, FormStateInterface $form_state): void {
   // Grab the default socialblue colors, these are set if the color settings
   // aren't overridden yet.
   $default_colors = \Drupal::configFactory()->getEditable('socialblue.settings')->getRawData();
@@ -257,7 +257,7 @@ function socialblue_update_gin_color_settings(array $form, FormStateInterface $f
  *
  * @throws \Drupal\Core\Entity\EntityStorageException
  */
-function socialblue_save_email_logo(array $form, FormStateInterface $form_state) {
+function socialblue_save_email_logo(array $form, FormStateInterface $form_state): void {
   $email_logo = $form_state->getValue('email_logo');
   // If an e-mail logo was uploaded then we mark the uploaded file as permanent.
   if (!empty($email_logo)) {

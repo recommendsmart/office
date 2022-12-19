@@ -32,13 +32,6 @@ class FilterHtmlImageSecureTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
-  /**
-   * An authenticated user.
-   *
-   * @var \Drupal\user\UserInterface
-   */
-  protected $webUser;
-
   protected function setUp(): void {
     parent::setUp();
 
@@ -64,20 +57,19 @@ class FilterHtmlImageSecureTest extends BrowserTestBase {
     $filtered_html_format->save();
 
     // Setup users.
-    $this->webUser = $this->drupalCreateUser([
+    $webUser = $this->drupalCreateUser([
       'access content',
       'access comments',
       'post comments',
       'skip comment approval',
       $filtered_html_format->getPermissionName(),
     ]);
-    $this->drupalLogin($this->webUser);
+    $this->drupalLogin($webUser);
 
     // Setup a node to comment and test on.
     $this->drupalCreateContentType(['type' => 'page', 'name' => 'Basic page']);
     // Add a comment field.
     $this->addDefaultCommentField('node', 'page');
-    $this->node = $this->drupalCreateNode();
   }
 
   /**
@@ -85,6 +77,8 @@ class FilterHtmlImageSecureTest extends BrowserTestBase {
    */
   public function testImageSource() {
     global $base_url;
+
+    $node = $this->drupalCreateNode();
 
     $public_files_path = PublicStream::basePath();
     $private_files_path = PrivateStream::basePath();
@@ -152,7 +146,7 @@ class FilterHtmlImageSecureTest extends BrowserTestBase {
     $edit = [
       'comment_body[0][value]' => implode("\n", $comment),
     ];
-    $this->drupalGet('node/' . $this->node->id());
+    $this->drupalGet('node/' . $node->id());
     $this->submitForm($edit, 'Save');
     foreach ($images as $image => $converted) {
       $found = FALSE;

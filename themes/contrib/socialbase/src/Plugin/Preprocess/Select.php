@@ -16,7 +16,7 @@ class Select extends BaseSelect {
   /**
    * {@inheritdoc}
    */
-  public function preprocess(array &$variables, $hook, array $info) {
+  public function preprocess(array &$variables, $hook, array $info): void {
     parent::preprocess($variables, $hook, $info);
 
     if (isset($variables['element']['#multiple']) && $variables['element']['#multiple'] == TRUE) {

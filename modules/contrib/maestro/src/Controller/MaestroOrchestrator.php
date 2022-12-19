@@ -82,6 +82,7 @@ class MaestroOrchestrator extends ControllerBase {
       \Drupal::messenger()->addError(t('Error!  No template by that name exits!'));
     }
 
+
     if ($redirect == 'taskconsole') {
       return new RedirectResponse(Url::fromRoute('maestro_taskconsole.taskconsole')->toString());
     }

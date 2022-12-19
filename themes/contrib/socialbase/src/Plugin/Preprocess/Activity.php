@@ -16,7 +16,7 @@ class Activity extends PreprocessBase {
   /**
    * {@inheritdoc}
    */
-  public function preprocess(array &$variables, $hook, array $info) {
+  public function preprocess(array &$variables, $hook, array $info): void {
     parent::preprocess($variables, $hook, $info);
 
     // Check if the view mode is one of the notification view modes.

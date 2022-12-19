@@ -4,7 +4,7 @@ namespace Drupal\Tests\eca\Kernel;
 
 use Drupal\Core\Action\ActionManager;
 use Drupal\eca\PluginManager\Action;
-use Drupal\eca_array\Plugin\Action\ArrayWrite;
+use Drupal\eca_test_array\Plugin\Action\ArrayWrite;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
@@ -22,7 +22,7 @@ class ActionDecoratorTest extends KernelTestBase {
     'system',
     'user',
     'eca',
-    'eca_array',
+    'eca_test_array',
   ];
 
   /**
@@ -50,16 +50,16 @@ class ActionDecoratorTest extends KernelTestBase {
     $filtered_definitions = $action_manager->getDefinitions();
     $unfiltered_definitions = $decorated_manager->getDefinitions();
     $this->assertTrue(isset($filtered_definitions['action_send_email_action']));
-    $this->assertFalse(isset($filtered_definitions['eca_array_increment']));
-    $this->assertFalse(isset($filtered_definitions['eca_array_write']));
+    $this->assertFalse(isset($filtered_definitions['eca_test_array_increment']));
+    $this->assertFalse(isset($filtered_definitions['eca_test_array_write']));
     $this->assertTrue(isset($unfiltered_definitions['action_send_email_action']));
-    $this->assertTrue(isset($unfiltered_definitions['eca_array_increment']));
-    $this->assertTrue(isset($unfiltered_definitions['eca_array_write']));
+    $this->assertTrue(isset($unfiltered_definitions['eca_test_array_increment']));
+    $this->assertTrue(isset($unfiltered_definitions['eca_test_array_write']));
 
-    $this->assertTrue($action_manager->hasDefinition('eca_array_write'), "Decorator must have definition when explicitly requested.");
-    $this->assertTrue($decorated_manager->hasDefinition('eca_array_write'));
-    $this->assertTrue($action_manager->createInstance('eca_array_write') instanceof ArrayWrite);
-    $this->assertTrue($decorated_manager->createInstance('eca_array_write') instanceof ArrayWrite);
+    $this->assertTrue($action_manager->hasDefinition('eca_test_array_write'), "Decorator must have definition when explicitly requested.");
+    $this->assertTrue($decorated_manager->hasDefinition('eca_test_array_write'));
+    $this->assertTrue($action_manager->createInstance('eca_test_array_write') instanceof ArrayWrite);
+    $this->assertTrue($decorated_manager->createInstance('eca_test_array_write') instanceof ArrayWrite);
   }
 
 }

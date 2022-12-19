@@ -64,6 +64,10 @@ function image_effects_theme() {
     'image_effects_opacity_summary' => [
       'variables' => ['data' => NULL, 'effect' => []],
     ],
+    // Pixelate image effect - summary.
+    'image_effects_pixelate_summary' => [
+      'variables' => ['data' => NULL, 'effect' => []],
+    ],
     // Relative crop image effect - summary.
     'image_effects_relative_crop_summary' => [
       'variables' => ['data' => NULL, 'effect' => []],

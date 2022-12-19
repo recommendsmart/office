@@ -224,3 +224,9 @@ sup {
 sub {
   bottom: -0.25em;
 }
+
+.line-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}

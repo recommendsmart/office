@@ -245,14 +245,11 @@ class Storage extends EditorialContentEntityBase implements StorageInterface {
    */
   public function getStringRepresentation() {
     $string = '';
-    $module_handler = \Drupal::moduleHandler();
-    $hook = 'storage_get_string_representation';
+    \Drupal::moduleHandler()->invokeAllWith('storage_get_string_representation', function (callable $hook, string $module) use (&$string) {
+      $string = $hook($this, $string);
+    });
 
-    foreach ($module_handler->getImplementations($hook) as $module) {
-      $string = $module_handler->invoke($module, $hook, [$this, $string]);
-    }
-
-    if (empty($string)) {
+    if (trim($string) === '') {
       $string = $this->generateFallbackStringRepresentation();
     }
 

@@ -8,6 +8,6 @@
     "source": "https://drupal.org/project/group_action"
   },
   "require": {
-    "drupal/group": "^1.4"
+    "drupal/group": "^1 || ^2@beta || ^3@beta"
   }
 }

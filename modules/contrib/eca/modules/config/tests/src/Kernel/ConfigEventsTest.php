@@ -9,8 +9,8 @@ use Drupal\Core\Config\ConfigRenameEvent;
 use Drupal\Core\Config\Importer\MissingContentEvent;
 use Drupal\Core\Config\StorageComparer;
 use Drupal\eca\Entity\Eca;
-use Drupal\eca_array\Plugin\Action\ArrayIncrement;
-use Drupal\eca_array\Plugin\Action\ArrayWrite;
+use Drupal\eca_test_array\Plugin\Action\ArrayIncrement;
+use Drupal\eca_test_array\Plugin\Action\ArrayWrite;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
 
@@ -32,8 +32,8 @@ class ConfigEventsTest extends KernelTestBase {
     'config_translation',
     'language',
     'eca',
-    'eca_array',
     'eca_config',
+    'eca_test_array',
   ];
 
   /**
@@ -76,7 +76,7 @@ class ConfigEventsTest extends KernelTestBase {
       'gateways' => [],
       'actions' => [
         'array_write_config_name' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'Write config name into array',
           'configuration' => [
             'key' => 'config_name',
@@ -85,7 +85,7 @@ class ConfigEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'array_write_site_name' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'Write site name into array',
           'configuration' => [
             'key' => 'site_name',
@@ -134,7 +134,7 @@ class ConfigEventsTest extends KernelTestBase {
       'gateways' => [],
       'actions' => [
         'array_increment' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'Increment',
           'configuration' => [
             'key' => 'inc',
@@ -216,7 +216,7 @@ class ConfigEventsTest extends KernelTestBase {
       'gateways' => [],
       'actions' => [
         'array_increment_import' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'Increment import',
           'configuration' => [
             'key' => 'import_inc',
@@ -224,7 +224,7 @@ class ConfigEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'array_increment_import_missing_content' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'Increment import missing content',
           'configuration' => [
             'key' => 'import_missing_content_inc',
@@ -232,7 +232,7 @@ class ConfigEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'array_increment_import_validate' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'Increment import validate',
           'configuration' => [
             'key' => 'import_validate_inc',
@@ -240,7 +240,7 @@ class ConfigEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'array_increment_rename' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'Increment rename',
           'configuration' => [
             'key' => 'import_rename_inc',

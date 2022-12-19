@@ -42,7 +42,14 @@ class StorageAccessControlHandler extends EntityAccessControlHandler {
             ->addCacheableDependency($entity);
         }
 
-        return AccessResult::allowedIfHasPermission($account, 'view published storage entities')
+        return AccessResult::allowedIfHasPermissions(
+          $account,
+          [
+            'view published storage entities',
+            'view published ' . $entity->bundle() . ' storage entities',
+          ],
+          'OR'
+        )
           ->cachePerPermissions()
           ->addCacheableDependency($entity);
 
@@ -98,6 +105,7 @@ class StorageAccessControlHandler extends EntityAccessControlHandler {
     return AccessResult::allowedIfHasPermissions(
       $account,
       [
+        'administer storage entities',
         'add storage entities',
         'add ' . (string) $entity_bundle . ' storage entities',
       ],

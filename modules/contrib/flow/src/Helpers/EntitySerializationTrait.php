@@ -3,8 +3,7 @@
 namespace Drupal\flow\Helpers;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\flow\Normalizer\FlowContentEntityNormalizer;
-use Drupal\flow\Normalizer\FlowEntityReferenceFieldItemNormalizer;
+use Drupal\flow\Internals\NormalizerContainer;
 use Symfony\Component\Serializer\Serializer;
 
 /**
@@ -87,14 +86,15 @@ trait EntitySerializationTrait {
    *   The normalized array.
    */
   public function toConfigArray(ContentEntityInterface $entity): array {
-    FlowContentEntityNormalizer::$cleanupFieldValues = TRUE;
-    FlowEntityReferenceFieldItemNormalizer::$normalizeNewEntities = TRUE;
+    $normalizer_container = NormalizerContainer::get();
+    $normalizer_container->contentEntityNormalizer()::$cleanupFieldValues = TRUE;
+    $normalizer_container->entityReferenceItemNormalizer()::$normalizeNewEntities = TRUE;
     try {
       return $this->getSerializer()->normalize($entity, get_class($entity));
     }
     finally {
-      FlowContentEntityNormalizer::$cleanupFieldValues = FALSE;
-      FlowEntityReferenceFieldItemNormalizer::$normalizeNewEntities = FALSE;
+      $normalizer_container->contentEntityNormalizer()::$cleanupFieldValues = FALSE;
+      $normalizer_container->entityReferenceItemNormalizer()::$normalizeNewEntities = FALSE;
     }
   }
 
@@ -110,14 +110,15 @@ trait EntitySerializationTrait {
    *   The entity.
    */
   public function fromConfigArray(array $array, string $entity_class): ContentEntityInterface {
-    FlowContentEntityNormalizer::$cleanupFieldValues = TRUE;
-    FlowEntityReferenceFieldItemNormalizer::$normalizeNewEntities = TRUE;
+    $normalizer_container = NormalizerContainer::get();
+    $normalizer_container->contentEntityNormalizer()::$cleanupFieldValues = TRUE;
+    $normalizer_container->entityReferenceItemNormalizer()::$normalizeNewEntities = TRUE;
     try {
       return $this->getSerializer()->denormalize($array, $entity_class);
     }
     finally {
-      FlowContentEntityNormalizer::$cleanupFieldValues = FALSE;
-      FlowEntityReferenceFieldItemNormalizer::$normalizeNewEntities = FALSE;
+      $normalizer_container->contentEntityNormalizer()::$cleanupFieldValues = FALSE;
+      $normalizer_container->entityReferenceItemNormalizer()::$normalizeNewEntities = FALSE;
     }
   }
 

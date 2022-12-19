@@ -2,6 +2,8 @@
 
 namespace Drupal\eca_form\Event;
 
+use Drupal\eca\Event\RenderEventInterface;
+
 /**
  * Dispatched when a form is being processed.
  *
@@ -11,6 +13,14 @@ namespace Drupal\eca_form\Event;
  *
  * @package Drupal\eca_form\Event
  */
-class FormProcess extends FormBase {
+class FormProcess extends FormBase implements RenderEventInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function &getRenderArray(): array {
+    $form = &$this->getForm();
+    return $form;
+  }
 
 }

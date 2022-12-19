@@ -20,7 +20,7 @@ class Node extends NodeBase {
   /**
    * {@inheritdoc}
    */
-  protected function preprocessElement(Element $element, Variables $variables) {
+  protected function preprocessElement(Element $element, Variables $variables): void {
     parent::preprocessElement($element, $variables);
 
     if (theme_get_setting('style') !== 'sky') {
@@ -71,7 +71,7 @@ class Node extends NodeBase {
           break;
 
         case 'teaser':
-          $variables['label'] = render($variables['label']);
+          $variables['label'] = $this->renderer->render($variables['label']);
           $variables['card_link_label'] = $this->t('View album');
 
           if (views_get_view_result('albums', 'embed_album_cover', $node->id())) {

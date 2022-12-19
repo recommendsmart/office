@@ -6,7 +6,7 @@ package: Other
 dependencies:
   - field_bundle:field_bundle
 
-# Information added by Drupal.org packaging script on 2022-07-25
-version: '1.0.3'
+# Information added by Drupal.org packaging script on 2022-12-08
+version: '1.0.4'
 project: 'field_bundle'
-datestamp: 1658741688
+datestamp: 1670499966

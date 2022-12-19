@@ -23,7 +23,7 @@ class GroupSettingsHelp extends PreprocessBase implements PreprocessInterface {
   /**
    * {@inheritdoc}
    */
-  public function preprocessVariables(Variables $variables) {
+  public function preprocessVariables(Variables $variables): void {
     $build = [];
     $unique_id = Html::getUniqueId('group-settings-help');
     $icon = Bootstrap::glyphicon('info-sign');

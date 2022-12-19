@@ -4,6 +4,9 @@ namespace Drupal\socialbase\Plugin\Preprocess;
 
 use Drupal\bootstrap\Utility\Variables;
 use Drupal\bootstrap\Plugin\Preprocess\BootstrapDropdown;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Pre-processes variables for the "bootstrap_dropdown" theme hook.
@@ -12,14 +15,46 @@ use Drupal\bootstrap\Plugin\Preprocess\BootstrapDropdown;
  *
  * @BootstrapPreprocess("bootstrap_dropdown")
  */
-class Dropdown extends BootstrapDropdown {
+class Dropdown extends BootstrapDropdown implements ContainerFactoryPluginInterface {
+
+  /**
+   * Route Match service.
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface
+   */
+  protected RouteMatchInterface $routeMatch;
+
+  /**
+   * {@inheritDoc}
+   */
+  public function __construct(
+    array $configuration,
+          $plugin_id,
+          $plugin_definition,
+    RouteMatchInterface $route_match
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->routeMatch = $route_match;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('current_route_match')
+    );
+  }
 
   /**
    * {@inheritdoc}
    */
-  public function preprocess(array &$variables, $hook, array $info) {
+  public function preprocess(array &$variables, $hook, array $info): void {
     $operations = !!mb_strpos($variables['theme_hook_original'], 'operations');
-    $route = \Drupal::routeMatch()->getRouteName();
+    $route = $this->routeMatch->getRouteName();
 
     if ($operations &&  ($route === 'view.event_manage_enrollments.page_manage_enrollments' || $route === 'view.group_manage_members.page_group_manage_members')) {
       $variables['default_button'] = FALSE;
@@ -49,7 +84,7 @@ class Dropdown extends BootstrapDropdown {
   /**
    * Function to preprocess the links.
    */
-  protected function preprocessLinks(Variables $variables) {
+  protected function preprocessLinks(Variables $variables): void {
     parent::preprocessLinks($variables);
 
     $operations = !!mb_strpos($variables->theme_hook_original, 'operations');

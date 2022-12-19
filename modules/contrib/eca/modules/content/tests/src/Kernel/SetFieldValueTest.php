@@ -1148,6 +1148,7 @@ class SetFieldValueTest extends KernelTestBase {
     $token_services->addTokenData('node1', $node1);
     $token_services->addTokenData('node2', $node2);
     $token_services->addTokenData('node3', $node3);
+    $token_services->addTokenData('nodes', [$node2, $node3]);
 
     // Create an action that sets a target of the node.
     /** @var \Drupal\eca_content\Plugin\Action\SetFieldValue $action */
@@ -1239,6 +1240,18 @@ class SetFieldValueTest extends KernelTestBase {
     $this->assertEquals($node3->id(), $node1->field_node_multi[0]->target_id, 'The target ID of the first item must match with the ID of node3.');
     $this->assertEquals($new_node->id(), $node1->field_node_multi[1]->target_id, 'The target ID of second item must match with the ID of new node.');
     $this->assertEquals($node2->id(), $node1->field_node_multi[2]->target_id, 'The target ID of third item must match with the ID of node2.');
+
+    $action = $action_manager->createInstance('eca_set_field_value', [
+      'method' => 'set:clear',
+      'field_name' => 'field_node_multi',
+      'field_value' => '[nodes]',
+    ] + $defaults);
+    $action->execute($node1);
+    $this->assertTrue(isset($node1->field_node_multi[0]), 'First item must be set.');
+    $this->assertTrue(isset($node1->field_node_multi[1]), 'Second item must be set.');
+    $this->assertFalse(isset($node1->field_node_multi[2]), 'Third item must not be set.');
+    $this->assertEquals($node2->id(), $node1->field_node_multi[0]->target_id);
+    $this->assertEquals($node3->id(), $node1->field_node_multi[1]->target_id);
 
     $account_switcher->switchBack();
   }

@@ -224,8 +224,8 @@ class SetCanvasImageEffect extends ConfigurableImageEffectBase {
     // Get offset of original image.
     if ($this->configuration['canvas_size'] === 'exact') {
       list($x_pos, $y_pos) = explode('-', $this->configuration['exact']['placement']);
-      $data['x_pos'] = image_filter_keyword($x_pos, $data['width'], $image->getWidth()) + $this->configuration['exact']['x_offset'];
-      $data['y_pos'] = image_filter_keyword($y_pos, $data['height'], $image->getHeight()) + $this->configuration['exact']['y_offset'];
+      $data['x_pos'] = ImageUtility::getKeywordOffset($x_pos, $data['width'], $image->getWidth()) + $this->configuration['exact']['x_offset'];
+      $data['y_pos'] = ImageUtility::getKeywordOffset($y_pos, $data['height'], $image->getHeight()) + $this->configuration['exact']['y_offset'];
     }
     else {
       $data['x_pos'] = $this->configuration['relative']['left'];

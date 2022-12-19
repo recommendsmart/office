@@ -85,7 +85,7 @@ namespace Drupal\Tests\r4032login\Unit {
     /**
      * {@inheritdoc}
      */
-    protected function setUp() {
+    protected function setUp(): void {
       $this->kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
       $this->configFactory = $this->getConfigFactoryStub([
         'r4032login.settings' => [
@@ -262,7 +262,7 @@ namespace Drupal\Tests\r4032login\Unit {
         $r4032login,
         'on403',
       ]);
-      $dispatcher->dispatch(KernelEvents::EXCEPTION, $event);
+      $dispatcher->dispatch($event, KernelEvents::EXCEPTION);
 
       $response = $event->getResponse();
       $this->assertNull($response);

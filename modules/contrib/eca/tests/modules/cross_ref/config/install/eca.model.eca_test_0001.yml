@@ -237,7 +237,7 @@ modeldata: |
           <camunda:field name="message">
             <camunda:string>Node [entity:title] references [refentity:title]</camunda:string>
           </camunda:field>
-        <camunda:field name="replace_tokens"><camunda:string/></camunda:field></bpmn2:extensionElements>
+        <camunda:field name="replace_tokens"><camunda:string>yes</camunda:string></camunda:field></bpmn2:extensionElements>
         <bpmn2:incoming>Flow_0gtu934</bpmn2:incoming>
       </bpmn2:task>
       <bpmn2:sequenceFlow id="Flow_1tgic5x" name="Not empty?" camunda:modelerTemplate="org.drupal.condition.eca_entity_field_value_empty" sourceRef="Activity_0r1gs9s" targetRef="Activity_0h8b7vh">
@@ -271,7 +271,7 @@ modeldata: |
           <camunda:field name="message">
             <camunda:string>Node [entity:title] got updated</camunda:string>
           </camunda:field>
-        <camunda:field name="replace_tokens"><camunda:string/></camunda:field></bpmn2:extensionElements>
+        <camunda:field name="replace_tokens"><camunda:string>yes</camunda:string></camunda:field></bpmn2:extensionElements>
         <bpmn2:incoming>Flow_09h5anm</bpmn2:incoming>
       </bpmn2:task>
       <bpmn2:sequenceFlow id="Flow_09h5anm" sourceRef="Event_1cfd8ek" targetRef="Activity_1cxcwjm"/>
@@ -397,7 +397,7 @@ modeldata: |
           <camunda:field name="message">
             <camunda:string>The title of the referenced node is [originalentity:field_other_node:entity:title].</camunda:string>
           </camunda:field>
-        <camunda:field name="replace_tokens"><camunda:string/></camunda:field></bpmn2:extensionElements>
+        <camunda:field name="replace_tokens"><camunda:string>yes</camunda:string></camunda:field></bpmn2:extensionElements>
         <bpmn2:incoming>Flow_164r6h9</bpmn2:incoming>
       </bpmn2:task>
       <bpmn2:sequenceFlow id="Flow_164r6h9" sourceRef="Activity_1w7m4sk" targetRef="Activity_077d2t8"/>

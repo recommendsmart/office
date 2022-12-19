@@ -3,7 +3,7 @@
 namespace Drupal\Tests\eca_user\Kernel;
 
 use Drupal\eca\Entity\Eca;
-use Drupal\eca_array\Plugin\Action\ArrayWrite;
+use Drupal\eca_test_array\Plugin\Action\ArrayWrite;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
 use Drupal\user\Event\UserEvents as CoreUserEvents;
@@ -25,8 +25,8 @@ class UserEventsTest extends KernelTestBase {
     'user',
     'field',
     'eca',
-    'eca_array',
     'eca_user',
+    'eca_test_array',
   ];
 
   /**
@@ -110,7 +110,7 @@ class UserEventsTest extends KernelTestBase {
       'gateways' => [],
       'actions' => [
         'write_login' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'login',
           'configuration' => [
             'key' => 'login',
@@ -119,7 +119,7 @@ class UserEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_logout' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'logout',
           'configuration' => [
             'key' => 'logout',
@@ -128,7 +128,7 @@ class UserEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_cancel' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'cancel',
           'configuration' => [
             'key' => 'cancel',
@@ -137,7 +137,7 @@ class UserEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_floodblockip' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'floodblockip',
           'configuration' => [
             'key' => 'floodblockip',
@@ -146,7 +146,7 @@ class UserEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_floodblockuser' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'floodblockuser',
           'configuration' => [
             'key' => 'floodblockuser',
@@ -155,7 +155,7 @@ class UserEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_set_user' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'set_user',
           'configuration' => [
             'key' => 'set_user',

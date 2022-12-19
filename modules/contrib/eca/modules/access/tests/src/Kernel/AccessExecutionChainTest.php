@@ -29,6 +29,7 @@ class AccessExecutionChainTest extends KernelTestBase {
     'node',
     'eca',
     'eca_access',
+    'eca_test_array',
   ];
 
   /**
@@ -235,6 +236,162 @@ class AccessExecutionChainTest extends KernelTestBase {
     $this->assertTrue($page->access('view'));
     $this->assertTrue($page->title->access('edit'));
     $this->assertTrue($page->body->access('edit'));
+  }
+
+  /**
+   * Tests entity create access using eca_access plugins.
+   */
+  public function testCreateAccess(): void {
+    /** @var \Drupal\Core\Session\AccountSwitcherInterface $account_switcher */
+    $account_switcher = \Drupal::service('account_switcher');
+    $account_switcher->switchTo(User::load(2));
+
+    $access_handler = \Drupal::entityTypeManager()->getAccessControlHandler('node');
+    $this->assertFalse($access_handler->createAccess('article'));
+
+    // This config does the following:
+    // 1. It reacts upon determining create access, restricted to node article.
+    // 2. Upon that, it grants access for all users.
+    $eca_config_values = [
+      'langcode' => 'en',
+      'status' => TRUE,
+      'id' => 'entity_access',
+      'label' => 'ECA entity create access',
+      'modeller' => 'fallback',
+      'version' => '1.0.0',
+      'events' => [
+        'create_access' => [
+          'plugin' => 'access:create',
+          'label' => 'Node article create access',
+          'configuration' => [
+            'entity_type_id' => 'node',
+            'bundle' => 'article',
+            'langcode' => '',
+          ],
+          'successors' => [
+            ['id' => 'grant_access', 'condition' => ''],
+          ],
+        ],
+      ],
+      'conditions' => [],
+      'gateways' => [],
+      'actions' => [
+        'grant_access' => [
+          'plugin' => 'eca_access_set_result',
+          'label' => 'Grant access',
+          'configuration' => [
+            'access_result' => 'allowed',
+          ],
+          'successors' => [],
+        ],
+      ],
+    ];
+    $ecaConfig = Eca::create($eca_config_values);
+    $ecaConfig->trustData()->save();
+    \Drupal::entityTypeManager()->getAccessControlHandler('node')->resetCache();
+
+    $this->assertTrue($access_handler->createAccess('article'));
+  }
+
+  /**
+   * Tests access checks using a different account than the current user.
+   */
+  public function testEntityAccessDifferentAccount(): void {
+    User::create([
+      'uid' => 3,
+      'name' => 'authenticated2',
+      'roles' => ['test_role_eca'],
+    ])->save();
+
+    /** @var \Drupal\Core\Session\AccountSwitcherInterface $account_switcher */
+    $account_switcher = \Drupal::service('account_switcher');
+    $account_switcher->switchTo(User::load(2));
+
+    $article = Node::create([
+      'type' => 'article',
+      'title' => $this->randomMachineName(),
+      'status' => FALSE,
+    ]);
+    $article->save();
+    $this->assertFalse($article->access('view'));
+
+    // This config does the following:
+    // 1. It reacts upon determining entity access, restricted to node article.
+    // 2. Upon that, it grants access for user ID 3.
+    $eca_config_values = [
+      'langcode' => 'en',
+      'status' => TRUE,
+      'id' => 'entity_access_different_account',
+      'label' => 'ECA entity access different account',
+      'modeller' => 'fallback',
+      'version' => '1.0.0',
+      'events' => [
+        'entity_access' => [
+          'plugin' => 'access:entity',
+          'label' => 'Node article access',
+          'configuration' => [
+            'entity_type_id' => 'node',
+            'bundle' => 'article',
+            'operation' => 'view',
+          ],
+          'successors' => [
+            ['id' => 'array_write', 'condition' => ''],
+          ],
+        ],
+      ],
+      'conditions' => [
+        'array_has_key_value' => [
+          'plugin' => 'eca_test_array_has_key_and_value',
+          'configuration' => [
+            'key' => 'account_id',
+            'value' => '3',
+          ],
+        ],
+      ],
+      'gateways' => [],
+      'actions' => [
+        'array_write' => [
+          'plugin' => 'eca_test_array_write',
+          'label' => 'Write account user into array',
+          'configuration' => [
+            'key' => 'account_id',
+            'value' => '[account:uid]',
+          ],
+          'successors' => [
+            ['id' => 'grant_access', 'condition' => 'array_has_key_value'],
+          ],
+        ],
+        'grant_access' => [
+          'plugin' => 'eca_access_set_result',
+          'label' => 'Grant access',
+          'configuration' => [
+            'access_result' => 'allowed',
+          ],
+          'successors' => [],
+        ],
+      ],
+    ];
+    $ecaConfig = Eca::create($eca_config_values);
+    $ecaConfig->trustData()->save();
+    \Drupal::entityTypeManager()->getAccessControlHandler('node')->resetCache();
+
+    $article = Node::create([
+      'type' => 'article',
+      'title' => $this->randomMachineName(),
+      'status' => FALSE,
+    ]);
+    $article->save();
+    $this->assertFalse($article->access('view'));
+    $this->assertTrue($article->access('view', User::load(3)));
+
+    $page = Node::create([
+      'type' => 'page',
+      'title' => $this->randomMachineName(),
+      'status' => FALSE,
+    ]);
+    $page->save();
+    $this->assertFalse($page->access('view'), "Access must still be revoked on nodes other than articles.");
+    $this->assertFalse($page->access('view', User::load(3)), "Access must still be revoked on nodes other than articles.");
   }
 
 }

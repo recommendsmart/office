@@ -327,6 +327,7 @@ class MaestroEngine {
   public static function getProcessVariable($variableName, $processID) {
     $query = \Drupal::entityTypeManager()->getStorage('maestro_process_variables')->getQuery();
     $query->condition('process_id', $processID)
+      ->accessCheck(FALSE)
       ->condition('variable_name', $variableName);
     $entity_ids = $query->execute();
     // We are expecting only 1 result... if any.
@@ -354,6 +355,7 @@ class MaestroEngine {
   public static function setProcessVariable($variableName, $variableValue, $processID) {
     $query = \Drupal::entityTypeManager()->getStorage('maestro_process_variables')->getQuery();
     $query->condition('process_id', $processID)
+      ->accessCheck(FALSE)
       ->condition('variable_name', $variableName);
     $varID = $query->execute();
     if (count($varID) > 0) {
@@ -366,6 +368,7 @@ class MaestroEngine {
       // by_variable = 1, process_variable needs to match our variable.
       $query = \Drupal::entityTypeManager()->getStorage('maestro_production_assignments')->getQuery();
       $query ->condition('process_variable', $varID)
+        ->accessCheck(FALSE)
         ->condition('by_variable', '1')
         ->condition('task_completed', '0');
       $entries = $query->execute();
@@ -411,6 +414,7 @@ class MaestroEngine {
   public static function getProcessVariableID($variableName, $processID) {
     $query = \Drupal::entityTypeManager()->getStorage('maestro_process_variables')->getQuery();
     $query->condition('process_id', $processID)
+      ->accessCheck(FALSE)
       ->condition('variable_name', $variableName);
     $entity_ids = $query->execute();
     // We are expecting only 1 result... if any.
@@ -723,6 +727,7 @@ class MaestroEngine {
     $output = [];
     // Lets get the assignments based on this queue ID.
     $query = \Drupal::entityTypeManager()->getStorage('maestro_production_assignments')->getQuery();
+    $query->accessCheck(FALSE);
     $query->condition('queue_id', $queueID);
     $entity_ids = $query->execute();
     if (count($entity_ids) > 0) {
@@ -1372,6 +1377,7 @@ class MaestroEngine {
     // task is not archived, not completed and hasn't run once.
     $query = \Drupal::entityTypeManager()->getStorage('maestro_queue')->getQuery();
     $query->condition('archived', '0')
+      ->accessCheck(FALSE)
       ->condition('status', '0')
       ->condition('is_interactive', '0')
       ->condition('run_once', '0')
@@ -1382,6 +1388,7 @@ class MaestroEngine {
     // now we need interactive tasks that have a completion status.
     $query = \Drupal::entityTypeManager()->getStorage('maestro_queue')->getQuery();
     $query->condition('archived', '0')
+      ->accessCheck(FALSE)
       ->condition('is_interactive', '1')
     // This allows the interactive tasks to set their status.
       ->condition('status', '0', '<>')
@@ -1458,6 +1465,7 @@ class MaestroEngine {
       // So now only for interactive tasks that are not complete and have aged beyond their reminder intervals.
       $query = \Drupal::entityTypeManager()->getStorage('maestro_queue')->getQuery();
       $query->condition('archived', '0')
+        ->accessCheck(FALSE)
         ->condition('is_interactive', '1')
         ->condition('status', '0')
         ->condition('run_once', '1')
@@ -1486,6 +1494,7 @@ class MaestroEngine {
       // Now for escalations.
       $query = \Drupal::entityTypeManager()->getStorage('maestro_queue')->getQuery();
       $query->condition('archived', '0')
+        ->accessCheck(FALSE)
         ->condition('is_interactive', '1')
         ->condition('status', '0')
         ->condition('run_once', '1')
@@ -1560,6 +1569,7 @@ class MaestroEngine {
         $query = \Drupal::entityTypeManager()->getStorage('maestro_queue')->getQuery();
         // Race condition?  what if its complete and not archived, yet a loopback happens?  Leave for now.
         $query->condition('archived', TASK_ARCHIVE_REGEN, '<>')
+          ->accessCheck(FALSE)
           ->condition('status', TASK_STATUS_ACTIVE, '<>')
           ->condition('process_id', $processID)
           ->condition('task_id', $taskID)
@@ -1576,6 +1586,7 @@ class MaestroEngine {
           $query = \Drupal::entityTypeManager()->getStorage('maestro_queue')->getQuery();
           // We don't need to recreate if this thing is already in the queue.
           $query->condition('archived', '0')
+            ->accessCheck(FALSE)
             ->condition('status', TASK_STATUS_ACTIVE)->condition('process_id', $processID)
             ->condition('task_id', $taskID);
           $entity_ids = $query->execute();
@@ -1601,6 +1612,7 @@ class MaestroEngine {
           // Race condition?  what if its complete and not archived, yet a loopback happens?  Leave for now.
           $query = \Drupal::entityTypeManager()->getStorage('maestro_queue')->getQuery();
           $query->condition('archived', '1')
+            ->accessCheck(FALSE)
             ->condition('status', '0')
             ->condition('process_id', $processID)
           // Task is an AND.
@@ -1634,6 +1646,7 @@ class MaestroEngine {
           // now, we have a list of noRegenStatusArray which are entity IDs in the maestro_queue for which we do NOT change the archive flag for.
           $query = \Drupal::entityTypeManager()->getStorage('maestro_queue')->getQuery();
           $query->condition('status', '0', '<>')
+            ->accessCheck(FALSE)
           // All completed tasks that haven't been regen'd.
             ->condition('process_id', $processID);
           $regenIDs = $query->execute();

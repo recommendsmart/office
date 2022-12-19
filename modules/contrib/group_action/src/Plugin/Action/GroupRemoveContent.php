@@ -8,7 +8,8 @@ namespace Drupal\group_action\Plugin\Action;
  * @Action(
  *   id = "group_remove_content",
  *   label = "Group: remove content",
- *   type = "node"
+ *   type = "node",
+ *   deriver = "Drupal\group_action\Plugin\Action\GroupActionDeriver"
  * )
  *
  * @TODO, support multiple entity types once core is fixed.

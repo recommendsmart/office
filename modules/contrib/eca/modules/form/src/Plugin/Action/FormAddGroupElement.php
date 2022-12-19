@@ -4,8 +4,10 @@ namespace Drupal\eca_form\Plugin\Action;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\RenderElement;
+use Drupal\eca\Plugin\Action\ActionBase;
 use Drupal\eca\Plugin\DataType\DataTransferObject;
 use Drupal\eca\Plugin\FormFieldPluginTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Adds a grouping element to a form.
@@ -20,6 +22,13 @@ use Drupal\eca\Plugin\FormFieldPluginTrait;
 class FormAddGroupElement extends FormActionBase {
 
   use FormFieldPluginTrait;
+
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): ActionBase {
+    $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
+    // Reverse the order of lookups.
+    $instance->lookupKeys = ['array_parents', 'parents'];
+    return $instance;
+  }
 
   /**
    * {@inheritdoc}

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\eca_array\Plugin\Action;
+namespace Drupal\eca_test_array\Plugin\Action;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\eca\Plugin\Action\ActionBase;
@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * An action that increments a number in an array.
  *
  * @Action(
- *   id = "eca_array_increment",
+ *   id = "eca_test_array_increment",
  *   label = @Translation("Static array: increment"),
  *   description = @Translation("This action increments a number in a static array."),
  *   nodocs = true

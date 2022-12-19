@@ -2,6 +2,8 @@
 
 namespace Drupal\eca_form\Event;
 
+use Drupal\eca\Event\RenderEventInterface;
+
 /**
  * Dispatched when a form is being build.
  *
@@ -11,6 +13,14 @@ namespace Drupal\eca_form\Event;
  *
  * @package Drupal\eca_form\Event
  */
-class FormBuild extends FormBase {
+class FormBuild extends FormBase implements RenderEventInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function &getRenderArray(): array {
+    $form = &$this->getForm();
+    return $form;
+  }
 
 }

@@ -16,7 +16,7 @@ class ConfirmFormModal extends PreprocessBase {
   /**
    * {@inheritdoc}
    */
-  public function preprocess(array &$variables, $hook, array $info) {
+  public function preprocess(array &$variables, $hook, array $info): void {
     parent::preprocess($variables, $hook, $info);
 
     $form = &$variables['form'];

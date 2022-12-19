@@ -6,7 +6,9 @@ use Drupal\Core\Routing\RouteSubscriberBase;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * Class RouteSubscriber.
+ * Subscriber for user related routes.
+ *
+ * Adds an access requirement for a role_delegation route.
  *
  * @package Drupal\userprotect\Routing
  */

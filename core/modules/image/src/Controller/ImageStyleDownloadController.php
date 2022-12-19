@@ -157,15 +157,6 @@ class ImageStyleDownloadController extends FileDownloadController {
 
     $headers = [];
 
-    // If not using a public scheme, let other modules provide headers and
-    // control access to the file.
-    if (!$is_public) {
-      $headers = $this->moduleHandler()->invokeAll('file_download', [$image_uri]);
-      if (in_array(-1, $headers) || empty($headers)) {
-        throw new AccessDeniedHttpException();
-      }
-    }
-
     // Don't try to generate file if source is missing.
     if (!$this->sourceImageExists($image_uri, $token_is_valid)) {
       // If the image style converted the extension, it has been added to the
@@ -173,7 +164,7 @@ class ImageStyleDownloadController extends FileDownloadController {
       // the actual source image, we remove the extension and check if that
       // image exists.
       $path_info = pathinfo(StreamWrapperManager::getTarget($image_uri));
-      $converted_image_uri = sprintf('%s://%s%s%s', $this->streamWrapperManager->getScheme($derivative_uri), $path_info['dirname'], DIRECTORY_SEPARATOR, $path_info['filename']);
+      $converted_image_uri = sprintf('%s://%s%s', $this->streamWrapperManager->getScheme($derivative_uri), $path_info['dirname'] === '.' ? '' : $path_info['dirname'] . DIRECTORY_SEPARATOR, $path_info['filename']);
       if (!$this->sourceImageExists($converted_image_uri, $token_is_valid)) {
         $this->logger->notice('Source image at %source_image_path not found while trying to generate derivative image at %derivative_path.', ['%source_image_path' => $image_uri, '%derivative_path' => $derivative_uri]);
         return new Response($this->t('Error generating image, missing source file.'), 404);
@@ -181,6 +172,15 @@ class ImageStyleDownloadController extends FileDownloadController {
       else {
         // The converted file does exist, use it as the source.
         $image_uri = $converted_image_uri;
+      }
+    }
+
+    // If not using a public scheme, let other modules provide headers and
+    // control access to the file.
+    if (!$is_public) {
+      $headers = $this->moduleHandler()->invokeAll('file_download', [$image_uri]);
+      if (in_array(-1, $headers) || empty($headers)) {
+        throw new AccessDeniedHttpException();
       }
     }
 
@@ -207,10 +207,8 @@ class ImageStyleDownloadController extends FileDownloadController {
     if ($success) {
       $image = $this->imageFactory->get($derivative_uri);
       $uri = $image->getSource();
-      $headers += [
-        'Content-Type' => $image->getMimeType(),
-        'Content-Length' => $image->getFileSize(),
-      ];
+      $headers['Content-Type'] = $image->getMimeType();
+      $headers['Content-Length'] = $image->getFileSize();
       // \Drupal\Core\EventSubscriber\FinishResponseSubscriber::onRespond()
       // sets response as not cacheable if the Cache-Control header is not
       // already modified. When $is_public is TRUE, the following sets the

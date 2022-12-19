@@ -18,8 +18,8 @@ class Fieldset extends PreprocessBase {
   /**
    * {@inheritdoc}
    */
-  protected function preprocessElement(Element $element, Variables $variables) {
-    if (isset($element['#type']) && $element['#type'] == ('radios' || 'checkboxes')) {
+  protected function preprocessElement(Element $element, Variables $variables): void {
+    if (isset($element['#type']) && (($element['#type'] == 'radios') || ($element['#type'] == 'checkboxes'))) {
       $variables['form_group'] = TRUE;
     }
 

@@ -16,7 +16,7 @@ abstract class UserProtectBrowserTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['userprotect', 'userprotect_test'];
+  protected static $modules = ['userprotect', 'userprotect_test'];
 
   /**
    * {@inheritdoc}

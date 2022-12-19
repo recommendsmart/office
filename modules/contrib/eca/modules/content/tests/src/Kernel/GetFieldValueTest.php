@@ -222,6 +222,14 @@ class GetFieldValueTest extends KernelTestBase {
     $action->execute($node3);
     $this->assertEquals($node->id(), $token_services->replaceClear('[ref_token:multi:0:nid]'));
 
+    /** @var \Drupal\eca_content\Plugin\Action\GetFieldValue $action */
+    $action = $action_manager->createInstance('eca_get_field_value', [
+      'token_name' => 'ref_token:multi_first',
+      'field_name' => 'field_content_multi.0',
+    ]);
+    $action->execute($node3);
+    $this->assertEquals($node->id(), $token_services->replaceClear('[ref_token:multi_first:nid]'));
+
     $account_switcher->switchBack();
   }
 

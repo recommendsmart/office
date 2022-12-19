@@ -7,15 +7,19 @@
 
 namespace Drupal\maestro_interactive_task_plugin_example\ProxyClass {
 
+    use Drupal\Core\Extension\ModuleUninstallValidatorInterface;
+    use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+    use Symfony\Component\DependencyInjection\ContainerInterface;
+    use Drupal\Core\StringTranslation\TranslationInterface;
     /**
      * Provides a proxy class for \Drupal\maestro_interactive_task_plugin_example\MaestroInteractiveExampleTaskUninstallValidator.
      *
      * @see \Drupal\Component\ProxyBuilder
      */
-    class MaestroInteractiveExampleTaskUninstallValidator implements \Drupal\Core\Extension\ModuleUninstallValidatorInterface
+    class MaestroInteractiveExampleTaskUninstallValidator implements ModuleUninstallValidatorInterface
     {
 
-        use \Drupal\Core\DependencyInjection\DependencySerializationTrait;
+        use DependencySerializationTrait;
 
         /**
          * The id of the original proxied service.
@@ -46,7 +50,7 @@ namespace Drupal\maestro_interactive_task_plugin_example\ProxyClass {
          * @param string $drupal_proxy_original_service_id
          *   The service ID of the original service.
          */
-        public function __construct(\Symfony\Component\DependencyInjection\ContainerInterface $container, $drupal_proxy_original_service_id)
+        public function __construct(ContainerInterface $container, $drupal_proxy_original_service_id)
         {
             $this->container = $container;
             $this->drupalProxyOriginalServiceId = $drupal_proxy_original_service_id;
@@ -78,7 +82,7 @@ namespace Drupal\maestro_interactive_task_plugin_example\ProxyClass {
         /**
          * {@inheritdoc}
          */
-        public function setStringTranslation(\Drupal\Core\StringTranslation\TranslationInterface $translation)
+        public function setStringTranslation(TranslationInterface $translation)
         {
             return $this->lazyLoadItself()->setStringTranslation($translation);
         }

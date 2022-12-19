@@ -20,8 +20,14 @@ be passed as arguments:
 
 ```bash
 chmod +x ./public/modules/contrib/wmsingles/scripts/update-to-v3.sh
-./public/modules/contrib/wmsingles/scripts/update-to-v3.sh config/*
+./public/modules/contrib/node_singles/scripts/update-to-v3.sh config/*
 public/modules/custom/* public/themes/custom/* public/sites/*
+```
+
+If you're using macOS, make sure to run this before the script:
+```bash
+brew install gnu-sed
+PATH="$(brew --prefix gnu-sed)/libexec/gnubin:$PATH"
 ```
 
 3. Apply any changes:

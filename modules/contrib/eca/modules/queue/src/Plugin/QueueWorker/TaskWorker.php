@@ -7,6 +7,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\eca\Token\TokenInterface;
 use Drupal\eca_queue\Event\ProcessingTaskEvent;
+use Drupal\eca_queue\Exception\NotYetDueForProcessingException;
 use Drupal\eca_queue\Task;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -17,7 +18,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * @QueueWorker(
  *   id = "eca_task",
  *   title = @Translation("ECA Tasks"),
- *   cron = {"time" = 15}
+ *   cron = {"time" = 15},
+ *   deriver = "Drupal\eca_queue\Plugin\QueueWorker\TaskWorkerDeriver"
  * )
  */
 class TaskWorker extends QueueWorkerBase implements ContainerFactoryPluginInterface {
@@ -78,11 +80,24 @@ class TaskWorker extends QueueWorkerBase implements ContainerFactoryPluginInterf
     }
     $task = $data;
     if (!$task->isDueForProcessing()) {
-      throw new \Exception('Task is not yet due for processing.');
+      throw new NotYetDueForProcessingException('Task is not yet due for processing.');
     }
     $this->tokenServices->addTokenDataProvider($task);
     $this->eventDispatcher->dispatch(new ProcessingTaskEvent($task), QueueEvents::PROCESSING_TASK);
     $this->tokenServices->removeTokenDataProvider($task);
+  }
+
+  /**
+   * Normalizes the user-defined task name to be compatible with machine names.
+   *
+   * @param string $task_name
+   *   The task name to normalize.
+   *
+   * @return string
+   *   The normalized task name.
+   */
+  public static function normalizeTaskName(string $task_name): string {
+    return str_replace(' ', '_', mb_strtolower(trim($task_name)));
   }
 
 }

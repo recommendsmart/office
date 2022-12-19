@@ -47,10 +47,11 @@ class ViewsQuery extends ConfigurableActionBase {
    * {@inheritdoc}
    */
   public function execute($object = NULL): void {
-    if (!($display = $this->getDisplay())) {
+    if (!$this->getDisplay() || !isset($this->view)) {
       return;
     }
-    $display->execute();
+    $this->view->preExecute();
+    $this->view->execute();
     $token_name = trim($this->configuration['token_name']);
     if ($token_name === '') {
       $token_name = implode(':', [
@@ -155,8 +156,7 @@ class ViewsQuery extends ConfigurableActionBase {
    */
   protected function getDisplay(): ?DisplayPluginBase {
     $view_id = $this->getViewId();
-    $display_id = $this->getDisplayId();
-    if ($view_id === '' || $display_id === '') {
+    if ($view_id === '') {
       return NULL;
     }
 
@@ -166,8 +166,15 @@ class ViewsQuery extends ConfigurableActionBase {
     }
 
     $this->view = $view->getExecutable();
-    if (!$this->view->setDisplay($this->getDisplayId())) {
-      return NULL;
+
+    $display_id = $this->getDisplayId();
+    if ($display_id !== '') {
+      if (!$this->view->setDisplay($display_id)) {
+        return NULL;
+      }
+    }
+    else {
+      $this->view->initDisplay();
     }
 
     $args = [];
@@ -177,6 +184,7 @@ class ViewsQuery extends ConfigurableActionBase {
       }
     }
     $this->view->setArguments($args);
+
     return $this->view->getDisplay();
   }
 

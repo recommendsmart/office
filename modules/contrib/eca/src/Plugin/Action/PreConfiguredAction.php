@@ -10,7 +10,8 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @Action(
  *   id = "eca_preconfigured_action",
- *   deriver = "\Drupal\eca\Plugin\Action\PreConfiguredActionDeriver"
+ *   deriver = "\Drupal\eca\Plugin\Action\PreConfiguredActionDeriver",
+ *   nodocs = true
  * )
  */
 class PreConfiguredAction extends ConfigurableActionBase {

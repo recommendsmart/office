@@ -70,6 +70,11 @@ trait TokenDecoratorTrait {
       $data = NULL;
     }
 
+    // Directly use the entity, instead of the wrapped adapter.
+    if ($data instanceof EntityAdapter) {
+      $data = $data->getEntity();
+    }
+
     if (empty($parts) && (is_null($data) || $this->getTokenType($data))) {
       $this->data[$key] = $data;
       return $this;
@@ -276,7 +281,16 @@ trait TokenDecoratorTrait {
    * {@inheritdoc}
    */
   public function generate($type, array $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
-    if (!isset($data[$type]) && $this->hasTokenData($type)) {
+    if ($type === '_eca_root_token') {
+      // Check for each item when generating values for root-level tokens.
+      foreach (array_keys($tokens) as $root_level_token) {
+        if (!isset($data[$root_level_token]) && $this->hasTokenData($root_level_token)) {
+          // Use previously set data in case it's not given otherwise.
+          $data[$root_level_token] = $this->getTokenData($root_level_token);
+        }
+      }
+    }
+    elseif (!isset($data[$type]) && $this->hasTokenData($type)) {
       // Use previously set data in case it's not given otherwise.
       $data[$type] = $this->getTokenData($type);
     }

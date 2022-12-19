@@ -477,13 +477,17 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
       // explicitly here instead. The advantage is that this will not
       // interrupt the process.
       $variables = Error::decodeException($e);
-      unset($variables['backtrace']);
+      $variables = array_filter($variables, function ($key) {
+        return $key[0] == '@' || $key[0] == '%';
+      }, ARRAY_FILTER_USE_KEY);
       $log_entry->log('%type: @message in %function (line %line of %file).', $variables, RfcLogLevel::ERROR);
       return FALSE;
     }
     catch (\Exception $e) {
       $variables = Error::decodeException($e);
-      unset($variables['backtrace']);
+      $variables = array_filter($variables, function ($key) {
+        return $key[0] == '@' || $key[0] == '%';
+      }, ARRAY_FILTER_USE_KEY);
       $log_entry->log('%type: @message in %function (line %line of %file).', $variables, RfcLogLevel::ERROR);
       return FALSE;
     }

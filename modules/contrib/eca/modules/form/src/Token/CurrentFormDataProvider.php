@@ -18,9 +18,9 @@ class CurrentFormDataProvider implements DataProviderInterface {
   /**
    * The ECA form event subscriber.
    *
-   * @var \Drupal\eca\EventSubscriber\EcaExecutionFormSubscriber
+   * @var \Drupal\eca\EventSubscriber\EcaExecutionFormSubscriber|null
    */
-  protected EcaExecutionFormSubscriber $subscriber;
+  protected ?EcaExecutionFormSubscriber $subscriber = NULL;
 
   /**
    * In-memory cache of instantiated data.
@@ -30,20 +30,10 @@ class CurrentFormDataProvider implements DataProviderInterface {
   protected static $cached = [];
 
   /**
-   * Constructs a new FormDataProvider object.
-   *
-   * @param \Drupal\eca\EventSubscriber\EcaExecutionFormSubscriber $subscriber
-   *   The ECA form event subscriber.
-   */
-  public function __construct(EcaExecutionFormSubscriber $subscriber) {
-    $this->subscriber = $subscriber;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function getData(string $key) {
-    if (!($events = $this->subscriber->getStackedFormEvents())) {
+    if (!($events = $this->subscriber()->getStackedFormEvents())) {
       return NULL;
     }
 
@@ -105,6 +95,23 @@ class CurrentFormDataProvider implements DataProviderInterface {
    */
   public function hasData(string $key): bool {
     return $this->getData($key) !== NULL;
+  }
+
+  /**
+   * Get the ECA form event subscriber.
+   *
+   * This service can not be obtained through dependency injection, because
+   * this may lead to a circular reference.
+   * @see https://www.drupal.org/project/eca/issues/3318655
+   *
+   * @return \Drupal\eca\EventSubscriber\EcaExecutionFormSubscriber
+   *   The subscriber.
+   */
+  protected function subscriber(): EcaExecutionFormSubscriber {
+    if (!isset($this->subscriber)) {
+      $this->subscriber = EcaExecutionFormSubscriber::get();
+    }
+    return $this->subscriber;
   }
 
 }

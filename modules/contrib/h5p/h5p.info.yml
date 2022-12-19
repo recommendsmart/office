@@ -8,7 +8,7 @@ dependencies:
   - drupal:field
   - drupal:file
 
-# Information added by Drupal.org packaging script on 2022-01-20
-version: '2.0.0-alpha2'
+# Information added by Drupal.org packaging script on 2022-12-14
+version: '2.0.0-alpha3'
 project: 'h5p'
-datestamp: 1642679841
+datestamp: 1671019062

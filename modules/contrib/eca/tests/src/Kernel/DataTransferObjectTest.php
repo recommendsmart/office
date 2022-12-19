@@ -27,7 +27,7 @@ class DataTransferObjectTest extends KernelTestBase {
     'text',
     'node',
     'eca',
-    'eca_array',
+    'eca_test_array',
   ];
 
   /**
@@ -85,6 +85,32 @@ class DataTransferObjectTest extends KernelTestBase {
     /** @var \Drupal\node\Entity\NodeType $node_type */
     $node_type = \Drupal::entityTypeManager()->getStorage('node_type')->loadUnchanged('article');
     $this->assertEquals('ECA Article', $node_type->get('name'));
+  }
+
+  /**
+   * Tests removing values.
+   */
+  public function testRemove(): void {
+    $user1 = User::create(['name' => 'user1']);
+    $user1->save();
+    $user2 = User::create(['name' => 'user2']);
+    $user2->save();
+    $user3 = User::create(['name' => 'user3']);
+    $user3->save();
+    $user4 = User::create(['name' => 'user4']);
+    $user4->save();
+    $dto = DataTransferObject::create([$user1, $user2, $user3]);
+    $this->assertSame(3, $dto->count());
+    $item = $dto->remove($user4);
+    $this->assertNull($item);
+    $this->assertSame(3, $dto->count());
+    $item = $dto->remove($user2);
+    $this->assertNotNull($item);
+    $this->assertSame(2, $dto->count());
+    $cloned_user1 = clone $user1;
+    $item = $dto->remove($cloned_user1);
+    $this->assertNotNull($item);
+    $this->assertSame(1, $dto->count());
   }
 
 }

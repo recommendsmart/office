@@ -464,6 +464,25 @@ class Eca extends ConfigEntityBase implements EntityWithPluginCollectionInterfac
           }
         }
       }
+
+      // Identify number fields and replace them with a valid numeric value if
+      // the field is configured with a token. This is important to get those
+      // fields through form validation without issues.
+      // @todo Add support for nested form fields like e.g. in container/fieldset.
+      $numeric_fields = [];
+      $form = [];
+      $form_state = new FormState();
+      foreach ($plugin->buildConfigurationForm($form, $form_state) as $key => $form_field) {
+        if (isset($form_field['#type'], $fields[$key]) &&
+          ($form_field['#type'] === 'number') &&
+          (mb_substr((string) $fields[$key], 0, 1) === '[') &&
+          (mb_substr((string) $fields[$key], -1, 1) === ']') &&
+          (mb_strlen((string) $fields[$key]) <= 255)) {
+          // Remember the original configuration value.
+          $numeric_fields[$key] = $fields[$key];
+          $fields[$key] = $form_field['#min'] ?? 0;
+        }
+      }
     }
 
     // Simulate filling and submitting a form for configuring the plugin.
@@ -525,6 +544,11 @@ class Eca extends ConfigEntityBase implements EntityWithPluginCollectionInterfac
     }
     // Collect the resulting form field values.
     $fields = ($plugin instanceof ConfigurableInterface ? $plugin->getConfiguration() : []) + $fields;
+
+    // Restore tokens for numeric configuration fields.
+    foreach ($numeric_fields as $key => $original_value) {
+      $fields[$key] = $original_value;
+    }
     return TRUE;
   }
 

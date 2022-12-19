@@ -26,7 +26,7 @@ class UserProtectionPermissionsTest extends UserProtectBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Revoke default permissions on the authenticated user role that are
@@ -47,13 +47,18 @@ class UserProtectionPermissionsTest extends UserProtectBrowserTestBase {
    */
   public function testEditOwnMail() {
     // Create account that may edit its own mail address.
-    $account = $this->drupalCreateUser(['userprotect.mail.edit', 'userprotect.account.edit']);
+    $account = $this->drupalCreateUser(
+      [
+        'userprotect.mail.edit',
+        'userprotect.account.edit',
+      ]);
     $this->drupalLogin($account);
 
     $edit = [
       'mail' => $this->randomMachineName() . '@example.com',
     ];
-    $this->drupalPostForm('user/' . $account->id() . '/edit', $edit, t('Save'));
+    $this->drupalGet('user/' . $account->id() . '/edit');
+    $this->submitForm($edit, 'Save');
 
     // Assert the mail address changed.
     $account = $this->reloadEntity($account);
@@ -69,7 +74,6 @@ class UserProtectionPermissionsTest extends UserProtectBrowserTestBase {
   public function testNoEditOwnMail() {
     // Create account that may NOT edit its own mail address.
     $account = $this->drupalCreateUser(['userprotect.account.edit']);
-    $expected_mail = $account->getEmail();
     $this->drupalLogin($account);
 
     $this->drupalGet('user/' . $account->id() . '/edit');
@@ -84,7 +88,11 @@ class UserProtectionPermissionsTest extends UserProtectBrowserTestBase {
    */
   public function testEditOwnPass() {
     // Create account that may edit its own password.
-    $account = $this->drupalCreateUser(['userprotect.pass.edit', 'userprotect.account.edit']);
+    $account = $this->drupalCreateUser(
+      [
+        'userprotect.pass.edit',
+        'userprotect.account.edit',
+      ]);
     $this->drupalLogin($account);
 
     $new_pass = $this->randomMachineName();
@@ -93,7 +101,8 @@ class UserProtectionPermissionsTest extends UserProtectBrowserTestBase {
       'pass[pass1]' => $new_pass,
       'pass[pass2]' => $new_pass,
     ];
-    $this->drupalPostForm('user/' . $account->id() . '/edit', $edit, t('Save'));
+    $this->drupalGet('user/' . $account->id() . '/edit');
+    $this->submitForm($edit, 'Save');
 
     // Assert the password changed.
     $account = $this->reloadEntity($account);
@@ -111,7 +120,6 @@ class UserProtectionPermissionsTest extends UserProtectBrowserTestBase {
   public function testNoEditOwnPass() {
     // Create account that may NOT edit its own password.
     $account = $this->drupalCreateUser(['userprotect.account.edit']);
-    $expected_pass = $account->pass_raw;
     $this->drupalLogin($account);
 
     $this->drupalGet('user/' . $account->id() . '/edit');
@@ -132,7 +140,7 @@ class UserProtectionPermissionsTest extends UserProtectBrowserTestBase {
 
     // Assert the user can edit its own account.
     $this->drupalGet('user/' . $account->id() . '/edit');
-    $this->assertResponse(200, "The user may edit its own account.");
+    $this->assertSession()->statusCodeEquals(200);
   }
 
   /**
@@ -148,7 +156,7 @@ class UserProtectionPermissionsTest extends UserProtectBrowserTestBase {
 
     // Assert the user can edit its own account.
     $this->drupalGet('user/' . $account->id() . '/edit');
-    $this->assertResponse(403, "The user may NOT edit its own account.");
+    $this->assertSession()->statusCodeEquals(403);
   }
 
 }

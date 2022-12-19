@@ -20,10 +20,14 @@ class UserProtectionTest extends UserProtectBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
-    $this->account = $this->drupalCreateUser(['administer users', 'administer permissions']);
+    $this->account = $this->drupalCreateUser(
+      [
+        'administer users',
+        'administer permissions',
+      ]);
     $this->drupalLogin($this->account);
   }
 

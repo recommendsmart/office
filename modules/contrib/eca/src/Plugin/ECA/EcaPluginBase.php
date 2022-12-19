@@ -3,6 +3,7 @@
 namespace Drupal\eca\Plugin\ECA;
 
 use Drupal\Component\Plugin\PluginBase as DrupalPluginBase;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Messenger\MessengerInterface;
@@ -20,6 +21,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 abstract class EcaPluginBase extends DrupalPluginBase implements ContainerFactoryPluginInterface {
 
   use StringTranslationTrait;
+  use DependencySerializationTrait;
 
   /**
    * List of modules that provide ECA plugins.

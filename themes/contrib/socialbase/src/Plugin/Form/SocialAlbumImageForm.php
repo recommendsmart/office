@@ -18,7 +18,7 @@ class SocialAlbumImageForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function alterFormElement(Element $form, FormStateInterface $form_state, $form_id = NULL) {
+  public function alterFormElement(Element $form, FormStateInterface $form_state, $form_id = NULL): void {
     $form->actions->cancel->addClass(['btn', 'btn-default']);
   }
 

@@ -47,7 +47,7 @@ label {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
+  flex-wrap: wrap;
 }
 
 .form-group-inline .form-group {
@@ -56,15 +56,15 @@ label {
 
 .form-group-inline .form-item {
   -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  -ms-flex: 1;
+  flex: 1;
 }
 
 .form-group-inline .btn {
   margin-left: 8px;
   margin-bottom: 5px;
   -ms-flex-negative: 0;
-      flex-shrink: 0;
+  flex-shrink: 0;
 }
 
 [dir='rtl'] .form-group-inline .btn {
@@ -74,14 +74,14 @@ label {
 
 .form-group-inline--right {
   -webkit-box-pack: end;
-      -ms-flex-pack: end;
-          justify-content: flex-end;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
 }
 
 .form-group-inline--right .button--primary {
   -webkit-box-ordinal-group: 11;
-      -ms-flex-order: 10;
-          order: 10;
+  -ms-flex-order: 10;
+  order: 10;
 }
 
 .form-no-label label + .form-required {
@@ -135,17 +135,17 @@ span.form-required {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
+  flex-wrap: wrap;
   -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
   margin-bottom: 0;
 }
 
 .views-exposed-form__actions .btn-default {
   -webkit-box-ordinal-group: 11;
-      -ms-flex-order: 10;
-          order: 10;
+  -ms-flex-order: 10;
+  order: 10;
 }
 
 .views-exposed-form__actions .btn-flat {
@@ -157,10 +157,10 @@ span.form-required {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
+  flex-wrap: wrap;
   -webkit-box-pack: start;
-      -ms-flex-pack: start;
-          justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
 }
 
 .form--default .form-actions .btn-group--primary,
@@ -168,12 +168,12 @@ span.form-required {
   margin-left: auto;
   margin-right: 0;
   -webkit-box-ordinal-group: 11;
-      -ms-flex-order: 10;
-          order: 10;
+  -ms-flex-order: 10;
+  order: 10;
 }
 
-[dir='rtl'] .form--default .form-actions .btn-group--primary, [dir='rtl']
-.form--default .form-actions .btn-primary {
+[dir='rtl'] .form--default .form-actions .btn-group--primary,
+[dir='rtl'] .form--default .form-actions .btn-primary {
   margin-left: 0;
   margin-right: auto;
 }
@@ -271,7 +271,8 @@ details summary svg.icon-summary-arrow {
   left: 1.25rem;
 }
 
-details summary:focus, details summary.btn:focus {
+details summary:focus,
+details summary.btn:focus {
   outline: #0f64ce solid 2px;
 }
 
@@ -281,7 +282,7 @@ details[open] summary {
 
 details[open] summary svg.icon-summary-arrow {
   -webkit-transform: rotate(180deg);
-          transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 
 select {

@@ -64,7 +64,10 @@ class SimpleOauthCommands extends DrushCommands {
    */
   public function generateKeys($keypath) {
     if (!$this->isDirectory($keypath)) {
-      $this->fileSystem->mkdir($keypath);
+      if (!$this->fileSystem->mkdir($keypath, NULL, TRUE) || !$this->isDirectory($keypath)) {
+        $this->logger()->error(sprintf('Directory at "%s" could not be created.', $keypath));
+        return;
+      }
     }
     $keys_path = $this->fileSystem->realpath($keypath);
 

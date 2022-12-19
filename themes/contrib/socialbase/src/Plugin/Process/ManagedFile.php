@@ -18,7 +18,7 @@ class ManagedFile extends BaseManagedFile {
   /**
    * {@inheritdoc}
    */
-  public static function processElement(Element $element, FormStateInterface $form_state, array &$complete_form) {
+  public static function processElement(Element $element, FormStateInterface $form_state, array &$complete_form): void {
     $ajax_wrapper_id = $element->upload_button->getProperty('ajax')['wrapper'];
     if ($prefix = $element->getProperty('prefix')) {
       $prefix = preg_replace('/<div id="' . $ajax_wrapper_id . '">/', '<div id="' . $ajax_wrapper_id . '">', $prefix);

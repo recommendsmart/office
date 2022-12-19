@@ -30,6 +30,7 @@ class EnqueueTaskTest extends KernelTestBase {
     'node',
     'eca',
     'eca_queue',
+    'eca_test_array',
   ];
 
   /**
@@ -294,6 +295,100 @@ class EnqueueTaskTest extends KernelTestBase {
     $this->assertFalse($task->hasData('node'), 'No node data must have been passed to the task.');
 
     $queue->deleteItem($item);
+  }
+
+  /**
+   * Tests distributed task handling.
+   */
+  public function testTaskDistribution(): void {
+    // This ECA configuration puts a task into its own queue.
+    $eca_config_values = [
+      'langcode' => 'en',
+      'status' => TRUE,
+      'id' => 'queue_process',
+      'label' => 'ECA distributed task',
+      'modeller' => 'fallback',
+      'version' => '1.0.0',
+      'events' => [
+        'eca_test_array_write' => [
+          'plugin' => 'eca_test_array:write',
+          'label' => 'Write event for enqueing a distributed task.',
+          'configuration' => [
+            'key' => 'mykey',
+            'value' => 'myvalue',
+          ],
+          'successors' => [
+            ['id' => 'action_enqueue_distributed', 'condition' => ''],
+          ],
+        ],
+        'event_queue' => [
+          'plugin' => 'eca_queue:processing_task',
+          'label' => 'ECA processing task',
+          'configuration' => [
+            'task_name' => 'my_distributed_task',
+            'task_value' => '',
+            'distribute' => TRUE,
+            'cron' => '',
+          ],
+          'successors' => [
+            ['id' => 'action_enqueue_another', 'condition' => ''],
+          ],
+        ],
+      ],
+      'conditions' => [],
+      'gateways' => [],
+      'actions' => [
+        'action_enqueue_distributed' => [
+          'plugin' => 'eca_enqueue_task',
+          'label' => 'Enqueue a distributed task',
+          'configuration' => [
+            'task_name' => 'my_distributed_task',
+            'task_value' => 'my_task_value',
+            'tokens' => '',
+          ],
+          'successors' => [],
+        ],
+        'action_enqueue_another' => [
+          'plugin' => 'eca_enqueue_task',
+          'label' => 'Enqueue another task (not distributed)',
+          'configuration' => [
+            'task_name' => 'another_task',
+            'task_value' => 'my_task_value',
+            'tokens' => '',
+          ],
+          'successors' => [],
+        ],
+      ],
+    ];
+    $ecaConfig = Eca::create($eca_config_values);
+    $ecaConfig->save();
+
+    $not_distributed_queue = \Drupal::queue('eca_task', TRUE);
+    $distributed_queue = \Drupal::queue('eca_task:my_distributed_task', TRUE);
+    $this->assertSame(0, $not_distributed_queue->numberOfItems());
+    $this->assertSame(0, $distributed_queue->numberOfItems());
+
+    /** @var \Drupal\Core\Action\ActionManager $action_manager */
+    $action_manager = \Drupal::service('plugin.manager.action');
+
+    $action_manager->createInstance('eca_test_array_write', [
+      'key' => 'mykey',
+      'value' => 'myvalue',
+    ])->execute();
+
+    $this->assertSame(1, $distributed_queue->numberOfItems());
+    $this->assertSame(0, $not_distributed_queue->numberOfItems());
+
+    /** @var \Drupal\Core\Queue\QueueWorkerManagerInterface $queue_worker_manager */
+    $queue_worker_manager = \Drupal::service('plugin.manager.queue_worker');
+    /** @var \Drupal\eca_queue\Plugin\QueueWorker\TaskWorker $queue_worker */
+    $queue_worker = $queue_worker_manager->createInstance('eca_task:my_distributed_task');
+    $item = $distributed_queue->claimItem();
+    $queue_worker->processItem($item->data);
+    $distributed_queue->deleteItem($item);
+    $this->assertSame(0, $distributed_queue->numberOfItems());
+    $this->assertSame(1, $not_distributed_queue->numberOfItems());
+    $not_distributed_queue->deleteQueue();
   }
 
 }

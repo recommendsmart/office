@@ -16,7 +16,7 @@ class BookNavigation extends PreprocessBase {
   /**
    * {@inheritdoc}
    */
-  public function preprocess(array &$variables, $hook, array $info) {
+  public function preprocess(array &$variables, $hook, array $info): void {
     parent::preprocess($variables, $hook, $info);
 
     // Disables the menu tree below the content on a

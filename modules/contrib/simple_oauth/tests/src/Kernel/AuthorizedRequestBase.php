@@ -159,7 +159,7 @@ abstract class AuthorizedRequestBase extends EntityKernelTestBase {
     $scope_2->save();
     $this->scope = "{$scope_1->getName()} {$scope_2->getName()}";
 
-    $this->clientSecret = $this->getRandomGenerator()->string();
+    $this->clientSecret = $this->randomString();
 
     $this->client = Consumer::create([
       'client_id' => 'test_client',

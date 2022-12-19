@@ -18,7 +18,7 @@ class LikeAndDislikeIcons extends PreprocessBase {
   /**
    * {@inheritdoc}
    */
-  protected function preprocessVariables(Variables $variables) {
+  protected function preprocessVariables(Variables $variables): void {
     parent::preprocessVariables($variables);
 
     $variables->url = Url::fromRoute('view.who_liked_this_entity.wholiked', [

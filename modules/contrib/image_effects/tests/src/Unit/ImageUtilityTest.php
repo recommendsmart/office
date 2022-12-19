@@ -83,4 +83,93 @@ class ImageUtilityTest extends TestCase {
     $this->assertSame($expected_height, $result['height']);
   }
 
+  /**
+   * @covers ::getKeywordOffset()
+   */
+  public function testInvalidGetKeywordOffset(): void {
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage('Invalid anchor \'foo\' provided to getKeywordOffset()');
+    ImageUtility::getKeywordOffset('foo', 0, 0);
+  }
+
+  /**
+   * @covers ::getKeywordOffset()
+   *
+   * @dataProvider providerTestGetKeywordOffset
+   */
+  public function testGetKeywordOffset(array $input, int $expected): void {
+    $this->assertSame($expected, ImageUtility::getKeywordOffset($input['anchor'], $input['current'], $input['new']));
+  }
+
+  /**
+   * Provides data for testGetKeywordOffset().
+   *
+   * @return array
+   *   Keyed array containing:
+   *   - 'input' - Array which contains input for Image::getKeywordOffset().
+   *   - 'return' - The expected output.
+   *
+   * @see testGetKeywordOffset()
+   */
+  public function providerTestGetKeywordOffset(): array {
+    // Define input / output datasets to test different branch conditions.
+    $tests = [];
+
+    // Left and top => return 0.
+    $tests[] = [
+      'input' => [
+        'anchor' => 'left',
+        'current' => 100,
+        'new' => 20,
+      ],
+      'return' => 0,
+    ];
+    $tests[] = [
+      'input' => [
+        'anchor' => 'top',
+        'current' => 100,
+        'new' => 20,
+      ],
+      'return' => 0,
+    ];
+
+    // Right and bottom => return (current - new).
+    $tests[] = [
+      'input' => [
+        'anchor' => 'right',
+        'current' => 100,
+        'new' => 20,
+      ],
+      'return' => 80,
+    ];
+    $tests[] = [
+      'input' => [
+        'anchor' => 'bottom',
+        'current' => 100,
+        'new' => 30,
+      ],
+      'return' => 70,
+    ];
+
+    // Center => return (current - new)/2.
+    $tests[] = [
+      'input' => [
+        'anchor' => 'center',
+        'current' => 100,
+        'new' => 20,
+      ],
+      'return' => 40,
+    ];
+    $tests[] = [
+      'input' => [
+        'anchor' => 'center',
+        'current' => 100,
+        'new' => 91,
+      ],
+      'return' => 5,
+    ];
+
+    return $tests;
+  }
+
 }

@@ -53,7 +53,8 @@ class MaestroTrace extends FormBase {
       ];
 
       $query = \Drupal::entityTypeManager()->getStorage('maestro_queue')->getQuery();
-      $query->condition('process_id', $processID);
+      $query->condition('process_id', $processID)
+        ->accessCheck(FALSE);
       $entity_ids = $query->execute();
       $statusArray = MaestroEngine::getTaskStatusArray();
       $archiveArray = MaestroEngine::getTaskArchiveArray();
@@ -67,7 +68,7 @@ class MaestroTrace extends FormBase {
 
         $form['tasks_table'][$queueRecord->id->getString()]['change'] = [
           '#type' => 'checkbox',
-          '#wrapper_attributes' => ['class' => 'maestro_hide_col'],
+          '#wrapper_attributes' => ['class' => ['maestro_hide_col']],
           '#attributes' => [
             'title' => $this->t("Check this box to signal that this row's values should be saved."),
           ],
@@ -143,7 +144,8 @@ class MaestroTrace extends FormBase {
         // This really shouldn't happen, but it's a catch all.
       ];
       $query = \Drupal::entityTypeManager()->getStorage('maestro_process_variables')->getQuery();
-      $query->condition('process_id', $processID);
+      $query->condition('process_id', $processID)
+        ->accessCheck(FALSE);
       $entity_ids = $query->execute();
       foreach ($entity_ids as $variableID) {
         $varRecord = \Drupal::entityTypeManager()
@@ -155,7 +157,7 @@ class MaestroTrace extends FormBase {
 
         $form['vars_table'][$varRecord->id->getString()]['change'] = [
           '#type' => 'checkbox',
-          '#wrapper_attributes' => ['class' => 'maestro_hide_col'],
+          '#wrapper_attributes' => ['class' => ['maestro_hide_col']],
           '#attributes' => [
             'title' => $this->t("Check this box to signal that this row's values should be saved."),
           ],

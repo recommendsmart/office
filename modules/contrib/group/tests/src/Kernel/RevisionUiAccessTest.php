@@ -206,7 +206,12 @@ class RevisionUiAccessTest extends GroupKernelTestBase {
 
     $group_revision = clone $group;
     if ($extra_revision) {
-      $group_revision->setPublished($extra_revision_published);
+      if ($extra_revision_published) {
+        $group_revision->setPublished();
+      }
+      else {
+        $group_revision->setUnpublished();
+      }
       $group_revision->setNewRevision(TRUE);
       $group_revision->isDefaultRevision(TRUE);
       $group_revision->save();

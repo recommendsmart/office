@@ -80,7 +80,7 @@ trait PropertyPathTrait {
       if ($data instanceof ComplexDataInterface) {
         $data = $this->getDataProperties($data, $property);
       }
-      if (($data instanceof \ArrayAccess || is_array($data)) && isset($data[$property])) {
+      if ((($data instanceof \ArrayAccess) || is_array($data)) && isset($data[$property])) {
         $data = $data[$property];
         if ($data instanceof DataReferenceInterface) {
           // Directly jump to the contained target, if any is present.

@@ -8,6 +8,15 @@ eca.settings:
     documentation_domain:
       type: string
       label: 'Documentation domain'
+    user:
+      type: string
+      label: 'Execute models with user'
+    dependency_calculation:
+      type: sequence
+      label: 'Config dependency calculation'
+      sequence:
+        type: string
+        label: 'Enabled calculation setting'
 
 eca.eca.*:
   type: config_entity

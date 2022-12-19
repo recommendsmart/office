@@ -32,7 +32,7 @@ class RedirectToDestinationFileTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->user = $this->drupalCreateUser([], NULL, TRUE);

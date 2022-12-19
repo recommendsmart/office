@@ -13,8 +13,8 @@
   width: 24px;
   height: 24px;
   -webkit-box-flex: 0;
-      -ms-flex: 0 0 24px;
-          flex: 0 0 24px;
+  -ms-flex: 0 0 24px;
+  flex: 0 0 24px;
   margin-right: 10px;
   border-radius: 50%;
   margin-top: 2px;
@@ -29,30 +29,30 @@
   width: 44px;
   height: 44px;
   -ms-flex-preferred-size: 44px;
-      flex-basis: 44px;
+  flex-basis: 44px;
 }
 
 .list-item--withlabel {
   -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
+  flex-wrap: wrap;
   -webkit-box-pack: start;
-      -ms-flex-pack: start;
-          justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
 }
 
 .list-item__label {
   margin-right: 20px;
   font-weight: 500;
   -ms-flex-preferred-size: 100%;
-      flex-basis: 100%;
+  flex-basis: 100%;
   -ms-flex-item-align: start;
-      align-self: flex-start;
+  align-self: flex-start;
 }
 
 .list-item__text {
   -webkit-box-flex: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
   max-width: 100%;
   margin: 0;
   font-size: .875rem;
@@ -74,8 +74,8 @@
   padding-right: 1rem;
   margin-bottom: -1px;
   -webkit-box-pack: start;
-      -ms-flex-pack: start;
-          justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
   cursor: pointer;
 }
 
@@ -87,7 +87,8 @@
   z-index: -1;
 }
 
-.list-item--visibility:hover, .list-item--visibility:focus-within {
+.list-item--visibility:hover,
+.list-item--visibility:focus-within {
   background-color: #e6e6e6;
   cursor: pointer;
 }
@@ -96,10 +97,12 @@
   padding: 0;
 }
 
-.dropdown-menu--visibility > .list-item--visibility > a, .dropdown-menu--visibility > .list-item--visibility > a:hover, .dropdown-menu--visibility > .list-item--visibility > a:focus {
+.dropdown-menu--visibility > .list-item--visibility > a,
+.dropdown-menu--visibility > .list-item--visibility > a:hover,
+.dropdown-menu--visibility > .list-item--visibility > a:focus {
   background-color: inherit;
   -webkit-box-shadow: none;
-          box-shadow: none;
+  box-shadow: none;
   outline: none;
 }
 
@@ -112,7 +115,8 @@
   margin-left: 0.625rem;
 }
 
-.list-item--link:hover, .list-item--link:focus {
+.list-item--link:hover,
+.list-item--link:focus {
   background-color: rgba(0, 0, 0, 0.12);
 }
 
@@ -137,6 +141,6 @@
 @media (min-width: 600px) {
   .list-item__label {
     -ms-flex-preferred-size: 180px;
-        flex-basis: 180px;
+    flex-basis: 180px;
   }
 }

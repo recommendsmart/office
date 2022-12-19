@@ -5,8 +5,8 @@ namespace Drupal\Tests\eca_misc\Kernel;
 use Drupal\Component\EventDispatcher\Event;
 use Drupal\Core\DrupalKernelInterface;
 use Drupal\eca\Entity\Eca;
-use Drupal\eca_array\Plugin\Action\ArrayIncrement;
-use Drupal\eca_array\Plugin\Action\ArrayWrite;
+use Drupal\eca_test_array\Plugin\Action\ArrayIncrement;
+use Drupal\eca_test_array\Plugin\Action\ArrayWrite;
 use Drupal\KernelTests\KernelTestBase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,7 +38,7 @@ class KernelEventTest extends KernelTestBase {
     'user',
     'eca',
     'eca_misc',
-    'eca_array',
+    'eca_test_array',
   ];
 
   /**
@@ -158,7 +158,7 @@ class KernelEventTest extends KernelTestBase {
       'gateways' => [],
       'actions' => [
         'increment_view' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'view',
           'configuration' => [
             'key' => 'view',
@@ -166,7 +166,7 @@ class KernelEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_controller' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'controller',
           'configuration' => [
             'key' => 'controller',
@@ -174,7 +174,7 @@ class KernelEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_controller_arguments' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'controller_arguments',
           'configuration' => [
             'key' => 'controller_arguments',
@@ -182,7 +182,7 @@ class KernelEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_exception' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'exception',
           'configuration' => [
             'key' => 'exception',
@@ -190,7 +190,7 @@ class KernelEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_finish_request' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'finish_request',
           'configuration' => [
             'key' => 'finish_request',
@@ -198,7 +198,7 @@ class KernelEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_request' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'request increment',
           'configuration' => [
             'key' => 'request',
@@ -206,7 +206,7 @@ class KernelEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_request' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'request write',
           'configuration' => [
             'key' => 'request',
@@ -215,7 +215,7 @@ class KernelEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_response' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'response',
           'configuration' => [
             'key' => 'response',
@@ -223,7 +223,7 @@ class KernelEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_terminate' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'terminate',
           'configuration' => [
             'key' => 'terminate',
@@ -231,7 +231,7 @@ class KernelEventTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_subrequest_finished' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'container_initialize_subrequest_finished',
           'configuration' => [
             'key' => 'container_initialize_subrequest_finished',

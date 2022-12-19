@@ -1,9 +1,9 @@
 <?php
 
-namespace Drupal\eca_array\EventSubscriber;
+namespace Drupal\eca_test_array\EventSubscriber;
 
 use Drupal\eca\EventSubscriber\EcaBase as EcaBaseSubscriber;
-use Drupal\eca_array\Plugin\ECA\Event\ArrayEvent;
+use Drupal\eca_test_array\Plugin\ECA\Event\ArrayEvent;
 
 /**
  * ECA array event subscriber.

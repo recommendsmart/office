@@ -4,6 +4,7 @@ namespace Drupal\group_action\Plugin\Action;
 
 use Drupal\Component\Uuid\Uuid;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultReasonInterface;
 use Drupal\Core\Action\ConfigurableActionBase;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
@@ -16,8 +17,8 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Utility\Token;
 use Drupal\group\Entity\GroupInterface;
-use Drupal\group\Plugin\GroupContentEnablerManagerInterface;
 use Drupal\group_action\Compatibility;
+use Drupal\user\Entity\Role;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -31,6 +32,13 @@ abstract class GroupActionBase extends ConfigurableActionBase implements Contain
   use StringTranslationTrait;
 
   /**
+   * Flag indicating whether the used version of Group is v2 or greater.
+   *
+   * @var bool|null
+   */
+  static protected ?bool $isV2 = NULL;
+
+  /**
    * The entity type manager.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
@@ -38,11 +46,11 @@ abstract class GroupActionBase extends ConfigurableActionBase implements Contain
   protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
-   * The plugin manager of group content enablers.
+   * The plugin manager of group relation types.
    *
-   * @var \Drupal\group\Plugin\GroupContentEnablerManagerInterface
+   * @var \Drupal\group\Plugin\Group\Relation\GroupRelationTypeManagerInterface|\Drupal\group\Plugin\GroupContentEnablerManagerInterface
    */
-  protected GroupContentEnablerManagerInterface $gcePluginManager;
+  protected $gcePluginManager;
 
   /**
    * The Token service.
@@ -83,8 +91,8 @@ abstract class GroupActionBase extends ConfigurableActionBase implements Contain
    *   The plugin implementation definition.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\group\Plugin\GroupContentEnablerManagerInterface $gce_plugin_manager
-   *   The plugin manager of group content enablers.
+   * @param \Drupal\group\Plugin\Group\Relation\GroupRelationTypeManagerInterface|\Drupal\group\Plugin\GroupContentEnablerManagerInterface $gce_plugin_manager
+   *   The plugin manager of group relation types.
    * @param \Drupal\Core\Utility\Token $token
    *   The Token service.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
@@ -96,7 +104,7 @@ abstract class GroupActionBase extends ConfigurableActionBase implements Contain
    * @param \Drupal\group_action\Compatibility $compatibility
    *   An instance of a Compatibility object.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, GroupContentEnablerManagerInterface $gce_plugin_manager, Token $token, TranslationInterface $string_translation, EntityRepositoryInterface $entity_repository, AccountInterface $current_user, Compatibility $compatibility) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, $gce_plugin_manager, Token $token, TranslationInterface $string_translation, EntityRepositoryInterface $entity_repository, AccountInterface $current_user, Compatibility $compatibility) {
     parent::__construct($configuration + ['values' => []], $plugin_id, $plugin_definition);
     $this->entityTypeManager = $entity_type_manager;
     $this->gcePluginManager = $gce_plugin_manager;
@@ -114,12 +122,15 @@ abstract class GroupActionBase extends ConfigurableActionBase implements Contain
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    if (!isset(self::$isV2)) {
+      self::$isV2 = $container->has('group_relation_type.manager');
+    }
     return new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
       $container->get('entity_type.manager'),
-      $container->get('plugin.manager.group_content_enabler'),
+      self::$isV2 ? $container->get('group_relation_type.manager') : $container->get('plugin.manager.group_content_enabler'),
       $container->get('token'),
       $container->get('string_translation'),
       $container->get('entity.repository'),
@@ -161,16 +172,23 @@ abstract class GroupActionBase extends ConfigurableActionBase implements Contain
       ];
     }
     if ($default_config['content_plugin'] === '') {
+      $derivative_id = $this->getDerivativeId();
       $plugin_options = [
         '_none' => $this->t('- Select -'),
       ];
       $dynamics = [];
+      /** @var \Drupal\group\Plugin\Group\Relation\GroupRelationType $definition */
       foreach ($this->gcePluginManager->getDefinitions() as $id => $definition) {
-        $plugin_options[$id] = $definition['label'];
-        if (isset($definition['entity_type_id'])) {
-          $entity_type = $this->entityTypeManager->getDefinition($definition['entity_type_id']);
+        $entity_type_id = self::$isV2 ? $definition->getEntityTypeId() : ($definition['entity_type_id'] ?? NULL);
+        if ($derivative_id && ($derivative_id !== $entity_type_id)) {
+          continue;
+        }
+        $plugin_options[$id] = self::$isV2 ? $definition->getLabel() : $definition['label'];
+        if (isset($entity_type_id)) {
+          $id = self::$isV2 ? $definition->id() : $definition['id'];
+          $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
           if (($entity_type->hasKey('bundle') || $entity_type->getBundleEntityType())) {
-            $dynamics[$definition['id']] = $entity_type->getLabel() . ' (' . $this->t('dynamic') . ')';
+            $dynamics[$id] = $entity_type->getLabel() . ' (' . $this->t('dynamic') . ')';
           }
         }
       }
@@ -287,7 +305,42 @@ abstract class GroupActionBase extends ConfigurableActionBase implements Contain
     }
     if ($group && in_array($content_plugin_id, $this->gcePluginManager->getInstalledIds($group->getGroupType()))) {
       $operation = $this->configuration['operation'];
-      $result = AccessResult::allowedIf($group->hasPermission("$operation $content_plugin_id content", $account))->addCacheableDependency($group);
+      if (self::$isV2) {
+        $permission_provider = $this->gcePluginManager->getPermissionProvider($content_plugin_id);
+        $result = NULL;
+        if ($permission = $permission_provider->getPermission($operation, 'relationship', 'any')) {
+          $result = AccessResult::allowedIf($group->hasPermission($permission, $account))
+            ->addCacheableDependency($group)
+            ->addCacheContexts(['user']);
+        }
+        if ((!$result || !$result->isAllowed()) && ($permission = $permission_provider->getPermission($operation, 'relationship', 'own'))) {
+          $result = AccessResult::allowedIf($group->hasPermission($permission, $account))
+            ->addCacheableDependency($group)
+            ->addCacheContexts(['user']);
+        }
+        if (!$result) {
+          $result = AccessResult::forbidden("The requested content plugin does not provide any permissions.")
+            ->addCacheableDependency($group);
+        }
+        if (!$result->isAllowed() && $account->isAuthenticated()) {
+          $is_admin = ((int) $account->id() === 1) || !empty(array_filter($account->getRoles(TRUE), function ($rid) {
+            $role = Role::load($rid);
+            return $role && $role->isAdmin();
+          }));
+          if ($is_admin) {
+            $result = AccessResult::allowed()
+              ->addCacheableDependency($group)
+              ->addCacheContexts(['user']);
+          }
+        }
+        if (!$result->isAllowed() && ($result instanceof AccessResultReasonInterface)) {
+          $result->setReason("The current user has no permission to perform the group operation.");
+        }
+      }
+      else {
+        $result = AccessResult::allowedIf($group->hasPermission("$operation $content_plugin_id content", $account))
+          ->addCacheableDependency($group);
+      }
     }
     else {
       $result = $group ? AccessResult::forbidden("The requested content plugin is not installed.") : AccessResult::forbidden("Cannot operate on a non-existing group.");
@@ -312,11 +365,12 @@ abstract class GroupActionBase extends ConfigurableActionBase implements Contain
       return;
     }
     $content_plugin_definition = $this->gcePluginManager->getDefinition($content_plugin_id);
-    $entity_type_id = $content_plugin_definition['entity_type_id'];
+    $entity_type_id = self::$isV2 ? $content_plugin_definition->getEntityTypeId() : ($content_plugin_definition['entity_type_id'] ?? NULL);
     if ($entity_type_id !== $entity->getEntityTypeId()) {
       return;
     }
-    if (!empty($content_plugin_definition['entity_bundle']) && ($content_plugin_definition['entity_bundle'] !== $entity->bundle())) {
+    $entity_bundle = self::$isV2 ? $content_plugin_definition->getEntityBundle() : ($content_plugin_definition['entity_bundle'] ?? FALSE);
+    if (($entity_bundle !== FALSE) && ($entity_bundle !== $entity->bundle())) {
       return;
     }
     $operation = $this->configuration['operation'];
@@ -387,24 +441,34 @@ abstract class GroupActionBase extends ConfigurableActionBase implements Contain
   protected function executeOperation(string &$operation, GroupInterface $group, EntityInterface $entity, string &$content_plugin_id, array &$values): void {
     if ($operation === 'create') {
       $may_add = TRUE;
-      $add_method = ($this->configuration['add_method'] ?? 'skip_existing');
+      $add_method = $this->configuration['add_method'] ?? '';
+      if ($add_method === '') {
+        $add_method = 'skip_existing';
+      }
       if (in_array($add_method, ['skip_existing', 'update_existing'])) {
-        $may_add = empty($group->getContent($content_plugin_id, ['entity_id' => $entity->id()]));
+        $may_add = self::$isV2 ? empty($this->getRelationshipsByEntityAndGroup($entity, $group, $content_plugin_id)) : empty($group->getContent($content_plugin_id, ['entity_id' => $entity->id()]));
       }
       if ($may_add) {
-        $group->addContent($entity, $content_plugin_id, $values);
+        if (self::$isV2) {
+          $group->addRelationship($entity, $content_plugin_id, $values);
+        }
+        else {
+          $group->addContent($entity, $content_plugin_id, $values);
+        }
       }
       elseif ($add_method === 'update_existing') {
         $operation = 'update';
       }
     }
     if (($operation === 'delete') && !$entity->isNew()) {
-      foreach ($group->getContent($content_plugin_id, ['entity_id' => $entity->id()]) as $group_content) {
+      $group_contents = self::$isV2 ? $this->getRelationshipsByEntityAndGroup($entity, $group, $content_plugin_id) : $group->getContent($content_plugin_id, ['entity_id' => $entity->id()]);
+      foreach ($group_contents as $group_content) {
         $group_content->delete();
       }
     }
     if (($operation === 'update') && !$entity->isNew()) {
-      foreach ($group->getContent($content_plugin_id, ['entity_id' => $entity->id()]) as $group_content) {
+      $group_contents = self::$isV2 ? $this->getRelationshipsByEntityAndGroup($entity, $group, $content_plugin_id) : $group->getContent($content_plugin_id, ['entity_id' => $entity->id()]);
+      foreach ($group_contents as $group_content) {
         $need_save = FALSE;
         foreach ($values as $k => $vs) {
           if ($group_content->hasField($k) && ($group_content->get($k)->getValue() !== $vs)) {
@@ -480,16 +544,16 @@ abstract class GroupActionBase extends ConfigurableActionBase implements Contain
     }
     elseif (strpos($content_plugin_id, ':') === FALSE) {
       foreach ($this->gcePluginManager->getDefinitions() as $definition) {
-        if ($definition['id'] === $content_plugin_id) {
+        if ((self::$isV2 ? $definition->id() : $definition['id']) === $content_plugin_id) {
           $content_plugin_definition = $definition;
           break;
         }
       }
     }
-    if (!isset($content_plugin_definition['entity_type_id'])) {
+    $entity_type_id = self::$isV2 ? $content_plugin_definition->getEntityTypeId() : ($content_plugin_definition['entity_type_id'] ?? NULL);
+    if (!isset($entity_type_id)) {
       return NULL;
     }
-    $entity_type_id = $content_plugin_definition['entity_type_id'];
     if (Uuid::isValid($entity_id)) {
       return $this->entityRepository->loadEntityByUuid($entity_type_id, $entity_id);
     }
@@ -507,6 +571,17 @@ abstract class GroupActionBase extends ConfigurableActionBase implements Contain
       $tok = strtok("\n");
     }
     return $values;
+  }
+
+  /**
+   * @todo Remove once the below issue got fixed.
+   * @see https://www.drupal.org/project/group/issues/3310605
+   */
+  protected function getRelationshipsByEntityAndGroup(EntityInterface $entity, GroupInterface $group, string $content_plugin_id) {
+    return array_filter($group->getRelationshipsByEntity($entity, $content_plugin_id), static function ($relationship) use ($group) {
+      /** @var \Drupal\group\Entity\GroupRelationshipInterface $relationship */
+      return (((string) $relationship->getGroupId()) === ((string) $group->id()));
+    });
   }
 
 }

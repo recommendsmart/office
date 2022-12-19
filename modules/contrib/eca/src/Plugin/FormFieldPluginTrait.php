@@ -20,6 +20,15 @@ trait FormFieldPluginTrait {
   use FormPluginTrait;
 
   /**
+   * The lookup keys to use, respecting their occurring order.
+   *
+   * Values are either one of "parents" or "array_parents".
+   *
+   * @var string[]
+   */
+  protected array $lookupKeys = ['parents', 'array_parents'];
+
+  /**
    * Whether to use form field value filters or not.
    *
    * Mostly only relevant when working with submitted input values.
@@ -176,7 +185,7 @@ trait FormFieldPluginTrait {
 
     $key = array_pop($name_array);
     foreach ($this->lookupFormElements($form, $key) as &$element) {
-      if (empty($name_array) || (isset($element['#parents']) && $name_array === $element['#parents']) || (isset($element['#array_parents']) && $name_array === $element['#array_parents'])) {
+      if (empty($name_array) || (isset($element['#parents']) && array_intersect($name_array, $element['#parents']) === $name_array) || (isset($element['#array_parents']) && array_intersect($name_array, $element['#array_parents']) === $name_array)) {
         // Found the element due to defined parents or array_parents.
         return $element;
       }
@@ -206,6 +215,21 @@ trait FormFieldPluginTrait {
         }
       }
       unset($parent);
+    }
+
+    // Although not officially supported, try to get a target element using
+    // either "." or ":" as a separator for nested form elements. The official
+    // separator format is "][", which will be used for another try here.
+    // Not replacing "." and ":" at once, because there may be nested forms
+    // making use of both (e.g. "configuration.plugin.type:id").
+    $field_name = $this->configuration['field_name'];
+    if (mb_strpos($field_name, '.')) {
+      $this->configuration['field_name'] = str_replace('.', '][', $field_name);
+      return $this->getTargetElement();
+    }
+    if (mb_strpos($field_name, ':')) {
+      $this->configuration['field_name'] = str_replace(':', '][', $field_name);
+      return $this->getTargetElement();
     }
 
     return $nothing;
@@ -265,15 +289,45 @@ trait FormFieldPluginTrait {
    */
   protected function lookupFormElements(&$element, $key): array {
     $found = [];
-    foreach (Element::children($element) as $child_key) {
-      if (($child_key === $key) || (isset($element['#name']) && $element['#name'] === $key)) {
-        $found[] = &$element[$child_key];
+    $lookup_keys = $this->lookupKeys;
+    foreach ($lookup_keys as $lookup_key) {
+      switch ($lookup_key) {
+
+        case 'parents':
+          $this->lookupKeys = ['parents'];
+          foreach (Element::children($element) as $child_key) {
+            if ((isset($element[$child_key]['#name']) && $element[$child_key]['#name'] === $key) || (isset($element[$child_key]['#parents']) && in_array($key, $element[$child_key]['#parents'], TRUE))) {
+              $found[] = &$element[$child_key];
+            }
+            else {
+              /* @noinspection SlowArrayOperationsInLoopInspection */
+              $found = array_merge($found, $this->lookupFormElements($element[$child_key], $key));
+            }
+          }
+          break;
+
+        case 'array_parents':
+          $this->lookupKeys = ['array_parents'];
+          // Alternatively, traverse along the keys of the form build array.
+          foreach (Element::children($element) as $child_key) {
+            if (($child_key === $key) || (isset($element[$child_key]['#array_parents']) && in_array($key, $element[$child_key]['#array_parents'], TRUE))) {
+              $found[] = &$element[$child_key];
+            }
+            else {
+              /* @noinspection SlowArrayOperationsInLoopInspection */
+              $found = array_merge($found, $this->lookupFormElements($element[$child_key], $key));
+            }
+          }
+          break;
+
       }
-      else {
-        /* @noinspection SlowArrayOperationsInLoopInspection */
-        $found = array_merge($found, $this->lookupFormElements($element[$child_key], $key));
+
+      if ($found) {
+        break;
       }
     }
+
+    $this->lookupKeys = $lookup_keys;
     return $found;
   }
 
@@ -299,7 +353,26 @@ trait FormFieldPluginTrait {
     }
 
     $found = FALSE;
-    return $this->getFirstNestedOccurrence($field_name_array, $values, $found);
+    $value = &$this->getFirstNestedOccurrence($field_name_array, $values, $found);
+
+    if (!$found) {
+      // Although not officially supported, try to get a submitted value using
+      // either "." or ":" as a separator for nested form elements. The official
+      // separator format is "][", which will be used for another try here.
+      // Not replacing "." and ":" at once, because there may be nested forms
+      // making use of both (e.g. "configuration.plugin.type:id").
+      $field_name = $this->configuration['field_name'];
+      if (mb_strpos($field_name, '.')) {
+        $this->configuration['field_name'] = str_replace('.', '][', $field_name);
+        return $this->getSubmittedValue($found);
+      }
+      if (mb_strpos($field_name, ':')) {
+        $this->configuration['field_name'] = str_replace(':', '][', $field_name);
+        return $this->getSubmittedValue($found);
+      }
+    }
+
+    return $value;
   }
 
   /**

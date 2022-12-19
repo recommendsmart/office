@@ -136,7 +136,7 @@ abstract class Base extends KernelTestBase {
           continue 2;
         }
       }
-      $this->assertGreaterThan(RfcLogLevel::ERROR, $log_message[0], strip_tags(new FormattableMarkup($log_message[1], $log_message[2])));
+      $this->assertGreaterThan(RfcLogLevel::ERROR, $log_message[0], strip_tags((string) (new FormattableMarkup($log_message[1], $log_message[2]))));
     }
     self::assertEmpty($logRecords, 'Expected log records missing: ' . PHP_EOL . implode(PHP_EOL, $logRecords));
   }

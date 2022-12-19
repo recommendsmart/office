@@ -4,6 +4,7 @@ namespace Drupal\image_effects\Plugin\ImageToolkit\Operation\gd;
 
 use Drupal\system\Plugin\ImageToolkit\Operation\gd\GDImageToolkitOperationBase;
 use Drupal\image_effects\Component\ColorUtility;
+use Drupal\image_effects\Component\ImageUtility;
 use Drupal\image_effects\Component\PositionedRectangle;
 use Drupal\image_effects\Component\TextUtility;
 use Drupal\image_effects\Plugin\ImageToolkit\Operation\FontOperationTrait;
@@ -242,8 +243,8 @@ class TextToWrapper extends GDImageToolkitOperationBase {
 
     // Determine wrapper offset, based on placement option and direct
     // offset indicated in settings.
-    $wrapper_xpos = ceil(image_filter_keyword($arguments['layout_x_pos'], $arguments['canvas_width'], $original_wrapper_width)) + $arguments['layout_x_offset'];
-    $wrapper_ypos = ceil(image_filter_keyword($arguments['layout_y_pos'], $arguments['canvas_height'], $original_wrapper_height)) + $arguments['layout_y_offset'];
+    $wrapper_xpos = ImageUtility::getKeywordOffset($arguments['layout_x_pos'], $arguments['canvas_width'], $original_wrapper_width) + $arguments['layout_x_offset'];
+    $wrapper_ypos = ImageUtility::getKeywordOffset($arguments['layout_y_pos'], $arguments['canvas_height'], $original_wrapper_height) + $arguments['layout_y_offset'];
 
     // Position of wrapper's bottom right point.
     $xc_pos = $wrapper_xpos + $original_wrapper_width;

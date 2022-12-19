@@ -18,11 +18,11 @@ class FormElementLabel extends BaseFormElementLabel {
   /**
    * {@inheritdoc}
    */
-  public function preprocessElement(Element $element, Variables $variables) {
+  public function preprocessElement(Element $element, Variables $variables): void {
     if (isset($element['#id'])) {
       if ((isset($element['#render_icon']) && $element['#render_icon']) ||
-      strpos($element['#id'], 'field-visibility') !== FALSE ||
-      strpos($element['#id'], 'field-join-method') !== FALSE) {
+        strpos($element['#id'], 'field-visibility') !== FALSE ||
+        strpos($element['#id'], 'field-join-method') !== FALSE) {
 
         if (isset($element['#attributes']['title'])) {
           $description = $element['#attributes']['title'];

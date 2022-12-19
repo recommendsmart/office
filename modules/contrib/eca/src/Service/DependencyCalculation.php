@@ -2,6 +2,7 @@
 
 namespace Drupal\eca\Service;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -43,11 +44,25 @@ class DependencyCalculation {
   protected TokenInterface $token;
 
   /**
-   * List of dependencies, calculdated by this service.
+   * The configuration factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected ConfigFactoryInterface $configFactory;
+
+  /**
+   * List of dependencies, calculated by this service.
    *
    * @var array
    */
   protected array $dependencies;
+
+  /**
+   * An initialized list of enabled calculations.
+   *
+   * @var string[]|null
+   */
+  static protected ?array $enabledCalculations = NULL;
 
   /**
    * Constructs the dependency calculation service.
@@ -60,12 +75,15 @@ class DependencyCalculation {
    *   The entity field manager.
    * @param \Drupal\eca\Token\TokenInterface $token
    *   The token service.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The configuration factory.
    */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager, EntityTypeBundleInfoInterface $entityTypeBundleInfo, EntityFieldManagerInterface $entityFieldManager, TokenInterface $token) {
+  public function __construct(EntityTypeManagerInterface $entityTypeManager, EntityTypeBundleInfoInterface $entityTypeBundleInfo, EntityFieldManagerInterface $entityFieldManager, TokenInterface $token, ConfigFactoryInterface $config_factory) {
     $this->entityTypeManager = $entityTypeManager;
     $this->entityTypeBundleInfo = $entityTypeBundleInfo;
     $this->entityFieldManager = $entityFieldManager;
     $this->token = $token;
+    $this->configFactory = $config_factory;
   }
 
   /**
@@ -78,6 +96,14 @@ class DependencyCalculation {
    *   Calculated dependencies.
    */
   public function calculateDependencies(Eca $eca): array {
+    if (!isset(self::$enabledCalculations)) {
+      self::$enabledCalculations = $this->configFactory->get('eca.settings')->get('dependency_calculation') ?? [];
+    }
+    if (empty(self::$enabledCalculations)) {
+      // Nothing to calculate.
+      return [];
+    }
+
     $dependencies = [];
     $events = $eca->get('events') ?? [];
     $entity_field_info = [];
@@ -175,7 +201,9 @@ class DependencyCalculation {
         elseif ($is_entity_type) {
           $entity_type_id = $field;
           if (isset($bundle) && $bundle !== ContentEntityTypes::ALL && ($bundle_dependency = $this->entityTypeManager->getDefinition($entity_type_id)->getBundleConfigDependency($bundle))) {
-            $this->addDependency($bundle_dependency['type'], $bundle_dependency['name'], $dependencies);
+            if (in_array('bundle', self::$enabledCalculations, TRUE)) {
+              $this->addDependency($bundle_dependency['type'], $bundle_dependency['name'], $dependencies);
+            }
           }
         }
       }
@@ -187,6 +215,9 @@ class DependencyCalculation {
         }
         unset($matches);
       }
+    }
+    if (!in_array('field_storage', self::$enabledCalculations, TRUE)) {
+      return;
     }
     foreach ($variables as $variable) {
       $variable_parts = mb_strpos($variable, ':') ? explode(':', $variable) : explode('.', $variable);
@@ -208,17 +239,19 @@ class DependencyCalculation {
             // as we cannot determine the underlying entity type of Token
             // aliases in a bulletproof way.
             $this->addDependency('config', $info_item[$field_name], $dependencies);
-            // Include any field configuration from used bundles. Future
-            // additions of fields and new bundles will be handled via hook
-            // implementation.
-            $bundles = array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type_id));
-            foreach ($bundles as $bundle) {
-              $field_definitions = $this->entityFieldManager->getFieldDefinitions($entity_type_id, $bundle);
-              if (isset($field_definitions[$field_name])) {
-                $field_config_id = $entity_type_id . '.' . $bundle . '.' . $field_name;
-                /** @var \Drupal\field\FieldConfigInterface $field_config */
-                if ($field_config = $field_config_storage->load($field_config_id)) {
-                  $this->addDependency($field_config->getConfigDependencyKey(), 'field.field.' . $field_config->id(), $dependencies);
+            if (in_array('field_config', self::$enabledCalculations, TRUE)) {
+              // Include any field configuration from used bundles. Future
+              // additions of fields and new bundles will be handled via hook
+              // implementation.
+              $bundles = array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type_id));
+              foreach ($bundles as $bundle) {
+                $field_definitions = $this->entityFieldManager->getFieldDefinitions($entity_type_id, $bundle);
+                if (isset($field_definitions[$field_name])) {
+                  $field_config_id = $entity_type_id . '.' . $bundle . '.' . $field_name;
+                  /** @var \Drupal\field\FieldConfigInterface $field_config */
+                  if ($field_config = $field_config_storage->load($field_config_id)) {
+                    $this->addDependency($field_config->getConfigDependencyKey(), 'field.field.' . $field_config->id(), $dependencies);
+                  }
                 }
               }
             }

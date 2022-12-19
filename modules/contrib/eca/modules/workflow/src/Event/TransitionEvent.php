@@ -152,11 +152,11 @@ class TransitionEvent extends Event implements ConditionalApplianceInterface, En
       return FALSE;
     }
     $from_state = $arguments['from_state'] ?? '';
-    if (!in_array($from_state, ['', '*']) && ($from_state !== $this->fromState)) {
+    if (!in_array($from_state, ['', '*'], TRUE) && ($from_state !== $this->fromState)) {
       return FALSE;
     }
     $to_state = $arguments['to_state'] ?? '';
-    if (!in_array($to_state, ['', '*']) && ($to_state !== $this->toState)) {
+    if (!in_array($to_state, ['', '*'], TRUE) && ($to_state !== $this->toState)) {
       return FALSE;
     }
     return TRUE;

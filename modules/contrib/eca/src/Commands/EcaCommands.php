@@ -162,4 +162,48 @@ class EcaCommands extends DrushCommands {
     }
   }
 
+  /**
+   * Disable all existing ECA entities.
+   *
+   * @usage eca:disable
+   *   Disable all models.
+   *
+   * @command eca:disable
+   */
+  public function disableAllModels(): void {
+    /** @var \Drupal\eca\Entity\Eca $eca */
+    foreach ($this->configStorage->loadMultiple() as $eca) {
+      $modeller = $this->modellerServices->getModeller($eca->get('modeller'));
+      if ($modeller === NULL) {
+        $this->logger->error('This modeller plugin ' . $eca->get('modeller') . ' does not exist.');
+        continue;
+      }
+      $modeller
+        ->setConfigEntity($eca)
+        ->disable();
+    }
+  }
+
+  /**
+   * Enable all existing ECA entities.
+   *
+   * @usage eca:enable
+   *   Enable all models.
+   *
+   * @command eca:enable
+   */
+  public function enableAllModels(): void {
+    /** @var \Drupal\eca\Entity\Eca $eca */
+    foreach ($this->configStorage->loadMultiple() as $eca) {
+      $modeller = $this->modellerServices->getModeller($eca->get('modeller'));
+      if ($modeller === NULL) {
+        $this->logger->error('This modeller plugin ' . $eca->get('modeller') . ' does not exist.');
+        continue;
+      }
+      $modeller
+        ->setConfigEntity($eca)
+        ->enable();
+    }
+  }
+
 }

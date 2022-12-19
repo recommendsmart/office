@@ -39,23 +39,23 @@ conditions:
   Flow_0iztkfs:
     plugin: eca_entity_type_bundle
     configuration:
-      type: 'node type_1'
       negate: false
+      type: 'node type_1'
       entity: ''
   Flow_1jqykgu:
     plugin: eca_entity_type_bundle
     configuration:
-      type: 'node type_2'
       negate: false
+      type: 'node type_2'
       entity: ''
   Flow_0i81v8o:
     plugin: eca_entity_field_value
     configuration:
+      case: false
       expected_value: '[entity:nid]'
       field_name: field_other_node
       operator: equal
       type: value
-      case: false
       negate: true
       entity: refentity
   Flow_1tgic5x:
@@ -67,8 +67,8 @@ conditions:
   Flow_0rgzuve:
     plugin: eca_entity_field_value_empty
     configuration:
-      field_name: field_other_node
       negate: false
+      field_name: field_other_node
       entity: ''
   Flow_0c3s897:
     plugin: eca_entity_field_value_empty
@@ -155,14 +155,14 @@ actions:
     label: Msg
     configuration:
       message: 'Node [entity:title] references [refentity:title]'
-      replace_tokens: false
+      replace_tokens: true
     successors: {  }
   Activity_1cxcwjm:
     plugin: action_message_action
     label: Msg
     configuration:
       message: 'Node [entity:title] got updated'
-      replace_tokens: false
+      replace_tokens: true
     successors: {  }
   Activity_1w7m4sk:
     plugin: eca_token_load_entity_ref
@@ -211,5 +211,5 @@ actions:
     label: Msg
     configuration:
       message: 'The title of the referenced node is [originalentity:field_other_node:entity:title].'
-      replace_tokens: false
+      replace_tokens: true
     successors: {  }

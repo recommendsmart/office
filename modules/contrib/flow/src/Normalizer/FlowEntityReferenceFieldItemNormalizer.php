@@ -51,7 +51,7 @@ final class FlowEntityReferenceFieldItemNormalizer extends EntityReferenceFieldI
   /**
    * {@inheritdoc}
    */
-  public function normalize($field_item, $format = NULL, array $context = []) {
+  public function normalize($field_item, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
     if (self::$normalizeNewEntities) {
       /** @var \Drupal\Core\Entity\EntityInterface $entity */
       if (($field_item instanceof EntityReferenceItem) && ($entity = $field_item->get('entity')->getValue())) {
@@ -68,7 +68,7 @@ final class FlowEntityReferenceFieldItemNormalizer extends EntityReferenceFieldI
   /**
    * {@inheritdoc}
    */
-  public function denormalize($data, $class, $format = NULL, array $context = []) {
+  public function denormalize($data, $class, $format = NULL, array $context = []): mixed {
     if (self::$normalizeNewEntities) {
       if (is_array($data) && isset($data['entity'], $context['target_instance'])) {
         $field_item = $context['target_instance'];
@@ -86,14 +86,14 @@ final class FlowEntityReferenceFieldItemNormalizer extends EntityReferenceFieldI
   /**
    * {@inheritdoc}
    */
-  public function supportsNormalization($data, $format = NULL) {
+  public function supportsNormalization($data, ?string $format = NULL, array $context = []): bool {
     return $this->decoratedNormalizer->supportsNormalization($data, $format);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function supportsDenormalization($data, $type, $format = NULL) {
+  public function supportsDenormalization($data, string $type, string $format = NULL, array $context = []): bool {
     return $this->decoratedNormalizer->supportsDenormalization($data, $type, $format);
   }
 

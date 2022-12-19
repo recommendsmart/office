@@ -25,7 +25,7 @@ class DestinationParameterOverrideTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $config = $this->config('r4032login.settings');

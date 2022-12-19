@@ -3,6 +3,8 @@
 namespace Drupal\eca_content\Plugin\ECA\Condition;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
+use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\eca\Plugin\ECA\Condition\ConditionBase;
 use Drupal\eca\TypedData\PropertyPathTrait;
@@ -29,12 +31,53 @@ class EntityFieldValueEmpty extends ConditionBase {
   public function evaluate(): bool {
     $entity = $this->getValueFromContext('entity');
     $field_name = $this->tokenServices->replaceClear($this->configuration['field_name']);
+    $property_path = $this->normalizePropertyPath($field_name);
     $options = ['access' => FALSE, 'auto_item' => FALSE];
-    if (($entity instanceof EntityInterface) && ($property = $this->getTypedProperty($entity->getTypedData(), $field_name, $options))) {
-      return $this->negationCheck(method_exists($property, 'isEmpty') ? $property->isEmpty() : empty($property->getValue()));
+
+    // Setting the default return result to be false, stops execution chain
+    // when either the entity, field or property does not exist.
+    $result = FALSE;
+
+    if ($entity instanceof EntityInterface) {
+      $is_empty = NULL;
+      while ($property_path && !($property = $this->getTypedProperty($entity->getTypedData(), $property_path, $options))) {
+        $is_empty = TRUE; // Property does not exist, which means it's empty.
+        $property_path = implode('.', array_slice(explode('.', $property_path), 0, -1));
+      }
+      if (($is_empty === NULL) && $property) {
+        $is_empty = method_exists($property, 'isEmpty') ? $property->isEmpty() : empty($property->getValue());
+      }
+      if (!$is_empty) {
+        // For stale entity references, the empty check may return a false
+        // negative. Load the referenced entities to make sure, that they
+        // really exist.
+        if ($property instanceof EntityReferenceFieldItemListInterface) {
+          $is_empty = empty($property->referencedEntities());
+        }
+        elseif ($property instanceof EntityReferenceItem) {
+          $items = $property->getParent();
+          if ($items instanceof EntityReferenceFieldItemListInterface) {
+            $entities = $items->referencedEntities();
+            if ($entities) {
+              foreach ($items as $delta => $item) {
+                if (($item === $property) || ($item && ($item->getValue() === $property->getValue()))) {
+                  $is_empty = !isset($entities[$delta]);
+                  break;
+                }
+              }
+            }
+            else {
+              $is_empty = TRUE;
+            }
+          }
+        }
+      }
+      if ($is_empty !== NULL) {
+        $result = $this->negationCheck($is_empty);
+      }
     }
-    // Stop execution chain when field or property does not exist.
-    return FALSE;
+
+    return $result;
   }
 
   /**

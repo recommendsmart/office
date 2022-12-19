@@ -201,7 +201,7 @@ class RefreshTokenTest extends AuthorizedRequestBase {
       'scope' => $this->scope,
     ];
 
-    $parameters[$key] = $this->getRandomGenerator()->string(8, TRUE);
+    $parameters[$key] = $this->randomString();
     $request = Request::create($this->url->toString(), 'POST', $parameters);
     $response = $this->httpKernel->handle($request);
     $parsed_response = Json::decode((string) $response->getContent());

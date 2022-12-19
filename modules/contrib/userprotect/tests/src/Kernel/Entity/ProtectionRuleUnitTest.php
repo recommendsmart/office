@@ -21,7 +21,7 @@ class ProtectionRuleUnitTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['user', 'userprotect', 'field'];
+  protected static $modules = ['user', 'userprotect', 'field'];
 
   /**
    * The user protection plugin manager.
@@ -40,7 +40,7 @@ class ProtectionRuleUnitTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->manager = UserProtect::pluginManager();
     $this->protectionRule = ProtectionRule::create([
@@ -60,37 +60,37 @@ class ProtectionRuleUnitTest extends KernelTestBase {
    * Tests id().
    */
   public function testId() {
-    $this->assertIdentical('dummy', $this->protectionRule->id());
+    $this->assertSame('dummy', $this->protectionRule->id());
   }
 
   /**
    * Tests setProtectedEntityTypeId() and getProtectedEntityTypeId().
    */
   public function testProtectedEntityTypeId() {
-    $this->assertIdentical('user_role', $this->protectionRule->getProtectedEntityTypeId());
+    $this->assertSame('user_role', $this->protectionRule->getProtectedEntityTypeId());
     $entity_type = 'user';
     $this->assertInstanceOf(ProtectionRuleInterface::class, $this->protectionRule->setProtectedEntityTypeId($entity_type));
-    $this->assertIdentical($entity_type, $this->protectionRule->getProtectedEntityTypeId());
+    $this->assertSame($entity_type, $this->protectionRule->getProtectedEntityTypeId());
   }
 
   /**
    * Tests setProtectedEntityId() and getProtectedEntityId().
    */
   public function testProtectedEntityId() {
-    $this->assertIdentical('administrator', $this->protectionRule->getProtectedEntityId());
+    $this->assertSame('administrator', $this->protectionRule->getProtectedEntityId());
     $entity_id = 'authenticated';
     $this->assertInstanceOf(ProtectionRuleInterface::class, $this->protectionRule->setProtectedEntityId($entity_id));
-    $this->assertIdentical($entity_id, $this->protectionRule->getProtectedEntityId());
+    $this->assertSame($entity_id, $this->protectionRule->getProtectedEntityId());
   }
 
   /**
    * Tests setBypassRoles() and getBypassRoles().
    */
   public function testBypassRoles() {
-    $this->assertIdentical([], $this->protectionRule->getBypassRoles());
+    $this->assertSame([], $this->protectionRule->getBypassRoles());
     $roles = ['administrator'];
     $this->assertInstanceOf(ProtectionRuleInterface::class, $this->protectionRule->setBypassRoles($roles));
-    $this->assertIdentical($roles, $this->protectionRule->getBypassRoles());
+    $this->assertSame($roles, $this->protectionRule->getBypassRoles());
   }
 
   /**
@@ -128,23 +128,23 @@ class ProtectionRuleUnitTest extends KernelTestBase {
    */
   public function testToArray() {
     $array = $this->protectionRule->toArray();
-    $this->assertIdentical('dummy', $array['name']);
-    $this->assertIdentical('Dummy', $array['label']);
+    $this->assertSame('dummy', $array['name']);
+    $this->assertSame('Dummy', $array['label']);
     $expected_protections = [
       'user_mail' => [
         'status' => TRUE,
       ],
     ];
-    $this->assertIdentical($expected_protections, $array['protections']);
-    $this->assertIdentical('user_role', $array['protectedEntityTypeId']);
-    $this->assertIdentical('administrator', $array['protectedEntityId']);
+    $this->assertSame($expected_protections, $array['protections']);
+    $this->assertSame('user_role', $array['protectedEntityTypeId']);
+    $this->assertSame('administrator', $array['protectedEntityId']);
   }
 
   /**
    * Tests getPermissionName().
    */
   public function testGetPermissionName() {
-    $this->assertIdentical('userprotect.dummy.bypass', $this->protectionRule->getPermissionName());
+    $this->assertSame('userprotect.dummy.bypass', $this->protectionRule->getPermissionName());
   }
 
   /**

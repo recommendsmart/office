@@ -57,7 +57,7 @@ services:
     arguments: ['@entity_type.manager', '@entity_type.bundle.info']
   eca.service.dependency_calculation:
     class: Drupal\eca\Service\DependencyCalculation
-    arguments: ['@entity_type.manager', '@entity_type.bundle.info', '@entity_field.manager', '@eca.token_services']
+    arguments: ['@entity_type.manager', '@entity_type.bundle.info', '@entity_field.manager', '@eca.token_services', '@config.factory']
 
   eca.trigger_event:
     class: Drupal\eca\Event\TriggerEvent
@@ -84,6 +84,11 @@ services:
     parent: eca.default_event_subscriber
     tags:
       - { name: event_subscriber }
+  eca.execution.account_subscriber:
+    class: Drupal\eca\EventSubscriber\EcaExecutionAccountSubscriber
+    parent: eca.default_event_subscriber
+    tags:
+      - { name: event_subscriber }
   eca.execution.event_data_subscriber:
     class: Drupal\eca\EventSubscriber\EcaExecutionEventDataSubscriber
     parent: eca.default_event_subscriber
@@ -94,12 +99,24 @@ services:
     parent: eca.default_event_subscriber
     tags:
       - { name: event_subscriber }
+  eca.execution.switch_account_subscriber:
+    class: Drupal\eca\EventSubscriber\EcaExecutionSwitchAccountSubscriber
+    parent: eca.default_event_subscriber
+    calls:
+      - [setAccountSwitcher, ['@account_switcher']]
+      - [initializeUser, ['@config.factory', '@current_user']]
+    tags:
+      - { name: event_subscriber }
 
   eca.token_data.current_user:
     class: Drupal\eca\Token\CurrentUserDataProvider
     arguments: ['@current_user', '@entity_type.manager']
     tags:
       - { name: eca.token_data_provider, priority: -100 }
+  eca.token_data.context:
+    class: Drupal\eca\Token\ContextDataProvider
+    tags:
+      - { name: eca.token_data_provider, priority: -50 }
 
 parameters:
   eca.max_recursion_level: 1

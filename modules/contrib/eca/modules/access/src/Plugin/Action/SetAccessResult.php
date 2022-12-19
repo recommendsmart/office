@@ -5,8 +5,8 @@ namespace Drupal\eca_access\Plugin\Action;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\eca\Event\AccessEventInterface;
 use Drupal\eca\Plugin\Action\ConfigurableActionBase;
-use Drupal\eca_access\Event\EntityAccess;
 
 /**
  * Action to set an access result.
@@ -23,7 +23,7 @@ class SetAccessResult extends ConfigurableActionBase {
    * {@inheritdoc}
    */
   public function access($object, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
-    $result = $this->event instanceof EntityAccess ? AccessResult::allowed() : AccessResult::forbidden("Event is not compatible with this action.");
+    $result = $this->event instanceof AccessEventInterface ? AccessResult::allowed() : AccessResult::forbidden("Event is not compatible with this action.");
     return $return_as_object ? $result : $result->isAllowed();
   }
 
@@ -31,7 +31,7 @@ class SetAccessResult extends ConfigurableActionBase {
    * {@inheritdoc}
    */
   public function execute(): void {
-    if (!($this->event instanceof EntityAccess)) {
+    if (!($this->event instanceof AccessEventInterface)) {
       return;
     }
 
@@ -71,7 +71,7 @@ class SetAccessResult extends ConfigurableActionBase {
     $form['access_result'] = [
       '#type' => 'select',
       '#title' => $this->t('Access result'),
-      '#description' => $this->t('Please note: This action only works when reacting upon <em>ECA Access</em> events.'),
+      '#description' => $this->t('Please note: This action only works when reacting upon <em>access</em> events.'),
       '#default_value' => $this->configuration['access_result'],
       '#options' => [
         'forbidden' => $this->t('Forbidden'),

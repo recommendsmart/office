@@ -1,10 +1,10 @@
 name: Collapsible Fields
 type: module
 description: 'Allows to set the fields widgets and formatters as collapsible.'
-core_version_requirement: ^8 || ^9
+core_version_requirement: ^8 || ^9 || ^10
 package: Fields
 
-# Information added by Drupal.org packaging script on 2022-01-26
-version: '1.0.0-beta4'
+# Information added by Drupal.org packaging script on 2022-12-10
+version: '1.0.0'
 project: 'collapsible_fields'
-datestamp: 1643225399
+datestamp: 1670640669

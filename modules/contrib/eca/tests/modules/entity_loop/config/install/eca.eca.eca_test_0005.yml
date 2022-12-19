@@ -69,5 +69,5 @@ actions:
     label: Msg
     configuration:
       message: 'User [entity:name]'
-      replace_tokens: false
+      replace_tokens: true
     successors: {  }

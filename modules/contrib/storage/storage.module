@@ -87,8 +87,10 @@ function storage_form_storage_type_add_form_alter(&$form, FormStateInterface $fo
  * @see storage_form_storage_type_add_form_alter()
  */
 function storage_form_storage_type_add_form_submit($form, FormStateInterface $form_state) {
-  if ($form_state->getTriggeringElement()['#parents'][0] === 'save_continue' && $route_info = FieldUI::getOverviewRouteInfo('storage', $form_state->getValue('id'))) {
-    $form_state->setRedirectUrl($route_info);
+  if (\Drupal::moduleHandler()->moduleExists('field_ui')) {
+    if ($form_state->getTriggeringElement()['#parents'][0] === 'save_continue' && $route_info = FieldUI::getOverviewRouteInfo('storage', $form_state->getValue('id'))) {
+      $form_state->setRedirectUrl($route_info);
+    }
   }
 }
 

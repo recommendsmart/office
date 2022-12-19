@@ -222,14 +222,25 @@
   -webkit-box-flex: 1;
       -ms-flex: 1;
           flex: 1;
-  border-bottom-right-radius: 10px !important;
-  border-top-right-radius: 10px !important;
 }
 
 .socialblue--sky .block-profile-statistic-block .follow-user-wrapper .flag-follow-user,
 .socialblue--sky .block-group-statistic-block .follow-user-wrapper .flag-follow-user {
+  position: relative;
   padding: 6px 12px;
   font-weight: 400;
+}
+
+.socialblue--sky .block-profile-statistic-block .follow-user-wrapper .flag-follow-user .js-flag-message,
+.socialblue--sky .block-group-statistic-block .follow-user-wrapper .flag-follow-user .js-flag-message {
+  display: none;
+}
+
+.socialblue--sky .block-profile-statistic-block .follow-user-wrapper .flag-follow-user .ajax-throbber,
+.socialblue--sky .block-group-statistic-block .follow-user-wrapper .flag-follow-user .ajax-throbber {
+  position: absolute;
+  top: 4px;
+  right: 10px;
 }
 
 .socialblue--sky .block-profile-statistic-block .follow-user-wrapper .hero-footer__cta,

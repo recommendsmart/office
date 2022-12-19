@@ -23,17 +23,19 @@
 #}
 {{ attach_library('socialbase/message') }}
 {% if view_mode == 'inbox' %}
-<a href="{{ url }}" title="{{ 'View thread'|t }}" class="card message">
+<div class="card message">
   <div class="card__block">
     <div class="media-wrapper">
       <div class="media">
         <div class="media-left avatar">
-          {{ content.members }}
+          <a href="{{ url }}" title="{{ 'View thread'|t }}">
+            {{ content.members }}
+          </a>
         </div>
-        <div class="media-body message__inbox-body">
+        <a href="{{ url }}" title="{{ 'View thread'|t }}" class="media-body message__inbox-body">
           {{ content.membernames }} <span class="read-indicator"></span>
           {{ content.last_message }}
-        </div>
+        </a>
       </div>
     </div>
   </div>

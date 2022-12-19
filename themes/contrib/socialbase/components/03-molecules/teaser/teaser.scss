@@ -154,6 +154,15 @@
   .field--name-field-profile-self-introduction,
   .field--name-field-profile-summary {
     margin-bottom: 0.75rem;
+    overflow: hidden;
+
+    &,
+    > p {
+      width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
 
     > * {
       &:first-child {

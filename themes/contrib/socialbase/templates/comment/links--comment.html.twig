@@ -42,7 +42,7 @@
     {%- endif -%}
   {%- endif -%}
 
-  {% if links['comment-edit'] or links['comment-delete'] or links.report %}
+  {% if links['comment-edit'] or links['comment-unpublish'] or links['comment-sticky'] or links['comment-delete'] or links.report %}
     <div class="comment__actions pull-right">
       <button type="button" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-icon-toggle dropdown-toggle" title="{{ 'More options'|t }}">
         <svg class="btn-icon icon-gray" aria-hidden="true">
@@ -87,11 +87,11 @@
   <div class="btn comment__reply-btn">
     {%- for key, item in links|reverse if key == "comment-reply" -%}
       {%- if item.link -%}
-          {{ item.link }}
+        {{ item.link }}
       {%- elseif item.text_attributes -%}
         <span{{ item.text_attributes }}>{{ item.text }}</span>
       {%- else -%}
-          {{ item.text }}
+        {{ item.text }}
       {%- endif -%}
     {%- endfor -%}
   </div>

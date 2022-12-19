@@ -24,7 +24,7 @@ class PreconfiguredActionTest extends KernelTestBase {
     'user',
     'field',
     'eca',
-    'eca_array',
+    'eca_test_array',
   ];
 
   /**
@@ -67,7 +67,7 @@ class PreconfiguredActionTest extends KernelTestBase {
       'version' => '1.0.0',
       'events' => [
         'array_write' => [
-          'plugin' => 'eca_array:write',
+          'plugin' => 'eca_test_array:write',
           'label' => 'Write event for executing a pre-configured action.',
           'configuration' => [
             'key' => 'mykey',
@@ -105,7 +105,7 @@ class PreconfiguredActionTest extends KernelTestBase {
     $action_manager = \Drupal::service('plugin.manager.action');
 
     // Executing this action triggers the array write event.
-    $action_manager->createInstance('eca_array_write', [
+    $action_manager->createInstance('eca_test_array_write', [
       'key' => 'mykey',
       'value' => 'myvalue',
     ])->execute();
@@ -162,7 +162,7 @@ class PreconfiguredActionTest extends KernelTestBase {
       'version' => '1.0.0',
       'events' => [
         'array_write' => [
-          'plugin' => 'eca_array:write',
+          'plugin' => 'eca_test_array:write',
           'label' => 'Write event for executing a pre-configured action.',
           'configuration' => [
             'key' => 'mykey',
@@ -210,7 +210,7 @@ class PreconfiguredActionTest extends KernelTestBase {
     $action_manager = \Drupal::service('plugin.manager.action');
 
     // Executing this action triggers the array write event.
-    $action_manager->createInstance('eca_array_write', [
+    $action_manager->createInstance('eca_test_array_write', [
       'key' => 'mykey',
       'value' => 'myvalue',
     ])->execute();

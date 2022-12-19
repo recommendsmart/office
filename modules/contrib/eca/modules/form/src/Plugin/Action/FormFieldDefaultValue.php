@@ -28,6 +28,7 @@ class FormFieldDefaultValue extends FormFieldActionBase {
     if ($element = &$this->getTargetElement()) {
       $element = &$this->jumpToFirstFieldChild($element);
       $value = $this->configuration['value'];
+      $default_value_key = '#default_value';
 
       switch ($element['#type'] ?? NULL) {
 
@@ -78,13 +79,18 @@ class FormFieldDefaultValue extends FormFieldActionBase {
           }
           break;
 
+        case 'submit':
+        case 'button':
+        case 'hidden':
+          $default_value_key = '#value';
+
         default:
           $value = (string) $this->tokenServices->replaceClear($value);
           $this->filterFormFieldValue($value);
 
       }
 
-      $element['#default_value'] = $value;
+      $element[$default_value_key] = $value;
     }
   }
 

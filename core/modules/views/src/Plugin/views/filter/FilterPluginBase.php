@@ -858,7 +858,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
     }
     foreach ($this->options['group_info']['group_items'] as $id => $group) {
       if (!empty($group['title'])) {
-        $groups[$id] = $id != 'All' ? $this->t($group['title']) : $group['title'];
+        $groups[$id] = $group['title'];
       }
     }
 
@@ -882,7 +882,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
         }
         unset($form[$value]['#default_value']);
         $user_input = $form_state->getUserInput();
-        if (empty($user_input)) {
+        if (empty($user_input[$value])) {
           $user_input[$value] = $this->group_info;
           $form_state->setUserInput($user_input);
         }

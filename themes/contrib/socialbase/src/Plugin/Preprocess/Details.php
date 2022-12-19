@@ -17,7 +17,7 @@ class Details extends PreprocessBase {
   /**
    * {@inheritdoc}
    */
-  public function preprocess(array &$variables, $hook, array $info) {
+  public function preprocess(array &$variables, $hook, array $info): void {
     parent::preprocess($variables, $hook, $info);
 
     // Do not display the details title in file upload widget.

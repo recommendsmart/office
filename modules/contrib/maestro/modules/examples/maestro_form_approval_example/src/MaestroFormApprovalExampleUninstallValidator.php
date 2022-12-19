@@ -33,6 +33,7 @@ class MaestroFormApprovalExampleUninstallValidator implements ModuleUninstallVal
     if ($module == 'maestro_form_approval_example') {
       // Search for any node content of type "approval_form".
       $query = \Drupal::entityQuery('node')
+        ->accessCheck(FALSE)
         ->condition('type', 'approval_form');
 
       $nids = $query->execute();
@@ -44,6 +45,7 @@ class MaestroFormApprovalExampleUninstallValidator implements ModuleUninstallVal
       }
       // Now detect if this task still has open tasks...
       $query = \Drupal::entityQuery('maestro_process')
+        ->accessCheck(FALSE)
         ->condition('template_id', 'form_approval_flow')
         ->condition('complete', '0');
       $pids = $query->execute();

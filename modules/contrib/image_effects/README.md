@@ -35,6 +35,7 @@ Invert                   | Replace each pixel with its complementary color.     
 Mask                     | Apply a mask to the image.                                                                   | X          | IM only             |
 Mirror                   | Mirror the image horizontally and/or vertically.                                             | X          | X                   |
 Opacity                  | Change overall image transparency level.                                                     | X          | IM only             |
+Pixelate                 | Pixelate the image.                                                                          | X          | X                   |
 Relative crop            | Resize the image to match a ratio, for example 4:3 or 16:9.                                  | X          | X                   |
 Resize percentage        | Resize the image by percentage of its width/height.                                          | X          | X                   |
 Rotate                   | Rotate the image by a specified angle, optionally setting the background color. Replacement for Drupal core's Rotate effect.             | X          | X                   |

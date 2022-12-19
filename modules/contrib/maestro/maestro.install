@@ -75,7 +75,8 @@ function maestro_update_8003() {
     // Now to update the new entity identifiers entity with any existing entity_identifiers data.
     // we will assume that all of the identifiers have an entity type of 'node'.
     $query = \Drupal::entityQuery('maestro_process_variables')
-      ->condition('variable_name', 'entity_identifiers');
+      ->condition('variable_name', 'entity_identifiers')
+      ->accessCheck(FALSE);
     $entityIDs = $query->execute();
     foreach ($entityIDs as $entity_id) {
       $record = \Drupal::entityTypeManager()->getStorage('maestro_process_variables')->load($entity_id);
@@ -115,7 +116,7 @@ function maestro_update_8003() {
 function maestro_update_8004() {
   $message = NULL;
   if (\Drupal::moduleHandler()->moduleExists('views') && !View::load('maestro_completed_tasks')) {
-    $config_path = drupal_get_path('module', 'maestro') . '/config/install/views.view.maestro_completed_tasks.yml';
+    $config_path = \Drupal::service('extension.list.module')->getPath('maestro') . '/config/install/views.view.maestro_completed_tasks.yml';
     $data = Yaml::parse(file_get_contents($config_path));
     \Drupal::configFactory()->getEditable('views.view.maestro_completed_tasks')->setData($data)->save(TRUE);
     $message = 'The new Maestro Completed Tasks view has been created.';
@@ -132,7 +133,7 @@ function maestro_update_8004() {
 function maestro_update_8005() {
   $message = NULL;
   if (\Drupal::moduleHandler()->moduleExists('views') && !View::load('maestro_entity_identifiers')) {
-    $config_path = drupal_get_path('module', 'maestro') . '/config/install/views.view.maestro_entity_identifiers.yml';
+    $config_path = \Drupal::service('extension.list.module')->getPath('maestro') . '/config/install/views.view.maestro_entity_identifiers.yml';
     $data = Yaml::parse(file_get_contents($config_path));
     \Drupal::configFactory()->getEditable('views.view.maestro_entity_identifiers')->setData($data)->save(TRUE);
     $message = 'The new Maestro Entity Identifiers view for the Task Console has been created.';

@@ -45,7 +45,7 @@ final class FlowContentEntityNormalizer extends ContentEntityNormalizer {
   /**
    * {@inheritdoc}
    */
-  public function normalize($entity, $format = NULL, array $context = []) {
+  public function normalize($entity, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
     if (self::$cleanupFieldValues && ($entity instanceof ContentEntityInterface)) {
       foreach ($entity as $item_list) {
         $item_list->filterEmptyItems();
@@ -60,21 +60,21 @@ final class FlowContentEntityNormalizer extends ContentEntityNormalizer {
   /**
    * {@inheritdoc}
    */
-  public function denormalize($data, $class, $format = NULL, array $context = []) {
+  public function denormalize($data, $class, $format = NULL, array $context = []): mixed {
     return $this->decoratedNormalizer->denormalize($data, $class, $format, $context);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function supportsNormalization($data, $format = NULL) {
+  public function supportsNormalization($data, ?string $format = NULL, array $context = []): bool {
     return $this->decoratedNormalizer->supportsNormalization($data, $format);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function supportsDenormalization($data, $type, $format = NULL) {
+  public function supportsDenormalization($data, string $type, string $format = NULL, array $context = []): bool {
     return $this->decoratedNormalizer->supportsDenormalization($data, $type, $format);
   }
 

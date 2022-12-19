@@ -14,10 +14,10 @@ tags:
 ## Fields
 {% for field in fields %}
 
-### {{ field.label|raw }}
+`{{ field.label|raw }}`
 
-{{ field.description|raw }}
+:   {{ field.description|raw }}
 
-{!include/fields/{{ idfs }}/{{ field.name }}.md!}
+    {!include/fields/{{ idfs }}/{{ field.name }}.md!}
 {% endfor %}
 {% endif %}

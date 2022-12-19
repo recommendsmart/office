@@ -3,7 +3,6 @@ status: true
 dependencies:
   module:
     - eca_content
-    - taxonomy
 id: eca_test_0008
 modeller: bpmn_io
 label: 'Save new entity'

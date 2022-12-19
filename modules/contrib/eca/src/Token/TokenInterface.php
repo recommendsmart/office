@@ -193,7 +193,7 @@ interface TokenInterface {
    *   object and apply it to the corresponding render array. For example:
    *   @code
    *     $bubbleable_metadata = new BubbleableMetadata();
-   *     $build['#markup'] = $token_service->replace('Tokens: [node:nid] [current-user:uid]', ['node' => $node], [], $bubbleable_metadata);
+   *     $build['#markup'] = $token_service->replace('Tokens: [node:nid] [current_user:uid]', ['node' => $node], [], $bubbleable_metadata);
    *     $bubbleable_metadata->applyTo($build);
    *   @endcode
    *

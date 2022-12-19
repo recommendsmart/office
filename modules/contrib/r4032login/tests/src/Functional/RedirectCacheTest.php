@@ -47,7 +47,7 @@ class RedirectCacheTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Disable the access denied message so the cache will be set.
@@ -108,21 +108,23 @@ class RedirectCacheTest extends BrowserTestBase {
    * @throws \Behat\Mink\Exception\ExpectationException
    */
   public function testPrivateFileRedirectCache() {
+    $fileUrlGenerator = \Drupal::service('file_url_generator');
+
     // Assert there is the redirection since the node is not published.
-    $this->drupalGet(file_create_url($this->unpublishedNode->field_text_file->entity->getFileUri()));
+    $this->drupalGet($fileUrlGenerator->generateAbsoluteString($this->unpublishedNode->field_text_file->entity->getFileUri()));
     $this->assertSession()->addressEquals('user/login');
 
     // Assert there is not the redirection for an already published node file.
-    $this->drupalGet(file_create_url($this->publishedNode->field_text_file->entity->getFileUri()));
-    $this->assertSession()->addressEquals(file_create_url($this->publishedNode->field_text_file->entity->getFileUri()));
+    $this->drupalGet($fileUrlGenerator->generateAbsoluteString($this->publishedNode->field_text_file->entity->getFileUri()));
+    $this->assertSession()->addressEquals($fileUrlGenerator->generateAbsoluteString($this->publishedNode->field_text_file->entity->getFileUri()));
 
     // Publish the node.
     $this->unpublishedNode->setPublished()->save();
     $newlyPublishedNode = $this->unpublishedNode;
 
     // Assert there is not the redirection since the node is now published.
-    $this->drupalGet(file_create_url($newlyPublishedNode->field_text_file->entity->getFileUri()));
-    $this->assertSession()->addressEquals(file_create_url($newlyPublishedNode->field_text_file->entity->getFileUri()));
+    $this->drupalGet($fileUrlGenerator->generateAbsoluteString($newlyPublishedNode->field_text_file->entity->getFileUri()));
+    $this->assertSession()->addressEquals($fileUrlGenerator->generateAbsoluteString($newlyPublishedNode->field_text_file->entity->getFileUri()));
   }
 
 }

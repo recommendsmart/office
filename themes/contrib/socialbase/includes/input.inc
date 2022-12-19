@@ -8,7 +8,7 @@
 /**
  * Implements hook_preprocess_input().
  */
-function socialbase_preprocess_input(&$variables) {
+function socialbase_preprocess_input(&$variables): void {
 
   if (isset($variables['element']['#type']) && $variables['element']['#type'] === 'radio') {
     // Only reaction on the visibility field.
@@ -105,7 +105,7 @@ function socialbase_preprocess_input(&$variables) {
 /**
  * Implements hook_preprocess_textarea().
  */
-function socialbase_preprocess_textarea(&$variables) {
+function socialbase_preprocess_textarea(&$variables): void {
 
   if (isset($variables['element']['#array_parents'])) {
     $context = $variables['element']['#array_parents'];

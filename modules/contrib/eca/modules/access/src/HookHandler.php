@@ -51,4 +51,24 @@ class HookHandler extends BaseHookHandler {
     return $this->triggerEvent->dispatchFromPlugin('access:field', $entity, $operation, $account, $field_name);
   }
 
+  /**
+   * Trigger entity create access.
+   *
+   * @param array $context
+   *   An associative array of additional context values. By default it contains
+   *   language and the entity type ID:
+   *   - entity_type_id - the entity type ID.
+   *   - langcode - the current language code.
+   * @param string $entity_bundle
+   *   The entity bundle name.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The account that asks for access.
+   *
+   * @return \Drupal\Component\EventDispatcher\Event|\Symfony\Contracts\EventDispatcher\Event|null
+   *   The dispatched event, nor NULL if no event was dispatched.
+   */
+  public function createAccess(array $context, string $entity_bundle, AccountInterface $account): ?object {
+    return $this->triggerEvent->dispatchFromPlugin('access:create', $context, $entity_bundle, $account);
+  }
+
 }

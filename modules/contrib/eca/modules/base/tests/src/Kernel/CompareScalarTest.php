@@ -291,4 +291,33 @@ class CompareScalarTest extends KernelTestBase {
     ];
   }
 
+  /**
+   * Tests comparison of replaced tokens.
+   */
+  public function testTokenComparison(): void {
+    /** @var \Drupal\eca\PluginManager\Condition $condition_manager */
+    $condition_manager = \Drupal::service('plugin.manager.eca.condition');
+    /** @var \Drupal\eca\Token\TokenInterface $token_services */
+    $token_services = \Drupal::service('eca.token_services');
+
+    /** @var \Drupal\eca_base\Plugin\ECA\Condition\ScalarComparison $condition */
+    $condition = $condition_manager->createInstance('eca_scalar', [
+      'left' => '[left:value]',
+      'right' => '[right:value]',
+      'operator' => StringComparisonBase::COMPARE_EQUALS,
+      'type' => StringComparisonBase::COMPARE_TYPE_VALUE,
+      'case' => TRUE,
+      'negate' => FALSE,
+    ]);
+    $this->assertFalse($condition->evaluate());
+
+    $token_services->addTokenData('left:value', 'a');
+    $token_services->addTokenData('right:value', 'b');
+    $this->assertFalse($condition->evaluate());
+
+    $token_services->addTokenData('left:value', 'a');
+    $token_services->addTokenData('right:value', 'a');
+    $this->assertTrue($condition->evaluate());
+  }
+
 }

@@ -20,7 +20,7 @@ class ProtectionRuleBypassTest extends UserProtectKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->accessController = \Drupal::entityTypeManager()->getAccessControlHandler('user');
@@ -78,7 +78,11 @@ class ProtectionRuleBypassTest extends UserProtectKernelTestBase {
     $protected_account->addRole($rid);
 
     // Create operating account.
-    $account = $this->drupalCreateUser(['administer users', 'userprotect.dummy.bypass']);
+    $account = $this->drupalCreateUser(
+      [
+        'administer users',
+        'userprotect.dummy.bypass',
+      ]);
 
     // Test if account has the expected access.
     $this->assertTrue($this->accessController->access($protected_account, $operation, $account));
@@ -132,7 +136,11 @@ class ProtectionRuleBypassTest extends UserProtectKernelTestBase {
     $protected_account = $this->createProtectedUser([$plugin]);
 
     // Create operating account.
-    $account = $this->drupalCreateUser(['administer users', 'userprotect.dummy.bypass']);
+    $account = $this->drupalCreateUser(
+      [
+        'administer users',
+        'userprotect.dummy.bypass',
+      ]);
 
     // Test if account has the expected access.
     $this->assertTrue($this->accessController->access($protected_account, $operation, $account));

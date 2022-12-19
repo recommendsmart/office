@@ -150,6 +150,7 @@
     padding: 1rem 1.25rem;
     box-shadow: none;
     overflow: auto;
+    max-height: 70vh !important;
   }
 
   // Update position for the ajax throbber.

@@ -4,7 +4,6 @@ namespace Drupal\ctools\Plugin;
 
 use Drupal\ctools\Event\BlockVariantEvent;
 use Drupal\ctools\Event\BlockVariantEvents;
-use Drupal\Component\EventDispatcher\Event;
 
 /**
  * Provides methods for \Drupal\ctools\Plugin\BlockVariantInterface.
@@ -93,7 +92,7 @@ trait BlockVariantTrait {
    */
   public function getRegionAssignment($block_id) {
     $configuration = $this->getBlock($block_id)->getConfiguration();
-    return isset($configuration['region']) ? $configuration['region'] : NULL;
+    return $configuration['region'] ?? NULL;
   }
 
   /**
@@ -112,7 +111,7 @@ trait BlockVariantTrait {
    */
   public function getRegionName($region) {
     $regions = $this->getRegionNames();
-    return isset($regions[$region]) ? $regions[$region] : '';
+    return $regions[$region] ?? '';
   }
 
   /**

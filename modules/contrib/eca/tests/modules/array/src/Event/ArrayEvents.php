@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\eca_array\Event;
+namespace Drupal\eca_test_array\Event;
 
 /**
  * Defines events provided by the ECA test module for basic plugins.
@@ -14,6 +14,6 @@ final class ArrayEvents {
    *
    * @var string
    */
-  public const WRITE = 'eca_array.array_write';
+  public const WRITE = 'eca_test_array.array_write';
 
 }

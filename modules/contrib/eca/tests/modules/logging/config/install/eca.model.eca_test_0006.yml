@@ -17,13 +17,13 @@ modeldata: |
       <bpmn2:documentation>Write log messages.</bpmn2:documentation>
       <bpmn2:extensionElements>
         <camunda:properties>
-          <camunda:property name="Tags" value="test models,logging" />
+          <camunda:property name="Tags" value="test models,logging"/>
         </camunda:properties>
       </bpmn2:extensionElements>
       <bpmn2:startEvent id="Event_1eshshx" name="Presave node" camunda:modelerTemplate="org.drupal.event.content_entity:presave">
         <bpmn2:extensionElements>
           <camunda:properties>
-            <camunda:property name="pluginid" value="content_entity:presave" />
+            <camunda:property name="pluginid" value="content_entity:presave"/>
           </camunda:properties>
           <camunda:field name="type">
             <camunda:string>node _all</camunda:string>
@@ -34,7 +34,7 @@ modeldata: |
       <bpmn2:task id="Activity_02f0tls" name="Log" camunda:modelerTemplate="org.drupal.action.eca_write_log_message">
         <bpmn2:extensionElements>
           <camunda:properties>
-            <camunda:property name="pluginid" value="eca_write_log_message" />
+            <camunda:property name="pluginid" value="eca_write_log_message"/>
           </camunda:properties>
           <camunda:field name="channel">
             <camunda:string>eca</camunda:string>
@@ -48,22 +48,22 @@ modeldata: |
         </bpmn2:extensionElements>
         <bpmn2:incoming>Flow_0bcpf87</bpmn2:incoming>
       </bpmn2:task>
-      <bpmn2:sequenceFlow id="Flow_0bcpf87" sourceRef="Event_1eshshx" targetRef="Activity_02f0tls" />
+      <bpmn2:sequenceFlow id="Flow_0bcpf87" sourceRef="Event_1eshshx" targetRef="Activity_02f0tls"/>
     </bpmn2:process>
     <bpmndi:BPMNDiagram id="sid-1cabc76d-d88d-4356-9904-af226630ab20">
       <bpmndi:BPMNPlane id="sid-46a4a3ff-1826-420e-b0f0-4666d0e322a8" bpmnElement="eca_test_0006">
         <bpmndi:BPMNEdge id="Flow_0bcpf87_di" bpmnElement="Flow_0bcpf87">
-          <di:waypoint x="328" y="120" />
-          <di:waypoint x="380" y="120" />
+          <di:waypoint x="328" y="120"/>
+          <di:waypoint x="380" y="120"/>
         </bpmndi:BPMNEdge>
         <bpmndi:BPMNShape id="Event_1eshshx_di" bpmnElement="Event_1eshshx">
-          <dc:Bounds x="292" y="102" width="36" height="36" />
+          <dc:Bounds x="292" y="102" width="36" height="36"/>
           <bpmndi:BPMNLabel>
-            <dc:Bounds x="278" y="145" width="68" height="14" />
+            <dc:Bounds x="278" y="145" width="68" height="14"/>
           </bpmndi:BPMNLabel>
         </bpmndi:BPMNShape>
         <bpmndi:BPMNShape id="Activity_02f0tls_di" bpmnElement="Activity_02f0tls">
-          <dc:Bounds x="380" y="80" width="100" height="80" />
+          <dc:Bounds x="380" y="80" width="100" height="80"/>
         </bpmndi:BPMNShape>
       </bpmndi:BPMNPlane>
     </bpmndi:BPMNDiagram>

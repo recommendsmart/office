@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => 'b9b9d02c6cf42d7e7f4b6723fefc78f96630f06e',
+    'reference' => 'd5333056c3309fcc49fcad6931dc1edcb7ad9202',
     'name' => 'drupal/h5p',
   ),
   'versions' => 
@@ -18,16 +18,16 @@
       'aliases' => 
       array (
       ),
-      'reference' => 'b9b9d02c6cf42d7e7f4b6723fefc78f96630f06e',
+      'reference' => 'd5333056c3309fcc49fcad6931dc1edcb7ad9202',
     ),
     'h5p/h5p-core' => 
     array (
-      'pretty_version' => '1.24.2',
-      'version' => '1.24.2.0',
+      'pretty_version' => '1.24.4',
+      'version' => '1.24.4.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'db3da7a1441ae6c9ffacbb8110f41758c85beaa0',
+      'reference' => '52b1ae5556d0f846b004f8cedc01a1a3cea7bdf8',
     ),
     'h5p/h5p-editor' => 
     array (

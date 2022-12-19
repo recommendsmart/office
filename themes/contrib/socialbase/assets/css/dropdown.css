@@ -5,7 +5,7 @@
   margin-left: 2px;
   vertical-align: middle;
   border-top: 5px dashed;
-  border-top: 5px solid \9 ;
+  border-top: 5px solid \9;
   border-right: 5px solid transparent;
   border-left: 5px solid transparent;
 }
@@ -47,7 +47,7 @@
   text-align: left;
   background-color: #fff;
   -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.16), 0 6px 12px rgba(0, 0, 0, 0.32);
-          box-shadow: 0 0 6px rgba(0, 0, 0, 0.16), 0 6px 12px rgba(0, 0, 0, 0.32);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.16), 0 6px 12px rgba(0, 0, 0, 0.32);
   background-clip: padding-box;
 }
 
@@ -88,16 +88,20 @@
   background-color: #f3f3f3;
 }
 
-.dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus {
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
   text-decoration: none;
 }
 
-.dropdown-menu > .active > a, .dropdown-menu > .active > a:hover, .dropdown-menu > .active > a:focus {
+.dropdown-menu > .active > a,
+.dropdown-menu > .active > a:hover,
+.dropdown-menu > .active > a:focus {
   text-decoration: none;
   outline: 0;
 }
 
-.dropdown-menu > .disabled > a:hover, .dropdown-menu > .disabled > a:focus,
+.dropdown-menu > .disabled > a:hover,
+.dropdown-menu > .disabled > a:focus,
 .dropdown-menu > .disabled > span:hover,
 .dropdown-menu > .disabled > span:focus {
   text-decoration: none;
@@ -161,7 +165,7 @@
 .navbar-fixed-bottom .dropdown .caret {
   border-top: 0;
   border-bottom: 4px dashed;
-  border-bottom: 4px solid \9 ;
+  border-bottom: 4px solid \9;
   content: "";
 }
 
@@ -182,7 +186,7 @@
 
 .dropdown-menu .media-left {
   -ms-flex-negative: 0;
-      flex-shrink: 0;
+  flex-shrink: 0;
 }
 
 .dropdown-menu .media-left img {
@@ -268,7 +272,7 @@ html:not(.js) .dropdown .dropdown-toggle {
 .hero-footer__cta.open .caret,
 .hero-footer__cta .open .caret {
   -webkit-transform: rotate(180deg);
-          transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 
 .social-gtranslate-list--desktop > a:after {
@@ -282,7 +286,7 @@ html:not(.js) .dropdown .dropdown-toggle {
   margin-top: -.4rem;
   right: auto;
   -webkit-transform: rotate(180deg);
-          transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 
 @media (min-width: 600px) {
@@ -309,7 +313,8 @@ html:not(.js) .dropdown .dropdown-toggle {
 }
 
 @media (min-width: 600px) and (-ms-high-contrast: none) {
-  *::-ms-backdrop, .dropdown-menu .media-body {
+  *::-ms-backdrop,
+  .dropdown-menu .media-body {
     padding-right: 17px;
   }
 }

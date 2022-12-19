@@ -2,8 +2,12 @@
 
 namespace Drupal\socialbase\Plugin\Preprocess;
 
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\file\Entity\File;
 use Drupal\bootstrap\Plugin\Preprocess\FileLink as BaseFileLink;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
  * Pre-processes variables for the "file_link" theme hook.
@@ -14,16 +18,58 @@ use Drupal\bootstrap\Plugin\Preprocess\FileLink as BaseFileLink;
  *   replace = "template_preprocess_file_link"
  * )
  */
-class FileLink extends BaseFileLink {
+class FileLink extends BaseFileLink implements ContainerFactoryPluginInterface {
+
+  /**
+   * The theme manager service.
+   *
+   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   */
+  protected ThemeManagerInterface $themeManager;
+
+  /**
+   * The storage handler class for files.
+   *
+   * @var \Drupal\file\FileStorage
+   */
+  protected $fileStorage;
+
+  /**
+   * {@inheritDoc}
+   */
+  public function __construct(
+    array $configuration,
+          $plugin_id,
+          $plugin_definition,
+    ThemeManagerInterface $theme_manager,
+    EntityTypeManagerInterface $entity
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->themeManager = $theme_manager;
+    $this->fileStorage = $entity->getStorage('file');
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('theme.manager'),
+      $container->get('entity_type.manager')
+    );
+  }
 
   /**
    * {@inheritdoc}
    */
-  public function preprocess(array &$variables, $hook, array $info) {
+  public function preprocess(array &$variables, $hook, array $info): void {
     parent::preprocess($variables, $hook, $info);
 
     // Find out what the active theme is first.
-    $theme = \Drupal::theme()->getActiveTheme();
+    $theme = $this->themeManager->getActiveTheme();
 
     // Check if socialbase is one of the base themes.
     // Then get the path to socialbase theme and provide a variable
@@ -33,13 +79,11 @@ class FileLink extends BaseFileLink {
       $variables['path_to_socialbase'] = $basethemes['socialbase']->getPath();
     }
 
-    $file = ($variables['file'] instanceof File) ? $variables['file'] : File::load($variables['file']->fid);
+    $file = ($variables['file'] instanceof File) ? $variables['file'] : $this->fileStorage->load($variables['file']->fid);
 
-    $mime_type = $file->getMimeType();
-    $generic_mime_type = file_icon_class($mime_type);
-
-    if (isset($generic_mime_type)) {
-
+    if ($file instanceof File) {
+      $mime_type = $file->getMimeType();
+      $generic_mime_type = file_icon_class($mime_type);
       // Set new icons for the mime types.
       switch ($generic_mime_type) {
 
@@ -79,10 +123,9 @@ class FileLink extends BaseFileLink {
           $node_icon = 'text';
       }
 
+      // Set a new variable to be used in the template file.
+      $variables['node_icon'] = $node_icon;
     }
-
-    // Set a new variable to be used in the template file.
-    $variables['node_icon'] = $node_icon;
 
   }
 

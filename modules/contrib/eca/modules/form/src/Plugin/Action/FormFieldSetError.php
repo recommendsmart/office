@@ -36,6 +36,7 @@ class FormFieldSetError extends FormFieldValidateActionBase {
       '#default_value' => $this->configuration['message'],
       '#weight' => -49,
     ];
+    $form['field_name']['#description'] .= ' ' . $this->t("Leave empty to set a global error on the form.");
     return $form;
   }
 
@@ -45,6 +46,20 @@ class FormFieldSetError extends FormFieldValidateActionBase {
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     $this->configuration['message'] = $form_state->getValue('message');
     parent::submitConfigurationForm($form, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function execute(): void {
+    if (trim((string) $this->configuration['field_name']) === '') {
+      // We support setting a global error on the whole form.
+      $this->doExecute();
+    }
+    else {
+      // Otherwise, let the parent logic execute.
+      parent::execute();
+    }
   }
 
   /**

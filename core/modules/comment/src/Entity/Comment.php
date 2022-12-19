@@ -201,7 +201,7 @@ class Comment extends ContentEntityBase implements CommentInterface {
       }
     }
 
-    foreach ($entities as $id => $entity) {
+    foreach ($entities as $entity) {
       \Drupal::service('comment.statistics')->update($entity);
     }
   }

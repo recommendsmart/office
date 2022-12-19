@@ -40,7 +40,7 @@ class UserProtectionBaseUnitTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->moduleHandler = $this->createMock('\Drupal\Core\Extension\ModuleHandlerInterface');
@@ -52,7 +52,7 @@ class UserProtectionBaseUnitTest extends UnitTestCase {
         $this->pluginDefinition,
         $this->moduleHandler,
       ])
-      ->setMethods(['t'])
+      ->onlyMethods(['t'])
       ->getMock();
     $this->plugin->expects($this->any())
       ->method('t')
@@ -90,7 +90,7 @@ class UserProtectionBaseUnitTest extends UnitTestCase {
    * @covers ::defaultConfiguration
    */
   public function testDefaultConfiguration() {
-    $this->assertInternalType('array', $this->plugin->defaultConfiguration());
+    $this->assertIsArray($this->plugin->defaultConfiguration());
   }
 
 }

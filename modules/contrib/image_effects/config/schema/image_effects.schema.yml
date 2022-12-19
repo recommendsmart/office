@@ -223,6 +223,14 @@ image.effect.image_effects_opacity:
       type: integer
       label: 'Opacity % of the source image'
 
+image.effect.image_effects_pixelate:
+  type: mapping
+  label: 'Pixelate the image'
+  mapping:
+    size:
+      type: integer
+      label: 'Size of the pixels'
+
 image.effect.image_effects_relative_crop:
   type: mapping
   label: 'Relative crop'

@@ -1,13 +1,13 @@
 type: module
 name: Flow Context
 description: "Makes Flow-related content available as contextual Tokens. Requires the Context Stack module (drupal/context_stack)."
-core_version_requirement: ^9 || ^10
+core_version_requirement: ^9.4 || ^10
 package: Other
 dependencies:
   - flow:flow
   - context_stack:context_stack
 
-# Information added by Drupal.org packaging script on 2022-08-22
-version: '1.0.0-beta14'
+# Information added by Drupal.org packaging script on 2022-12-08
+version: '1.0.0-beta15'
 project: 'flow'
-datestamp: 1661176020
+datestamp: 1670490927

@@ -8,13 +8,12 @@
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Template\Attribute;
-use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Drupal\comment\CommentInterface;
 
 /**
  * Implements template_preprocess_form().
  */
-function socialbase_preprocess_form(&$variables) {
+function socialbase_preprocess_form(&$variables): void {
 
   $element = $variables['element'];
 
@@ -57,7 +56,7 @@ function socialbase_preprocess_form(&$variables) {
             $variables['comment_wrapper']->addClass('social_' . $element['form_html_id']['#value']);
             // Only on reply ajax call add another class and wrapper.
             // we need this class so ajax_comments understand to remove this
-            // element so there wont be multiple reply forms opened.
+            // element so there won't be multiple reply forms opened.
             if (!empty($element['#action']) && strpos($element['#action'], 'ajax_comments/reply') !== FALSE) {
               $variables['comment_reply_form_wrapper']->addClass('ajax-comments-form-reply');
               $variables['comment_reply_form_wrapper']->addClass('comments');
@@ -75,7 +74,10 @@ function socialbase_preprocess_form(&$variables) {
       if ($comment instanceof CommentInterface) {
         // Display comment created date in format 'time ago'.
         $created_time_ago = \Drupal::service('date.formatter')
-          ->formatTimeDiffSince($comment->getCreatedTime(), ['granularity' => 1, 'return_as_object' => TRUE]);
+          ->formatTimeDiffSince($comment->getCreatedTime(), [
+            'granularity' => 1,
+            'return_as_object' => TRUE,
+          ]);
 
         $submitted = t('@time ago', ['@time' => $created_time_ago->getString()]);
         $variables['submitted'] = Link::fromTextAndUrl($submitted, $comment->toUrl('canonical'));
@@ -118,7 +120,10 @@ function socialbase_preprocess_form(&$variables) {
 
       // Display post created date in format 'time ago'.
       $created_time_ago = \Drupal::service('date.formatter')
-        ->formatTimeDiffSince($post->getCreatedTime(), ['granularity' => 1, 'return_as_object' => TRUE]);
+        ->formatTimeDiffSince($post->getCreatedTime(), [
+          'granularity' => 1,
+          'return_as_object' => TRUE,
+        ]);
       $date = t('%time ago', ['%time' => $created_time_ago->getString()]);
       $variables['date']['#markup'] = $date;
       $variables['#cache']['max-age'] = $created_time_ago->getCacheMaxAge();
@@ -149,7 +154,7 @@ function socialbase_preprocess_form(&$variables) {
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function socialbase_form_social_post_entity_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+function socialbase_form_social_post_entity_form_alter(&$form, FormStateInterface $form_state, $form_id): void {
   $form['actions']['#inline'] = TRUE;
   $form['field_visibility']['#inline'] = TRUE;
 
@@ -163,7 +168,7 @@ function socialbase_form_social_post_entity_form_alter(&$form, FormStateInterfac
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function socialbase_form_comment_post_comment_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+function socialbase_form_comment_post_comment_form_alter(&$form, FormStateInterface $form_state, $form_id): void {
 
   if (isset($form['actions']['submit']['#button_type'])) {
     $form['actions']['submit']['#button_type'] = 'primary';
@@ -178,7 +183,7 @@ function socialbase_form_comment_post_comment_form_alter(&$form, FormStateInterf
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function socialbase_form_private_message_add_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+function socialbase_form_private_message_add_form_alter(&$form, FormStateInterface $form_state, $form_id): void {
 
   foreach ($form['actions'] as $key => &$actions) {
     // Must be pretty sure it's a submit button.
@@ -196,7 +201,7 @@ function socialbase_form_private_message_add_form_alter(&$form, FormStateInterfa
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function socialbase_form_comment_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+function socialbase_form_comment_form_alter(&$form, FormStateInterface $form_state, $form_id): void {
   $form['field_comment_body']['widget'][0]['#title_display'] = 'invisible';
   if (isset($form['actions']['submit']['#button_type'])) {
     $form['actions']['submit']['#button_type'] = 'primary';
@@ -207,7 +212,7 @@ function socialbase_form_comment_form_alter(&$form, FormStateInterface $form_sta
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function socialbase_form_node_event_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+function socialbase_form_node_event_form_alter(&$form, FormStateInterface $form_state, $form_id): void {
   if (isset($form['field_event_address'])) {
     $form['field_event_address']['widget'][0]['#title'] = '';
   }
@@ -216,7 +221,7 @@ function socialbase_form_node_event_form_alter(&$form, FormStateInterface $form_
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function socialbase_form_profile_profile_edit_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+function socialbase_form_profile_profile_edit_form_alter(&$form, FormStateInterface $form_state, $form_id): void {
   if (isset($form['field_profile_address'])) {
     $form['field_profile_address']['widget'][0]['#title'] = '';
   }
@@ -225,7 +230,7 @@ function socialbase_form_profile_profile_edit_form_alter(&$form, FormStateInterf
 /**
  * Implements hook_form_user_form_alter().
  */
-function socialbase_form_user_form_alter(&$form) {
+function socialbase_form_user_form_alter(&$form): void {
   if (isset($form['email_notifications'])) {
     $form['#attached']['library'][] = 'socialbase/form-horizontal';
     $form['timezone']['#attributes']['class'][] = 'form-horizontal';
@@ -235,7 +240,7 @@ function socialbase_form_user_form_alter(&$form) {
 /**
  * Implements hook_form_alter().
  */
-function socialbase_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+function socialbase_form_alter(&$form, FormStateInterface $form_state, $form_id): void {
 
   // Client side validation is not consistent accross devices. Disable for now.
   if (!isset($form['#attributes']['novalidate'])) {
@@ -284,16 +289,13 @@ function socialbase_form_alter(&$form, FormStateInterface $form_state, $form_id)
   }
 
   // Add card classes to all the social_content_reporting forms if enabled.
-  try {
-    // Get all 'report_' flags.
+  // Get all 'report_' flags.
+  if (\Drupal::hasService('social_content_report.content_report_service')) {
     $report_types = \Drupal::service('social_content_report.content_report_service')->getReportFlagTypes();
     foreach ($report_types as $report_type) {
       $content_reporting_forms[] = 'flagging_' . $report_type . '_add_form';
       $content_reporting_forms[] = 'flagging_' . $report_type . '_edit_form';
     }
-  }
-  // If the service doesn't exist then we don't need to do anything.
-  catch (ServiceNotFoundException $e) {
   }
 
   // These forms have a container with class form-action at the bottom and
@@ -461,7 +463,7 @@ function socialbase_form_alter(&$form, FormStateInterface $form_state, $form_id)
  * Set button types for input elements.
  * Note that these variables are read in hook_preprocess_input.
  */
-function socialbase_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+function socialbase_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id): void {
   $form['#attributes']['class'][] = 'form--default';
 
   // Delete is not an input element, so we must apply extra classes
@@ -508,7 +510,7 @@ function socialbase_form_node_form_alter(&$form, FormStateInterface $form_state,
 /**
  * Implements hook_form_search_content_form_alter().
  */
-function socialbase_form_search_content_form_alter(&$form) {
+function socialbase_form_search_content_form_alter(&$form): void {
   $form['actions']['submit']['#icon'] = [
     '#type' => "inline_template",
     '#template' => '<svg class="icon--search"><use xlink:href="#icon-search"></use></svg>',
@@ -518,7 +520,7 @@ function socialbase_form_search_content_form_alter(&$form) {
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function socialbase_form_node_layout_builder_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+function socialbase_form_node_layout_builder_form_alter(&$form, FormStateInterface $form_state, $form_id): void {
   // Make the layout builder specific styling available.
   $form['#attached']['library'][] = 'socialbase/form--toolbar';
 }

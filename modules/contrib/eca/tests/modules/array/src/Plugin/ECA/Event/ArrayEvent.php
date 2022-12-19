@@ -1,20 +1,20 @@
 <?php
 
-namespace Drupal\eca_array\Plugin\ECA\Event;
+namespace Drupal\eca_test_array\Plugin\ECA\Event;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\eca\Entity\Objects\EcaEvent;
 use Drupal\eca\Event\Tag;
 use Drupal\eca\Plugin\ECA\Event\EventBase;
-use Drupal\eca_array\Event\ArrayEvents;
-use Drupal\eca_array\Event\ArrayWriteEvent;
+use Drupal\eca_test_array\Event\ArrayEvents;
+use Drupal\eca_test_array\Event\ArrayWriteEvent;
 
 /**
  * Plugin implementation of the ECA array events.
  *
  * @EcaEvent(
- *   id = "eca_array",
- *   deriver = "Drupal\eca_array\Plugin\ECA\Event\ArrayEventDeriver"
+ *   id = "eca_test_array",
+ *   deriver = "Drupal\eca_test_array\Plugin\ECA\Event\ArrayEventDeriver"
  * )
  */
 class ArrayEvent extends EventBase {

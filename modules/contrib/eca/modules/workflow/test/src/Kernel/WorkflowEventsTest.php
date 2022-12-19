@@ -3,7 +3,7 @@
 namespace Drupal\Tests\eca_workflow\Kernel;
 
 use Drupal\eca\Entity\Eca;
-use Drupal\eca_array\Plugin\Action\ArrayIncrement;
+use Drupal\eca_test_array\Plugin\Action\ArrayIncrement;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
@@ -33,8 +33,8 @@ class WorkflowEventsTest extends KernelTestBase {
     'text',
     'workflows',
     'eca',
+    'eca_test_array',
     'eca_workflow',
-    'eca_array',
   ];
 
   /**
@@ -104,7 +104,7 @@ class WorkflowEventsTest extends KernelTestBase {
       'gateways' => [],
       'actions' => [
         'increment_initial_draft' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'Increment initial_draft',
           'configuration' => [
             'key' => 'initial_draft',
@@ -112,7 +112,7 @@ class WorkflowEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'increment_draft_published' => [
-          'plugin' => 'eca_array_increment',
+          'plugin' => 'eca_test_array_increment',
           'label' => 'Increment draft_published',
           'configuration' => [
             'key' => 'draft_published',

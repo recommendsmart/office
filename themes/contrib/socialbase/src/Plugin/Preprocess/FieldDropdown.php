@@ -16,7 +16,7 @@ class FieldDropdown extends PreprocessBase {
   /**
    * {@inheritdoc}
    */
-  public function preprocess(array &$variables, $hook, array $info) {
+  public function preprocess(array &$variables, $hook, array $info): void {
     parent::preprocess($variables, $hook, $info);
 
     if (isset($variables['active']) && is_numeric($variables['active'])) {
@@ -24,7 +24,7 @@ class FieldDropdown extends PreprocessBase {
       $selected_icon = _socialbase_get_visibility_icon($title);
     }
 
-    $variables['selected_icon'] = isset($selected_icon) ? $selected_icon : '';
+    $variables['selected_icon'] = $selected_icon ?? '';
   }
 
 }

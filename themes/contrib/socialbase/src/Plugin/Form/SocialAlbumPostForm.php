@@ -18,7 +18,7 @@ class SocialAlbumPostForm extends SocialAlbumImageForm {
   /**
    * {@inheritdoc}
    */
-  public function alterFormElement(Element $form, FormStateInterface $form_state, $form_id = NULL) {
+  public function alterFormElement(Element $form, FormStateInterface $form_state, $form_id = NULL): void {
     if (in_array($form_state->get('form_display')->getOriginalMode(), [
       EntityDisplayRepositoryInterface::DEFAULT_DISPLAY_MODE,
       'album',

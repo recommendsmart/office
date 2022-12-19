@@ -12,8 +12,8 @@
   display: -ms-flexbox;
   display: flex;
   -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
 }
 
 .vote-like {
@@ -68,13 +68,13 @@ svg[class^="icon-vote"] {
 
 .view--who-liked .row {
   -ms-flex-wrap: nowrap;
-      flex-wrap: nowrap;
+  flex-wrap: nowrap;
   -webkit-box-pack: start;
-      -ms-flex-pack: start;
-          justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
   -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
   border-bottom: 1px solid #e6e6e6;
   padding: 0.5rem 0;
 }
@@ -85,8 +85,8 @@ svg[class^="icon-vote"] {
 
 .view--who-liked .views-field-rendered-entity-1 {
   -webkit-box-flex: 0;
-      -ms-flex: 0 0 54px;
-          flex: 0 0 54px;
+  -ms-flex: 0 0 54px;
+  flex: 0 0 54px;
 }
 
 .view--who-liked .views-field-rendered-entity-1 a:focus {
@@ -95,8 +95,8 @@ svg[class^="icon-vote"] {
 
 .view--who-liked .views-field-name {
   -webkit-box-flex: 2;
-      -ms-flex: 2 1 auto;
-          flex: 2 1 auto;
+  -ms-flex: 2 1 auto;
+  flex: 2 1 auto;
   min-width: 0;
 }
 
@@ -128,7 +128,7 @@ svg[class^="icon-vote"] {
     fill: #343434;
     stroke: #343434;
     -webkit-transform: none;
-            transform: none;
+    transform: none;
   }
 }
 
@@ -147,7 +147,7 @@ svg[class^="icon-vote"] {
     text-align: center;
     vertical-align: middle;
     -ms-touch-action: manipulation;
-        touch-action: manipulation;
+    touch-action: manipulation;
     cursor: pointer;
     background-image: none;
     border: 1px solid transparent;
@@ -156,9 +156,9 @@ svg[class^="icon-vote"] {
     font-size: 0.875rem;
     line-height: 1.5;
     -webkit-user-select: none;
-       -moz-user-select: none;
-        -ms-user-select: none;
-            user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
     -webkit-transition: .3s ease-out;
     transition: .3s ease-out;
     outline: 0;
@@ -171,8 +171,8 @@ svg[class^="icon-vote"] {
   }
   .vote__wrapper {
     -webkit-box-pack: justify;
-        -ms-flex-pack: justify;
-            justify-content: space-between;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
   }
   .vote-like {
     margin-right: 10px;

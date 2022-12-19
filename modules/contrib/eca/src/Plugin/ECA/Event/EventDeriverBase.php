@@ -30,6 +30,9 @@ abstract class EventDeriverBase extends DeriverBase {
         'label' => $definition['label'],
         'tags' => $definition['tags'] ?? 0,
       ] + $base_plugin_definition;
+      if (isset($definition['description'])) {
+        $this->derivatives[$definition_id]['description'] = $definition['description'];
+      }
     }
     return $this->derivatives;
   }

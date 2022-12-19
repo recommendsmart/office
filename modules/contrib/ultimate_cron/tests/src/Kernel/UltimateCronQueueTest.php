@@ -23,9 +23,9 @@ class UltimateCronQueueTest extends CronQueueTest {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
-    module_load_install('ultimate_cron');
+    \Drupal::moduleHandler()->loadInclude('ultimate_cron', 'install');
     ultimate_cron_install();
     $this->installSchema('ultimate_cron', [
       'ultimate_cron_log',
@@ -58,7 +58,7 @@ class UltimateCronQueueTest extends CronQueueTest {
     // @see \Drupal\Core\Cron::processQueues()
     $this->connection->update('queue')
       ->condition('name', 'cron_queue_test_exception')
-      ->fields(['expire' => REQUEST_TIME - 1])
+      ->fields(['expire' => \Drupal::time()->getRequestTime() - 1])
       ->execute();
 
     // Has to be manually called for Ultimate Cron.
@@ -152,6 +152,13 @@ class UltimateCronQueueTest extends CronQueueTest {
 
     // @todo Test empty delay, causes a wait of 60 seconds with the test queue
     //   worker.
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function testLeaseTime() {
+    $this->markTestSkipped('Test does not support ultimate cron schedule logic');
   }
 
 }

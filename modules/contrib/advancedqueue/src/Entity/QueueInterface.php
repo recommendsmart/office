@@ -22,6 +22,34 @@ interface QueueInterface extends ConfigEntityInterface, EntityWithPluginCollecti
   const PROCESSOR_DAEMON = 'daemon';
 
   /**
+   * Type of expiration queues.
+   */
+  const QUEUE_THRESHOLD_ITEMS = 1;
+  const QUEUE_THRESHOLD_DAYS = 2;
+
+  /**
+   * Queue treshold by items count.
+   */
+  const QUEUE_THRESHOLD_ITEMS_LIMITS = [
+    100,
+    1000,
+    10000,
+    100000,
+    1000000,
+  ];
+
+  /**
+   * Queue limits by days.
+   */
+  const QUEUE_THRESHOLD_DAYS_LIMITS = [
+    7,
+    30,
+    60,
+    180,
+    365,
+  ];
+
+  /**
    * Enqueues the given job.
    *
    * The job will be modified with the assigned queue ID, job ID, and
@@ -130,6 +158,24 @@ interface QueueInterface extends ConfigEntityInterface, EntityWithPluginCollecti
    * @return $this
    */
   public function setProcessingTime($processing_time);
+
+  /**
+   * Gets the number of queue items to keep.
+   *
+   * @return int
+   *   The number of items to keep.
+   */
+  public function getThreshold();
+
+  /**
+   * Set the number of queue items to keep.
+   *
+   * @param int $threshold
+   *   The number of items. 0 for unlimited.
+   *
+   * @return $this
+   */
+  public function setThreshold($threshold);
 
   /**
    * Gets whether the queue is locked.

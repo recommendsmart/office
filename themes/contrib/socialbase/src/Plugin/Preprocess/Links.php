@@ -17,7 +17,7 @@ class Links extends PreprocessBase {
   /**
    * {@inheritdoc}
    */
-  public function preprocessVariables(Variables $variables) {
+  public function preprocessVariables(Variables $variables): void {
     unset($variables['links']['comment-add']);
     unset($variables['links']['comment-comments']);
 

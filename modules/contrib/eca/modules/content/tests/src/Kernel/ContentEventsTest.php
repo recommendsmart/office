@@ -4,7 +4,7 @@ namespace Drupal\Tests\eca_content\Kernel;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\eca\Entity\Eca;
-use Drupal\eca_array\Plugin\Action\ArrayWrite;
+use Drupal\eca_test_array\Plugin\Action\ArrayWrite;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\language\Entity\ContentLanguageSettings;
@@ -35,8 +35,8 @@ class ContentEventsTest extends KernelTestBase {
     'language',
     'content_translation',
     'eca',
-    'eca_array',
     'eca_content',
+    'eca_test_array',
   ];
 
   /**
@@ -127,7 +127,7 @@ class ContentEventsTest extends KernelTestBase {
       'gateways' => [],
       'actions' => [
         'write_bundlecreate' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'Write bundlecreate',
           'configuration' => [
             'key' => 'bundlecreate',
@@ -136,7 +136,7 @@ class ContentEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_bundledelete' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'Write bundledelete',
           'configuration' => [
             'key' => 'bundledelete',
@@ -364,7 +364,7 @@ class ContentEventsTest extends KernelTestBase {
       'gateways' => [],
       'actions' => [
         'write_create' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'Write create',
           'configuration' => [
             'key' => 'create',
@@ -373,7 +373,7 @@ class ContentEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_revisioncreate' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'Write revisioncreate',
           'configuration' => [
             'key' => 'revisioncreate',
@@ -382,7 +382,7 @@ class ContentEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_preload' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'Write preload',
           'configuration' => [
             'key' => 'preload',
@@ -391,7 +391,7 @@ class ContentEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_load' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'Write load',
           'configuration' => [
             'key' => 'load',
@@ -400,7 +400,7 @@ class ContentEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_storageload' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'Write storageload',
           'configuration' => [
             'key' => 'storageload',
@@ -409,7 +409,7 @@ class ContentEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_presave' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'Write presave',
           'configuration' => [
             'key' => 'presave',
@@ -418,7 +418,7 @@ class ContentEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_insert' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'Write insert',
           'configuration' => [
             'key' => 'insert',
@@ -427,7 +427,7 @@ class ContentEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_update' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'Write update',
           'configuration' => [
             'key' => 'update',
@@ -436,7 +436,7 @@ class ContentEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_translationinsert' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'Write translationinsert',
           'configuration' => [
             'key' => 'translationinsert',
@@ -445,7 +445,7 @@ class ContentEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_translationcreate' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'Write translationcreate',
           'configuration' => [
             'key' => 'translationcreate',
@@ -454,7 +454,7 @@ class ContentEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_translationdelete' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'Write translationdelete',
           'configuration' => [
             'key' => 'translationdelete',
@@ -463,7 +463,7 @@ class ContentEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_predelete' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'Write predelete',
           'configuration' => [
             'key' => 'predelete',
@@ -472,7 +472,7 @@ class ContentEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_delete' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'Write delete',
           'configuration' => [
             'key' => 'delete',
@@ -481,7 +481,7 @@ class ContentEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_revisiondelete' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'Write revisiondelete',
           'configuration' => [
             'key' => 'revisiondelete',
@@ -490,7 +490,7 @@ class ContentEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_view' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'Write view',
           'configuration' => [
             'key' => 'view',
@@ -499,7 +499,7 @@ class ContentEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_prepareview' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'Write prepareview',
           'configuration' => [
             'key' => 'prepareview',
@@ -508,7 +508,7 @@ class ContentEventsTest extends KernelTestBase {
           'successors' => [],
         ],
         'write_fieldvaluesinit' => [
-          'plugin' => 'eca_array_write',
+          'plugin' => 'eca_test_array_write',
           'label' => 'Write fieldvaluesinit',
           'configuration' => [
             'key' => 'fieldvaluesinit',

@@ -4,7 +4,14 @@ namespace Drupal\socialbase\Plugin\Alter;
 
 use Drupal\Component\Utility\Html;
 use Drupal\bootstrap\Plugin\Alter\ThemeSuggestions as BaseThemeSuggestions;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\file\Entity\File;
+use Drupal\views\ViewExecutable;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Implements hook_theme_suggestions_alter().
@@ -13,12 +20,74 @@ use Drupal\file\Entity\File;
  *
  * @BootstrapAlter("theme_suggestions")
  */
-class ThemeSuggestions extends BaseThemeSuggestions {
+class ThemeSuggestions extends BaseThemeSuggestions implements ContainerFactoryPluginInterface {
+
+  /**
+   * Route Match service.
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface
+   */
+  protected RouteMatchInterface $routeMatch;
+
+  /**
+   * The config factory service.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected ConfigFactoryInterface $config;
+
+  /**
+   * Current user object.
+   *
+   * @var \Drupal\Core\Session\AccountProxyInterface
+   */
+  protected AccountProxyInterface $currentUser;
+
+  /**
+   * The theme manager service.
+   *
+   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   */
+  protected ThemeManagerInterface $themeManager;
+
+  /**
+   * {@inheritDoc}
+   */
+  public function __construct(
+    array $configuration,
+          $plugin_id,
+          $plugin_definition,
+    RouteMatchInterface $route_match,
+    ConfigFactoryInterface $config,
+    AccountProxyInterface $account_proxy,
+    ThemeManagerInterface $theme_manager
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->routeMatch = $route_match;
+    $this->config = $config;
+    $this->currentUser = $account_proxy;
+    $this->themeManager = $theme_manager;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('current_route_match'),
+      $container->get('config.factory'),
+      $container->get('current_user'),
+      $container->get('theme.manager')
+    );
+  }
 
   /**
    * {@inheritdoc}
    */
-  public function alter(&$suggestions, &$context1 = NULL, &$hook = NULL) {
+  public function alter(&$suggestions, &$context1 = NULL, &$hook = NULL): void {
     parent::alter($suggestions, $context1, $hook);
 
     $variables = $this->variables;
@@ -32,10 +101,9 @@ class ThemeSuggestions extends BaseThemeSuggestions {
           _social_dashboard_is_activity_stream_on_dashboard() &&
           $variables['elements']['#view_mode'] === 'activity_comment'
         ) {
-          /** @var \Drupal\node\NodeInterface $node */
-          $node = \Drupal::routeMatch()->getParameter('node');
+          $node = $this->routeMatch->getParameter('node');
           /** @var \Drupal\layout_builder\SectionStorageInterface $section_storage */
-          $section_storage = \Drupal::routeMatch()->getParameter('section_storage');
+          $section_storage = $this->routeMatch->getParameter('section_storage');
           $bundle = is_null($node) ? $section_storage->getContextValues()['entity']->bundle() : $node->bundle();
 
           $suggestions[] = 'comment__' . $variables['elements']['#view_mode'] . '__' . $bundle;
@@ -53,7 +121,7 @@ class ThemeSuggestions extends BaseThemeSuggestions {
               break;
 
             case 'system_main_block':
-              if (\Drupal::routeMatch()->getRouteName() === 'social_album.post') {
+              if ($this->routeMatch->getRouteName() === 'social_album.post') {
                 $suggestions[] = 'block__social_post';
               }
               break;
@@ -69,9 +137,7 @@ class ThemeSuggestions extends BaseThemeSuggestions {
           $insert_before = 'block__' . implode(
             '__',
             array_map(
-              static function ($part) {
-                return str_replace('-', '_', $part);
-              },
+              static fn($part): string => str_replace('-', '_', $part),
               $parts
             )
           );
@@ -113,13 +179,13 @@ class ThemeSuggestions extends BaseThemeSuggestions {
         }
 
         if (isset($variables['elements']['#id'])) {
-          $theme = \Drupal::theme()->getActiveTheme()->getName();
+          $theme = $this->themeManager->getActiveTheme()->getName();
           $name = 'data_policy_page_title_block';
 
           if ($variables['elements']['#id'] == $theme . '_' . $name) {
             $suggestions[] = $variables['theme_hook_original'] . '__' . $name;
           }
-        };
+        }
 
         break;
 
@@ -135,7 +201,7 @@ class ThemeSuggestions extends BaseThemeSuggestions {
 
         if (isset($variables['element']['#id']) && $variables['element']['#id'] == 'edit-field-post-image-wrapper') {
           $suggestions[] = 'container__post_image';
-        };
+        }
 
         break;
 
@@ -175,7 +241,7 @@ class ThemeSuggestions extends BaseThemeSuggestions {
 
       case 'file_link':
         // For the new Social Comment we need a different theme hook suggestion.
-        if (\Drupal::config('social_comment_upload.settings')
+        if ($this->config->get('social_comment_upload.settings')
           ->get('allow_upload_comments')) {
           $file = $variables['file'];
 
@@ -192,7 +258,7 @@ class ThemeSuggestions extends BaseThemeSuggestions {
         }
 
         // Get the route name for file links.
-        $route_name = \Drupal::routeMatch()->getRouteName();
+        $route_name = $this->routeMatch->getRouteName();
 
         // Ensure that it is file.
         if (
@@ -208,7 +274,7 @@ class ThemeSuggestions extends BaseThemeSuggestions {
         // If the file link is part of a node field, suggest another template.
         if ($route_name == 'entity.node.canonical') {
           $file_id = $c_file->id();
-          $node = \Drupal::routeMatch()->getParameter('node');
+          $node = $this->routeMatch->getParameter('node');
           // We do not know the name of the file fields. These can be custom.
           $field_definitions = $node->getFieldDefinitions();
 
@@ -237,7 +303,7 @@ class ThemeSuggestions extends BaseThemeSuggestions {
 
         // Alter comment form.
         if ($variables['element']['#form_id'] == 'comment_comment_form') {
-          if (\Drupal::routeMatch()->getRouteName() === 'entity.comment.edit_form') {
+          if ($this->routeMatch->getRouteName() === 'entity.comment.edit_form') {
             $suggestions = [$variables['theme_hook_original'] . '__' . 'comment_edit'];
           }
           else {
@@ -246,7 +312,7 @@ class ThemeSuggestions extends BaseThemeSuggestions {
         }
 
         if ($variables['element']['#form_id'] == 'comment_post_comment_form') {
-          if (\Drupal::routeMatch()->getRouteName() === 'entity.comment.edit_form') {
+          if ($this->routeMatch->getRouteName() === 'entity.comment.edit_form') {
             $suggestions = [$variables['theme_hook_original'] . '__' . 'comment_edit'];
           }
           else {
@@ -256,7 +322,7 @@ class ThemeSuggestions extends BaseThemeSuggestions {
 
         // Distinguish message create form from thread form.
         if ($variables['element']['#form_id'] == 'private_message_add_form') {
-          if (\Drupal::routeMatch()->getRouteName() === 'entity.private_message_thread.canonical') {
+          if ($this->routeMatch->getRouteName() === 'entity.private_message_thread.canonical') {
             $suggestions = [$variables['theme_hook_original'] . '__' . 'private_message_thread'];
           }
           else {
@@ -266,7 +332,7 @@ class ThemeSuggestions extends BaseThemeSuggestions {
 
         // Add templates for post add/edit forms.
         if ($variables['element']['#form_id'] == 'social_post_entity_form') {
-          if (\Drupal::routeMatch()->getRouteName() === 'entity.post.edit_form') {
+          if ($this->routeMatch->getRouteName() === 'entity.post.edit_form') {
             $suggestions[] = $variables['theme_hook_original'] . '__post_edit';
           }
           else {
@@ -351,10 +417,8 @@ class ThemeSuggestions extends BaseThemeSuggestions {
         break;
 
       case 'views_view_fields':
-
-        /** @var \Drupal\views\ViewExecutable $view */
         $view = $variables['view'];
-        if (($view) && $view->id() == 'who_liked_this_entity') {
+        if ($view instanceof ViewExecutable && $view->id() == 'who_liked_this_entity') {
           $suggestions[] = $variables['theme_hook_original'] . '__wholiked';
         }
 
@@ -364,7 +428,7 @@ class ThemeSuggestions extends BaseThemeSuggestions {
 
         // Add an anonymous variant to all the default profile theme
         // suggestions.
-        if (\Drupal::currentUser()->isAnonymous()) {
+        if ($this->currentUser->isAnonymous()) {
           $default_suggestions = profile_theme_suggestions_profile($variables->getArrayCopy());
 
           foreach ($default_suggestions as $suggestion) {

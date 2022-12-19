@@ -122,6 +122,11 @@
     this.windowHeight = 0;
 
     /**
+     * @type {?HTMLElement}
+     */
+    this.$toggleWeightButton = null;
+
+    /**
      * Check this table's settings to see if there are parent relationships in
      * this table. For efficiency, large sections of code can be skipped if we
      * don't need to track horizontal movement and indentations.
@@ -175,9 +180,12 @@
     // Add a link before the table for users to show or hide weight columns.
     self.$toggleWeightButton = $(Drupal.theme('btn-sm', {
       'class': ['tabledrag-toggle-weight'],
+      'data-drupal-selector': ['tabledrag-toggle-weight'],
       title: Drupal.t('Re-order rows by numerical weight instead of dragging.'),
       'data-toggle': 'tooltip'
     }));
+
+    self.$toggleWeightButton = $('[data-drupal-selector="tabledrag-toggle-weight"]');
 
     self.$toggleWeightButton
       .on('click', $.proxy(function (e) {
@@ -185,8 +193,8 @@
         this.toggleColumns();
       }, this))
       .wrap('<div class="tabledrag-toggle-weight-wrapper"></div>')
-      .parent()
-    ;
+      .parent();
+
     $table.before(self.$toggleWeightButton);
 
     // Initialize the specified columns (for example, weight or parent columns)

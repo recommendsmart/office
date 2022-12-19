@@ -34,13 +34,13 @@ actions:
     plugin: action_message_action
     label: Msg
     configuration:
-      message: 'Message 2: [entity:title]'
       replace_tokens: false
+      message: 'Message 2: [entity:title]'
     successors: {  }
   Activity_0c0cfkg:
     plugin: action_message_action
     label: Msg
     configuration:
-      message: 'Message 3: [entity:name]'
       replace_tokens: false
+      message: 'Message 3: [entity:name]'
     successors: {  }

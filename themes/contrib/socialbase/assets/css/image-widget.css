@@ -32,7 +32,7 @@
 
 .btn--post-remove-image:hover .btn-icon {
   -webkit-transform: rotate(90deg);
-          transform: rotate(90deg);
+  transform: rotate(90deg);
 }
 
 .btn--post-remove-image:focus {
@@ -57,8 +57,8 @@
   }
   .form-type-managed-file .image-widget .preview {
     -webkit-box-flex: 0;
-        -ms-flex: 0 0 auto;
-            flex: 0 0 auto;
+    -ms-flex: 0 0 auto;
+    flex: 0 0 auto;
   }
   .form-type-managed-file .image-widget .file--image {
     margin-bottom: 0.5rem;

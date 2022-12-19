@@ -4,9 +4,11 @@ namespace Drupal\eca_queue\Plugin\Action;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Queue\QueueFactory;
+use Drupal\Core\Queue\QueueWorkerManagerInterface;
 use Drupal\eca\Plugin\Action\ActionBase;
 use Drupal\eca\Plugin\Action\ConfigurableActionBase;
 use Drupal\eca\Plugin\DataType\DataTransferObject;
+use Drupal\eca_queue\Plugin\QueueWorker\TaskWorker;
 use Drupal\eca_queue\Task;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -28,6 +30,13 @@ class EnqueueTask extends ConfigurableActionBase {
   protected QueueFactory $queueFactory;
 
   /**
+   * The queue worker manager.
+   *
+   * @var \Drupal\Core\Queue\QueueWorkerManagerInterface
+   */
+  protected QueueWorkerManagerInterface $queueWorkerManager;
+
+  /**
    * The name of the queue.
    *
    * @var string
@@ -41,6 +50,7 @@ class EnqueueTask extends ConfigurableActionBase {
     /** @var \Drupal\eca_queue\Plugin\Action\EnqueueTask $instance */
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->setQueueFactory($container->get('queue'));
+    $instance->setQueueWorkerManager($container->get('plugin.manager.queue_worker'));
     return $instance;
   }
 
@@ -64,10 +74,18 @@ class EnqueueTask extends ConfigurableActionBase {
     }
 
     $task = new Task($task_name, $task_value, $data, $task_not_before);
-    $queue = $this->queueFactory->get(static::$queueName, TRUE);
+    // Check whether the task is to be distributed into its own queue.
+    $distributed_queue_name = static::$queueName . ':' . TaskWorker::normalizeTaskName($task_name);
+    if ($this->queueWorkerManager->hasDefinition($distributed_queue_name)) {
+      $queue_name = $distributed_queue_name;
+    }
+    else {
+      $queue_name = static::$queueName;
+    }
+    $queue = $this->queueFactory->get($queue_name, TRUE);
     $queue->createQueue();
     if (FALSE === $queue->createItem($task)) {
-      throw new \RuntimeException(sprintf("Failed to create queue item for Task '%s' and value '%s' in queue '%s'.", $task->getTaskName(), $task->getTaskValue(), static::$queueName));
+      throw new \RuntimeException(sprintf("Failed to create queue item for Task '%s' and value '%s' in queue '%s'.", $task->getTaskName(), $task->getTaskValue(), $queue_name));
     }
   }
 
@@ -93,6 +111,16 @@ class EnqueueTask extends ConfigurableActionBase {
   }
 
   /**
+   * Set the queue worker manager.
+   *
+   * @param \Drupal\Core\Queue\QueueWorkerManagerInterface $manager
+   *   The queue worker manager.
+   */
+  public function setQueueWorkerManager(QueueWorkerManagerInterface $manager): void {
+    $this->queueWorkerManager = $manager;
+  }
+
+  /**
    * Get the delay in seconds for the task to be created.
    *
    * Can be overwritten by sub-classes, if the support delays.
@@ -112,13 +140,14 @@ class EnqueueTask extends ConfigurableActionBase {
     $form['task_name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Task name'),
-      '#description' => $this->t('When reacting upon the event "ECA processing queued task", you can use this name to identify the task.'),
+      '#description' => $this->t('The task name will be used to identify, what type of task is to be processed. When multiple tasks are created that are of the same nature, they should share the same task name. When reacting upon the event "ECA processing queued task", you can use this name to recognize the task.'),
       '#default_value' => $this->configuration['task_name'],
+      '#required' => TRUE,
       '#weight' => -50,
     ];
     $form['task_value'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Task value'),
+      '#title' => $this->t('Task value (optional)'),
       '#description' => $this->t('You may optionally define a task value here for more granular task control.'),
       '#default_value' => $this->configuration['task_value'],
       '#weight' => -40,

@@ -146,6 +146,26 @@ class NodeSingles implements NodeSinglesInterface {
   /**
    * {@inheritdoc}
    */
+  public function getSingleByClass(string $className, ?string $langcode = NULL): ?NodeInterface {
+    $storage = $this->entityTypeManager
+      ->getStorage('node');
+
+    if (!method_exists($storage, 'getBundleFromClass')) {
+      throw new \LogicException('Entity bundle classes were introduced in Drupal 9.3.0-alpha1. Please update to be able to use this method.');
+    }
+
+    $bundle = $storage->getBundleFromClass($className);
+
+    if ($bundle === NULL) {
+      return NULL;
+    }
+
+    return $this->getSingleByBundle($bundle);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isSingle(NodeTypeInterface $type): bool {
     return $type->getThirdPartySetting('node_singles', 'is_single', FALSE);
   }
@@ -161,7 +181,7 @@ class NodeSingles implements NodeSinglesInterface {
     }
 
     $list = [];
-    /** @var \Drupal\node\Entity\NodeTypeInterface $type */
+    /** @var \Drupal\node\NodeTypeInterface $type */
     $nodeTypes = $this->entityTypeManager->getStorage('node_type')->loadMultiple();
     foreach ($nodeTypes as $type) {
       if ($this->isSingle($type)) {

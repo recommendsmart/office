@@ -185,6 +185,46 @@ class FormConditionsTest extends KernelTestBase {
     $this->assertTrue($condition->evaluate(), 'Value of form field "test_field" equals expected value.');
     $form_state->setValue('test_field', 'Another value');
     $this->assertFalse($condition->evaluate(), 'Different value must not evaluate to TRUE.');
+
+    // Simulate submission of a list of checked and un-checked checkboxes.
+    $form_state->setValue(['test', 'field_list'], [0, '1', 0, '2', 0, 0]);
+    $config = [
+      'field_name' => 'test.field_list',
+      'field_value' => '',
+      'operator' => StringComparisonBase::COMPARE_EQUALS,
+      'type' => StringComparisonBase::COMPARE_TYPE_VALUE,
+      'case' => FALSE,
+      'negate' => FALSE,
+    ];
+    /** @var \Drupal\eca_form\Plugin\ECA\Condition\FormFieldValue $condition */
+    $condition = $this->conditionManager->createInstance('eca_form_field_value', $config);
+    $condition->setEvent($event);
+    $this->assertFalse($condition->evaluate(), 'The submitted list is not empty.');
+    $condition->setConfiguration(['negate' => TRUE] + $condition->getConfiguration());
+    $this->assertTrue($condition->evaluate(), 'The submitted list is not empty.');
+
+    $config = [
+      'field_name' => 'test[field_list]',
+      'field_value' => '2',
+      'operator' => StringComparisonBase::COMPARE_EQUALS,
+      'type' => StringComparisonBase::COMPARE_TYPE_VALUE,
+      'case' => FALSE,
+      'negate' => FALSE,
+    ];
+    /** @var \Drupal\eca_form\Plugin\ECA\Condition\FormFieldValue $condition */
+    $condition = $this->conditionManager->createInstance('eca_form_field_value', $config);
+    $condition->setEvent($event);
+    $this->assertTrue($condition->evaluate(), 'The submitted value "2" is checked in the list.');
+    $condition->setConfiguration([
+      'field_name' => 'test][field_list',
+      'field_value' => '2',
+    ] + $condition->getConfiguration());
+    $this->assertTrue($condition->reset()->evaluate(), 'The submitted value "2" is checked in the list.');
+    $condition->setConfiguration([
+      'field_name' => 'test][field_list',
+      'field_value' => '3',
+    ] + $condition->getConfiguration());
+    $this->assertFalse($condition->reset()->evaluate(), 'The submitted value "3" is not checked in the list.');
   }
 
   /**

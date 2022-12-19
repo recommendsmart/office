@@ -123,6 +123,7 @@ class DocsCommands extends DrushCommands {
   public function plugins(): void {
     @$this->fileSystem->mkdir('../mkdocs/include/modules', NULL, TRUE);
     @$this->fileSystem->mkdir('../mkdocs/include/plugins', NULL, TRUE);
+    $this->toc['0-ECA']['0-placeholder'] = 'plugins/eca/index.md';
 
     foreach ($this->modellerServices->events() as $event) {
       $this->pluginDoc($event);
@@ -133,7 +134,7 @@ class DocsCommands extends DrushCommands {
     foreach ($this->actionServices->actions() as $action) {
       $this->pluginDoc($action);
     }
-    $this->updateToc('plugins', FALSE);
+    $this->updateToc('plugins');
   }
 
   /**
@@ -154,7 +155,7 @@ class DocsCommands extends DrushCommands {
       ->loadMultiple() as $eca) {
       $this->modelDoc($eca);
     }
-    $this->updateToc('library', TRUE);
+    $this->updateToc('library');
   }
 
   /**
@@ -162,17 +163,30 @@ class DocsCommands extends DrushCommands {
    *
    * @param string $key
    *   The key for the TOC to update.
-   * @param bool $sort
-   *   Flag, if the TOX array should be sorted before output.
    */
-  private function updateToc(string $key, bool $sort): void {
+  private function updateToc(string $key): void {
     $filename = '../mkdocs/toc/' . $key . '.yml';
-    if ($sort) {
-      $this->sortNestedArrayAssoc($this->toc);
-    }
+    $this->sortNestedArrayAssoc($this->toc);
     $content = Yaml::encode($this->toc);
-    $content = '0: ' . $key . '/index.md' . PHP_EOL . str_replace('- placeholder: ', '- ', $content);
-    file_put_contents($filename, $content);
+    $content = '- ' . $key . '/index.md' . PHP_EOL . str_replace(
+      ['0-ECA:', '  0-placeholder: ', '  1-', '  2-', '  3-'],
+      ['ECA:', '  ', '  ', '  ', '  '],
+      $content);
+    $content = preg_replace_callback('/\n\s*/', 'self::updateTocReplace', $content);
+    file_put_contents($filename, substr($content, 0, -2));
+  }
+
+  /**
+   * Return each match followed by "- " for proper lists, regardless of indent.
+   *
+   * @param array $matches
+   *   The matches from preg_replace_callbacl.
+   *
+   * @return string
+   *   The appended string.
+   */
+  private function updateTocReplace(array $matches): string {
+    return $matches[0] . '- ';
   }
 
   /**
@@ -222,13 +236,13 @@ class DocsCommands extends DrushCommands {
 
     if (!isset($values['toc'][$values['provider_name']])) {
       // Initialize TOC for a new provider.
-      $values['toc'][$values['provider_name']]['placeholder'] = $values['provider_path'] . '/index.md';
+      $values['toc'][$values['provider_name']]['0-placeholder'] = $values['provider_path'] . '/index.md';
       file_put_contents('../mkdocs/docs/' . $values['provider_path'] . '/index.md', $this->render(__DIR__ . '/../../templates/docs/provider.md.twig', $values));
       if (!file_exists('../mkdocs/include/modules/' . $values['provider'] . '.md')) {
         file_put_contents('../mkdocs/include/modules/' . $values['provider'] . '.md', '');
       }
     }
-    $values['toc'][$values['provider_name']][ucfirst($values['type']) . 's'][(string) $values['label']] = $filename;
+    $values['toc'][$values['provider_name']][$values['weight'] . '-' . ucfirst($values['type']) . 's'][(string) $values['label']] = $filename;
   }
 
   /**
@@ -249,8 +263,8 @@ class DocsCommands extends DrushCommands {
       $values['provider_name'] = $this->moduleHandler->getName($values['provider']);
     }
     if (mb_strpos($values['provider'], 'eca_') === 0) {
-      $basePath = str_replace('_', '/', $values['provider']);
-      $values['toc'] = &$this->toc['ECA'];
+      $basePath = str_replace('eca_', 'eca/', $values['provider']);
+      $values['toc'] = &$this->toc['0-ECA'];
     }
     else {
       $basePath = $values['provider'];
@@ -258,18 +272,22 @@ class DocsCommands extends DrushCommands {
     }
     $form_state = new FormState();
     if ($plugin instanceof EventInterface) {
+      $weight = 1;
       $type = 'event';
       $form = $plugin->buildConfigurationForm([], $form_state);
     }
     elseif ($plugin instanceof ConditionInterface) {
+      $weight = 2;
       $type = 'condition';
       $form = $plugin->buildConfigurationForm([], $form_state);
     }
     elseif ($plugin instanceof ActionInterface) {
+      $weight = 3;
       $type = 'action';
       $form = $this->actionServices->getConfigurationForm($plugin, $form_state);
     }
     else {
+      $weight = 4;
       $type = 'error';
       $form = [];
     }
@@ -288,6 +306,7 @@ class DocsCommands extends DrushCommands {
         'description' => $def['#description'] ?? '',
       ];
     }
+    $values['weight'] = $weight;
     $values['type'] = $type;
     $values['fields'] = $fields;
     return $values;

@@ -59,3 +59,26 @@ function eca_access_entity_field_access($operation, FieldDefinitionInterface $fi
 
   return AccessResult::neutral();
 }
+
+/**
+ * Implements hook_entity_create_access().
+ */
+function eca_access_entity_create_access(AccountInterface $account, array $context, $entity_bundle = NULL) {
+  if (!isset($entity_bundle)) {
+    // Entities without bundles usually use the entity type ID, e.g. users.
+    $entity_bundle = $context['entity_type_id'];
+  }
+
+  /** @var \Drupal\eca_access\Event\CreateAccess $event */
+  if ($event = _eca_access_hook_handler()->createAccess($context, $entity_bundle, $account)) {
+    if ($result = $event->getAccessResult()) {
+      if ($result instanceof RefinableCacheableDependencyInterface) {
+        // Disable caching on dynamically determined access.
+        $result->mergeCacheMaxAge(0);
+      }
+      return $result;
+    }
+  }
+
+  return AccessResult::neutral();
+}

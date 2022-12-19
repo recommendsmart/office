@@ -16,7 +16,7 @@ class ThemeSuggestions extends BaseThemeSuggestions {
   /**
    * {@inheritdoc}
    */
-  public function alter(&$suggestions, &$context = NULL, &$hook = NULL) {
+  public function alter(&$suggestions, &$context = NULL, &$hook = NULL): void {
     parent::alter($suggestions, $context, $hook);
 
     // Add new template suggestions to be able to override for different style.

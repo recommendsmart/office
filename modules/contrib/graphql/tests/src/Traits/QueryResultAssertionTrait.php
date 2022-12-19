@@ -3,6 +3,8 @@
 namespace Drupal\Tests\graphql\Traits;
 
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\graphql\GraphQL\Execution\ExecutionResult;
 use GraphQL\Server\OperationParams;
 
@@ -15,6 +17,11 @@ trait QueryResultAssertionTrait {
    * @var \Drupal\graphql\Entity\ServerInterface
    */
   protected $server;
+
+  /**
+   * @var \Drupal\Core\Render\RendererInterface|null
+   */
+  protected $renderer;
 
   /**
    * Return the default cache max age for this test case.
@@ -81,11 +88,17 @@ trait QueryResultAssertionTrait {
    *   The expected cache metadata object.
    */
   protected function assertResults($query, array $variables, array $expected, CacheableMetadata $metadata = NULL): void {
-    $result = $this->server->executeOperation(
-      OperationParams::create([
-        'query' => $query,
-        'variables' => $variables,
-      ])
+    $context = new RenderContext();
+    $result = $this->getRenderer()->executeInRenderContext(
+      $context,
+      function () use ($query, $variables) {
+        return $this->server->executeOperation(
+          OperationParams::create([
+            'query' => $query,
+            'variables' => $variables,
+          ])
+        );
+      }
     );
 
     $this->assertResultErrors($result, []);
@@ -106,15 +119,22 @@ trait QueryResultAssertionTrait {
    *   The expected cache metadata object.
    */
   protected function assertErrors($query, array $variables, $expected, CacheableMetadata $metadata): void {
-    $result = $this->server->executeOperation(
-      OperationParams::create([
-        'query' => $query,
-        'variables' => $variables,
-      ])
+    $context = new RenderContext();
+    $result = $this->getRenderer()->executeInRenderContext(
+      $context,
+      function () use ($query, $variables) {
+        return $this->server->executeOperation(
+          OperationParams::create([
+            'query' => $query,
+            'variables' => $variables,
+          ])
+        );
+      }
     );
 
     $this->assertResultErrors($result, $expected);
     $this->assertResultMetadata($result, $metadata);
+    self::assertTrue($context->isEmpty(), "Metadata was leaked during operation execution: {$context->serialize()}");
   }
 
   /**
@@ -208,6 +228,22 @@ trait QueryResultAssertionTrait {
 
     $unexpectedTags = array_diff($result->getCacheTags(), $expected->getCacheTags());
     $this->assertEmpty($unexpectedTags, 'Unexpected cache tags: ' . implode(', ', $unexpectedTags));
+  }
+
+  /**
+   * Get the Drupal renderer.
+   *
+   * Uses either the renderer available in the test class or fetches the Drupal
+   * renderer service.
+   *
+   * @return \Drupal\Core\Render\RendererInterface
+   *   The renderer service for the test.
+   */
+  private function getRenderer() : RendererInterface {
+    if (!isset($this->renderer)) {
+      $this->renderer = \Drupal::service('renderer');
+    }
+    return $this->renderer;
   }
 
 }

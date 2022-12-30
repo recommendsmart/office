@@ -1,0 +1,7 @@
+.data-field-widget-inline {
+  display: flex;
+}
+
+.data-field-widget-inline > div {
+  margin-right: 0.75em;
+}

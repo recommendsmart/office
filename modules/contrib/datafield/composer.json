@@ -1,0 +1,23 @@
+{
+  "name": "drupal/json_table",
+  "description": "This module allows you create data field with widget table",
+  "type": "drupal-module",
+  "minimum-stability": "stable",
+  "homepage": "https://www.drupal.org/project/datafield",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/datafield",
+    "source": "https://git.drupalcode.org/project/datafield"
+  },
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "NGUYEN Bao",
+      "email": "n.bao@yahoo.com",
+      "homepage": "https://www.drupal.org/u/lazzyvn",
+      "role": "Maintainer"
+    }
+  ],
+  "require": {
+    "drupal/core": "^9 || ^10"
+  }
+}

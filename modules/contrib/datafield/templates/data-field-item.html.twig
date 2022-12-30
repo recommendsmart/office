@@ -1,0 +1,7 @@
+{% for subfield, subitem in item %}
+  {% if subitem -%}
+    <div class="triples-field-{{ subfield }}">
+      {{ subitem }}
+    </div>
+  {% endif %}
+{% endfor %}

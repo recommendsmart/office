@@ -27,6 +27,7 @@
         "drupal/content_to_group": "^1.0@alpha",
         "drupal/cshs": "^3.5",
         "drupal/custom_pub": "^1.0@beta",
+        "drupal/datafield": "^1.0",
         "drupal/description_list_field": "^1.0@alpha",
         "drupal/designs": "^1.0",
         "drupal/dxpr_theme": "^1.2",

@@ -1,0 +1,7 @@
+<dl class="triples-field-definition-list">
+  {% for item in items %}
+    <dt>{{ item|first }}</dt>
+    <dd>{{ item.second }}</dd>
+    <dd>{{ item.third }}</dd>
+  {% endfor %}
+</dl>

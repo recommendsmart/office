@@ -5216,6 +5216,60 @@
             "install-path": "../../modules/contrib/data_policy"
         },
         {
+            "name": "drupal/datafield",
+            "version": "1.0.7",
+            "version_normalized": "1.0.7.0",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupalcode.org/project/datafield.git",
+                "reference": "1.0.7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/datafield-1.0.7.zip",
+                "reference": "1.0.7",
+                "shasum": "5aa95d1e097237742bfa39b864f17fdba9fb3e09"
+            },
+            "require": {
+                "drupal/core": "^9 || ^10"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "drupal": {
+                    "version": "1.0.7",
+                    "datestamp": "1672357944",
+                    "security-coverage": {
+                        "status": "covered",
+                        "message": "Covered by Drupal's security advisory policy"
+                    }
+                }
+            },
+            "installation-source": "dist",
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "NGUYEN Bao",
+                    "homepage": "https://www.drupal.org/u/lazzyvn",
+                    "email": "n.bao@yahoo.com",
+                    "role": "Maintainer"
+                },
+                {
+                    "name": "lazzyvn",
+                    "homepage": "https://www.drupal.org/user/2896581"
+                }
+            ],
+            "description": "This module allows you create data field with widget table",
+            "homepage": "https://www.drupal.org/project/datafield",
+            "support": {
+                "source": "https://git.drupalcode.org/project/datafield",
+                "issues": "https://www.drupal.org/project/issues/datafield"
+            },
+            "install-path": "../../modules/contrib/datafield"
+        },
+        {
             "name": "drupal/dbug",
             "version": "2.0.0",
             "version_normalized": "2.0.0.0",

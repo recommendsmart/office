@@ -1,0 +1,59 @@
+datafield.add_form:
+  path: '/datafield/{entity_type}/{entity}/{field_name}/add'
+  defaults:
+    _title: 'Add'
+    _form: '\Drupal\datafield\Form\AddFieldForm'
+  options:
+    parameters:
+      entity:
+        type: entity:{entity_type}
+  requirements:
+    _permission: 'access content'
+
+datafield.delete_form:
+  path: '/datafield/{entity_type}/{entity}/{field_name}/{delta}/delete'
+  defaults:
+    _title: 'Delete'
+    _form: '\Drupal\datafield\Form\DeleteFieldForm'
+  options:
+    parameters:
+      entity:
+        type: entity:{entity_type}
+  requirements:
+    _permission: 'access content'
+
+datafield.clone_form:
+  path: '/datafield/{entity_type}/{entity}/{field_name}/{delta}/clone'
+  defaults:
+    _title: 'Clone'
+    _form: '\Drupal\datafield\Form\CloneFieldForm'
+  options:
+    parameters:
+      entity:
+        type: entity:{entity_type}
+  requirements:
+    _permission: 'access content'
+
+datafield.edit_form:
+  path: '/datafield/{entity_type}/{entity}/{field_name}/{delta}/edit'
+  defaults:
+    _title: 'Edit'
+    _form: '\Drupal\datafield\Form\EditFieldForm'
+  options:
+    parameters:
+      entity:
+        type: entity:{entity_type}
+  requirements:
+    _permission: 'access content'
+
+datafield.edit_all_form:
+  path: '/datafield/{entity_type}/{entity}/{field_name}/edit'
+  defaults:
+    _title: 'Edit'
+    _form: '\Drupal\datafield\Form\EditAllFieldForm'
+  options:
+    parameters:
+      entity:
+        type: entity:{entity_type}
+  requirements:
+    _permission: 'access content'

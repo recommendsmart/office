@@ -1,0 +1,203 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for data Field module.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Render\Element;
+
+/**
+ * Implements hook_theme().
+ */
+function datafield_theme(): array {
+  $item = ['render element' => 'elements'];
+  return [
+    'data_field_item' => $item,
+    'data_field_subfield' => $item,
+    'data_field_definition_list' => $item,
+    'data_field_chart' => [
+      'variables' => [
+        'id_field_name' => 'data-field-chart',
+        'settings' => NULL,
+      ],
+      'template' => 'data-field-chart',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function datafield_form_field_storage_config_edit_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+
+  if (($field_config = $form_state->get('field_config')) && $field_config->get('field_type') == 'data_field') {
+    array_unshift(
+      $form['actions']['submit']['#submit'],
+      'Drupal\datafield\Plugin\Field\FieldType\DataField::submitStorageConfigEditForm'
+    );
+  }
+}
+
+/**
+ * Prepares variables for data-field-item template.
+ */
+function template_preprocess_data_field_item(array &$variables): void {
+  $variables['settings'] = $variables['elements']['#settings'];
+  $variables['field_settings'] = $variables['elements']['#field_settings'];
+  $subfields = array_keys($variables["field_settings"]["columns"]);
+  foreach ($subfields as $subfield) {
+    $variables['item'][$subfield] = $variables['elements']['#item']->$subfield;
+    if (!empty($variables["settings"][$subfield]["show_label"])) {
+      $variables['item'][$subfield] = [
+        '#theme' => 'data_field_subfield',
+        '#subfield' =>  $variables['elements']['#item']->$subfield,
+        '#index' => $subfield,
+        '#field_name' => $subfield,
+        '#label' => $variables['field_settings'][$subfield]["label"] ?? '',
+      ];
+    }
+  }
+}
+
+/**
+ * Prepares variables for data-field-item template.
+ */
+function template_preprocess_data_field_subfield(array &$variables): void {
+  $variables['index'] = $variables['elements']['#index'] ?? NULL;
+  $variables['value'] = $variables['elements']['#subfield'] ?? NULL;
+  $variables['label'] = $variables['elements']['#label'] ?? NULL;
+}
+
+/**
+ * Prepares variables for data-field-definition-list template.
+ */
+function template_preprocess_data_field_definition_list(array &$variables): void {
+  $variables['settings'] = $variables['elements']['#settings'];
+  $variables['field_settings'] = $variables['elements']['#field_settings'];
+  $subfields = array_keys($variables["field_settings"]["storage"]);
+  $variables['items'] = $variables['elements']['#items'];
+  foreach ($subfields as $subfield) {
+    if (!empty($variables["settings"][$subfield]["show_label"])) {
+      $variables['items'][$subfield]["label"] = $variables["field_settings"][$subfield]["label"];
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ */
+function datafield_field_storage_config_update(EntityInterface $entity): void {
+
+  /* @var \Drupal\field\Entity\FieldStorageConfig $entity */
+  if ($entity->getType() == 'data_field') {
+    $settings = $entity->getSettings();
+    $original_settings = $entity->original->getSettings();
+
+    $isChanged = FALSE;
+    foreach ($settings['columns'] as $index=>$storage) {
+      $subfield = $storage['name'];
+      if (!empty($original_settings['columns'][$subfield]) && $storage['type'] != $original_settings['columns'][$subfield]['type']) {
+        $isChanged = TRUE;
+        break;
+      }
+    }
+    if ($isChanged) {
+      Drupal::messenger()
+        ->addWarning(t('Since storage type has been changed you need to verify the configuration of corresponding widget on form display page.'));
+    }
+  }
+
+}
+
+/**
+ * Implements hook_validation_constraint_alter().
+ */
+function datafield_validation_constraint_alter(array &$definitions): void {
+  // This constraint is required to test empty boolean values.
+  $definitions['NotEqualTo']['class'] = '\Symfony\Component\Validator\Constraints\NotEqualTo';
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function datafield_theme_suggestions_data_field_item(array $variables): array {
+  return [
+    'data_field_item__' . $variables['elements']['#field_name'],
+  ];
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ *
+ * @todo remove this once the 'data-field-subfield.html.twig' is removed.
+ */
+function datafield_theme_suggestions_data_field_subfield(array $variables): array {
+  return [
+    'data_field_subfield__' . $variables['elements']['#field_name'],
+  ];
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function datafield_theme_suggestions_data_field_definition_list(array $variables): array {
+  return [
+    'data_field_definition_list__' . $variables['elements']['#field_name'],
+  ];
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ */
+function datafield_theme_suggestions_item_list_alter(array &$suggestions, array $variables): void {
+  $field_name = $variables['context']['data_field']['field_name'] ?? NULL;
+  if ($field_name) {
+    $suggestions[] = 'item_list__data_field__' . $field_name;
+  }
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ */
+function datafield_theme_suggestions_table_alter(array &$suggestions, array &$variables): void {
+  $id = \Drupal\Component\Utility\Html::getId('data_field--field-name');
+  $field_name = $variables['attributes'][$id] ?? NULL;
+  if ($field_name) {
+    $suggestions[] = 'table__data_field__' . $field_name;
+  }
+  if (!empty($variables["rows"]) && count($variables["rows"]) > 1) {
+    $variables["header"][0] = '';
+  }
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ */
+function datafield_theme_suggestions_details_alter(array &$suggestions, array $variables): void {
+  $id = \Drupal\Component\Utility\Html::getId('data_field--field-name');
+  $field_name = $variables['element']['#attributes'][$id] ?? NULL;
+  if ($field_name) {
+    $suggestions[] = 'details__data_field__' . $field_name;
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function datafield_preprocess_field_multiple_value_form(&$variables) {
+  if (!empty($variables["element"]['#widgetDataFieldTable'])) {
+    if (!empty($variables["element"]["add_more"])) {
+      $variables["button"] = $variables["element"]["add_more"];
+      unset($variables["element"]["add_more"]);
+    }
+    $variables["table"]["#header"] = $variables["element"]["#header"];
+    $variables["table"]["#caption"] = $variables["element"]["#title"];
+    $variables["element"]["#title"] = '';
+    foreach (Element::children($variables["element"]) as $delta => $element) {
+      $variables["table"][$delta] = $variables["element"][$delta];
+    }
+    unset($variables["table"]["#rows"]);
+  }
+}

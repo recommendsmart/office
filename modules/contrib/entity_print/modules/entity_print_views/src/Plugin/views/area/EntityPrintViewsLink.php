@@ -90,6 +90,10 @@ class EntityPrintViewsLink extends AreaPluginBase {
    * {@inheritdoc}
    */
   public function render($empty = FALSE) {
+    if ($empty && empty($this->options['empty'])) {
+      return [];
+    }
+
     $route_params = [
       'export_type' => !empty($this->options['export_type']) ? $this->options['export_type'] : 'pdf',
       'view_name' => $this->view->storage->id(),

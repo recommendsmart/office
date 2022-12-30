@@ -60,7 +60,10 @@ class ViewsAccessTest extends KernelTestBase {
     $this->assertFalse($this->checkAccess($account, 'my_test_view', 'page_1'), 'Access not allowed because user does not have entity print permission.');
 
     // Both entity print access and views access.
-    $account = $this->createUser(['entity print views access', 'administer nodes']);
+    $account = $this->createUser([
+      'entity print views access',
+      'administer nodes',
+    ]);
     $this->assertTrue($this->checkAccess($account, 'my_test_view', 'page_1'), 'Access allowed for user with "entity print views access" and "administer nodes"');
   }
 

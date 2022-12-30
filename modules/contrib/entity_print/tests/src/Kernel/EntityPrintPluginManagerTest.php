@@ -37,6 +37,8 @@ class EntityPrintPluginManagerTest extends KernelTestBase {
    * @covers ::createSelectedInstance
    */
   public function testCreateSelectedInstance() {
+    $this->expectException(PrintEngineException::class);
+
     /** @var \Drupal\Core\Config\ConfigFactoryInterface $factory */
     $factory = $this->container->get('config.factory');
     $config = $factory->getEditable('entity_print.settings');

@@ -101,7 +101,10 @@ class EntityPrintAccessTest extends KernelTestBase {
    */
   public function testInvalidRouteParameters($entity_type, $entity_id, $export_type) {
     $entity_id = $entity_id ?: $this->createNode()->id();
-    $account = $this->createUser(['bypass entity print access', 'access content']);
+    $account = $this->createUser([
+      'bypass entity print access',
+      'access content',
+    ]);
     $this->assertSame(FALSE, $this->checkAccess($account, $entity_type, $entity_id, $export_type));
   }
 
@@ -126,7 +129,10 @@ class EntityPrintAccessTest extends KernelTestBase {
    */
   public function testSecondaryEntityTypeAccess() {
     // User with print entity type user permissions and entity view.
-    $account = $this->createUser(['entity print access type user', 'access content']);
+    $account = $this->createUser([
+      'entity print access type user',
+      'access content',
+    ]);
     $this->assertTrue($this->checkAccess($account, 'user', $account->id()), 'User with "type user" permission and access content permission is allowed to see the content.');
   }
 

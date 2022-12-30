@@ -1,14 +1,14 @@
 name: Entity Print Views
 description: 'Allows any Drupal View to be printed'
 type: module
-core_version_requirement: ^8 || ^9 || ^10
+core_version_requirement: ^9.4 || ^10.0
 package: Entity Print
 configure: entity_print.settings
 dependencies:
   - drupal:views
   - entity_print:entity_print
 
-# Information added by Drupal.org packaging script on 2022-09-10
-version: '8.x-2.7'
+# Information added by Drupal.org packaging script on 2022-12-28
+version: '8.x-2.9'
 project: 'entity_print'
-datestamp: 1662781699
+datestamp: 1672245370

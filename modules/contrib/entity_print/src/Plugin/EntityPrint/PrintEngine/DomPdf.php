@@ -80,6 +80,8 @@ class DomPdf extends PdfEngineBase implements ContainerFactoryPluginInterface {
     $this->dompdfOptions->setFontDir(\Drupal::service('file_system')->getTempDirectory());
     $this->dompdfOptions->setLogOutputFile(\Drupal::service('file_system')->getTempDirectory() . DIRECTORY_SEPARATOR . self::LOG_FILE_NAME);
     $this->dompdfOptions->setIsRemoteEnabled($this->configuration['enable_remote']);
+    $this->dompdfOptions->setIsFontSubsettingEnabled($this->configuration['font_subsetting']);
+    $this->dompdfOptions->setIsPhpEnabled($this->configuration['embedded_php']);
 
     $this->dompdf = new DompdfLib($this->dompdfOptions);
     if ($this->configuration['disable_log']) {
@@ -110,7 +112,7 @@ class DomPdf extends PdfEngineBase implements ContainerFactoryPluginInterface {
    * {@inheritdoc}
    */
   public static function getInstallationInstructions() {
-    return t('Please install with: @command', ['@command' => 'composer require "dompdf/dompdf 0.8.0"']);
+    return t('Please install with: @command', ['@command' => 'composer require "dompdf/dompdf ^2.0.1"']);
   }
 
   /**
@@ -121,6 +123,8 @@ class DomPdf extends PdfEngineBase implements ContainerFactoryPluginInterface {
       'enable_html5_parser' => TRUE,
       'disable_log' => FALSE,
       'enable_remote' => TRUE,
+      'font_subsetting' => TRUE,
+      'embedded_php' => FALSE,
       'cafile' => '',
       'verify_peer' => TRUE,
       'verify_peer_name' => TRUE,
@@ -151,6 +155,20 @@ class DomPdf extends PdfEngineBase implements ContainerFactoryPluginInterface {
       '#type' => 'checkbox',
       '#default_value' => $this->configuration['enable_remote'],
       '#description' => $this->t('This settings must be enabled for CSS and Images to work unless you manipulate the source manually.'),
+    ];
+    $form['font_subsetting'] = [
+      '#title' => $this->t('Enable font subsetting'),
+      '#type' => 'checkbox',
+      '#default_value' => $this->configuration['font_subsetting'],
+      '#description' => $this->t('The bundled, PHP-based php-font-lib provides support for loading and sub-setting fonts.'),
+    ];
+    $form['embedded_php'] = [
+      '#title' => $this->t('Enable embedded PHP'),
+      '#type' => 'checkbox',
+      '#default_value' => $this->configuration['embedded_php'],
+      '#description' => $this->t('If this setting is set to true then DomPdf will automatically evaluate embedded PHP. See <a href=":wiki">https://github.com/dompdf/dompdf/wiki/Usage#embedded-php-support</a>', [
+        ':wiki' => 'https://github.com/dompdf/dompdf/wiki/Usage#embedded-php-support',
+      ]),
     ];
     $form['ssl_configuration'] = [
       '#type' => 'details',

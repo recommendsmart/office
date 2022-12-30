@@ -46,37 +46,7 @@ function social_geolocation_maps_field_widget_form_alter(&$element, FormStateInt
  * Implements hook_views_query_alter().
  */
 function social_geolocation_maps_views_query_alter(ViewExecutable $view, QueryPluginBase $query): void {
-  // Due to issues with grouped filters I have to switch >= to < myself when
-  // user changes upcoming events to events in the past.
-  if ($view->id() === 'social_geolocation_leaflet_commonmap_with_marker_icons' &&
-    $view->getDisplay()->display['id'] === 'block_community_events_map') {
-    $query_args = $view->getRequest()->get('field_event_date_value');
-
-    // If there are query parameters set for the field_event_date_value we
-    // make sure the query reflects this before execution.
-    if ($query_args !== NULL) {
-      $exposed = $view->getExposedInput();
-      $filter = $exposed['field_event_date_value'];
-
-      if ($filter !== NULL) {
-        // Grab all the filter options.
-        $filter_options = $view->display_handler->getOption('filters');
-
-        // Based on the number from the Grouped value, grab the correct
-        // operator.
-        $operator = $filter_options['field_event_date_value']['group_info']['group_items'][$query_args]['operator'];
-
-        // Switch the operator field.
-        foreach ($query->where[1]['conditions'] as $key => $options) {
-          if ($operator !== NULL && strpos($options['field'], 'node__field_event_date.field_event_date_value') !== FALSE) {
-            $field = "DATE_FORMAT(node__field_event_date.field_event_date_value, '%Y-%m-%d\T%H:%i:%s') " . $operator . " DATE_FORMAT('" . date('Y-m-d\TH:i:s') . "', '%Y-%m-%d\T%H:%i:%s')";
-            $query->where[1]['conditions'][$key]['field'] = $field;
-          }
-        }
-      }
-    }
-  }
-  elseif ($view->id() === 'social_geolocation_members' &&
+  if ($view->id() === 'social_geolocation_members' &&
     $view->getDisplay()->display['id'] === 'members_map_block') {
 
     // Do not show users on the map who hide their location.
@@ -250,6 +220,10 @@ function social_geolocation_maps_views_post_render(ViewExecutable $view, &$outpu
     $social_event_settings = \Drupal::config('social_event.settings');
     $address_visibility_settings = $social_event_settings->get('address_visibility_settings');
     if (!isset($address_visibility_settings['street_code_private']) || empty($address_visibility_settings['street_code_private'])) {
+      return;
+    }
+
+    if (empty($output['#rows']['locations'])) {
       return;
     }
 

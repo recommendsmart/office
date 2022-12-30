@@ -800,6 +800,7 @@ display:
     position: 2
     display_options:
       display_extenders: {  }
+      exposed_block: true
       filters:
         status:
           id: status
@@ -944,7 +945,7 @@ display:
             description: ''
             use_operator: false
             operator: field_event_date_end_value_op
-            identifier: field_event_date_end_value
+            identifier: field_event_date_value
             required: false
             remember: false
             multiple: false
@@ -968,7 +969,7 @@ display:
             widget: radios
             multiple: false
             remember: false
-            default_group: '2'
+            default_group: '1'
             default_group_multiple: {  }
             group_items:
               1:

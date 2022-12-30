@@ -2,6 +2,7 @@
 
 namespace Drupal\entity_print\EventSubscriber;
 
+use Drupal\Core\Messenger\MessengerInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -32,6 +33,13 @@ class PrintEngineExceptionSubscriber implements EventSubscriberInterface {
   protected $entityTypeManager;
 
   /**
+   * The messenger service.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  protected MessengerInterface $messenger;
+
+  /**
    * PrintEngineExceptionSubscriber constructor.
    *
    * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
@@ -39,9 +47,10 @@ class PrintEngineExceptionSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   Entity type manager.
    */
-  public function __construct(RouteMatchInterface $routeMatch, EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(RouteMatchInterface $routeMatch, EntityTypeManagerInterface $entityTypeManager, MessengerInterface $messenger) {
     $this->routeMatch = $routeMatch;
     $this->entityTypeManager = $entityTypeManager;
+    $this->messenger = $messenger;
   }
 
   /**
@@ -53,7 +62,7 @@ class PrintEngineExceptionSubscriber implements EventSubscriberInterface {
   public function handleException(ExceptionEvent $event) {
     $exception = $event->getThrowable();
     if ($exception instanceof PrintEngineException) {
-      \Drupal::messenger()->addError(new FormattableMarkup($exception->getPrettyMessage(), []));
+      $this->messenger->addError(new FormattableMarkup($exception->getPrettyMessage(), []));
 
       if ($entity = $this->getEntity()) {
         $event->setResponse(new RedirectResponse($entity->toUrl()->toString()));

@@ -19,7 +19,13 @@ class FilenameGeneratorTest extends KernelTestBase {
    *
    * @var array
    */
-  protected static $modules = ['system', 'user', 'node', 'filter', 'entity_print'];
+  protected static $modules = [
+    'system',
+    'user',
+    'node',
+    'filter',
+    'entity_print',
+  ];
 
   /**
    * The filename generator.
@@ -72,7 +78,10 @@ class FilenameGeneratorTest extends KernelTestBase {
    * Test the filename when using multiple entities.
    */
   public function testFilenameMultipleEntities() {
-    $entities = [$this->createNode(['title' => 'entity1']), $this->createNode(['title' => 'entity2'])];
+    $entities = [
+      $this->createNode(['title' => 'entity1']),
+      $this->createNode(['title' => 'entity2']),
+    ];
     $this->assertEquals('entity1-entity2', $this->filenameGenerator->generateFilename($entities));
   }
 

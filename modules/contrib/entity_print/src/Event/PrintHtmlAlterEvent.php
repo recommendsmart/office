@@ -24,6 +24,17 @@ class PrintHtmlAlterEvent extends Event {
   protected $entities;
 
   /**
+   * The server application programming interface string.
+   *
+   * Will be some like 'fpm-fcgi' or 'cgi-fcgi' for PHP
+   * running through a browser call. Will be 'cli' for calls
+   * initiated through the console (e.g. drush).
+   *
+   * @var string
+   */
+  protected $phpSapi = PHP_SAPI;
+
+  /**
    * PrintHtmlAlterEvent constructor.
    *
    * @param string $html
@@ -54,6 +65,13 @@ class PrintHtmlAlterEvent extends Event {
    */
   public function getEntities() {
     return $this->entities;
+  }
+
+  /**
+   * Gets the initialized PHP SAPI.
+   */
+  public function getPhpSapi() {
+    return $this->phpSapi;
   }
 
 }

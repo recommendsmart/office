@@ -3,7 +3,6 @@
 namespace Drupal\Tests\entity_print\Unit;
 
 use Drupal\Core\Extension\Extension;
-use Drupal\Core\Extension\InfoParserInterface;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\entity_print\Asset\AssetCollector;

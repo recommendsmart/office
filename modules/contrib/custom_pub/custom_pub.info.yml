@@ -1,10 +1,10 @@
 name: Custom Publishing Options
 description: Adds the ability to add Custom publishing options to the node Add/Edit forms.
-core_version_requirement: ^8 || ^9
+core_version_requirement: ^9.3 || ^10.0
 configure: entity.custom_publishing_option.collection
 type: module
 
-# Information added by Drupal.org packaging script on 2021-08-09
-version: '8.x-1.0-beta3'
+# Information added by Drupal.org packaging script on 2022-12-20
+version: '8.x-1.0'
 project: 'custom_pub'
-datestamp: 1628530054
+datestamp: 1671552168

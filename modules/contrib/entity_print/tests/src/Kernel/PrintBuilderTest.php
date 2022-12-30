@@ -73,6 +73,9 @@ class PrintBuilderTest extends KernelTestBase {
    * @covers ::deliverPrintable
    */
   public function testNoEntities() {
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage('You must pass at least 1 entity');
+
     $print_engine = $this->container->get('plugin.manager.entity_print.print_engine')->createInstance('testprintengine');
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage('You must pass at least 1 entity');

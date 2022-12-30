@@ -19,6 +19,13 @@ class EntityPrintActionTest extends BrowserTestBase {
   protected static $modules = ['node', 'entity_print_test', 'views'];
 
   /**
+   * The node object to test against.
+   *
+   * @var \Drupal\node\Entity\Node
+   */
+  protected $node;
+
+  /**
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';

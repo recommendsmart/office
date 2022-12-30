@@ -132,6 +132,14 @@ class SettingsForm extends ConfigFormBase {
       '#default_value' => $config->get('force_download'),
     ];
 
+    $form['entity_print']['base_url'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Base URL'),
+      '#description' => $this->t('Useful if you plan to print in <em>CLI</em> context like <em>drush</em> using queue workers or other background processing means. Leave blank in all other cases.'),
+      '#attributes' => ['placeholder' => $this->getRequest()->getSchemeAndHttpHost()],
+      '#default_value' => $config->get('base_url'),
+    ];
+
     foreach ($this->exportTypeManager->getDefinitions() as $export_type => $definition) {
       // If we have a print_engine in the form_state then use that otherwise,
       // fall back to what was saved as this is a fresh form. Check explicitly
@@ -233,6 +241,7 @@ class SettingsForm extends ConfigFormBase {
     $config
       ->set('default_css', $values['default_css'])
       ->set('force_download', $values['force_download'])
+      ->set('base_url', $values['base_url'])
       ->save();
 
     $this->messenger()->addStatus($this->t('Configuration saved.'));

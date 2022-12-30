@@ -126,5 +126,39 @@ function social_geolocation_maps_update_9001(&$sandbox): void {
   }
 
   $config->setData($data)->save(TRUE);
+}
 
+/**
+ * Update event maps views.
+ *
+ * Revert exposed identifier on upcoming events filtration on events map,
+ * set exposed form in block as true, to hide the exposed filter in view,
+ * because filtration is handled is sidebar filter block and set
+ * "Ongoing and upcoming events" as default group filter option in
+ * field_event_date_end_value filter.
+ */
+function social_geolocation_maps_update_9002(&$sandbox): void {
+  $config = \Drupal::configFactory()
+    ->getEditable('views.view.social_geolocation_leaflet_commonmap_with_marker_icons');
+  $data = $config->getRawData();
+
+  // Revert exposed identifier on upcoming events filtration on events map
+  // that was wrongly changed in social_geolocation_maps_update_9001.
+  if (isset($data['display']['block_community_events_map']['display_options']['filters']['field_event_date_end_value']['expose']['identifier'])) {
+    $data['display']['block_community_events_map']['display_options']['filters']['field_event_date_end_value']['expose']['identifier'] = 'field_event_date_value';
+  }
+
+  // Set exposed form in block as true, to hide the exposed filter in view,
+  // because filtration is handled is sidebar filter block.
+  if (isset($data['display']['block_community_events_map']['display_options'])) {
+    $data['display']['block_community_events_map']['display_options']['exposed_block'] = TRUE;
+  }
+
+  // Set "Ongoing and upcoming events" as default group filter option in
+  // field_event_date_end_value filter.
+  if (isset($data['display']['block_community_events_map']['display_options']['filters']['field_event_date_end_value']['group_info'])) {
+    $data['display']['block_community_events_map']['display_options']['filters']['field_event_date_end_value']['group_info']['default_group'] = '1';
+  }
+
+  $config->setData($data)->save(TRUE);
 }

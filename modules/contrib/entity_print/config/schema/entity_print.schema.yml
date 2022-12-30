@@ -13,15 +13,18 @@ entity_print.settings:
       label: 'All in-use print engines.'
       sequence:
         type: string
+    base_url:
+      type: string
+      label: 'Base URL to drupal page'
 
-entint_print_engine_pdf:
+entity_print_engine_pdf:
   type: mapping
   label: 'Base settings for engines using the PDF base class'
   mapping:
     default_paper_size:
       type: string
       label: 'Default Paper Size'
-    orientation:
+    default_paper_orientation:
       type: string
       label: 'Paper Orientation'
     username:
@@ -43,7 +46,7 @@ entity_print.print_engine.*:
       label: 'Settings for the Print Engine.'
 
 entity_print_print_engine.dompdf:
-  type: entint_print_engine_pdf
+  type: entity_print_engine_pdf
   label: 'Dompdf specific settings'
   mapping:
     enable_html5_parser:
@@ -52,6 +55,12 @@ entity_print_print_engine.dompdf:
     enable_remote:
       type: boolean
       label: 'Enable remote urls'
+    font_subsetting:
+      type: boolean
+      label: 'Enable font subsetting'
+    embedded_php:
+      type: boolean
+      label: 'Enable embedded PHP'
     cafile:
       type: string
       label: 'Path to the cafile'
@@ -63,7 +72,7 @@ entity_print_print_engine.dompdf:
       label: 'Verify Peer Name'
 
 entity_print_print_engine.phpwkhtmltopdf:
-  type: entint_print_engine_pdf
+  type: entity_print_engine_pdf
   label: 'PHP Wkhtmltopdf'
   mapping:
     binary_location:
@@ -95,10 +104,10 @@ entity_print_print_engine.tcpdfv1:
   label: 'TCPDF (v1)'
   type: mapping
   mapping:
-    page_format:
+    default_paper_size:
       type: string
       label: 'The page format. E.g. A3, A4 or many more options'
-    orientation:
+    default_paper_orientation:
       type: string
       label: 'Paper Orientation'
 

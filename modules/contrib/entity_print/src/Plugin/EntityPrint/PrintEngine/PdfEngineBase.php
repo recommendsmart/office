@@ -23,7 +23,7 @@ abstract class PdfEngineBase extends PrintEngineBase {
       '#description' => $this->t('The page size to print the PDF to.'),
       '#weight' => -10,
     ];
-    $form['orientation'] = [
+    $form['default_paper_orientation'] = [
       '#type' => 'select',
       '#title' => $this->t('Paper Orientation'),
       '#options' => [
@@ -31,7 +31,7 @@ abstract class PdfEngineBase extends PrintEngineBase {
         static::LANDSCAPE => $this->t('Landscape'),
       ],
       '#description' => $this->t('The paper orientation one of Landscape or Portrait'),
-      '#default_value' => $this->configuration['orientation'],
+      '#default_value' => $this->configuration['default_paper_orientation'],
       '#weight' => -9,
     ];
     $form['credentials'] = [
@@ -69,7 +69,7 @@ abstract class PdfEngineBase extends PrintEngineBase {
    */
   public function defaultConfiguration() {
     return parent::defaultConfiguration() + [
-      'orientation' => 'portrait',
+      'default_paper_orientation' => 'portrait',
       'default_paper_size' => 'letter',
       'username' => '',
       'password' => '',

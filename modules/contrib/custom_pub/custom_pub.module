@@ -11,11 +11,6 @@ use Drupal\custom_pub\Entity\CustomPublishingOption;
 
 /**
  * Implements hook_help().
- *
- * @param $route_name
- * @param RouteMatchInterface $route_match
- *
- * @return string
  */
 function custom_pub_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {
@@ -43,9 +38,6 @@ function custom_pub_help($route_name, RouteMatchInterface $route_match) {
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
- *
- * @param $form
- * @param FormStateInterface $form_state
  */
 function custom_pub_form_node_type_edit_form_alter(&$form, FormStateInterface $form_state) {
   $node_type = $form_state->getBuildInfo()['callback_object']->getEntity();
@@ -77,10 +69,8 @@ function custom_pub_form_node_type_edit_form_alter(&$form, FormStateInterface $f
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
- * Regroup any custom publishing options to be under a grouped tab on the node form.
  *
- * @param $form
- * @param FormStateInterface $form_state
+ * Regroup any custom publishing options to be under a grouped tab on the node form.
  */
 function custom_pub_form_node_form_alter(&$form, FormStateInterface $form_state) {
   $entities = \Drupal::entityTypeManager()->getStorage('custom_publishing_option')->loadMultiple();
@@ -104,7 +94,7 @@ function custom_pub_form_node_form_alter(&$form, FormStateInterface $form_state)
     }
   }
 
-  // show the fieldset if we have options the user can use.
+  // Show the fieldset if we have options the user can use.
   if ($custom_publish_options) {
     $form['custom_publish_options'] = [
       '#type' => 'details',

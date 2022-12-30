@@ -105,7 +105,7 @@
         "drupal/yasm": "^2.0",
         "drupal/yasm_blocks": "^2.0",
         "drupal/yasm_charts": "^2.0",
-        "goalgorilla/open_social": "11.5.3",
+        "goalgorilla/open_social": "11.5.4",
         "monolog/monolog": "^2.3.5"
     },
     "repositories": [

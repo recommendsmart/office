@@ -5,6 +5,7 @@ namespace Drupal\frontend_editing\Controller;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityFormBuilder;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
 use Drupal\paragraphs\ParagraphInterface;
@@ -34,16 +35,26 @@ class FrontendEditingController extends ControllerBase {
   protected $builder;
 
   /**
+   * The entity repository.
+   *
+   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   */
+  protected $entityRepository;
+
+  /**
    * FrontendEditingController constructor.
    *
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   Renderer service.
    * @param \Drupal\Core\Entity\EntityFormBuilder $builder
    *   Entity form builder.
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   *   The entity repository.
    */
-  public function __construct(RendererInterface $renderer, EntityFormBuilder $builder) {
+  public function __construct(RendererInterface $renderer, EntityFormBuilder $builder, EntityRepositoryInterface $entity_repository) {
     $this->renderer = $renderer;
     $this->builder = $builder;
+    $this->entityRepository = $entity_repository;
   }
 
   /**
@@ -52,7 +63,8 @@ class FrontendEditingController extends ControllerBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('renderer'),
-      $container->get('entity.form_builder')
+      $container->get('entity.form_builder'),
+      $container->get('entity.repository')
     );
   }
 
@@ -87,6 +99,12 @@ class FrontendEditingController extends ControllerBase {
       ));
       return [];
     }
+
+    // If the entity type is translatable, ensure we use the proper entity
+    // translation for the current context, so that the access check is made on
+    // the entity translation.
+    $entity = $this->entityRepository->getTranslationFromContext($entity);
+
     if (!$entity->access('update')) {
       throw new AccessDeniedHttpException();
     }

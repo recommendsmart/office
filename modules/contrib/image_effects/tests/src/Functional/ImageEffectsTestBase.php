@@ -28,7 +28,7 @@ abstract class ImageEffectsTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'stark';
 
   /**
    * Test image style.
@@ -65,6 +65,23 @@ abstract class ImageEffectsTestBase extends BrowserTestBase {
    */
   protected $fileSystem;
 
+  /**
+   * @var \Drupal\Core\Extension\ModuleExtensionList
+   */
+  protected $moduleList;
+
+  /**
+   * @var \Drupal\Core\File\FileUrlGeneratorInterface
+   */
+  protected $fileUrlGenerator;
+
+  /**
+   * Admin user.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  protected $adminUser;
+
   // Colors that are used in testing.
   // @codingStandardsIgnoreStart
   protected $black       = [  0,   0,   0,   0];
@@ -90,6 +107,12 @@ abstract class ImageEffectsTestBase extends BrowserTestBase {
 
     // Set the file system.
     $this->fileSystem = $this->container->get('file_system');
+
+    // Set the module list.
+    $this->moduleList = $this->container->get('extension.list.module');
+
+    // Set the file URL generator.
+    $this->fileUrlGenerator = $this->container->get('file_url_generator');
 
     // Create a user and log it in.
     $this->adminUser = $this->drupalCreateUser([
@@ -250,17 +273,13 @@ abstract class ImageEffectsTestBase extends BrowserTestBase {
    * @param string $path
    *   The path to the test image file.
    * @param string $name
-   *   (optional) The name of the item for which the path is requested.
-   *   Ignored for $type 'core'. If null, $path is returned. Defaults
-   *   to null.
-   * @param string $type
-   *   (optional) The type of the item; one of 'core', 'profile', 'module',
-   *   'theme', or 'theme_engine'. Defaults to 'module'.
+   *   (optional) The name of the item for which the path is requested. If null,
+   *   $path is returned. Defaults to null.
    */
-  protected function getTestImageCopyUri($path, $name = NULL, $type = 'module') {
+  protected function getTestImageCopyUri($path, $name = NULL) {
     $test_directory = 'public://test-images/';
     $this->fileSystem->prepareDirectory($test_directory, FileSystemInterface::CREATE_DIRECTORY);
-    $source_uri = $name ? drupal_get_path($type, $name) : '';
+    $source_uri = $name ? $this->moduleList->getPath($name) : '';
     $source_uri .= $path;
     $target_uri = $test_directory . \Drupal::service('file_system')->basename($source_uri);
     return $this->fileSystem->copy($source_uri, $target_uri, FileSystemInterface::EXISTS_REPLACE);

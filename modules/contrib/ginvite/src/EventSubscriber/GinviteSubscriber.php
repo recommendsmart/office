@@ -2,6 +2,8 @@
 
 namespace Drupal\ginvite\EventSubscriber;
 
+use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -10,7 +12,7 @@ use Drupal\Core\Url;
 use Drupal\ginvite\GroupInvitationLoader;
 use Drupal\ginvite\Event\UserRegisteredFromInvitationEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -51,6 +53,13 @@ class GinviteSubscriber implements EventSubscriberInterface {
   protected $loggerFactory;
 
   /**
+   * Config factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  private $configFactory;
+
+  /**
    * Constructs GinviteSubscriber.
    *
    * @param \Drupal\ginvite\GroupInvitationLoader $invitation_loader
@@ -61,36 +70,37 @@ class GinviteSubscriber implements EventSubscriberInterface {
    *   The messenger service.
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
    *   The logger factory service.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface|null $config_factory
+   *   The config factory.
    */
-  public function __construct(GroupInvitationLoader $invitation_loader, AccountInterface $current_user, MessengerInterface $messenger, LoggerChannelFactoryInterface $logger_factory) {
+  public function __construct(GroupInvitationLoader $invitation_loader, AccountInterface $current_user, MessengerInterface $messenger, LoggerChannelFactoryInterface $logger_factory, ConfigFactoryInterface $config_factory = NULL) {
+    if ($config_factory === NULL) {
+      @trigger_error('Calling GinviteSubscriber::__construct() without the $config_factory argument is deprecated in ginvite:2.0.2 and will be required before ginvite:3.0.0.', E_USER_DEPRECATED);
+      $config_factory = \Drupal::configFactory();
+    }
     $this->groupInvitationLoader = $invitation_loader;
     $this->currentUser = $current_user;
     $this->messenger = $messenger;
     $this->loggerFactory = $logger_factory;
+    $this->configFactory = $config_factory;
   }
 
   /**
    * Notify user about Pending invitations.
    *
-   * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
-   *   The GetResponseEvent to process.
+   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
+   *   The RequestEvent to process.
    */
-  public function notifyAboutPendingInvitations(GetResponseEvent $event) {
+  public function notifyAboutPendingInvitations(RequestEvent $event) {
     if ($this->groupInvitationLoader->loadByUser()) {
+      $config = $this->configFactory->get('ginvite.pending_invitations_warning');
       // Exclude routes where this info is redundant or will generate a
       // misleading extra message on the next request.
-      $route_exclusions = [
-        'view.my_invitations.page_1',
-        'ginvite.invitation.accept',
-        'ginvite.invitation.decline',
-      ];
       $route = $event->getRequest()->get('_route');
 
-      if (!empty($route) && !in_array($route, $route_exclusions)) {
+      if (!empty($route) && !in_array($route, $config->get('excluded_routes') ?? [], TRUE) && !empty($config->get('warning_message'))) {
         $destination = Url::fromRoute('view.my_invitations.page_1', ['user' => $this->currentUser->id()])->toString();
-        $replace = ['@url' => $destination];
-        $message = $this->t('You have pending group invitations. <a href="@url">Visit your profile</a> to see them.', $replace);
-        $this->messenger->addMessage($message, 'warning', FALSE);
+        $this->messenger->addMessage(new FormattableMarkup($config->get('warning_message'), ['@my_invitations_url' => $destination]), 'warning', FALSE);
       }
     }
   }

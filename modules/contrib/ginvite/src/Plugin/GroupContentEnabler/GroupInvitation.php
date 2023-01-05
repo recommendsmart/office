@@ -82,6 +82,11 @@ class GroupInvitation extends GroupContentEnablerBase implements ContainerFactor
   }
 
   /**
+   * Invitation expired automatically.
+   */
+  const INVITATION_EXPIRED = 3;
+
+  /**
    * {@inheritdoc}
    */
   public function getGroupOperations(GroupInterface $group) {
@@ -318,7 +323,14 @@ class GroupInvitation extends GroupContentEnablerBase implements ContainerFactor
       '#type' => 'number',
       '#title' => $this->t('Expire invites'),
       '#default_value' => !empty($this->getConfiguration()['invitation_expire']) ? $this->getConfiguration()['invitation_expire'] : '',
-      '#description' => $this->t('Automatically remove open invites after the specified days. If left empty invites will not expire.'),
+      '#description' => $this->t('Automatically expire open invites after the specified days. If left empty invites will not expire.'),
+    ];
+
+    $form['invitation_expire_keep'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Keep expired invitations'),
+      '#default_value' => !empty($this->getConfiguration()['invitation_expire_keep']) ? $this->getConfiguration()['invitation_expire_keep'] : FALSE,
+      '#description' => $this->t('If checked, the expired invitations will be kept with a expired status instead of removed.'),
     ];
 
     // Invitation Email Configuration.
@@ -405,6 +417,7 @@ class GroupInvitation extends GroupContentEnablerBase implements ContainerFactor
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     $this->configuration['unblock_invitees'] = $this->currentUser->hasPermission('administer account settings') ? $form_state->getValue('unblock_invitees') : 0;
     $this->configuration['invitation_expire'] = $form_state->getValue('invitation_expire');
+    $this->configuration['invitation_expire_keep'] = $form_state->getValue('invitation_expire_keep');
     $this->configuration['invitation_subject'] = $form_state->getValue('invitation_subject');
     $this->configuration['invitation_body'] = $form_state->getValue('invitation_body');
     $this->configuration['existing_user_invitation_subject'] = $form_state->getValue('existing_user_invitation_subject');

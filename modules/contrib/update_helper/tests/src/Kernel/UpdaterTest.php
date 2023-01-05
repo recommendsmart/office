@@ -76,7 +76,7 @@ class UpdaterTest extends KernelTestBase {
           'help',
         ],
         'install_themes' => [
-          'seven',
+          'olivero',
         ],
         'import_configs' => [
           'tour.tour.tour-update-helper-test',
@@ -117,7 +117,9 @@ class UpdaterTest extends KernelTestBase {
     // See \Drupal\KernelTests\Core\File\FileTestBase::setUpFilesystem().
     $public_file_directory = $this->siteDirectory . '/files';
 
-    require_once 'core/includes/file.inc';
+    if (version_compare(\Drupal::VERSION, '10', '<')) {
+      require_once 'core/includes/file.inc';
+    }
 
     mkdir($this->siteDirectory, 0775);
     mkdir($this->siteDirectory . '/files', 0775);
@@ -220,7 +222,7 @@ class UpdaterTest extends KernelTestBase {
     $update_helper = \Drupal::service('update_helper.updater');
 
     $this->assertFalse($this->moduleHandler->moduleExists('help'), 'Module "help" should not be installed.');
-    $this->assertFalse($this->themeHandler->themeExists('seven'), 'Theme "seven" should not be installed.');
+    $this->assertFalse($this->themeHandler->themeExists('olivero'), 'Theme "olivero" should not be installed.');
 
     // Create some configuration file for tour, so that it can be imported.
     $this->assertEquals(NULL, $config_factory->get('tour.tour.tour-update-helper-test')->get('id'), 'Tour configuration should not exist.');
@@ -232,7 +234,7 @@ class UpdaterTest extends KernelTestBase {
 
     $this->assertEquals($expected_config_data, $this->container->get('config.factory')->get('field.storage.node.body')->get());
     $this->assertTrue($this->moduleHandler->moduleExists('help'), 'Module "help" should be installed.');
-    $this->assertTrue($this->themeHandler->themeExists('seven'), 'Theme "seven" should be installed.');
+    $this->assertTrue($this->themeHandler->themeExists('olivero'), 'Theme "olivero" should be installed.');
     $this->assertEquals('tour-update-helper-test', $this->container->get('config.factory')->get('tour.tour.tour-update-helper-test')->get('id'), 'Tour configuration should exist.');
   }
 

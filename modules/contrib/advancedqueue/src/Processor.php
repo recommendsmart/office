@@ -96,20 +96,18 @@ class Processor implements ProcessorInterface {
       if ($this->shouldStop) {
         break;
       }
+      $job = $queue->getBackend()->claimJob();
+      if (!$job) {
+        // The queue is empty. Stop here.
+        break;
+      }
+      $this->processJob($job, $queue);
+      $num_processed++;
 
       if ($processing_time && $this->time->getCurrentTime() >= $expected_end) {
         // Time limit reached. Stop here.
         break;
       }
-
-      $job = $queue->getBackend()->claimJob();
-      if (!$job) {
-        // No item processed in that round, let the CPU rest.
-        sleep(1);
-        continue;
-      }
-      $this->processJob($job, $queue);
-      $num_processed++;
     }
 
     return $num_processed;

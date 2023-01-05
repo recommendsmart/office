@@ -82,8 +82,8 @@ class RectangleTest extends TestCase {
     if ($libgd_version_found !== 1) {
       $this->markTestSkipped('Cannot determine the GD version available.');
     }
-    if (version_compare($matches[1], '2.2.2', '<')) {
-      $this->markTestSkipped("GD version 2.2.2 or above is required, {$matches[1]} found.");
+    if (version_compare($matches[1], '2.2.2', '<') || version_compare($matches[1], '2.3.0', '>=')) {
+      $this->markTestSkipped("GD version above 2.2.2 and below 2.3.0 is required, {$matches[1]} found.");
     }
 
     $image = imagecreatetruecolor($width, $height);

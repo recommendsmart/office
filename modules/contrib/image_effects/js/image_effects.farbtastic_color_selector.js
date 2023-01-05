@@ -2,6 +2,8 @@
  * @file
  *
  * Farbtastic color selector.
+ *
+ * @todo remove this once Drupal 9 is no longer supported.
  */
 
 (function ($) {

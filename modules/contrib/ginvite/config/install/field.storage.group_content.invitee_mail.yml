@@ -1,8 +1,10 @@
 langcode: en
 status: true
 dependencies:
-  module:
-    - ginvite
+  enforced:
+    module:
+      - group
+      - ginvite
 id: group_content.invitee_mail
 field_name: invitee_mail
 entity_type: group_content

@@ -59,7 +59,7 @@ class SetCanvasTest extends ImageEffectsTestBase {
     $image = $this->imageFactory->get($original_uri);
     $this->assertEquals(40, $image->getWidth());
     $this->assertEquals(20, $image->getHeight());
-    $derivative_url = file_url_transform_relative($this->testImageStyle->buildUrl($original_uri));
+    $derivative_url = $this->fileUrlGenerator->transformRelative($this->testImageStyle->buildUrl($original_uri));
     $variables = [
       '#theme' => 'image_style',
       '#style_name' => 'image_effects_test',
@@ -67,7 +67,7 @@ class SetCanvasTest extends ImageEffectsTestBase {
       '#width' => $image->getWidth(),
       '#height' => $image->getHeight(),
     ];
-    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"80\" height=\"40\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
+    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"80\" height=\"40\" alt=\"\" .*\/\>/", $this->getImageTag($variables));
 
     // Check that ::applyEffect generates image with expected canvas.
     $this->testImageStyle->createDerivative($original_uri, $derivative_uri);
@@ -102,7 +102,7 @@ class SetCanvasTest extends ImageEffectsTestBase {
     $image = $this->imageFactory->get($original_uri);
     $this->assertEquals(40, $image->getWidth());
     $this->assertEquals(20, $image->getHeight());
-    $derivative_url = file_url_transform_relative($this->testImageStyle->buildUrl($original_uri));
+    $derivative_url = $this->fileUrlGenerator->transformRelative($this->testImageStyle->buildUrl($original_uri));
     $variables = [
       '#theme' => 'image_style',
       '#style_name' => 'image_effects_test',
@@ -110,7 +110,7 @@ class SetCanvasTest extends ImageEffectsTestBase {
       '#width' => $image->getWidth(),
       '#height' => $image->getHeight(),
     ];
-    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"70\" height=\"90\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
+    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"70\" height=\"90\" alt=\"\" .*\/\>/", $this->getImageTag($variables));
 
     // Check that ::applyEffect generates image with expected canvas.
     $this->testImageStyle->createDerivative($original_uri, $derivative_uri);

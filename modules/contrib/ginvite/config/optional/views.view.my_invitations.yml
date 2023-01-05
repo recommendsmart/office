@@ -1,6 +1,10 @@
 langcode: en
 status: true
 dependencies:
+  enforced:
+    module:
+      - group
+      - ginvite
   config:
     - field.storage.group_content.group_roles
     - user.role.authenticated

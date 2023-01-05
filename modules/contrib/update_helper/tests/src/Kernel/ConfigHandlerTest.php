@@ -97,7 +97,9 @@ EOF;
     // See \Drupal\KernelTests\Core\File\FileTestBase::setUpFilesystem().
     $public_file_directory = $this->siteDirectory . '/files';
 
-    require_once 'core/includes/file.inc';
+    if (version_compare(\Drupal::VERSION, '10', '<')) {
+      require_once 'core/includes/file.inc';
+    }
 
     mkdir($this->siteDirectory, 0775);
     mkdir($this->siteDirectory . '/files', 0775);

@@ -1,12 +1,12 @@
 name: 'Group invite'
 description: 'Allows group managers to invite people into their group'
 type: module
-core_version_requirement: ^8.8 || ^9
+core_version_requirement: ^8.8 || ^9 || ^10
 package: Group
 dependencies:
   - group:group
 
-# Information added by Drupal.org packaging script on 2021-08-16
-version: '2.0.1'
+# Information added by Drupal.org packaging script on 2022-09-08
+version: '2.1.0'
 project: 'ginvite'
-datestamp: 1629113656
+datestamp: 1662645495

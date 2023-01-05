@@ -16,7 +16,7 @@ class ImagemagickArgumentsTest extends ImageEffectsTestBase {
    */
   public function providerToolkits() {
     $toolkits = parent::providerToolkits();
-    // @todo This effect is irrelevant on GD.
+    // This effect is irrelevant on GD toolkit.
     unset($toolkits['GD']);
     return $toolkits;
   }
@@ -55,7 +55,7 @@ class ImagemagickArgumentsTest extends ImageEffectsTestBase {
 
     // Check that ::transformDimensions returns expected dimensions.
     $image = $this->imageFactory->get($original_uri);
-    $derivative_url = file_url_transform_relative($this->testImageStyle->buildUrl($original_uri));
+    $derivative_url = $this->fileUrlGenerator->transformRelative($this->testImageStyle->buildUrl($original_uri));
     $variables = [
       '#theme' => 'image_style',
       '#style_name' => 'image_effects_test',
@@ -63,7 +63,7 @@ class ImagemagickArgumentsTest extends ImageEffectsTestBase {
       '#width' => $image->getWidth(),
       '#height' => $image->getHeight(),
     ];
-    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"640\" height=\"480\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
+    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"640\" height=\"480\" alt=\"\" .*\/\>/", $this->getImageTag($variables));
 
     // Create derivative image.
     $this->testImageStyle->createDerivative($original_uri, $derivative_uri);
@@ -91,7 +91,7 @@ class ImagemagickArgumentsTest extends ImageEffectsTestBase {
     // Check that ::transformDimensions does not provide dimension
     // attributes.
     $image = $this->imageFactory->get($original_uri);
-    $derivative_url = file_url_transform_relative($this->testImageStyle->buildUrl($original_uri));
+    $derivative_url = $this->fileUrlGenerator->transformRelative($this->testImageStyle->buildUrl($original_uri));
     $variables = [
       '#theme' => 'image_style',
       '#style_name' => 'image_effects_test',
@@ -99,7 +99,7 @@ class ImagemagickArgumentsTest extends ImageEffectsTestBase {
       '#width' => $image->getWidth(),
       '#height' => $image->getHeight(),
     ];
-    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
+    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" alt=\"\" .*\/\>/", $this->getImageTag($variables));
 
     // Create derivative image.
     $this->testImageStyle->createDerivative($original_uri, $derivative_uri);
@@ -129,7 +129,7 @@ class ImagemagickArgumentsTest extends ImageEffectsTestBase {
 
     // Check that ::transformDimensions returns expected dimensions.
     $image = $this->imageFactory->get($original_uri);
-    $derivative_url = file_url_transform_relative($this->testImageStyle->buildUrl($original_uri));
+    $derivative_url = $this->fileUrlGenerator->transformRelative($this->testImageStyle->buildUrl($original_uri));
     $variables = [
       '#theme' => 'image_style',
       '#style_name' => 'image_effects_test',
@@ -137,7 +137,7 @@ class ImagemagickArgumentsTest extends ImageEffectsTestBase {
       '#width' => $image->getWidth(),
       '#height' => $image->getHeight(),
     ];
-    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"320\" height=\"120\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
+    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"320\" height=\"120\" alt=\"\" .*\/\>/", $this->getImageTag($variables));
 
     // Remove effect.
     $this->removeEffectFromTestStyle($uuid);
@@ -158,7 +158,7 @@ class ImagemagickArgumentsTest extends ImageEffectsTestBase {
 
     // Check that ::transformDimensions returns expected dimensions.
     $image = $this->imageFactory->get($original_uri);
-    $derivative_url = file_url_transform_relative($this->testImageStyle->buildUrl($original_uri));
+    $derivative_url = $this->fileUrlGenerator->transformRelative($this->testImageStyle->buildUrl($original_uri));
     $variables = [
       '#theme' => 'image_style',
       '#style_name' => 'image_effects_test',
@@ -166,7 +166,7 @@ class ImagemagickArgumentsTest extends ImageEffectsTestBase {
       '#width' => $image->getWidth(),
       '#height' => $image->getHeight(),
     ];
-    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"64\" height=\"48\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
+    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"64\" height=\"48\" alt=\"\" .*\/\>/", $this->getImageTag($variables));
 
     // Remove effect.
     $this->removeEffectFromTestStyle($uuid);

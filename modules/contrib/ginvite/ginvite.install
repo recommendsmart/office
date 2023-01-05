@@ -63,3 +63,17 @@ function ginvite_update_8001() {
     }
   }
 }
+
+/**
+ * Initialize new "ginvite.pending_invitations_warning" config.
+ */
+function ginvite_update_8003() {
+  $config = \Drupal::configFactory()->getEditable('ginvite.pending_invitations_warning');
+  $config->set('excluded_routes', [
+    'view.my_invitations.page_1',
+    'ginvite.invitation.accept',
+    'ginvite.invitation.decline',
+  ]);
+  $config->set('warning_message', 'You have pending group invitations. <a href="@my_invitations_url">Visit your profile</a> to see them.');
+  $config->save(TRUE);
+}

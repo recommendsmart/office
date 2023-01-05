@@ -78,7 +78,7 @@ class GroupInviteTest extends GroupBrowserTestBase {
   }
 
   /**
-   * Create invites and let them expire.
+   * Create invites and test general group invite behavior.
    */
   public function testInviteRolePermission() {
     $this->drupalLogin($this->groupCreator);

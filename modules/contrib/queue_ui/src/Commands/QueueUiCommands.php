@@ -205,13 +205,13 @@ class QueueUiCommands extends DrushCommands {
   /**
    * Helper function to start a batch process.
    *
-   * @param \Drupal\Core\Batch\BatchBuilder $batch
+   * @param \Drupal\Core\Batch\BatchBuilder $batch_definition
    *   The batch that needs to be processed.
    */
-  protected function startBatch(BatchBuilder $batch): void {
+  protected function startBatch(BatchBuilder $batch_definition): void {
     // Set and configure the batch.
-    batch_set($batch->toArray());
-    $batch =& batch_get();
+    batch_set($batch_definition->toArray());
+    $batch = & batch_get();
     $batch['progressive'] = FALSE;
 
     // Process the batch.

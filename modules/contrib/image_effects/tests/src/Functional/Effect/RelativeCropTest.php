@@ -50,7 +50,7 @@ class RelativeCropTest extends ImageEffectsTestBase {
     $this->assertEquals(14, $image_gd->getHeight());
 
     $derivative_uri = $this->testImageStyle->buildUri($test_file_uris['border']);
-    $derivative_url = file_url_transform_relative($this->testImageStyle->buildUrl($test_file_uris['border']));
+    $derivative_url = $this->fileUrlGenerator->transformRelative($this->testImageStyle->buildUrl($test_file_uris['border']));
 
     // Test that no cropping will be done if the ratio matches the original.
     $test_data['Matching ratio'] = [
@@ -157,7 +157,7 @@ class RelativeCropTest extends ImageEffectsTestBase {
         '#width' => $image->getWidth(),
         '#height' => $image->getHeight(),
       ];
-      $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"{$test['expected_width']}\" height=\"{$test['expected_height']}\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables), $test_description);
+      $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"{$test['expected_width']}\" height=\"{$test['expected_height']}\" alt=\"\" .*\/\>/", $this->getImageTag($variables), $test_description);
 
       // Check that ::applyEffect generates an image with the expected
       // dimensions.

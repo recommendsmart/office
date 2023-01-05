@@ -42,7 +42,13 @@ class ImageEffectsUninstallValidator implements ModuleUninstallValidatorInterfac
     // Prevents uninstalling 'jquery_colorpicker' if its color selector plugin
     // is in use.
     if ($module == 'jquery_colorpicker' && $this->configFactory->get('image_effects.settings')->get('color_selector.plugin_id') === 'jquery_colorpicker') {
-      $reasons[] = $this->t('The <em>Image Effects</em> module is using the <em>JQuery Colorpicker</em> color selector');
+      $reasons[] = $this->t('The <em>Image Effects</em> module is using the <em>JQuery Colorpicker</em> color selector.');
+    }
+    // Prevents uninstalling 'color' if the farbtastic color selector plugin
+    // is in use.
+    // @todo remove versioning once Drupal 9 is no longer  supported.
+    if ((version_compare(\Drupal::VERSION, 10) >= 0) && $module == 'color' && $this->configFactory->get('image_effects.settings')->get('color_selector.plugin_id') === 'farbtastic') {
+      $reasons[] = $this->t('The <em>Image Effects</em> module is using the <em>Farbtastic</em> color selector.');
     }
     return $reasons;
   }

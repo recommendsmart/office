@@ -7,7 +7,7 @@ This module offers supporting functionalities to make configuration updates easi
 This module has Drush command. In order to execute it properly, you have to use Drush installed with your project.
 In case of composer build, it's: `[project directory]/vendor/bin/drush`
 
-Drush version has to be greater than 10.2.
+Drush version has to be greater than 11.0.
 
 ### Provided features
 

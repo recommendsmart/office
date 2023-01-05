@@ -55,7 +55,7 @@ class BackgroundTest extends ImageEffectsTestBase {
     $image = $this->imageFactory->get($original_uri);
     $this->assertEquals(40, $image->getWidth());
     $this->assertEquals(20, $image->getHeight());
-    $derivative_url = file_url_transform_relative($this->testImageStyle->buildUrl($original_uri));
+    $derivative_url = $this->fileUrlGenerator->transformRelative($this->testImageStyle->buildUrl($original_uri));
     $variables = [
       '#theme' => 'image_style',
       '#style_name' => 'image_effects_test',
@@ -63,7 +63,7 @@ class BackgroundTest extends ImageEffectsTestBase {
       '#width' => $image->getWidth(),
       '#height' => $image->getHeight(),
     ];
-    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"360\" height=\"240\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
+    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"360\" height=\"240\" alt=\"\" .*\/\>/", $this->getImageTag($variables));
 
     // Check that ::applyEffect generates image with expected canvas.
     $derivative_uri = $this->testImageStyle->buildUri($original_uri);
@@ -99,12 +99,11 @@ class BackgroundTest extends ImageEffectsTestBase {
         ]);
         // The operation replaced the resource, check that the old one has
         // been destroyed.
+        // @todo remove once Drupal 9 is no longer supported.
         if (PHP_VERSION_ID < 80000) {
           $new_res = $image->getToolkit()->getResource();
           $this->assertIsResource($new_res);
           $this->assertNotEquals($new_res, $old_res);
-          // @todo In https://www.drupal.org/node/3133236 convert this to
-          // $this->assertIsNotResource($old_res).
           $this->assertFalse(is_resource($old_res));
         }
         // Save image and compare against original, should differ.

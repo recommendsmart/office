@@ -111,7 +111,7 @@ class ConfigurationUpdate extends DrupalGenerator {
       // from 0001.
       /** @var \Drupal\Core\Update\UpdateRegistry $service */
       $service = \Drupal::service('update.post_update_registry');
-      $updates = array_merge($service->getModuleUpdateFunctions($vars['module']), array_keys($service->getRemovedPostUpdates($vars['module'])));
+      $updates = array_merge($service->getUpdateFunctions($vars['module']), array_keys($service->getRemovedPostUpdates($vars['module'])));
       $lastUpdate = 0;
       foreach($updates as $update) {
         if (preg_match('/^'. preg_quote($vars['module']) . '_post_update_(\d*)_.*$/', $update, $matches)) {

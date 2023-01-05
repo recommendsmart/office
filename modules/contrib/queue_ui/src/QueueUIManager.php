@@ -18,6 +18,13 @@ use Drupal\Core\Queue\QueueFactory;
 class QueueUIManager extends DefaultPluginManager {
 
   /**
+   * The queue service.
+   *
+   * @var \Drupal\Core\Queue\QueueFactory
+   */
+  protected $queueService;
+
+  /**
    * Constructs an QueueWorkerManager object.
    *
    * @param \Traversable $namespaces

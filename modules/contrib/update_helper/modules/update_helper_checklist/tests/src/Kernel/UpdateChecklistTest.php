@@ -33,7 +33,7 @@ class UpdateChecklistTest extends KernelTestBase {
   /**
    * Install entity schema for Update entity.
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->installEntitySchema('update_helper_checklist_update');

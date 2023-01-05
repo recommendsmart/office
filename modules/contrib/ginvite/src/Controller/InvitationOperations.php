@@ -6,12 +6,14 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityFormBuilderInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Url;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\ginvite\Plugin\GroupContentEnabler\GroupInvitation;
 use Drupal\group\Entity\GroupContent;
 use Drupal\group\Entity\GroupContentInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\group\GroupMembershipLoader;
 use Drupal\group\Entity\GroupInterface;
@@ -67,6 +69,30 @@ class InvitationOperations extends ControllerBase {
       $container->get('entity.form_builder'),
       $container->get('messenger')
     );
+  }
+
+  /**
+   * Custom access check for the invitation routes.
+   *
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The user account.
+   * @param \Drupal\group\Entity\GroupInterface $group
+   *   The group entity.
+   *
+   * @return \Drupal\Core\Access\AccessResultInterface
+   */
+  public function access(AccountInterface $account, GroupInterface $group) {
+    // Check if plugin is enabled for this group type.
+    if (!$group->getGroupType()->hasContentPlugin('group_invitation')) {
+      return AccessResult::forbidden();
+    }
+
+    // Check if user account has permission.
+    if ($group->hasPermission('invite users to group', $account)) {
+      return AccessResult::allowed();
+    }
+
+    return AccessResult::forbidden();
   }
 
   /**
@@ -178,9 +204,10 @@ class InvitationOperations extends ControllerBase {
     $invited = $group_content->get('entity_id')->getString();
     $group = $group_content->getGroup();
     $membership = $this->membershipLoader->load($group, $this->currentUser());
+    $current_state = $group_content->get('invitation_status')->value;
 
     // Only allow user accept/decline own invitations.
-    if ($invited == $this->currentUser()->id() && !$membership) {
+    if ($invited == $this->currentUser()->id() && !$membership && (int) $current_state === GroupInvitation::INVITATION_PENDING) {
       return AccessResult::allowed();
     }
 

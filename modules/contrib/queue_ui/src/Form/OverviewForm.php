@@ -222,7 +222,7 @@ class OverviewForm extends FormBase {
 
       $operations = [];
       // If queue inspection is enabled for this implementation.
-      if ($queue_ui = $this->queueUIManager->fromQueueName($name)) {
+      if ($this->queueUIManager->fromQueueName($name)) {
         $operations['inspect'] = [
           'title' => $this->t('Inspect'),
           'url' => Url::fromRoute('queue_ui.inspect', ['queueName' => $name]),

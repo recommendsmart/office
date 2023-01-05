@@ -144,7 +144,7 @@ function ginvite_group_content_delete(GroupContentInterface $group_content) {
     $group_plugin_collection = \Drupal::service('plugin.manager.group_content_enabler')->getInstalled($group->getGroupType());
     $group_invite_config = $group_plugin_collection->getConfiguration()['group_invitation'];
 
-    if ($group_invite_config['send_cancel_email']) {
+    if ($group_invite_config['send_cancel_email'] && $group_content->get('invitation_status')->value == GroupInvitation::INVITATION_PENDING) {
       $mail = $group_content->get('invitee_mail')->getString();
       $mailManager = \Drupal::service('plugin.manager.mail');
       $from = $group_content->getEntity();
@@ -234,15 +234,32 @@ function ginvite_mail($key, &$message, $params) {
 }
 
 /**
- * Set referenced entity to Invitation when invited user registered.
- *
  * Implements hook_ENTITY_TYPE_insert().
  */
 function ginvite_user_insert(UserInterface $user) {
+  _ginvite_handle_new_user_registration_or_update($user);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ */
+function ginvite_user_update(UserInterface $user) {
+  _ginvite_handle_new_user_registration_or_update($user);
+}
+
+/**
+ * Handles when a new user registers or an existing gets updated.
+ *
+ * Sets entity reference property on pending invitations of a previously
+ * non-existing user by email.
+ *
+ * @param \Drupal\user\UserInterface $user
+ *   A user.
+ */
+function _ginvite_handle_new_user_registration_or_update(UserInterface $user) {
   // If a user is created without e-mail (because the field is optional or
   // because they are created through SSO) then we can not use the mail to check
-  // for pending invites so we exit early.
-  // TODO: Fix automatic group joining for invites leading to SSO registration.
+  // for pending invites, so we exit early.
   if ($user->get('mail')->isEmpty()) {
     return;
   }
@@ -250,18 +267,31 @@ function ginvite_user_insert(UserInterface $user) {
   $properties = [
     'invitee_mail' => $user->getEmail(),
     'invitation_status' => GroupInvitation::INVITATION_PENDING,
+    // For security reasons we only allow to get the ownership of invitations
+    // that previously belonged to a non-existing user, once the owner is set
+    // they cannot be reassigned (for example, by simply changing email
+    // addresses).
+    'entity_id' => 0,
   ];
 
+  /** @var \Drupal\ginvite\GroupInvitation[] $invitations */
   $invitations = \Drupal::service('ginvite.invitation_loader')->loadByProperties($properties);
   /** @var \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher $event_dispatcher */
   $event_dispatcher = \Drupal::service('event_dispatcher');
   foreach ($invitations as $invitation) {
     $group_content = $invitation->getGroupContent();
-    $group_content->set('entity_id', $user);
+    $group_content->set('entity_id', $user->id());
     $group_content->save();
     // Dispatch an event when the user is registered from an invitation.
-    $event = new UserRegisteredFromInvitationEvent($invitation);
-    $event_dispatcher->dispatch(UserRegisteredFromInvitationEvent::EVENT_NAME, $event);
+    // It is not that simple identifying that due to some SSO implementation
+    // that usually creates a stub user first and only starts filling in
+    // fields on the object, so $user->isNew() is not a viable option here.
+    // @todo Should we trigger new event when an existing users change their
+    //   email address to one that belongs to a pending invitation?
+    if ($user->getLastLoginTime() === 0) {
+      $event = new UserRegisteredFromInvitationEvent($invitation);
+      $event_dispatcher->dispatch($event, UserRegisteredFromInvitationEvent::EVENT_NAME);
+    }
   }
 }
 
@@ -365,7 +395,8 @@ function ginvite_cron() {
   foreach ($group_type_storage->loadMultiple() as $group_type_id => $group_type) {
     // Foreach group type get the configuration for the invites expired time.
     $group_plugin_collection = \Drupal::service('plugin.manager.group_content_enabler')->getInstalled($group_type);
-    $days = isset($group_plugin_collection->getConfiguration()['group_invitation']['invitation_expire']) ? $group_plugin_collection->getConfiguration()['group_invitation']['invitation_expire'] : NULL;
+    $days = $group_plugin_collection->getConfiguration()['group_invitation']['invitation_expire'] ?? NULL;
+    $keep_invitations = (bool) ($group_plugin_collection->getConfiguration()['group_invitation']['invitation_expire_keep'] ?? FALSE);
 
     // Nothing configured? Skip.
     if (!$days) {
@@ -374,8 +405,10 @@ function ginvite_cron() {
 
     // Query for all the invites that are expired for this group type.
     $group_content_storage = \Drupal::entityTypeManager()->getStorage('group_content');
+    $config_id = $group_type->getContentPlugin('group_invitation')->getContentTypeConfigId();
     $expired_invites = $group_content_storage->getQuery()
-      ->condition('type', $group_type_id . '-' . 'group_invitation')
+      ->accessCheck(FALSE)
+      ->condition('type', $config_id)
       ->condition('invitation_status', GroupInvitation::INVITATION_PENDING)
       ->condition('created', $request_time - ($days * $interval), '<')
       ->execute();
@@ -385,9 +418,18 @@ function ginvite_cron() {
       continue;
     }
 
-    // Permanently remove all expired invites.
     $group_invitations = $group_content_storage->loadMultiple($expired_invites);
-    $group_content_storage->delete($group_invitations);
+    if ($keep_invitations) {
+      foreach ($group_invitations as $invitation) {
+        // Mark invitation as expired.
+        $invitation->set('invitation_status', GroupInvitation::INVITATION_EXPIRED)->save();
+      }
+    }
+    else {
+      // Permanently remove all expired invites.
+      $group_content_storage->delete($group_invitations);
+    }
+
   }
 
   // Set the time that we removed the expired invites so we don't do it too

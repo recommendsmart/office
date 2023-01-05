@@ -9,11 +9,12 @@
 (function ($) {
   'use strict';
   Drupal.behaviors.imageEffectsHtmlColorSelector = {
-    attach: function (context, settings) {
-      $('.image-effects-html-color-selector .form-color', context).once('image-effects-html-color-selector').each(function (index) {
-        $(this).on('change', function (event) {
-          var suffix = $(this).parents('.image-effects-html-color-selector').find('.field-suffix').get(0);
-          $(suffix).text(this.value.toUpperCase());
+    attach(context) {
+      const elements = once('image-effects-html-color-selector', '.image-effects-html-color-selector .form-color', context);
+      elements.forEach(function (index) {
+        $(index).on('change', function (event) {
+          var suffix = $(index).parents('.image-effects-html-color-selector').find('.form-item__suffix').get(0);
+          $(suffix).text(index.value.toUpperCase());
         });
       });
     }

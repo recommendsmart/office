@@ -118,7 +118,7 @@ class AspectSwitcherTest extends ImageEffectsTestBase {
     // landscape.
     // Check that ::transformDimensions returns expected dimensions.
     $original_landscape_image = $image_factory->get($original_landscape_uri);
-    $derivative_landscape_url = file_url_transform_relative($this->testImageStyle->buildUrl($original_landscape_uri));
+    $derivative_landscape_url = $this->fileUrlGenerator->transformRelative($this->testImageStyle->buildUrl($original_landscape_uri));
     $variables = [
       '#theme' => 'image_style',
       '#style_name' => $this->testImageStyleName,
@@ -126,7 +126,7 @@ class AspectSwitcherTest extends ImageEffectsTestBase {
       '#width' => $original_landscape_image->getWidth(),
       '#height' => $original_landscape_image->getHeight(),
     ];
-    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_landscape_url, '/') . "\" width=\"{$this->effects['landscape']['data']['width']}\" height=\"{$this->effects['landscape']['data']['height']}\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
+    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_landscape_url, '/') . "\" width=\"{$this->effects['landscape']['data']['width']}\" height=\"{$this->effects['landscape']['data']['height']}\" alt=\"\" .*\/\>/", $this->getImageTag($variables));
     // Check that ::applyEffect returns expected dimensions.
     $dest_uri = $image_style->buildUri($original_landscape_uri);
     $this->assertTrue($image_style->createDerivative($original_landscape_uri, $dest_uri));
@@ -138,7 +138,7 @@ class AspectSwitcherTest extends ImageEffectsTestBase {
     // portrait.
     // Check that ::transformDimensions returns expected dimensions.
     $original_portrait_image = $image_factory->get($original_portrait_uri);
-    $derivative_portrait_url = file_url_transform_relative($this->testImageStyle->buildUrl($original_portrait_uri));
+    $derivative_portrait_url = $this->fileUrlGenerator->transformRelative($this->testImageStyle->buildUrl($original_portrait_uri));
     $variables = [
       '#theme' => 'image_style',
       '#style_name' => $this->testImageStyleName,
@@ -146,7 +146,7 @@ class AspectSwitcherTest extends ImageEffectsTestBase {
       '#width' => $original_portrait_image->getWidth(),
       '#height' => $original_portrait_image->getHeight(),
     ];
-    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_portrait_url, '/') . "\" width=\"{$this->effects['portrait']['data']['width']}\" height=\"{$this->effects['portrait']['data']['height']}\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
+    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_portrait_url, '/') . "\" width=\"{$this->effects['portrait']['data']['width']}\" height=\"{$this->effects['portrait']['data']['height']}\" alt=\"\" .*\/\>/", $this->getImageTag($variables));
     // Check that ::applyEffect returns expected dimensions.
     $dest_uri = $image_style->buildUri($original_portrait_uri);
     $image_style->createDerivative($original_portrait_uri, $dest_uri);
@@ -190,7 +190,7 @@ class AspectSwitcherTest extends ImageEffectsTestBase {
     // Check that no changes are made when source image is portrait.
     // Check that ::transformDimensions returns expected dimensions.
     $original_portrait_image = $image_factory->get($original_portrait_uri);
-    $derivative_portrait_url = file_url_transform_relative($this->testImageStyle->buildUrl($original_portrait_uri));
+    $derivative_portrait_url = $this->fileUrlGenerator->transformRelative($this->testImageStyle->buildUrl($original_portrait_uri));
     $variables = [
       '#theme' => 'image_style',
       '#style_name' => $this->testImageStyleName,
@@ -198,7 +198,7 @@ class AspectSwitcherTest extends ImageEffectsTestBase {
       '#width' => $original_portrait_image->getWidth(),
       '#height' => $original_portrait_image->getHeight(),
     ];
-    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_portrait_url, '/') . "\" width=\"20\" height=\"40\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
+    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_portrait_url, '/') . "\" width=\"20\" height=\"40\" alt=\"\" .*\/\>/", $this->getImageTag($variables));
     // Check that ::applyEffect returns expected dimensions.
     $dest_uri = $image_style->buildUri($original_portrait_uri);
     $image_style->createDerivative($original_portrait_uri, $dest_uri);

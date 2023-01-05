@@ -90,7 +90,7 @@ class AutoOrientTest extends ImageEffectsTestBase {
       $this->assertEquals($data['original_height'], $image->getHeight());
 
       // Get expected derivative URL.
-      $derivative_url = file_url_transform_relative($this->testImageStyle->buildUrl($original_uri));
+      $derivative_url = $this->fileUrlGenerator->transformRelative($this->testImageStyle->buildUrl($original_uri));
 
       // Check that ::transformDimensions returns expected dimensions.
       $variables = [
@@ -100,7 +100,7 @@ class AutoOrientTest extends ImageEffectsTestBase {
         '#width' => $image->getWidth(),
         '#height' => $image->getHeight(),
       ];
-      $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"{$data['derivative_width']}\" height=\"{$data['derivative_height']}\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
+      $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"{$data['derivative_width']}\" height=\"{$data['derivative_height']}\" alt=\"\" .*\/\>/", $this->getImageTag($variables));
 
       // Check that ::applyEffect generates image with expected dimensions.
       $derivative_uri = $this->testImageStyle->buildUri($original_uri);
@@ -137,7 +137,7 @@ class AutoOrientTest extends ImageEffectsTestBase {
 
     $test_data = [];
     for ($i = 1; $i < 9; $i++) {
-      $test_data[$i]['test_file'] = drupal_get_path('module', 'image_effects') . "/tests/images/image-test-exif-orientation-$i.jpeg";
+      $test_data[$i]['test_file'] = $this->moduleList->getPath('image_effects') . "/tests/images/image-test-exif-orientation-$i.jpeg";
     }
 
     foreach ($test_data as $data) {

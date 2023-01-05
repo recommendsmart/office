@@ -25,6 +25,16 @@ function image_effects_requirements($phase) {
     }
   }
 
+  // Check Color module installed if farbtastic color picker is on.
+  if (\Drupal::config('image_effects.settings')->get('color_selector.plugin_id') === 'farbtastic' && !\Drupal::service('module_handler')->moduleExists('color')) {
+    $requirements['image_effects_farbtastic'] = [
+      'title' => t('Farbtastic library'),
+      'value' => t('Color module not installed'),
+      'severity' => REQUIREMENT_ERROR,
+      'description' => t('The Image Effects module requires the Color module to be installed to use the Farbtastic library.'),
+    ];
+  }
+
   return $requirements;
 }
 

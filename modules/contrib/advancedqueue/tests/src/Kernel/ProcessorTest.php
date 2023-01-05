@@ -108,7 +108,6 @@ class ProcessorTest extends KernelTestBase {
    * @dataProvider retryJobProvider
    */
   public function testRetry(Job $job) {
-    $this->queue->setProcessingTime(2);
     $this->queue->enqueueJob($job);
 
     // Confirm that the job has been requeued.
@@ -122,7 +121,7 @@ class ProcessorTest extends KernelTestBase {
     $this->assertEquals(0, $num_processed);
 
     // Confirm that the job was re-processed, and left after the $retry_limit.
-    sleep(5);
+    sleep(1);
     $num_processed = $this->processor->processQueue($this->queue);
     $this->assertEquals(1, $num_processed);
     $counts = $this->queue->getBackend()->countJobs();
@@ -152,7 +151,7 @@ class ProcessorTest extends KernelTestBase {
       'expected_state' => Job::STATE_FAILURE,
       'expected_message' => '',
       'max_retries' => '1',
-      'retry_delay' => 5,
+      'retry_delay' => 1,
     ]);
 
     return [[$first_job], [$second_job]];

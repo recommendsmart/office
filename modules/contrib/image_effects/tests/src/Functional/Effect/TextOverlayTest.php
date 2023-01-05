@@ -116,7 +116,7 @@ class TextOverlayTest extends ImageEffectsTestBase {
       $image = $this->imageFactory->get($original_uri);
 
       // Load Image Style and get expected derivative URL.
-      $derivative_url = file_url_transform_relative($this->testImageStyle->buildUrl($original_uri));
+      $derivative_url = $this->fileUrlGenerator->transformRelative($this->testImageStyle->buildUrl($original_uri));
 
       // Check that ::applyEffect generates image with expected dimensions
       // and colors at corners.
@@ -136,7 +136,7 @@ class TextOverlayTest extends ImageEffectsTestBase {
         '#width' => $image->getWidth(),
         '#height' => $image->getHeight(),
       ];
-      $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"{$derivative_image->getWidth()}\" height=\"{$derivative_image->getHeight()}\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
+      $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"{$derivative_image->getWidth()}\" height=\"{$derivative_image->getHeight()}\" alt=\"\" .*\/\>/", $this->getImageTag($variables));
     }
   }
 

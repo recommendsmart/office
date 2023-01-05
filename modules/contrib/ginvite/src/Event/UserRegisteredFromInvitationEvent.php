@@ -3,7 +3,7 @@
 namespace Drupal\ginvite\Event;
 
 use Drupal\ginvite\GroupInvitation;
-use Symfony\Component\EventDispatcher\Event;
+use Drupal\Component\EventDispatcher\Event;
 
 /**
  * Event related with user registered invitation.

@@ -124,7 +124,8 @@ trait GDOperationTrait {
       // @todo when #2583041 is committed, add a check for memory
       // availability before creating the resource.
       $cut = imagecreatetruecolor($src_w, $src_h);
-      // @todo remove the is_resource check when PHP 8.0 is minimum version.
+      // @todo remove the is_resource check once Drupal 9 is no longer
+      // supported.
       if (!is_object($cut) && !is_resource($cut)) {
         return FALSE;
       }

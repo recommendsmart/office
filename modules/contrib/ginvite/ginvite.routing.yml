@@ -28,7 +28,7 @@ ginvite.invitation.bulk:
     _form: '\Drupal\ginvite\Form\BulkGroupInvitation'
     _title_callback: '\Drupal\ginvite\Controller\InvitationOperations::invitationTitle'
   requirements:
-    _group_permission: 'administer members'
+    _custom_access: '\Drupal\ginvite\Controller\InvitationOperations::access'
   options:
     parameters:
       group:
@@ -40,7 +40,7 @@ ginvite.invitation.bulk.confirm:
     _form: '\Drupal\ginvite\Form\BulkGroupInvitationConfirm'
     _title_callback: '\Drupal\ginvite\Controller\InvitationOperations::invitationTitle'
   requirements:
-    _group_permission: 'administer members'
+    _custom_access: '\Drupal\ginvite\Controller\InvitationOperations::access'
   options:
     parameters:
       group:

@@ -2,6 +2,10 @@ group_content_enabler.config.invitation_expire:
   type: 'integer'
   label: 'Expire invites'
 
+group_content_enabler.config.invitation_expire_keep:
+  type: 'boolean'
+  label: Keep expired invitations'
+
 group_content_enabler.config.invitation_subject:
   type: 'text'
   label: 'Subject'
@@ -41,3 +45,17 @@ group_content_enabler.config.send_cancel_email:
 group_content_enabler.config.send_email_existing_users:
   type: 'boolean'
   label: 'Send invitation e-mail to already registered users'
+
+ginvite.pending_invitations_warning:
+  type: config_object
+  label: Pending invitations warning settings
+  mapping:
+    excluded_routes:
+      type: sequence
+      nullable: false
+      label: Exclude routes where this warning is redundant or would generate confusion
+      sequence:
+        type: string
+    warning_message:
+      label: The warning message about pending invitations
+      type: text

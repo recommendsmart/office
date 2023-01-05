@@ -26,7 +26,7 @@ class GaussianBlur extends GDImageToolkitOperationBase {
    */
   protected function execute(array $arguments) {
     $blur = $this->imageCopyGaussianBlurred($this->getToolkit()->getResource(), $arguments['radius'], $arguments['sigma']);
-    // @todo remove the is_resource check when PHP 8.0 is minimum version.
+    // @todo remove the is_resource check once Drupal 9 is no longer  supported.
     if ((is_object($blur) && $blur instanceof \GdImage) || is_resource($blur)) {
       $original_resource = $this->getToolkit()->getResource();
       $this->getToolkit()->setResource($blur);

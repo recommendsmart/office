@@ -5,7 +5,7 @@ namespace Drupal\queue_ui\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\queue_ui\QueueUIManager;
-use Drupal\Core\Render\Renderer;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -28,12 +28,12 @@ class ItemDetailForm extends FormBase {
    *
    * @param \Drupal\queue_ui\QueueUIManager $queueUIManager
    *   The QueueUIManager object.
-   * @param \Drupal\Core\Render\Renderer $renderer
+   * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The Renderer object.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The ModuleHandler object.
    */
-  public function __construct(QueueUIManager $queueUIManager, Renderer $renderer, ModuleHandlerInterface $moduleHandler) {
+  public function __construct(QueueUIManager $queueUIManager, RendererInterface $renderer, ModuleHandlerInterface $moduleHandler) {
     $this->queueUIManager = $queueUIManager;
     $this->renderer = $renderer;
     $this->moduleHandler = $moduleHandler;
@@ -72,7 +72,7 @@ class ItemDetailForm extends FormBase {
       $data = [
         '#type' => 'html_tag',
         '#tag' => 'pre' ,
-        '#value' => print_r(unserialize($queueItem->data), TRUE),
+        '#value' => print_r(unserialize($queueItem->data, ['allowed_classes' => FALSE]), TRUE),
       ];
       $data = $this->renderer->renderPlain($data);
 

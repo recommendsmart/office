@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * @file
+ * File contains hook implementations.
+ */
+
+/**
+ * Implements hook_config_schema_info_alter().
+ */
+function views_default_user_taxonomy_config_schema_info_alter(&$definitions) {
+  $definitions['views.argument_default.taxonomy_tid']['mapping']['user'] = [
+    'type' => 'boolean',
+    'label' => "Load default filter from user page, that''s good for related taxonomy blocks",
+  ];
+}

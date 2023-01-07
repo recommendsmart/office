@@ -16728,6 +16728,64 @@
             "install-path": "../../modules/contrib/views_bulk_operations"
         },
         {
+            "name": "drupal/views_default_user_taxonomy",
+            "version": "2.0.0",
+            "version_normalized": "2.0.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupalcode.org/project/views_default_user_taxonomy.git",
+                "reference": "2.0.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/views_default_user_taxonomy-2.0.0.zip",
+                "reference": "2.0.0",
+                "shasum": "09f406bbdbe0e50f13b2956c8518454501a3b1c6"
+            },
+            "require": {
+                "drupal/core": "^8.8 || ^9 || ^10"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "drupal": {
+                    "version": "2.0.0",
+                    "datestamp": "1673049158",
+                    "security-coverage": {
+                        "status": "covered",
+                        "message": "Covered by Drupal's security advisory policy"
+                    }
+                }
+            },
+            "installation-source": "dist",
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Kevin Quillen",
+                    "homepage": "https://kevinquillen.com"
+                },
+                {
+                    "name": "kevinquillen",
+                    "homepage": "https://www.drupal.org/user/317279"
+                }
+            ],
+            "description": "Overrides the default Taxonomy argument to provide filtering on user page functionality with Views.",
+            "homepage": "https://www.drupal.org/project/views_default_user_taxonomy",
+            "keywords": [
+                "Drupal",
+                "filtering",
+                "views",
+                "visibility"
+            ],
+            "support": {
+                "source": "https://git.drupalcode.org/project/views_default_user_taxonomy",
+                "issues": "https://www.drupal.org/project/issues/views_default_user_taxonomy"
+            },
+            "install-path": "../../modules/contrib/views_default_user_taxonomy"
+        },
+        {
             "name": "drupal/views_infinite_scroll",
             "version": "2.0.1",
             "version_normalized": "2.0.1.0",

@@ -1,0 +1,18 @@
+{
+    "name": "drupal/views_default_user_taxonomy",
+    "description": "Overrides the default Taxonomy argument to provide filtering on user page functionality with Views.",
+    "keywords": ["Drupal", "views", "visibility", "filtering"],
+    "type": "drupal-module",
+    "license": "GPL-2.0-or-later",
+    "homepage": "https://www.drupal.org/project/views_default_user_taxonomy",
+    "authors": [
+        {
+            "name": "Kevin Quillen",
+            "homepage": "https://kevinquillen.com"
+        }
+    ],
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/views_default_user_taxonomy",
+        "source": "https://git.drupalcode.org/project/views_default_user_taxonomy"
+    }
+}

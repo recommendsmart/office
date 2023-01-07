@@ -1,0 +1,13 @@
+name: 'Views Default User Taxonomy'
+description: 'Overrides the default Taxonomy argument to provide additional filtering by user entity.'
+type: module
+core_version_requirement: ^8.8 || ^9 || ^10
+package: Views
+dependencies:
+  - drupal:taxonomy
+  - drupal:views
+
+# Information added by Drupal.org packaging script on 2023-01-06
+version: '2.0.0'
+project: 'views_default_user_taxonomy'
+datestamp: 1673049161

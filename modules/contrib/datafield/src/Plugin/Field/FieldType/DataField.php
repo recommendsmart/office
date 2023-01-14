@@ -531,7 +531,7 @@ class DataField extends FieldItemBase {
               '#type' => 'select',
               '#title' => $entity_type->getBundleLabel(),
               '#options' => $bundle_options,
-              '#default_value' => $field_settings[$subfield]['target_bundles'],
+              '#default_value' => $field_settings[$subfield]['target_bundles'] ?? '',
               '#required' => TRUE,
             ];
 

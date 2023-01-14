@@ -799,7 +799,12 @@ abstract class Base extends FormatterBase {
    * Formats a number.
    */
   protected function numberFormat(string $subfield, string $number): string {
-    $settings = $this->getSetting('formatter_settings')[$subfield];
+    $formatterSettings = $this->getSetting('formatter_settings');
+    $settings = $formatterSettings[$subfield] ?? [
+        'scale' => 0,
+        'decimal_separator' => '.',
+        'thousand_separator' => ',',
+      ];
     if ($this->getFieldSetting('columns')[$subfield]['type'] == 'integer') {
       $settings['scale'] = 0;
     }

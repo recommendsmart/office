@@ -21,8 +21,11 @@ For the first permission it may be necessary to automatically create terms
 for existing users or new users. There are settings that enable this at
 Structure -> Taxonomy -> User taxonomy.
 
+The 'view private taxonomies' permission will grant access to terms that are
+not published.
+
 When granting 'View private taxonomies' there may be different requirements
-when creating content.  Sometimes when creating or editing content, just the
+when creating content. Sometimes when creating or editing content, just the
 user's terms should be accessed even though the user has permission to see all
 users' terms.  In other cases all terms should be available when creating or
 editing content. The Private Term Reference field is provided to allow better

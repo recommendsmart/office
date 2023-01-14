@@ -3,7 +3,6 @@
 namespace Drupal\datafield\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Serialization\Json;
-use Drupal\Component\Utility\Html;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Markup;
@@ -71,8 +70,10 @@ class Details extends Base {
       ]);
       $subfields = array_keys($setting);
     }
+    // No other way to pass context to the theme.
+    // @see datafield_theme_suggestions_table_alter()
     $attributes = [
-      Html::getId('data_field--field-name') => $items->getName(),
+      'data_field--field-name' => $items->getName(),
       'class' => ['data-field-details'],
     ];
 

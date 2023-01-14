@@ -51,7 +51,7 @@ class FilenameGenerator implements FilenameGeneratorInterface {
       }
     }
 
-    $event = $this->dispatcher->dispatch(PrintEvents::FILENAME_ALTER, new FilenameAlterEvent($filenames, $entities));
+    $event = $this->dispatcher->dispatch(new FilenameAlterEvent($filenames, $entities), PrintEvents::FILENAME_ALTER);
     $filenames = $event->getFilenames();
 
     return $filenames ? implode('-', $filenames) : static::DEFAULT_FILENAME;

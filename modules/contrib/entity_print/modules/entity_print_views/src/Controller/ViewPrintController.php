@@ -97,7 +97,7 @@ class ViewPrintController extends ControllerBase {
     $executable = $view->getExecutable();
     $executable->setDisplay($display_id);
 
-    if ($args = $this->currentRequest->query->get('view_args')) {
+    if ($args = $this->currentRequest->query->all('view_args')) {
       $executable->setArguments($args);
     }
 

@@ -3,7 +3,6 @@
 namespace Drupal\datafield\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Serialization\Json;
-use Drupal\Component\Utility\Html;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
@@ -25,7 +24,7 @@ class UnformattedList extends ListBase {
   public function viewElements(FieldItemListInterface $items, $langcode): array {
     $element = [];
 
-    $element['#attributes']['class'][] = Html::getId('data_field-unformatted-list');
+    $element['#attributes']['class'][] = 'data-field-unformatted-list';
     if (!empty($this->getSetting('custom_class'))) {
       $element['#attributes']['class'][] = $this->getSetting('custom_class');
     }

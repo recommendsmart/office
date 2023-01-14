@@ -229,8 +229,8 @@
         // Add event listener
         toggleLi.addEventListener('click', toolbarClick);
         // Add to toolbar
-        const siblingLi = document.querySelector('[class*="gin--"] #toolbar-item-administration-tray .menu-item__spacer');
-        siblingLi.parentNode.insertBefore(toggleLi, siblingLi.nextSibling);
+        const toolbarUl = document.querySelector('[class*="gin--"] #toolbar-item-administration-tray .toolbar-menu');
+        toolbarUl.appendChild(toggleLi);
       }
 
       // Function to add button to admin toolbar in Seven theme

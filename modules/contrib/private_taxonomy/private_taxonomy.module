@@ -25,15 +25,21 @@ function private_taxonomy_taxonomy_vocabulary_access(
   $operation,
   AccountInterface $account) {
 
-  if ($entity->getEntityTypeId() == 'taxonomy_vocabulary' &&
-    $operation == 'view') {
+  $is_private_vocabulary = private_taxonomy_is_vocabulary_private($entity->id());
 
-    if ($account->hasPermission('administer own taxonomy') ||
-      $account->hasPermission('view private taxonomies')) {
+  if (!$is_private_vocabulary) {
+    return AccessResult::neutral();
+  }
 
+  if ($operation == 'view' || $operation == 'access taxonomy overview') {
+
+    $permission = $account->hasPermission('administer own taxonomy');
+
+    if ($permission) {
       return AccessResult::allowed();
     }
   }
+
   // No opinion.
   return AccessResult::neutral();
 }

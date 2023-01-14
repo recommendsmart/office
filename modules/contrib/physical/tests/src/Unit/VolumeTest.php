@@ -23,7 +23,7 @@ class VolumeTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->volume = new Volume('4', 'm3');

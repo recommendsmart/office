@@ -23,7 +23,7 @@ class MeasurementTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->measurement = new Length('10', 'm');

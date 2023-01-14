@@ -98,7 +98,7 @@ class DataFieldTable extends Base {
         '#title' => $this->t('Column label: %title', ['%title' => $title]),
         '#size' => 30,
         '#attributes' => ['placeholder' => $this->t('Column label')],
-        '#default_value' => $setting[$subfield]['column_label'] ?: $field_settings["field_settings"][$subfield]['label'],
+        '#default_value' => $setting[$subfield]['column_label'] ?? $title,
       ];
       if (in_array($field_settings['columns'][$subfield]['type'], [
         'numeric',
@@ -140,7 +140,7 @@ class DataFieldTable extends Base {
       if (!empty($settings['formatter_settings'][$subfield])) {
         $summary[] = ucfirst($subfield) . ' ' .
           $this->t('column label: @column_label',
-            ['@column_label' => $settings['formatter_settings'][$subfield]['column_label']]
+            ['@column_label' => $settings['formatter_settings'][$subfield]['column_label'] ?? '']
           );
       }
     }
@@ -164,9 +164,9 @@ class DataFieldTable extends Base {
     $table = ['#type' => 'table'];
 
     // No other way to pass context to the theme.
-    // @see data_field_theme_suggestions_table_alter()
+    // @see datafield_theme_suggestions_table_alter()
     $id = HTML::getId('data_field');
-    $table['#attributes'][$id . '--field-name'] = $field_name;
+    $table['#attributes']['data-field--field-name'] = $field_name;
     $table['#attributes']['class'][] = $id . '-table';
     if (!empty($settings['custom_class'])) {
       $table['#attributes']['class'][] = $settings['custom_class'];

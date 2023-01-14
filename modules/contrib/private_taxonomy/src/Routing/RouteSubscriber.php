@@ -14,17 +14,16 @@ class RouteSubscriber extends RouteSubscriberBase {
    * {@inheritdoc}
    */
   public function alterRoutes(RouteCollection $collection) {
+    // Permit access to admin/structure/taxonomy. The list of terms displayed
+    // is handled by private_taxonomy_taxonomy_vocabulary_access().
     if ($route = $collection->get('entity.taxonomy_vocabulary.collection')) {
-      $requirements = [
-        '_private_taxonomy_view' => 'vocabulary_list',
-      ];
-      $route->setRequirements($requirements);
-    }
-    if ($route = $collection->get('entity.taxonomy_vocabulary.overview_form')) {
-      $requirements = [
-        '_private_taxonomy_view' => 'vocabulary_list',
-      ];
-      $route->setRequirements($requirements);
+      $permissions = $route->getRequirement('_permission');
+      if ($permissions !== NULL) {
+        // We need a '+' prefix if other permissions already exist.
+        $permissions .= "+";
+      }
+      $permissions .= "administer own taxonomy";
+      $route->setRequirement('_permission', $permissions);
     }
   }
 

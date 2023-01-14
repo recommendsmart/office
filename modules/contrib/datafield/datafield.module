@@ -162,13 +162,9 @@ function datafield_theme_suggestions_item_list_alter(array &$suggestions, array 
  * Implements hook_theme_suggestions_HOOK_alter().
  */
 function datafield_theme_suggestions_table_alter(array &$suggestions, array &$variables): void {
-  $id = \Drupal\Component\Utility\Html::getId('data_field--field-name');
-  $field_name = $variables['attributes'][$id] ?? NULL;
+  $field_name = $variables['attributes']['data-field--field-name'] ?? NULL;
   if ($field_name) {
     $suggestions[] = 'table__data_field__' . $field_name;
-  }
-  if (!empty($variables["rows"]) && count($variables["rows"]) > 1) {
-    $variables["header"][0] = '';
   }
 }
 
@@ -176,8 +172,7 @@ function datafield_theme_suggestions_table_alter(array &$suggestions, array &$va
  * Implements hook_theme_suggestions_HOOK_alter().
  */
 function datafield_theme_suggestions_details_alter(array &$suggestions, array $variables): void {
-  $id = \Drupal\Component\Utility\Html::getId('data_field--field-name');
-  $field_name = $variables['element']['#attributes'][$id] ?? NULL;
+  $field_name = $variables['element']['#attributes']['data_field--field-name'] ?? NULL;
   if ($field_name) {
     $suggestions[] = 'details__data_field__' . $field_name;
   }

@@ -10,7 +10,7 @@
       return JSON.parse(string);
     }
     catch (e) {
-      return null;
+      return NULL;
     }
   }
 

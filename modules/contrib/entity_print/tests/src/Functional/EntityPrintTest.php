@@ -79,4 +79,14 @@ class EntityPrintTest extends BrowserTestBase {
     $this->assertSession()->pageTextNotContains('The website encountered an unexpected error');
   }
 
+  /**
+   * Regular 404s should work.
+   */
+  public function testPageNotFoundException() {
+    $this->drupalGet('/this-page-does-not-exist');
+    $this->assertSession()->pageTextNotContains('The website encountered an unexpected error');
+    $this->assertSession()->statusCodeEquals(404);
+  }
+
+
 }

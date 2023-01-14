@@ -37,7 +37,7 @@ class TemperatureTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->temperatureKelvin = new Temperature('504', 'K');

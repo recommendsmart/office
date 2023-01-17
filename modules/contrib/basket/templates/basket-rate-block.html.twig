@@ -1,6 +1,0 @@
-{% for item in info.items %}
-	<div class="item">
-		<div class="name">{{ item.iso }}</div>
-		<div class="rate">{{ item.rate|basket_number_format(2, ',', ' ') }}</div>
-	</div>
-{% endfor %}

@@ -1,5 +1,0 @@
-default_css: true
-force_download: true
-base_url: ''
-print_engines:
-  pdf_engine: dompdf

@@ -1,5 +1,0 @@
-services:
-  basket.commands:
-    class: \Drupal\basket\Commands\BasketCommands
-    tags:
-      - { name: drush.command }

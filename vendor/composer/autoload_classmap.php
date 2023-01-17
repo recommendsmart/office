@@ -8,7 +8,6 @@ $baseDir = dirname($vendorDir);
 return array(
     'Attribute' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
-    'Dompdf\\Cpdf' => $vendorDir . '/dompdf/dompdf/lib/Cpdf.php',
     'Drupal' => $baseDir . '/core/lib/Drupal.php',
     'Drupal\\Component\\DependencyInjection\\Container' => $baseDir . '/core/lib/Drupal/Component/DependencyInjection/Container.php',
     'Drupal\\Component\\DependencyInjection\\PhpArrayContainer' => $baseDir . '/core/lib/Drupal/Component/DependencyInjection/PhpArrayContainer.php',
@@ -36,7 +35,7 @@ return array(
     'Normalizer' => $vendorDir . '/symfony/polyfill-intl-normalizer/Resources/stubs/Normalizer.php',
     'PEAR_Exception' => $vendorDir . '/pear/pear_exception/PEAR/Exception.php',
     'PhpToken' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/PhpToken.php',
-    'Stringable' => $vendorDir . '/myclabs/php-enum/stubs/Stringable.php',
+    'Stringable' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
     'UnhandledMatchError' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
     'ValueError' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
     'geoPHP' => $vendorDir . '/phayes/geophp/geoPHP.inc',

@@ -1,4 +1,0 @@
-services:
-  opigno_notification.manager:
-    class: Drupal\opigno_notification\Services\OpignoNotificationManager
-    arguments: ['@current_user', '@entity_type.manager']

@@ -1,5 +1,0 @@
-opigno_learning_path.learning_path_settings:
-  title: 'Opigno Training Settings'
-  base_route_name: opigno_learning_path.learning_path_settings
-  names:
-    - opigno_learning_path.learning_path_settings

@@ -1,7 +1,0 @@
-USD:
-  name: 'USD'
-  iso: 'USD'
-  rate: 1
-  prefix: '$'
-  locked: 1
-  default: 1

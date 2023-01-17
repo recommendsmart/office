@@ -1,4 +1,0 @@
-config:
-  notification_order_admin: '1'
-  notification_order_user: '1'
-  notification_order_user_field: basket_order_mail

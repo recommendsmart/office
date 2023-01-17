@@ -1,9 +1,0 @@
-langcode: en
-status: true
-dependencies:
-  module:
-    - node
-id: node.blog_teaser_small
-label: 'Blog teaser small'
-targetEntityType: node
-cache: true

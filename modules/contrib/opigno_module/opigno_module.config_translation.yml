@@ -1,5 +1,0 @@
-opigno_module.settings:
-  title: 'Module Settings'
-  base_route_name: opigno_module.settings
-  names:
-    - opigno_module.settings

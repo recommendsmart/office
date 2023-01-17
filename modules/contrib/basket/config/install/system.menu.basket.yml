@@ -1,9 +1,0 @@
-id: basket
-label: 'Basket menu'
-description: 'Links related to Basket.'
-langcode: null
-locked: true
-dependencies:
-  enforced:
-    module:
-      - basket

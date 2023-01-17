@@ -7,6 +7,7 @@ on:
       - "website/**"
     branches:
       - 2.x
+  workflow_dispatch: ~
 
 permissions:
   contents: read
@@ -31,7 +32,7 @@ jobs:
           node-version: 18
 
       - name: Build Website
-        run: "make docs"
+        run: "make website"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1

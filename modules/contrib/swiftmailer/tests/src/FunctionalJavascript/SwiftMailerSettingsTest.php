@@ -21,7 +21,7 @@ class SwiftMailerSettingsTest extends WebDriverTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'swiftmailer',
     'mailsystem',
     'block',
@@ -37,7 +37,7 @@ class SwiftMailerSettingsTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->drupalPlaceBlock('local_tasks_block');
     $this->drupalPlaceBlock('local_actions_block');
@@ -77,10 +77,10 @@ class SwiftMailerSettingsTest extends WebDriverTestBase {
     $provider = $config->get('smtp_credential_provider');
     $user = $config->get('smtp_credentials.swiftmailer.username');
     $password = $config->get('smtp_credentials.swiftmailer.password');
-    $this->assertEqual($transport, 'smtp');
-    $this->assertEqual($provider, 'swiftmailer');
-    $this->assertEqual($user, 'example');
-    $this->assertEqual($password, 'pass');
+    $this->assertSame('smtp', $transport);
+    $this->assertSame('swiftmailer', $provider);
+    $this->assertSame('example', $user);
+    $this->assertSame('pass', $password);
 
     // Select Spool tranport option.
     $page->fillField('transport[type]', 'spool');
@@ -93,8 +93,8 @@ class SwiftMailerSettingsTest extends WebDriverTestBase {
     $config = $this->config('swiftmailer.transport');
     $transport = $config->get('transport');
     $directory = $config->get('spool_directory');
-    $this->assertEqual($transport, 'spool');
-    $this->assertEqual($directory, 'aaaaa');
+    $this->assertSame('spool', $transport);
+    $this->assertSame('aaaaa', $directory);
 
     // Select Sendmail tranport option.
     $page->fillField('transport[type]', 'sendmail');
@@ -107,8 +107,8 @@ class SwiftMailerSettingsTest extends WebDriverTestBase {
     $config = $this->config('swiftmailer.transport');
     $transport = $config->get('transport');
     $path = $config->get('sendmail_path');
-    $this->assertEqual($transport, 'sendmail');
-    $this->assertEqual($path, 'bbbbb');
+    $this->assertSame('sendmail', $transport);
+    $this->assertSame('bbbbb', $path);
   }
 
   /**
@@ -137,9 +137,9 @@ class SwiftMailerSettingsTest extends WebDriverTestBase {
     $content_type = $config->get('content_type');
     $mode = $config->get('generate_plain');
     $character = $config->get('character_set');
-    $this->assertEqual($content_type, 'text/html');
-    $this->assertEqual($mode, TRUE);
-    $this->assertEqual($character, 'EUC-CN');
+    $this->assertSame('text/html', $content_type);
+    $this->assertEquals(TRUE, $mode);
+    $this->assertSame('EUC-CN', $character);
   }
 
 }

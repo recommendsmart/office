@@ -104,7 +104,7 @@ class Queue extends ConfigEntityBase implements QueueInterface {
   protected $processing_time = 90;
 
   /**
-   * Determine the type of threshold.
+   * Determine the type of queue cleanup threshold.
    *
    * @var array
    */
@@ -218,7 +218,7 @@ class Queue extends ConfigEntityBase implements QueueInterface {
   /**
    * {@inheritdoc}
    */
-  public function setThreshold($threshold) {
+  public function setThreshold(array $threshold) {
     $this->threshold = $threshold;
     return $this;
   }

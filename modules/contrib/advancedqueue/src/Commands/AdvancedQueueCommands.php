@@ -48,12 +48,18 @@ class AdvancedQueueCommands extends DrushCommands {
    *
    * @param string $queue_id
    *   The queue ID.
+   * @param array $options
+   *   The options passed to this drush function.
    *
    * @throws \Exception
    *
    * @command advancedqueue:queue:process
+   * @option timeout The maximum execution time of the script. Be warned that this is a rough estimate as the time is only checked between two items.
+   * @usage advancedqueue:queue:process queuename --timeout=60
+   *   Set maximum queue processing time to 60 seconds. After this, the process
+   *   will complete even if there are items left in the queue.
    */
-  public function process($queue_id) {
+  public function process($queue_id, array $options = ['timeout' => 90]) {
     $queue_storage = $this->entityTypeManager->getStorage('advancedqueue_queue');
     /** @var \Drupal\advancedqueue\Entity\QueueInterface $queue */
     $queue = $queue_storage->load($queue_id);
@@ -72,6 +78,11 @@ class AdvancedQueueCommands extends DrushCommands {
         $this->processor->stop();
       });
     }
+
+    // Set the processing time for this Drush command. Note: it is up to
+    // Processor implementations to handle this. See the default
+    // \Drupal\advancedqueue\Processor class for an example of this.
+    $queue->setProcessingTime((int) $options['timeout']);
 
     $start = microtime(TRUE);
     $num_processed = $this->processor->processQueue($queue);

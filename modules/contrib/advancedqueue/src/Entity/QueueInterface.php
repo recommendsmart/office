@@ -28,7 +28,7 @@ interface QueueInterface extends ConfigEntityInterface, EntityWithPluginCollecti
   const QUEUE_THRESHOLD_DAYS = 2;
 
   /**
-   * Queue treshold by items count.
+   * Queue threshold by items count.
    */
   const QUEUE_THRESHOLD_ITEMS_LIMITS = [
     100,
@@ -162,20 +162,25 @@ interface QueueInterface extends ConfigEntityInterface, EntityWithPluginCollecti
   /**
    * Gets the number of queue items to keep.
    *
-   * @return int
-   *   The number of items to keep.
+   * @return array
+   *   The array of type, limit and state of the cleanup threshold where:
+   *   - type is either 0 (keep all), QUEUE_THRESHOLD_ITEMS or
+   *     QUEUE_THRESHOLD_DAYS;
+   *   - limit is the number of items or days to keep;
+   *   - state is either 'all' or Job::STATE_SUCCESS to remove all items or
+   *     only the ones that have finished successfully.
    */
   public function getThreshold();
 
   /**
    * Set the number of queue items to keep.
    *
-   * @param int $threshold
-   *   The number of items. 0 for unlimited.
+   * @param array $threshold
+   *   An array containing the type, limit and state of the cleanup threshold.
    *
    * @return $this
    */
-  public function setThreshold($threshold);
+  public function setThreshold(array $threshold);
 
   /**
    * Gets whether the queue is locked.

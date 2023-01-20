@@ -5,7 +5,7 @@ widget:
       css/entity-reference-tree.css: {}
       
 jstree:
-  version: 3.3.7  
+  version: 3.3.14
   js:
     js/jstree/jstree.min.js: { minified: true }
 
@@ -14,13 +14,13 @@ jstree:
     - core/drupalSettings
     
 jstree_default_theme:
-  version: 3.3.7
+  version: 3.3.14
   css:
     theme:
       css/jstree/themes/default/style.min.css: { minified: true }
     
 jstree_default-dark_theme:
-  version: 3.3.7
+  version: 3.3.14
   css:
     theme:
       css/jstree/themes/default-dark/style.min.css: { minified: true }

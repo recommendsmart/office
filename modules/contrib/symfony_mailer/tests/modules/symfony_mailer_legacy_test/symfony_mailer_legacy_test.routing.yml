@@ -1,0 +1,9 @@
+symfony_mailer_legacy_test.send:
+  path: '/admin/symfony_mailer_legacy_test/send'
+  defaults:
+    _form: 'Drupal\symfony_mailer_legacy_test\Form\LegacyTestEmailForm'
+    _title: 'Send legacy test email'
+  requirements:
+    _access: 'TRUE'
+  options:
+    _admin_route: TRUE

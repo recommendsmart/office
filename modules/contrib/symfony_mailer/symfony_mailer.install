@@ -1,0 +1,141 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the symfony mailer module.
+ */
+
+use Drupal\filter\Entity\FilterFormat;
+use Drupal\symfony_mailer\Entity\MailerPolicy;
+use Drupal\symfony_mailer\Entity\MailerTransport;
+
+/**
+ * Implements hook_requirements().
+ */
+function symfony_mailer_requirements($phase) {
+  $requirements = [];
+
+  $packages = [
+    'html2text/html2text' => 'Html2Text\Html2Text',
+    'symfony/mailer' => 'Symfony\Component\Mailer\Mailer',
+    'tijsverkoyen/css-to-inline-styles' => 'TijsVerkoyen\CssToInlineStyles\CssToInlineStyles',
+  ];
+
+  foreach ($packages as $name => $class) {
+    if (!class_exists($class)) {
+      $missing[] = $name;
+    }
+  }
+
+  if (!empty($missing)) {
+    $requirements['symfony_mailer_packages'] = [
+      'title' => t('Symfony Mailer dependencies'),
+      'value' => t('Required packages missing.'),
+      'description' => ['#theme' => 'item_list', '#items' => $missing],
+      'severity' => REQUIREMENT_ERROR,
+    ];
+  }
+
+  return $requirements;
+}
+
+/**
+ * Update policy for multiple addresses.
+ */
+function symfony_mailer_update_10001() {
+  $adjusters = [
+    'email_bcc',
+    'email_cc',
+    'email_from',
+    'email_to',
+    'email_bcc',
+    'email_reply_to',
+  ];
+
+  foreach (MailerPolicy::loadMultiple() as $policy) {
+    $config = $policy->getConfiguration();
+    foreach ($config as $id => &$values) {
+      if (in_array($id, $adjusters) && !isset($values['addresses'])) {
+        $values = ['addresses' => [$values]];
+      }
+    }
+    $policy->setConfiguration($config)->save();
+  }
+}
+
+/**
+ * Create email_html text format.
+ */
+function symfony_mailer_update_10002() {
+  $values = [
+    'format' => 'email_html',
+    'name' => 'Email HTML',
+  ];
+
+  FilterFormat::create($values)->save();
+}
+
+/**
+ * Update body policy to add text format.
+ */
+function symfony_mailer_update_10003() {
+  foreach (MailerPolicy::loadMultiple() as $policy) {
+    $config = $policy->getConfiguration();
+    if (isset($config['email_body']['value'])) {
+      $config['email_body']['content'] = [
+        'value' => $config['email_body']['value'],
+        'format' => 'email_html',
+      ];
+      unset($config['email_body']['value']);
+    }
+    $policy->setConfiguration($config)->save();
+  }
+}
+
+/**
+ * Replace Native transport with Sendmail.
+ */
+function symfony_mailer_update_10004() {
+  if ($native = MailerTransport::load('native')) {
+    $native->delete();
+
+    $values = [
+      'id' => 'sendmail',
+      'label' => 'Sendmail',
+      'plugin' => 'sendmail',
+      'configuration' => [
+        'query' => ['command' > ''],
+      ],
+    ];
+    MailerTransport::create($values)->save();
+  }
+}
+
+/**
+ * Update smtp transports with new query configuration.
+ */
+function symfony_mailer_update_10005() {
+  foreach (MailerTransport::loadMultiple() as $transport) {
+    if ($transport->getPlugin()->getPluginId() === 'smtp') {
+      // Resave smtp transports so they get new default config entries.
+      $transport->save();
+    }
+  }
+}
+
+/**
+ * Add new "Wrap and convert" email policy element.
+ */
+function symfony_mailer_update_10006() {
+  foreach (MailerPolicy::loadMultiple() as $policy) {
+    $config = $policy->getConfiguration();
+    if (isset($config['mailer_html_to_text'])) {
+      $config['mailer_wrap_and_convert'] = [
+        'plain' => FALSE,
+        'swiftmailer' => FALSE,
+      ];
+      unset($config['mailer_html_to_text']);
+      $policy->setConfiguration($config)->save();
+    }
+  }
+}

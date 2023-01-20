@@ -1,0 +1,117 @@
+entity.mailer_transport.collection:
+  path: '/admin/config/system/mailer/transport'
+  defaults:
+    _entity_list: 'mailer_transport'
+    _title: 'Mailer transport'
+  requirements:
+    _permission: 'administer mailer'
+
+entity.mailer_transport.add_form:
+  path: '/admin/config/system/mailer/transport/add/{plugin_id}'
+  defaults:
+    _entity_form: 'mailer_transport.add'
+    _title: 'Add transport'
+  requirements:
+    _permission: 'administer mailer'
+
+entity.mailer_transport.edit_form:
+  path: '/admin/config/system/mailer/transport/{mailer_transport}'
+  defaults:
+    _entity_form: 'mailer_transport.edit'
+    _title: 'Edit transport'
+  requirements:
+    _entity_access: 'mailer_transport.update'
+
+entity.mailer_transport.delete_form:
+  path: '/admin/config/system/mailer/transport/{mailer_transport}/delete'
+  defaults:
+    _entity_form: 'mailer_transport.delete'
+    _title: 'Delete transport'
+  requirements:
+    _entity_access: 'mailer_transport.delete'
+
+entity.mailer_transport.set_default:
+  path: '/admin/config/system/mailer/transport/{mailer_transport}/set-default'
+  defaults:
+    _controller: '\Drupal\symfony_mailer\Controller\SymfonyMailerController::setAsDefault'
+  requirements:
+    _permission: 'administer mailer'
+
+entity.mailer_policy.collection:
+  path: '/admin/config/system/mailer'
+  defaults:
+    _entity_list: 'mailer_policy'
+    _title: 'Mailer policy'
+  requirements:
+    _permission: 'administer mailer'
+
+entity.mailer_policy.add_form:
+  path: '/admin/config/system/mailer/policy/add'
+  defaults:
+    _entity_form: 'mailer_policy.add'
+    _title: 'Add policy'
+  requirements:
+    _permission: 'administer mailer'
+
+entity.mailer_policy.add_id_form:
+  path: '/admin/config/system/mailer/policy/add/{policy_id}'
+  defaults:
+    _controller: '\Drupal\symfony_mailer\Controller\SymfonyMailerController::createPolicy'
+  requirements:
+    _permission: 'administer mailer'
+
+entity.mailer_policy.edit_form:
+  path: '/admin/config/system/mailer/policy/{mailer_policy}'
+  defaults:
+    _entity_form: 'mailer_policy.edit'
+    _title: 'Edit policy'
+  requirements:
+    _entity_access: 'mailer_policy.update'
+
+entity.mailer_policy.delete_form:
+  path: '/admin/config/system/mailer/policy/{mailer_policy}/delete'
+  defaults:
+    _entity_form: 'mailer_policy.delete'
+    _title: 'Delete policy'
+  requirements:
+    _entity_access: 'mailer_policy.delete'
+
+symfony_mailer.import.status:
+  path: '/admin/config/system/mailer/import'
+  defaults:
+    _controller: '\Drupal\symfony_mailer\Controller\SymfonyMailerController::importStatus'
+    _title: 'Import configuration'
+  requirements:
+    _permission: 'administer mailer'
+
+symfony_mailer.import.all:
+  path: '/admin/config/system/mailer/import-all'
+  defaults:
+    _controller: '\Drupal\symfony_mailer\Controller\SymfonyMailerController::importAll'
+    _title: 'Import all'
+  requirements:
+    _permission: 'administer mailer'
+
+symfony_mailer.import.import:
+  path: '/admin/config/system/mailer/import/{id}'
+  defaults:
+    _controller: '\Drupal\symfony_mailer\Controller\SymfonyMailerController::import'
+    _title: 'Import'
+  requirements:
+    _permission: 'administer mailer'
+
+symfony_mailer.import.skip:
+  path: '/admin/config/system/mailer/import/{id}/skip'
+  defaults:
+    _controller: '\Drupal\symfony_mailer\Controller\SymfonyMailerController::skip'
+    _title: 'Skip'
+  requirements:
+    _permission: 'administer mailer'
+
+symfony_mailer.test:
+  path: '/admin/config/system/mailer/test'
+  defaults:
+    _form: '\Drupal\symfony_mailer\Form\TestEmailForm'
+    _title: 'Mailer test'
+  requirements:
+    _permission: 'administer mailer'

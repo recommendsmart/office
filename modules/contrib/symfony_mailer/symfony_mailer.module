@@ -1,0 +1,123 @@
+<?php
+
+/**
+ * @file
+ * Allows sending emails with Symfony Mailer.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Template\Attribute;
+use Drupal\Core\Url;
+use Drupal\symfony_mailer\Annotation\EmailBuilder;
+
+/**
+ * Implements hook_theme().
+ */
+function symfony_mailer_theme($existing, $type, $theme, $path) {
+  return [
+    'email' => [
+      'variables' => [
+        'email' => NULL,
+      ],
+      'mail theme' => TRUE,
+    ],
+    'email_wrap' => [
+      'variables' => [
+        'email' => NULL,
+        'body' => '',
+        'is_html' => TRUE,
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK() for email.
+ */
+function symfony_mailer_theme_suggestions_email(array $variables) {
+  return array_slice($variables['email']->getSuggestions('email', '__'), 1);
+}
+
+/**
+ * Implements hook_mailer_builder_info_alter().
+ */
+function symfony_mailer_mailer_builder_info_alter(array &$email_builders) {
+  // Add EmailBuilder definitions for any implementations of hook_mail() that
+  // don't already have one, using LegacyEmailBuilder.
+  $module_handler = \Drupal::moduleHandler();
+  $mail_hooks = [];
+  $module_handler->invokeAllWith('mail', function (callable $hook, string $module) use (&$mail_hooks) {
+    $mail_hooks[] = $module;
+  });
+  $missing = array_diff($mail_hooks, array_keys($email_builders));
+
+  foreach ($missing as $type) {
+    $params = [
+      'id' => $type,
+      'label' => $module_handler->getName($type),
+      'class' => "Drupal\symfony_mailer\Plugin\EmailBuilder\LegacyEmailBuilder",
+      'provider' => $type,
+    ];
+
+    $email_builders[$type] = (new EmailBuilder($params))->get();
+  }
+}
+
+/**
+ * Prepares variables for email template.
+ *
+ * Default template: email.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - email: Email object.
+ */
+function template_preprocess_email(array &$variables) {
+  $email = $variables['email'];
+  $variables['body'] = $email->getBody();
+  $variables = array_merge($variables, $email->getVariables());
+}
+
+/**
+ * Prepares variables for email wrap template.
+ *
+ * Default template: email-wrap.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - email: Email object.
+ *   - body: Body string.
+ *   - is_html: True if generating HTML output, false for plain text.
+ */
+function template_preprocess_email_wrap(array &$variables) {
+  $email = $variables['email'];
+  $variables['type'] = $email->getType();
+  $variables['sub_type'] = $email->getSubType();
+  $variables['attributes'] = new Attribute();
+}
+
+/**
+ * Implements hook_help().
+ */
+function symfony_mailer_help($route_name, RouteMatchInterface $route_match) {
+  // Remind site administrators if there are pending import operations. We
+  // don't need to issue the message on the import pages.
+  if ((substr($route_name, 0, strlen('symfony_mailer.import.')) != 'symfony_mailer.import.') && \Drupal::currentUser()->hasPermission('administer mailer') && \Drupal::service('plugin.manager.email_builder')->importRequired()) {
+    $params = [':import_config' => Url::fromRoute('symfony_mailer.import.status')->toString()];
+    \Drupal::messenger()->addError(t('There are Mailer configuration import operations pending: <a href=":import_config">import</a>.', $params));
+  }
+
+  switch ($route_name) {
+    case 'entity.mailer_policy.collection':
+      return '<p>' . t('Configure Mailer Policy to customise outgoing emails in many different ways. There are many possible policies to apply including: subject; body; addresses (from, to, ...); theme; transport; convert to plain text. Each policy can be set globally or for emails of a specific type.') . '</p>';
+
+    case 'symfony_mailer.import.status':
+      $params = [':mailer_policy' => Url::fromRoute('entity.mailer_policy.collection')->toString()];
+      $output = '<p>' . t('You can import configuration from existing modules to create an equivalent <a href=":mailer_policy">Mailer Policy</a>. It is recommended to run the import at the beginning, before you start editing policy.', $params) . '</p>';
+      $output .= '<p>' . t('<b>Warning</b> importing overwrites existing policy. If you have already created working policy then you should skip the import.');
+      return $output;
+
+    case 'symfony_mailer.test':
+      return '<p>' . t('Verify your Mailer configuration by sending a test email.') . '</p>';
+  }
+}

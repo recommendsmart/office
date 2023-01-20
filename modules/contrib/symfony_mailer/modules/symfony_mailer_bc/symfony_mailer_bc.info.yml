@@ -1,0 +1,12 @@
+name: Symfony Mailer Override
+type: module
+description: 'Overrides email building for key core and contrib modules, improving features and integration with Symfony Mailer.'
+core_version_requirement: ^9.4 || ^10
+package: Mail
+dependencies:
+  - symfony_mailer:symfony_mailer
+
+# Information added by Drupal.org packaging script on 2023-01-13
+version: '1.2.0-beta2'
+project: 'symfony_mailer'
+datestamp: 1673606005

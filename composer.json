@@ -88,6 +88,7 @@
         "drupal/storage": "^1.1",
         "drupal/subgroup": "^1.0",
         "drupal/switch_theme": "1.0.x-dev",
+        "drupal/symfony_mailer": "^1.2@beta",
         "drupal/tasks": "^1.0",
         "drupal/textarea_limit": "^2.0",
         "drupal/tms": "^1.0",

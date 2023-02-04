@@ -10,6 +10,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
+use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
 use Drupal\Core\Plugin\PluginFormInterface;
@@ -75,9 +76,6 @@ class Eca extends ConfigEntityBase implements EntityWithPluginCollectionInterfac
   protected static array $ignoreConfigValidationActions = [
     'action_send_email_action',
     'node_assign_owner_action',
-    'eca_tamper:find_replace_regex',
-    'eca_tamper:keyword_filter',
-    'eca_tamper:math',
   ];
 
   /**
@@ -205,6 +203,24 @@ class Eca extends ConfigEntityBase implements EntityWithPluginCollectionInterfac
   }
 
   /**
+   * Determines if ECA validation is being disabled for the current request.
+   *
+   * @return bool
+   *   TRUE, if the current request has a query argument eca_validation set to
+   *   off, FALSE otherwise.
+   */
+  protected function isValidationDisabled(): bool {
+    $request = $this->request();
+    /** @noinspection StrContainsCanBeUsedInspection */
+    $isAjax = mb_strpos($request->get(MainContentViewSubscriber::WRAPPER_FORMAT, ''), 'drupal_ajax') !== FALSE;
+    if ($isAjax && ($referer = $request->headers->get('referer')) && $query = parse_url($referer, PHP_URL_QUERY)) {
+      /** @noinspection StrContainsCanBeUsedInspection */
+      return mb_strpos($query, 'eca_validation=off') !== FALSE;
+    }
+    return $request->query->get('eca_validation', '') === 'off';
+  }
+
+  /**
    * Determine if the ECA config entity is editable.
    *
    * @return bool
@@ -214,20 +230,6 @@ class Eca extends ConfigEntityBase implements EntityWithPluginCollectionInterfac
   public function isEditable(): bool {
     if ($modeller = $this->getModeller()) {
       return $modeller->isEditable();
-    }
-    return FALSE;
-  }
-
-  /**
-   * Determine if the ECA config entity is exportable.
-   *
-   * @return bool
-   *   If the associated modeller supports exporting of a model, return TRUE,
-   *   FALSE otherwise.
-   */
-  public function isExportable(): bool {
-    if ($modeller = $this->getModeller()) {
-      return $modeller->isExportable();
     }
     return FALSE;
   }
@@ -480,7 +482,9 @@ class Eca extends ConfigEntityBase implements EntityWithPluginCollectionInterfac
           (mb_strlen((string) $fields[$key]) <= 255)) {
           // Remember the original configuration value.
           $numeric_fields[$key] = $fields[$key];
-          $fields[$key] = $form_field['#min'] ?? 0;
+          // The value "0" with a required field would cause a form error,
+          // let's use "1" instead.
+          $fields[$key] = $form_field['#min'] ?? 1;
         }
       }
     }
@@ -714,6 +718,9 @@ class Eca extends ConfigEntityBase implements EntityWithPluginCollectionInterfac
    */
   public function getPluginCollections(): array {
     $collections = [];
+    if ($this->isValidationDisabled()) {
+      return $collections;
+    }
     if (!empty($this->events)) {
       foreach ($this->events as $id => $info) {
         if (empty($info['plugin'])) {

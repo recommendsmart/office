@@ -5,7 +5,7 @@ namespace Drupal\eca_form\Plugin\Action;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Adds a hidden field to a form.
+ * Add a hidden field to a form.
  *
  * @Action(
  *   id = "eca_form_add_hiddenfield",

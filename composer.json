@@ -14,6 +14,7 @@
         "drupal/book_pdf": "^1.0@alpha",
         "drupal/browser_back_button": "^1.1",
         "drupal/business_rules": "^2.0@beta",
+        "drupal/calendar_view": "^2.0",
         "drupal/collapsible_fields": "^1.0@beta",
         "drupal/comments_order": "^3.0",
         "drupal/commerce": "^2.30",
@@ -102,7 +103,7 @@
         "drupal/yasm": "^2.0",
         "drupal/yasm_blocks": "^2.0",
         "drupal/yasm_charts": "^2.0",
-        "goalgorilla/open_social": "11.7.0-beta1",
+        "goalgorilla/open_social": "11.7.1",
         "monolog/monolog": "^2.3.5"
     },
     "repositories": [

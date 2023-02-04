@@ -1,0 +1,10 @@
+calendar_view:
+  version: VERSION
+  css:
+    component:
+      css/calendar-view.css: {}
+      css/calendar-view.default.css: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+    - core/once

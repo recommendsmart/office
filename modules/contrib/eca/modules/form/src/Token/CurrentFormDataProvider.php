@@ -27,7 +27,7 @@ class CurrentFormDataProvider implements DataProviderInterface {
    *
    * @var array
    */
-  protected static $cached = [];
+  protected static array $cached = [];
 
   /**
    * {@inheritdoc}
@@ -42,7 +42,6 @@ class CurrentFormDataProvider implements DataProviderInterface {
     switch ($key) {
 
       case 'form':
-      case 'current-form':
       case 'current_form':
         $form_object = $form_state->getFormObject();
         $dto_values = [

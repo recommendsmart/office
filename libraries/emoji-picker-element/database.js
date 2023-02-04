@@ -75,7 +75,7 @@ function initialMigration (db) {
   });
 }
 
-const openReqs = {};
+const openIndexedDBRequests = {};
 const databaseCache = {};
 const onCloseListeners = {};
 
@@ -91,7 +91,7 @@ function handleOpenOrDeleteReq (resolve, reject, req) {
 async function createDatabase (dbName) {
   const db = await new Promise((resolve, reject) => {
     const req = indexedDB.open(dbName, DB_VERSION_CURRENT);
-    openReqs[dbName] = req;
+    openIndexedDBRequests[dbName] = req;
     req.onupgradeneeded = e => {
       // Technically there is only one version, so we don't need this `if` check
       // But if an old version of the JS is in another browser tab
@@ -141,7 +141,7 @@ function dbPromise (db, storeName, readOnlyOrReadWrite, cb) {
 
 function closeDatabase (dbName) {
   // close any open requests
-  const req = openReqs[dbName];
+  const req = openIndexedDBRequests[dbName];
   const db = req && req.result;
   if (db) {
     db.close();
@@ -153,7 +153,7 @@ function closeDatabase (dbName) {
       }
     }
   }
-  delete openReqs[dbName];
+  delete openIndexedDBRequests[dbName];
   delete databaseCache[dbName];
   delete onCloseListeners[dbName];
 }

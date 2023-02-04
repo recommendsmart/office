@@ -8,11 +8,12 @@ use Drupal\eca_misc\Plugin\RouteInterface;
 use Drupal\eca_misc\Plugin\RouteTrait;
 
 /**
- * Plugin implementation of the ECA condition for entity type and bundle.
+ * Condition plugin for matching the name of the route.
  *
  * @EcaCondition(
  *   id = "eca_route_match",
- *   label = "Route match"
+ *   label = "Route match",
+ *   description = @Translation("Gets and compares the name of the route.")
  * )
  */
 class RouteMatch extends StringComparisonBase {
@@ -52,6 +53,7 @@ class RouteMatch extends StringComparisonBase {
     $form['route'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Route name'),
+      '#description' => $this->t('The routes and their parameters can be found in the <em>MODULE.routing.yml</em> file, e.g. the route name <em>entity.node.preview</em>.'),
       '#default_value' => $this->configuration['route'],
       '#weight' => -70,
     ];

@@ -16,6 +16,7 @@ use Drupal\eca\PluginManager\Event;
 use Drupal\eca\PluginManager\Modeller;
 use Drupal\eca\Service\DependencyCalculation;
 use Drupal\eca\Token\TokenInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Trait to provide all required services for ECA config entities.
@@ -112,6 +113,13 @@ trait EcaTrait {
    * @var \Drupal\Core\Form\FormBuilderInterface|null
    */
   protected ?FormBuilderInterface $formBuilder;
+
+  /**
+   * The request.
+   *
+   * @var \Symfony\Component\HttpFoundation\Request|null
+   */
+  protected ?Request $request;
 
   /**
    * Initializes the modeller plugin manager.
@@ -280,6 +288,18 @@ trait EcaTrait {
       $this->formBuilder = \Drupal::formBuilder();
     }
     return $this->formBuilder;
+  }
+
+  /**
+   * Initialize the request.
+   *
+   * @return \Symfony\Component\HttpFoundation\Request
+   */
+  protected function request(): Request {
+    if (!isset($this->request)) {
+      $this->request = \Drupal::request();
+    }
+    return $this->request;
   }
 
 }

@@ -1,0 +1,84 @@
+{#
+/**
+ * @file
+ * Default theme implementation for a cell of a Calendar View table.
+ *
+ * Available variables:
+ * - elements: Original variables passed to this template.
+ * - attributes: HTML attributes for the wrapper.
+ * - timestamp: The datetime value.
+ * - date: The formatted date value.
+ * - empty: Wether or not this day as content.
+ * - content: Custom content.
+ * - rows: A list of view rows including the following:
+ *   - content: The content as a render array.
+ *   - attributes: The date field name used to get this content.
+ *   - from: A timestamp.
+ *   - to: Another timestamp (empty for single value date field).
+ *   - item: The date field item. Useful to get date type.
+ *   - calendar_filter: The date field used to retrieve this content.
+ *
+ * @see template_preprocess_calendar_view_day()
+ *
+ * @ingroup themeable
+ */
+#}
+{%
+  set classes = [
+    'calendar-view-day',
+    empty ? 'empty',
+  ]
+%}
+
+<div{{ attributes.addClass(classes) }}>
+  {% set html_date = timestamp|format_date('html_date') %}
+
+  {% set day_title %}
+    {% trans %}
+      {{ count }} result for {{ html_date }}
+    {% plural count %}
+      {{ count }} results for {{ html_date }}
+    {% endtrans %}
+  {% endset %}
+
+	{# Calendar day #}
+	{% block day_number %}
+    <time class="calendar-view-day__number" datetime="{{ timestamp|date('Y-m-d\TH:i:s') }}" title="{{ day_title|trim }}">
+      {{ timestamp|date('d') }}
+    </time>
+	{% endblock %}
+
+  {% block day_content %}
+	  {# Simple list #}
+    {% if rows and not hours.display %}
+      <ul class="calendar-view-day__rows">
+        {% for timestamp,results in rows %}
+          {% for row in results %}
+            {% set row_classes = [ default_row_class ? 'views-row'] %}
+            <li{{ row.attributes.addClass(row_classes,'calendar-view-day__row') }}>
+              {{- row.content -}}
+            </li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {# Event by hour #}
+    {% if hours.display %}
+      <div class="calendar-view-day__allday">
+        {# @todo All day events #}
+      </div>
+
+      <ul class="calendar-view-day__hours">
+        {# Given datetime events #}
+        {% for h in range(hours.start, hours.end) %}
+          {% set time_now = timestamp + (3600 * h) %}
+          <li class="calendar-view-day__hour">
+            <time datetime="{{ time_now|date('Y-m-d\TH:i:s') }}">{{ '%02d:00'|format(h) }}</time>
+            <div>{{ rows[time_now] }}</div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endblock %}
+</div>

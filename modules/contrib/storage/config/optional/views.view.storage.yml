@@ -21,7 +21,7 @@ display:
       access:
         type: perm
         options:
-          perm: 'administer storage entities'
+          perm: 'access storage overview'
       cache:
         type: tag
         options: {  }

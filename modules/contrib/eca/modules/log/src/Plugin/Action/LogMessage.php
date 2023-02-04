@@ -12,7 +12,8 @@ use Drupal\eca\Plugin\Action\ConfigurableActionBase;
  *
  * @Action(
  *   id = "eca_write_log_message",
- *   label = @Translation("Log Message")
+ *   label = @Translation("Log Message"),
+ *   description = @Translation("Writes a log message into the given type with the given severity.")
  * )
  */
 class LogMessage extends ConfigurableActionBase {
@@ -57,13 +58,15 @@ class LogMessage extends ConfigurableActionBase {
     $form = parent::buildConfigurationForm($form, $form_state);
     $form['channel'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Channel'),
+      '#title' => $this->t('Type'),
       '#default_value' => $this->configuration['channel'],
+      '#description' => $this->t('The name of the logger type, the message should be logged to.'),
       '#weight' => -30,
     ];
     $form['severity'] = [
       '#type' => 'select',
       '#title' => $this->t('Severity'),
+      '#description' => $this->t('The severity of the log message.'),
       '#default_value' => $this->configuration['severity'],
       '#options' => RfcLogLevel::getLevels(),
       '#weight' => -20,
@@ -71,6 +74,7 @@ class LogMessage extends ConfigurableActionBase {
     $form['message'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Message'),
+      '#description' => $this->t('The message, which should be logged.'),
       '#default_value' => $this->configuration['message'],
       '#weight' => -10,
     ];

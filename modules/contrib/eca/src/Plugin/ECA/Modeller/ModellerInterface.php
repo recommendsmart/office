@@ -169,14 +169,6 @@ interface ModellerInterface extends PluginInspectionInterface {
   public function isEditable(): bool;
 
   /**
-   * Determines if the modeller supports exporting.
-   *
-   * @return bool
-   *   TRUE, if the modellers supports exporting, FALSE otherwise.
-   */
-  public function isExportable(): bool;
-
-  /**
    * Returns a render array with everything required for model editing.
    *
    * @return array

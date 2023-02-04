@@ -3,7 +3,7 @@
 namespace Drupal\eca_form\Plugin\Action;
 
 /**
- * Adds a text field to a form.
+ * Add a text field to a form.
  *
  * @Action(
  *   id = "eca_form_add_textfield",

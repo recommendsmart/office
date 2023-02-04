@@ -7,6 +7,7 @@ use Drupal\block_content\Event\BlockContentGetDependencyEvent;
 use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
 use Drupal\Core\Render\PageDisplayVariantSelectionEvent;
 use Drupal\Core\Render\RenderEvents;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\eca\Plugin\ECA\Event\EventBase;
 use Drupal\jsonapi\ResourceType\ResourceTypeBuildEvent;
 use Drupal\jsonapi\ResourceType\ResourceTypeBuildEvents;
@@ -36,6 +37,7 @@ class DrupalCoreEvent extends EventBase {
         'label' => 'Block content get dependency',
         'event_name' => BlockContentEvents::BLOCK_CONTENT_GET_DEPENDENCY,
         'event_class' => BlockContentGetDependencyEvent::class,
+        'description' => new TranslatableMarkup('Fires, when getting the dependency of a non-reusable block.'),
       ];
     }
     if (class_exists(FileUploadSanitizeNameEvent::class)) {
@@ -43,6 +45,7 @@ class DrupalCoreEvent extends EventBase {
         'label' => 'Sanitize file name',
         'event_name' => FileUploadSanitizeNameEvent::class,
         'event_class' => FileUploadSanitizeNameEvent::class,
+        'description' => new TranslatableMarkup('Fires during a file upload that lets subscribers sanitize the filename.'),
       ];
     }
     if (class_exists(RenderEvents::class)) {
@@ -50,6 +53,7 @@ class DrupalCoreEvent extends EventBase {
         'label' => 'Select page display mode',
         'event_name' => RenderEvents::SELECT_PAGE_DISPLAY_VARIANT,
         'event_class' => PageDisplayVariantSelectionEvent::class,
+        'description' => new TranslatableMarkup('Fires when selecting a page display variant to use.'),
       ];
     }
     if (class_exists(ResourceTypeBuildEvents::class)) {
@@ -57,6 +61,7 @@ class DrupalCoreEvent extends EventBase {
         'label' => 'Build resource type',
         'event_name' => ResourceTypeBuildEvents::BUILD,
         'event_class' => ResourceTypeBuildEvent::class,
+        'description' => new TranslatableMarkup('Fires during the resource type build process.'),
       ];
     }
     if (class_exists(LayoutBuilderEvents::class)) {
@@ -64,11 +69,13 @@ class DrupalCoreEvent extends EventBase {
         'label' => 'Prepare layout builder element',
         'event_name' => LayoutBuilderEvents::PREPARE_LAYOUT,
         'event_class' => PrepareLayoutEvent::class,
+        'description' => new TranslatableMarkup('Fires, when preparing a layout builder element.'),
       ];
       $actions['section_component_build_render_array'] = [
         'label' => 'Build render array',
         'event_name' => LayoutBuilderEvents::SECTION_COMPONENT_BUILD_RENDER_ARRAY,
         'event_class' => SectionComponentBuildRenderArrayEvent::class,
+        'description' => new TranslatableMarkup('Fires, when a render array of a component is built.'),
       ];
     }
     if (class_exists(LocaleEvents::class)) {
@@ -76,6 +83,7 @@ class DrupalCoreEvent extends EventBase {
         'label' => 'Save translated string',
         'event_name' => LocaleEvents::SAVE_TRANSLATION,
         'event_class' => LocaleEvent::class,
+        'description' => new TranslatableMarkup('Fires, when saving a translated string.'),
       ];
     }
     return $actions;

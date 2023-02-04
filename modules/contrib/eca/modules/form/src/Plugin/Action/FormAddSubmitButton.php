@@ -8,11 +8,12 @@ use Drupal\eca\Plugin\FormFieldPluginTrait;
 use Drupal\eca_form\HookHandler;
 
 /**
- * Adds a submit button to a form.
+ * Add a submit button to a form.
  *
  * @Action(
  *   id = "eca_form_add_submit_button",
  *   label = @Translation("Form: add submit button"),
+ *   description = @Translation("Add a submit button with a type and a label to a form."),
  *   type = "form"
  * )
  */
@@ -79,7 +80,7 @@ class FormAddSubmitButton extends FormActionBase {
     $form['name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Trigger name'),
-      '#description' => $this->t('The trigger name must be a machine name and is used for being identified on form submission. Example: <em>accept</em>, <em>send</em>. It can later be accessed via token <em>[current-form:triggered]</em>.'),
+      '#description' => $this->t('The trigger name must be a machine name and is used for being identified on form submission. Example: <em>accept</em>, <em>send</em>. It can later be accessed via token <em>[current_form:triggered]</em>.'),
       '#weight' => -10,
       '#default_value' => $this->configuration['name'],
       '#required' => TRUE,
@@ -87,6 +88,7 @@ class FormAddSubmitButton extends FormActionBase {
     $form['value'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Button label'),
+      '#description' => $this->t('The label of the button shown to the user.'),
       '#weight' => -9,
       '#default_value' => $this->configuration['value'],
       '#required' => TRUE,
@@ -101,6 +103,7 @@ class FormAddSubmitButton extends FormActionBase {
         'danger' => $this->t('Danger'),
       ],
       '#default_value' => $this->configuration['button_type'],
+      '#description' => $this->t('Here you can select the type of the button from the list.'),
       '#weight' => -8,
       '#required' => TRUE,
     ];

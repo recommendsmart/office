@@ -35,7 +35,7 @@ class PriceListEvent extends EventBase {
    * @return \Drupal\commerce_pricelist\Entity\PriceListInterface
    *   Gets the price list.
    */
-  public function getPriceList() {
+  public function getPriceList() : PriceListInterface {
     return $this->priceList;
   }
 

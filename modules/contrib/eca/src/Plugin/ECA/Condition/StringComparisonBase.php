@@ -178,6 +178,7 @@ abstract class StringComparisonBase extends ConditionBase {
     $form['operator'] = [
       '#type' => 'select',
       '#title' => $this->t('Comparison operator'),
+      '#description' => $this->t('The available comparison operators like <em>equals</em> or <em>less than</em>.'),
       '#default_value' => $this->getOperator(),
       '#options' => $this->getOptions('operator'),
       '#weight' => -80,

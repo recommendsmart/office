@@ -12,12 +12,12 @@ use Drupal\Core\Render\BubbleableMetadata;
  */
 function eca_form_token_info(): array {
   $info = [];
-  $info['types']['current-form'] = [
+  $info['types']['current_form'] = [
     'name' => t('Current form'),
     'description' => t('Tokens containing information about the current form. This is only available when reacting upon ECA Form events.'),
-    'needs-data' => 'current-form',
+    'needs-data' => 'current_form',
   ];
-  $info['tokens']['current-form'] = [
+  $info['tokens']['current_form'] = [
     'id' => [
       'name' => t('Form ID'),
       'description' => t('The form ID as machine name.'),
@@ -36,7 +36,7 @@ function eca_form_token_info(): array {
     ],
     'values' => [
       'name' => t('Submitted values'),
-      'description' => t('The form input values submitted by the user. For example, when the form has a "username" input, then its submission value may be accessed with [current-form:values:username]. If you need to compare agains raw values, use the condition "Form field: compare submitted value" instead.'),
+      'description' => t('The form input values submitted by the user. For example, when the form has a "username" input, then its submission value may be accessed with [current_form:values:username]. If you need to compare agains raw values, use the condition "Form field: compare submitted value" instead.'),
       'dynamic' => TRUE,
     ],
     'num-errors' => [
@@ -55,10 +55,10 @@ function eca_form_token_info(): array {
  * Implements hook_tokens().
  */
 function eca_form_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata): array {
-  if ($type === 'current-form' && !empty($data['current-form'])) {
+  if ($type === 'current_form' && !empty($data['current_form'])) {
     // The current form info is just a DTO, declare it as such and pass through.
-    $data['dto'] = $data['current-form'];
-    unset($data['current-form']);
+    $data['dto'] = $data['current_form'];
+    unset($data['current_form']);
     return eca_tokens('dto', $tokens, $data, $options, $bubbleable_metadata);
   }
   return [];

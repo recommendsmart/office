@@ -469,7 +469,6 @@ display:
           order: DESC
           expose:
             label: ''
-            field_identifier: ''
           exposed: false
       arguments:
         id:

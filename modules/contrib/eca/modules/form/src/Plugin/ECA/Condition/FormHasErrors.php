@@ -10,7 +10,8 @@ use Drupal\eca\Plugin\FormPluginTrait;
  *
  * @EcaCondition(
  *   id = "eca_form_has_errors",
- *   label = @Translation("Form: has any errors")
+ *   label = @Translation("Form: has any errors"),
+ *   description = @Translation("Checks whether the current form state has any errors.")
  * )
  */
 class FormHasErrors extends ConditionBase {

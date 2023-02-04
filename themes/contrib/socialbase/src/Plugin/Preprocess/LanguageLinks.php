@@ -4,7 +4,7 @@ namespace Drupal\socialbase\Plugin\Preprocess;
 
 use Drupal\bootstrap\Plugin\Preprocess\PreprocessBase;
 use Drupal\bootstrap\Utility\Variables;
-use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -58,7 +58,7 @@ class LanguageLinks extends PreprocessBase implements ContainerFactoryPluginInte
     $variables['attributes']['class'][] = 'dropdown-menu';
     $langcode = $this->languageManager->getCurrentLanguage()->getId();
     $language = $this->languageManager->getLanguage($langcode);
-    if ($langcode instanceof LanguageInterface) {
+    if ($language instanceof Language) {
       $variables['heading']['text'] = $language->getName();
     }
   }

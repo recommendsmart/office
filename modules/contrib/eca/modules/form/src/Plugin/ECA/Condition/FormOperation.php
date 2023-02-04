@@ -12,7 +12,8 @@ use Drupal\eca\Plugin\FormPluginTrait;
  *
  * @EcaCondition(
  *   id = "eca_form_operation",
- *   label = @Translation("Entity form: compare operation")
+ *   label = @Translation("Entity form: compare operation"),
+ *   description = @Translation("Evaluates against the machine name of the entity form operation.")
  * )
  */
 class FormOperation extends StringComparisonBase {

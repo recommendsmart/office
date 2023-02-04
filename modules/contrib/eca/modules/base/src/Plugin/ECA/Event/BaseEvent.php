@@ -72,7 +72,7 @@ class BaseEvent extends EventBase implements PluginUsageInterface {
         '#type' => 'textfield',
         '#title' => $this->t('Frequency'),
         '#default_value' => $this->configuration['frequency'],
-        '#description' => $this->t('The frequency of a cron job is defined by a cron spcific notation which is best explained at https://en.wikipedia.org/wiki/Cron.'),
+        '#description' => $this->t('The frequency of a cron job is defined by a cron spcific notation which is best explained at https://en.wikipedia.org/wiki/Cron. Note: date and time need to be provided in UTC timezone.'),
       ];
     }
     elseif ($this->eventClass() === CustomEvent::class) {

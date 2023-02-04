@@ -6,7 +6,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\eca\Plugin\DataType\DataTransferObject;
 
 /**
- * Adds a field with options to a form.
+ * Add a field with options to a form.
  *
  * @Action(
  *   id = "eca_form_add_optionsfield",
@@ -74,6 +74,7 @@ class FormAddOptionsfield extends FormAddFieldActionBase {
     $form['multiple'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Allow multiple values'),
+      '#description' => $this->t('Whether the user can select more than one value in the option field.'),
       '#default_value' => $this->configuration['multiple'],
       '#weight' => -45,
     ];

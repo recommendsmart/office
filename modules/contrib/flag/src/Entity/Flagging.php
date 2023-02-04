@@ -97,6 +97,13 @@ class Flagging extends ContentEntityBase implements FlaggingInterface {
   /**
    * {@inheritdoc}
    */
+  public function getCreatedTime() {
+    return $this->get('created')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getFlaggable() {
     $flaggable_type = $this->getFlaggableType();
     $flaggable_id = $this->getFlaggableId();

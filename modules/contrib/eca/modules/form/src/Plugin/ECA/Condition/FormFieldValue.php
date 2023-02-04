@@ -12,7 +12,8 @@ use Drupal\eca\Plugin\FormFieldPluginTrait;
  *
  * @EcaCondition(
  *   id = "eca_form_field_value",
- *   label = "Form field: compare submitted value"
+ *   label = @Translation("Form field: compare submitted value"),
+ *   description = @Translation("Compares a submitted form field value.")
  * )
  */
 class FormFieldValue extends StringComparisonBase {
@@ -145,7 +146,7 @@ class FormFieldValue extends StringComparisonBase {
     $form['field_value'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Field value'),
-      '#description' => $this->t('This field supports tokens.'),
+      '#description' => $this->t('The field value to compare. This field supports tokens.'),
       '#default_value' => $this->configuration['field_value'],
       '#weight' => -70,
     ];

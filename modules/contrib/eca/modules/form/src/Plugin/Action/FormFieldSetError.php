@@ -10,6 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
  * @Action(
  *   id = "eca_form_field_set_error",
  *   label = @Translation("Form field: set validation error"),
+ *   description = @Translation("Shows a validation error with a given message text."),
  *   type = "form"
  * )
  */

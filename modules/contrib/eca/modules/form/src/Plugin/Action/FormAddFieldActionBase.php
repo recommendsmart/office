@@ -106,6 +106,7 @@ abstract class FormAddFieldActionBase extends FormActionBase {
       $form['type'] = [
         '#type' => 'select',
         '#title' => $this->t('Field type'),
+        '#description' => $this->t('List of the available types of the field to be added.'),
         '#weight' => -100,
         '#options' => $type_options,
         '#default_value' => $this->configuration['type'],
@@ -115,7 +116,7 @@ abstract class FormAddFieldActionBase extends FormActionBase {
     $form['name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Field name'),
-      '#description' => $this->t('The field name is a machine name and is used for being identified on form submission. Example: <em>first_name</em>. It can later be accessed via token <em>[current-form:values:first_name]</em>.'),
+      '#description' => $this->t('The field name is a machine name and is used for being identified on form submission. Example: <em>first_name</em>. It can later be accessed via token <em>[current_form:values:first_name]</em>.'),
       '#weight' => -90,
       '#default_value' => $this->configuration['name'],
       '#required' => TRUE,
@@ -123,6 +124,7 @@ abstract class FormAddFieldActionBase extends FormActionBase {
     $form['title'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Field title'),
+      '#description' => $this->t('The title of the field to be added.'),
       '#weight' => -80,
       '#default_value' => $this->configuration['title'],
       '#required' => TRUE,
@@ -130,18 +132,21 @@ abstract class FormAddFieldActionBase extends FormActionBase {
     $form['description'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Field description'),
+      '#description' => $this->t('The description of the field to be added.'),
       '#weight' => -70,
       '#default_value' => $this->configuration['description'],
     ];
     $form['required'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Field is required'),
+      '#description' => $this->t('Whether the added field is required or not.'),
       '#default_value' => $this->configuration['required'],
       '#weight' => -60,
     ];
     $form['default_value'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Default value'),
+      '#description' => $this->t('The default value if the field is empty.'),
       '#weight' => -30,
       '#default_value' => $this->configuration['default_value'],
     ];

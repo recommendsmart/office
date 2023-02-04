@@ -598,7 +598,6 @@ display:
           order: ASC
           expose:
             label: ''
-            field_identifier: ''
           exposed: false
         id:
           id: id
@@ -613,7 +612,6 @@ display:
           order: DESC
           expose:
             label: ''
-            field_identifier: ''
           exposed: false
         quantity:
           id: quantity
@@ -628,7 +626,6 @@ display:
           order: ASC
           expose:
             label: ''
-            field_identifier: ''
           exposed: false
       arguments:
         product_id:

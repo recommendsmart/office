@@ -15,8 +15,6 @@ use Drupal\eca\Service\Modellers;
 use Drupal\eca_ui\Service\TokenBrowserService;
 use Mtownsend\XmlToArray\XmlToArray;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Abstract class for BPMN modellers.
@@ -88,6 +86,13 @@ abstract class ModellerBpmnBase extends ModellerBase {
     $this->doc = new \DOMDocument();
     $this->doc->loadXML($this->modeldata);
     $this->xpath = new \DOMXPath($this->doc);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function prepareForExport(): void {
+    $this->prepareForUpdate($this->eca->getModel()->getModeldata());
   }
 
   /**
@@ -299,27 +304,6 @@ abstract class ModellerBpmnBase extends ModellerBase {
       $this->messenger->addError($e->getMessage());
     }
     return NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isExportable(): bool {
-    return TRUE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function export(): ?Response {
-    $this->prepareForUpdate($this->eca->getModel()->getModeldata());
-    $filename = mb_strtolower($this->getPluginId()) . '-' . mb_strtolower($this->getId()) . '.tar.gz';
-    $tempFileName = 'temporary://' . $filename;
-    $this->modellerServices->exportArchive($this->eca, $tempFileName);
-    return new BinaryFileResponse($tempFileName, 200, [
-      'Content-Type' => 'application/octet-stream',
-      'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-    ]);
   }
 
   /**

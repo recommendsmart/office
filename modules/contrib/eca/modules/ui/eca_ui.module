@@ -103,13 +103,11 @@ function eca_ui_entity_operation(EntityInterface $entity): array {
         'weight' => 52,
       ];
     }
-    if ($entity->isExportable()) {
-      $operations['export'] = [
-        'title' => t('Export'),
-        'url' => Url::fromRoute('entity.eca.export', ['eca' => $entity->id()]),
-        'weight' => 52,
-      ];
-    }
+    $operations['export'] = [
+      'title' => t('Export'),
+      'url' => Url::fromRoute('entity.eca.export', ['eca' => $entity->id()]),
+      'weight' => 52,
+    ];
   }
   return $operations;
 }

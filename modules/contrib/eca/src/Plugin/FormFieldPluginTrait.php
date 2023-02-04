@@ -80,12 +80,14 @@ trait FormFieldPluginTrait {
       $form['strip_tags'] = [
         '#type' => 'checkbox',
         '#title' => $this->t('Strip tags'),
+        '#description' => $this->t('Whether stripping all <em>HTML</em> and <em>PHP</em> tags or not.'),
         '#default_value' => $this->configuration['strip_tags'],
         '#weight' => -10,
       ];
       $form['trim'] = [
         '#type' => 'checkbox',
         '#title' => $this->t('Trim'),
+        '#description' => $this->t('Whether stripping all whitespaces at the beginning and end or not.'),
         '#default_value' => $this->configuration['trim'],
         '#weight' => -9,
       ];

@@ -56,11 +56,13 @@ class LogEvent extends EventBase {
       $form['channel'] = [
         '#type' => 'textfield',
         '#title' => $this->t('Type'),
+        '#description' => $this->t('The name of the logger type.'),
         '#default_value' => $this->configuration['channel'],
       ];
       $form['min_severity'] = [
         '#type' => 'select',
         '#title' => $this->t('Minimum severity'),
+        '#description' => $this->t('The minimum severity. E.g. "critical" also covers "alert" and below.'),
         '#options' => RfcLogLevel::getLevels(),
         '#default_value' => $this->configuration['min_severity'],
       ];

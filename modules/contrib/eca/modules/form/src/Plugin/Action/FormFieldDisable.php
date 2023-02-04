@@ -8,6 +8,7 @@ namespace Drupal\eca_form\Plugin\Action;
  * @Action(
  *   id = "eca_form_field_disable",
  *   label = @Translation("Form field: set as disabled"),
+ *   description = @Translation("Disable a form field."),
  *   type = "form"
  * )
  */

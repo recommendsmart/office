@@ -11,11 +11,12 @@ use Drupal\eca_misc\Plugin\RouteInterface;
 use Drupal\eca_misc\Plugin\RouteTrait;
 
 /**
- * Load an entity into the token environment.
+ * Loads a route parameter into the token environment.
  *
  * @Action(
  *   id = "eca_token_load_route_param",
- *   label = @Translation("Token: load route parameter")
+ *   label = @Translation("Token: load route parameter"),
+ *   description = @Translation("Loads a route parameter into the token environment.")
  * )
  */
 class TokenLoadRouteParameter extends ConfigurableActionBase {
@@ -69,12 +70,14 @@ class TokenLoadRouteParameter extends ConfigurableActionBase {
     $form['parameter_name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Name of route parameter'),
+      '#description' => $this->t('The routes and their parameters can be found in the <em>MODULE.routing.yml</em> file. Example for the route <em>entity.node.preview</em>: <em>/node/preview/{node_preview}/{view_mode_id}</em> where <em>node_preview</em> and <em>view_mode_id</em> are the parameter names.'),
       '#default_value' => $this->configuration['parameter_name'],
       '#weight' => -20,
     ];
     $form['token_name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Name of token'),
+      '#description' => $this->t('The name of the token, the parameter value gets stored into.'),
       '#default_value' => $this->configuration['token_name'],
       '#weight' => -10,
     ];

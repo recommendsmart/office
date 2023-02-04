@@ -132,4 +132,15 @@ class WorkflowTransition extends ConfigurableActionBase {
     $this->moderationInformation = $moderation_information;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function calculateDependencies(): array {
+    return [
+      'config' => [
+        'workflows.workflow.' . $this->pluginDefinition['workflow_id'],
+      ],
+    ];
+  }
+
 }

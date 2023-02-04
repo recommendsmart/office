@@ -11,6 +11,8 @@ use Drupal\eca\Service\Actions;
 use Drupal\eca\Service\Conditions;
 use Drupal\eca\Service\Modellers;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Base class for ECA modeller plugins.
@@ -112,10 +114,25 @@ abstract class ModellerBase extends EcaPluginBase implements ModellerInterface {
   }
 
   /**
+   * Prepares a model for export.
+   *
+   * By default, this is doing nothing. But this can be overwritten by
+   * modeller implementations.
+   */
+  protected function prepareForExport(): void {}
+
+  /**
    * {@inheritdoc}
    */
-  public function isExportable(): bool {
-    return FALSE;
+  public function export(): ?Response {
+    $this->prepareForExport();
+    $filename = mb_strtolower($this->getPluginId()) . '-' . mb_strtolower($this->getEca()->id()) . '.tar.gz';
+    $tempFileName = 'temporary://' . $filename;
+    $this->modellerServices->exportArchive($this->eca, $tempFileName);
+    return new BinaryFileResponse($tempFileName, 200, [
+      'Content-Type' => 'application/octet-stream',
+      'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+    ]);
   }
 
   /**

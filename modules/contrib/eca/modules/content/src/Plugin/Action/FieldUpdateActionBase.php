@@ -17,6 +17,7 @@ use Drupal\eca\Plugin\Action\ActionBase;
 use Drupal\eca\Plugin\Action\ConfigurableActionTrait;
 use Drupal\eca\Plugin\DataType\DataTransferObject;
 use Drupal\eca\TypedData\PropertyPathTrait;
+use Drupal\eca_content\Plugin\EntitySaveTrait;
 use Drupal\field\FieldStorageConfigInterface;
 
 /**
@@ -31,6 +32,7 @@ use Drupal\field\FieldStorageConfigInterface;
 abstract class FieldUpdateActionBase extends ActionBase implements ConfigurableInterface, DependentPluginInterface, PluginFormInterface {
 
   use ConfigurableActionTrait;
+  use EntitySaveTrait;
   use PropertyPathTrait;
 
   /**
@@ -132,12 +134,14 @@ abstract class FieldUpdateActionBase extends ActionBase implements ConfigurableI
    */
   protected function save(FieldableEntityInterface $entity): void {
     if (empty($entity->eca_context) || !empty($this->configuration['save_entity'])) {
-      $entity->save();
+      $this->saveEntity($entity);
     }
   }
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function execute($entity = NULL) {
     if (!($entity instanceof FieldableEntityInterface)) {

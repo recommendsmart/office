@@ -1,0 +1,11 @@
+name: Calendar View (demo)
+description: Create example calendar Views.
+type: module
+core_version_requirement: ^8 || ^9 || ^10
+dependencies:
+  - calendar_view:calendar_view
+
+# Information added by Drupal.org packaging script on 2023-01-31
+version: '2.0.2'
+project: 'calendar_view'
+datestamp: 1675178751

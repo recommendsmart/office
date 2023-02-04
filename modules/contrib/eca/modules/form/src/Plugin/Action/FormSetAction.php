@@ -43,7 +43,7 @@ class FormSetAction extends FormActionBase {
     $form['action'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Action URL'),
-      '#description' => $this->t('This field supports tokens.'),
+      '#description' => $this->t('The URL of a form action like <em>www.example.com/search</em>. This field supports tokens.'),
       '#weight' => -10,
       '#default_value' => $this->configuration['action'],
       '#required' => TRUE,

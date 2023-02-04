@@ -4,6 +4,8 @@ namespace Drupal\eca_base\Event;
 
 use Cron\CronExpression;
 use Drupal\Component\EventDispatcher\Event;
+use Drupal\Core\Datetime\DateFormatterInterface;
+use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\eca\EcaState;
 use Drupal\eca\Event\ConditionalApplianceInterface;
 
@@ -26,13 +28,33 @@ class CronEvent extends Event implements ConditionalApplianceInterface {
   protected EcaState $state;
 
   /**
+   * The date formatter service.
+   *
+   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   */
+  protected DateFormatterInterface $dateFormatter;
+
+  /**
+   * The logger channel.
+   *
+   * @var \Drupal\Core\Logger\LoggerChannelInterface
+   */
+  protected LoggerChannelInterface $logger;
+
+  /**
    * Constructs a new CronEvent object.
    *
    * @param \Drupal\eca\EcaState $state
    *   The ECA state service.
+   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
+   *   The date formatter service.
+   * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
+   *   The logger channel.
    */
-  public function __construct(EcaState $state) {
+  public function __construct(EcaState $state, DateFormatterInterface $dateFormatter, LoggerChannelInterface $logger) {
     $this->state = $state;
+    $this->dateFormatter = $dateFormatter;
+    $this->logger = $logger;
   }
 
   /**
@@ -87,14 +109,24 @@ class CronEvent extends Event implements ConditionalApplianceInterface {
     // concurrent runs.
     $currentTime -= ($currentTime % 60);
     $lastRun -= ($lastRun % 60);
-
+    $nextRun = 0;
+    $due = FALSE;
     try {
-      return $currentTime >= $this->getNextRunTimestamp($lastRun, $frequency);
+      $nextRun = $this->getNextRunTimestamp($lastRun, $frequency);
+      $due = $currentTime >= $nextRun;
     }
     catch (\Exception $e) {
-      // @todo Log this exception.
+      $this->logger->error('Can not determine next run tim for cron: %msg', [
+        '%msg' => $e->getMessage(),
+      ]);
     }
-    return FALSE;
+    $this->logger->debug('Cron event assertion: now = %current - last = %last - next = %next - due %due', [
+      '%current' => $this->dateFormatter->format($currentTime),
+      '%last' => $this->dateFormatter->format($lastRun),
+      '%next' => $this->dateFormatter->format($nextRun),
+      '%due' => $due ? 'yes' : 'no',
+    ]);
+    return $due;
   }
 
   /**

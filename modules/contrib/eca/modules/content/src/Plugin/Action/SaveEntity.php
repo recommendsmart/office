@@ -7,6 +7,7 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\eca\Plugin\Action\ConfigurableActionBase;
+use Drupal\eca_content\Plugin\EntitySaveTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -20,6 +21,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * )
  */
 class SaveEntity extends ConfigurableActionBase {
+
+  use EntitySaveTrait;
 
   /**
    * The entity type manager.
@@ -58,12 +61,15 @@ class SaveEntity extends ConfigurableActionBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function execute($entity = NULL): void {
     if (!($entity instanceof ContentEntityInterface)) {
       return;
     }
-    $entity->save();
+
+    $this->saveEntity($entity);
   }
 
 }

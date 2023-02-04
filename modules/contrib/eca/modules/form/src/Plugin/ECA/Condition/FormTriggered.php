@@ -11,7 +11,8 @@ use Drupal\eca\Plugin\FormPluginTrait;
  *
  * @EcaCondition(
  *   id = "eca_form_triggered",
- *   label = @Translation("Form: compare triggered submission")
+ *   label = @Translation("Form: compare triggered submission"),
+ *   description = @Translation("Evaluates against the trigger name of the submission.")
  * )
  */
 class FormTriggered extends StringComparisonBase {

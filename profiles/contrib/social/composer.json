@@ -59,6 +59,7 @@
                 "Selecting the same day in a date between filter returns no results": "https://www.drupal.org/files/issues/2020-07-06/2842409-15.patch",
                 "Broken title in modal dialog when title is a render array": "https://www.drupal.org/files/issues/2019-10-21/2663316-76.drupal.Broken-title-in-modal-dialog-when-title-is-a-render-array.patch",
                 "Flood MemoryBackend::events[] key of micro time cannot guarantee uniqueness": "https://www.drupal.org/files/issues/2022-02-14/2910000-mr-1451-d93--floodmemorybackend-time-local.diff",
+                "Issue #1236098: Notice: Undefined index: 'base' in _color_rewrite_stylesheet()": "https://www.drupal.org/files/issues/undefined-index-in-_color_rewrite_stylesheet-1236098-37.patch",
                 "Issue #3251856: Incorrect typehint for FieldConfig::loadByName": "https://www.drupal.org/files/issues/2021-12-12/drupal9-incorrect_typehint-3251856-7.patch",
                 "Issue #2998390: Cache is not invalidated when comment deleted": "https://www.drupal.org/files/issues/2022-02-07/2998390-8.patch",
                 "Issue #3282073: Comment the \"user_post_update_update_roles\" that was added in Drupal 9.3": "https://www.drupal.org/files/issues/2022-05-24/social-comment_the_user_post_update_update_roles-3282073-2.patch",
@@ -76,8 +77,7 @@
                 "Remove dependency on jQuery UI Accordion for the accordion field group formatter": "https://www.drupal.org/files/issues/2021-10-16/3154304-2.patch"
             },
             "drupal/flag": {
-                "Add relationship to flagged entities when Flagging is base table": "https://www.drupal.org/files/issues/2021-11-08/2723703-76.patch",
-                "3248173: Symfony 4.4 event dispatcher parameter order change": "https://www.drupal.org/files/issues/2021-11-08/symfony-4-4-event-dispatcher-parameter-order-change-3248173-2.patch"
+                "Add relationship to flagged entities when Flagging is base table": "https://www.drupal.org/files/issues/2021-11-08/2723703-76.patch"
             },
             "drupal/graphql": {
                 "Issue #3191622: Remove leaked cache metadata check until Open Social properly avoids leaking cache metadata in entity query connections": "https://www.drupal.org/files/issues/2022-11-01/3191622-Implement-cache-metadata-for-ConnectionQueryHelperInterface-3.patch"
@@ -136,7 +136,7 @@
         "drupal/entity_reference_revisions": "1.10.0",
         "drupal/exif_orientation": "1.1",
         "drupal/field_group": "3.2.0",
-        "drupal/flag": "4.0.0-beta3",
+        "drupal/flag": "4.0.0-beta4",
         "drupal/gin": "3.0-beta3",
         "drupal/gin_toolbar": "1.0.0-rc1",
         "drupal/ginvite": "2.1.0",
@@ -145,7 +145,7 @@
         "drupal/group": "1.5.0",
         "drupal/image_effects": "3.4.0",
         "drupal/image_widget_crop": "2.4.0",
-        "drupal/jquery_ui_accordion": "1.1",
+        "drupal/jquery_ui_accordion": "2.0.0",
         "drupal/lazy": "3.11.0",
         "drupal/like_and_dislike": "1.0-beta2",
         "drupal/message": "1.4.0",

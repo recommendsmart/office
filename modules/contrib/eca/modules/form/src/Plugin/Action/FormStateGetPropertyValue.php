@@ -56,6 +56,7 @@ class FormStateGetPropertyValue extends FormStatePropertyActionBase {
       '#type' => 'textfield',
       '#title' => $this->t('Name of token'),
       '#default_value' => $this->configuration['token_name'],
+      '#description' => $this->t('The name of the token the property value should be stored into.'),
       '#required' => TRUE,
       '#weight' => -49,
     ];

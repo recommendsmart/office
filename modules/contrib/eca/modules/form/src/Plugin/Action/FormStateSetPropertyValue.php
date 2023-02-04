@@ -89,7 +89,7 @@ class FormStateSetPropertyValue extends FormStatePropertyActionBase {
     $form['property_value'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Value of the property'),
-      '#description' => $this->t('This field supports tokens.'),
+      '#description' => $this->t('The value of the property to be set. This field supports tokens.'),
       '#default_value' => $this->configuration['property_value'],
       '#weight' => -49,
     ];

@@ -57,6 +57,10 @@ Flood MemoryBackend::events[] key of micro time cannot guarantee uniqueness
 Source: https://www.drupal.org/files/issues/2022-02-14/2910000-mr-1451-d93--floodmemorybackend-time-local.diff
 
 
+Issue #1236098: Notice: Undefined index: 'base' in _color_rewrite_stylesheet()
+Source: https://www.drupal.org/files/issues/undefined-index-in-_color_rewrite_stylesheet-1236098-37.patch
+
+
 Issue #3251856: Incorrect typehint for FieldConfig::loadByName
 Source: https://www.drupal.org/files/issues/2021-12-12/drupal9-incorrect_typehint-3251856-7.patch
 

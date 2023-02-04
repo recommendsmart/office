@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\eca_base\Unit;
 
+use Drupal\Core\Datetime\DateFormatter;
+use Drupal\eca\ConfigurableLoggerChannel;
 use Drupal\eca\EcaState;
 use Drupal\eca_base\Event\CronEvent;
 use Drupal\Tests\UnitTestCase;
@@ -36,8 +38,10 @@ class CronEventTest extends UnitTestCase {
     $today_0100am = (new \DateTime($now->format('Y-m-d 01:00:01'), new \DateTimeZone('UTC')))->getTimestamp();
     $today_0200am = (new \DateTime($now->format('Y-m-d 02:00:01'), new \DateTimeZone('UTC')))->getTimestamp();
     $state_mock = $this->getStateMock($today_0100am, $today_0200am);
+    $date_formatter_mock = $this->createMock(DateFormatter::class);
+    $logger_mock = $this->createMock(ConfigurableLoggerChannel::class);
 
-    $event = new CronEvent($state_mock);
+    $event = new CronEvent($state_mock, $date_formatter_mock, $logger_mock);
     $nextTimestamp = $event->getNextRunTimestamp($lastTimestamp, $frequency);
     $this->assertEquals($expectedTimestamp, $nextTimestamp);
   }
@@ -96,22 +100,26 @@ class CronEventTest extends UnitTestCase {
     $today_0100am = (new \DateTime($now->format('Y-m-d 01:00:01'), new \DateTimeZone('UTC')))->getTimestamp();
     $today_0200am = (new \DateTime($now->format('Y-m-d 02:00:01'), new \DateTimeZone('UTC')))->getTimestamp();
     $state_mock = $this->getStateMock($today_0100am, $today_0200am);
+    $date_formatter_mock = $this->createMock(DateFormatter::class);
+    $logger_mock = $this->createMock(ConfigurableLoggerChannel::class);
 
-    $event = new CronEvent($state_mock);
+    $event = new CronEvent($state_mock, $date_formatter_mock, $logger_mock);
     $this->assertSame($return_today, $event->applies($this->randomMachineName(), ['frequency' => $frequency]), 'Today - ' . $message);
 
     // Last run set to today 23:59.
     $last_run = $today_0100am + 86400 - 3660;
     $tomorrow_0200am = $today_0200am + 86400;
     $state_mock = $this->getStateMock($last_run, $tomorrow_0200am);
-    $event = new CronEvent($state_mock);
+
+    $event = new CronEvent($state_mock, $date_formatter_mock, $logger_mock);
     $this->assertSame($return_tomorrow, $event->applies($this->randomMachineName(), ['frequency' => $frequency]), 'Tomorrow - ' . $message);
 
     // Last run set to tomorrow 23:59.
     $last_run = $today_0100am + (2 * 86400) - 3660;
     $tomorrow_0200am += 86400;
     $state_mock = $this->getStateMock($last_run, $tomorrow_0200am);
-    $event = new CronEvent($state_mock);
+
+    $event = new CronEvent($state_mock, $date_formatter_mock, $logger_mock);
     $this->assertSame($return_after_tomorrow, $event->applies($this->randomMachineName(), ['frequency' => $frequency]), 'After tomorrow - ' . $message);
   }
 

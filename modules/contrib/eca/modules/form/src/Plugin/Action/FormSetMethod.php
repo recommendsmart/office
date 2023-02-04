@@ -43,6 +43,7 @@ class FormSetMethod extends FormActionBase {
     $form['method'] = [
       '#type' => 'select',
       '#title' => $this->t('Method'),
+      '#description' => $this->t('The method of a form action <em>GET</em> or <em>POST</em>.'),
       '#options' => [
         'get' => 'GET',
         'post' => 'POST',

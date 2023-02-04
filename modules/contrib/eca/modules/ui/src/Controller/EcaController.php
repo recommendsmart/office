@@ -182,7 +182,7 @@ class EcaController extends ControllerBase {
    */
   public function export(string $eca): Response {
     /** @var \Drupal\eca\Entity\Eca $config */
-    if (($config = $this->storage->load($eca)) && $config->isExportable() && $modeller = $config->getModeller()) {
+    if (($config = $this->storage->load($eca)) && $modeller = $config->getModeller()) {
       $response = $modeller->export();
       if ($response) {
         return $response;

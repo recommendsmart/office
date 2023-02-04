@@ -281,10 +281,13 @@ class Modellers {
     $dependencies = [
       'config' => [
         'eca.eca.' . $eca->id(),
-        'eca.model.' . $eca->id(),
       ],
       'module' => [],
     ];
+    $comesWithEcaModel = $this->exportStorage->read('eca.model.' . $eca->id());
+    if ($comesWithEcaModel) {
+      $dependencies['config'][] = 'eca.model.' . $eca->id();
+    }
     $this->getNestedDependencies($dependencies, $eca->getDependencies());
     if (file_exists($archiveFileName)) {
       try {
@@ -300,9 +303,12 @@ class Modellers {
     }
     $archiver->addString('dependencies.yml', Yaml::encode($dependencies));
 
-    // Remove the first 2 items from the config dependencies.
+    // Remove "'eca.eca.ID" from the config dependencies.
     array_shift($dependencies['config']);
-    array_shift($dependencies['config']);
+    if ($comesWithEcaModel) {
+      // Also remove "'eca.model.ID" from the config dependencies.
+      array_shift($dependencies['config']);
+    }
     foreach ($dependencies as $type => $values) {
       if (empty($values)) {
         unset($dependencies[$type]);

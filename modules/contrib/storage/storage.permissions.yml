@@ -6,6 +6,9 @@ administer storage entities:
   description: 'Create, edit and delete all storage entities.'
   restrict access: true
 
+access storage overview:
+  title: 'Access the overview page of Storage entities'
+
 delete storage entities:
   title: 'Delete any Storage entity'
   restrict access: true

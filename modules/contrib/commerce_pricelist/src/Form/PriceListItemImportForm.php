@@ -388,6 +388,7 @@ class PriceListItemImportForm extends FormBase {
       $price_list_item = NULL;
       if (!$delete_existing) {
         $result = $price_list_item_storage->getQuery()
+          ->accessCheck(FALSE)
           ->condition('type', $price_list->bundle())
           ->condition('price_list_id', $price_list->id())
           ->condition('purchasable_entity', $purchasable_entity->id())

@@ -542,7 +542,7 @@ function _color_rewrite_stylesheet($theme, &$info, &$paths, $palette, $style) {
         $chunk = $conversion[$key];
       }
       // Not a pre-set color. Extrapolate from the base.
-      else {
+      elseif (isset($palette[$base])) {
         $chunk = _color_shift($palette[$base], $default[$base], $chunk, $info['blend_target']);
       }
     }

@@ -21,6 +21,7 @@ trait RouteTrait {
   protected function getRouteMatch(): RouteMatchInterface {
     /** @var \Drupal\Core\Routing\CurrentRouteMatch $currentRouteMatch */
     $currentRouteMatch = \Drupal::service('current_route_match');
+    //TODO Consider using the match function provided by PHP 8
     switch ($this->configuration['request']) {
       case RouteInterface::ROUTE_MAIN:
         return $currentRouteMatch->getMasterRouteMatch();
@@ -48,6 +49,7 @@ trait RouteTrait {
     $form['request'] = [
       '#type' => 'select',
       '#title' => $this->t('Request'),
+      '#description' => $this->t('The request route match.'),
       '#default_value' => $this->configuration['request'],
       '#options' => [
         RouteInterface::ROUTE_CURRENT => $this->t('current'),

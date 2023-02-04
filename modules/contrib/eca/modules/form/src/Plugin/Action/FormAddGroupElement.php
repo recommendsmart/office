@@ -10,12 +10,12 @@ use Drupal\eca\Plugin\FormFieldPluginTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Adds a grouping element to a form.
+ * Add a grouping element to a form.
  *
  * @Action(
  *   id = "eca_form_add_group_element",
  *   label = @Translation("Form: add grouping element"),
- *   description = @Translation("Adds a collapsible details element (also known as fieldset) for grouping form fields."),
+ *   description = @Translation("Add a collapsible details element (also known as fieldset) for grouping form fields."),
  *   type = "form"
  * )
  */
@@ -155,6 +155,7 @@ class FormAddGroupElement extends FormActionBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Open'),
       '#default_value' => $this->configuration['open'],
+      '#description' => $this->t('Whether the group should be open to edit or collapsed when displayed.'),
       '#weight' => -8,
     ];
     $form['weight'] = [
@@ -175,12 +176,14 @@ class FormAddGroupElement extends FormActionBase {
     $form['introduction_text'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Introduction text'),
+      '#description' => $this->t('Here you can set an introduction text of the group.'),
       '#weight' => -5,
       '#default_value' => $this->configuration['introduction_text'],
     ];
     $form['summary_value'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Summary value'),
+      '#description' => $this->t('Here you can set the summary text of the group.'),
       '#weight' => -4,
       '#default_value' => $this->configuration['summary_value'],
     ];

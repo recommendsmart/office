@@ -3,8 +3,10 @@
 namespace Drupal\access_records\Form;
 
 use Drupal\access_records\Entity\AccessRecord;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\language\Entity\ContentLanguageSettings;
@@ -23,13 +25,23 @@ class AccessRecordTypeForm extends BundleEntityFormBase {
   protected $entityFieldManager;
 
   /**
+   * The entity type bundle info service.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   */
+  protected EntityTypeBundleInfoInterface $bundleInfo;
+
+  /**
    * Constructs the AccessRecordTypeForm object.
    *
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info
+   *   The entity type bundle info.
    */
-  public function __construct(EntityFieldManagerInterface $entity_field_manager) {
+  public function __construct(EntityFieldManagerInterface $entity_field_manager, EntityTypeBundleInfoInterface $bundle_info) {
     $this->entityFieldManager = $entity_field_manager;
+    $this->bundleInfo = $bundle_info;
   }
 
   /**
@@ -37,7 +49,8 @@ class AccessRecordTypeForm extends BundleEntityFormBase {
    */
   public static function create(ContainerInterface $container) {
     $instance = new static(
-      $container->get('entity_field.manager')
+      $container->get('entity_field.manager'),
+      $container->get('entity_type.bundle.info')
     );
     $instance->setEntityTypeManager($container->get('entity_type.manager'));
     return $instance;
@@ -48,6 +61,10 @@ class AccessRecordTypeForm extends BundleEntityFormBase {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
+
+    $ajax_wrapper_id = Html::getUniqueId('form-ajax-wrapper');
+    $form['#prefix'] = '<div id="' . $ajax_wrapper_id . '">' . ($form['#prefix'] ?? '');
+    $form['#suffix'] = ($form['#suffix'] ?? '') . '</div>';
 
     /** @var \Drupal\access_records\AccessRecordTypeInterface $access_record_type */
     $access_record_type = $this->entity;
@@ -106,6 +123,14 @@ class AccessRecordTypeForm extends BundleEntityFormBase {
       '#disabled' => $has_data,
       '#size' => 1,
       '#options' => $target_type_options,
+      '#ajax' => [
+        'callback' => [$this, 'ajax'],
+        'wrapper' => $ajax_wrapper_id,
+        'method' => 'html',
+      ],
+      '#executes_submit_callback' => TRUE,
+      '#submit' => [[static::class, 'ajaxSubmit']],
+      '#limit_validation_errors' => [],
     ];
 
     $form['operations'] = [
@@ -116,6 +141,39 @@ class AccessRecordTypeForm extends BundleEntityFormBase {
       '#default_value' => $access_record_type->getOperations(),
       '#disabled' => $has_data,
     ];
+
+    if (NULL !== $access_record_type->getTargetTypeId()) {
+      $form['field_access'] = [
+        '#type' => 'details',
+        '#open' => $access_record_type->getFieldAccessEnabled(),
+        '#title' => $this->t('Field access'),
+      ];
+      $form['field_access']['field_access_enabled'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Enable field access'),
+        '#default_value' => $access_record_type->getFieldAccessEnabled(),
+        '#weight' => 10,
+      ];
+      $form['field_access']['help'] = [
+        '#type' => 'markup',
+        '#markup' => $this->t('<p>When enabled, access records of this type will additionally be involved for checking access on @target_type fields. This works the following way:<ul><li>When a matching access record grants access to a @target_type item, then the selected fields below are allowed to be accessed.</li><li>Not selected fields below will never be allowed by this type of access record.</li><li>When this feature is enabled, and no other type of access record exists, that grants access to a certain field, that field will never be allowed.</li></ul></p>', [
+          '@target_type' => $access_record_type->getTargetType()->getLabel(),
+        ]),
+        '#weight' => 20,
+      ];
+      $form['field_access']['field_access_fields_allowed'] = [
+        '#type' => 'checkboxes',
+        '#title' => $this->t('Allowed fields'),
+        '#options' => $this->getAllowedFieldOptions(),
+        '#default_value' => array_combine($access_record_type->getFieldAccessFieldsAllowed(), $access_record_type->getFieldAccessFieldsAllowed()),
+        '#weight' => 30,
+        '#states' => [
+          'disabled' => [
+            ':input[name="field_access_enabled"]' => ['checked' => FALSE],
+          ],
+        ],
+      ];
+    }
 
     $form['label_pattern'] = [
       '#title' => $this->t('Label pattern'),
@@ -210,6 +268,18 @@ class AccessRecordTypeForm extends BundleEntityFormBase {
     $access_record_type->set('operations', array_values(array_filter($form_state->getValue('operations'))));
     $access_record_type->set('status', (bool) $form_state->getValue(['options', 'status']));
     $access_record_type->set('new_revision', (bool) $form_state->getValue(['options', 'new_revision']));
+
+    $access_record_type->set('field_access_enabled', (bool) $form_state->getValue('field_access_enabled', $access_record_type->getFieldAccessEnabled()));
+    if ($form_state->hasValue('field_access_fields_allowed')) {
+      $field_access_fields_allowed = [];
+      foreach ($form_state->getValue('field_access_fields_allowed') as $k => $v) {
+        if ($k === $v) {
+          $field_access_fields_allowed[] = $k;
+        }
+      }
+      $access_record_type->set('field_access_fields_allowed', array_unique($field_access_fields_allowed));
+    }
+
     $status = $access_record_type->save();
 
     $t_args = ['%name' => $access_record_type->label()];
@@ -281,9 +351,7 @@ class AccessRecordTypeForm extends BundleEntityFormBase {
     }
 
     // Add some default fields.
-    if ($status == SAVED_NEW) {
-      $access_record_type->addDefaultFields();
-    }
+    $access_record_type->addDefaultFields();
 
     $this->entityFieldManager->clearCachedFieldDefinitions();
 
@@ -294,7 +362,7 @@ class AccessRecordTypeForm extends BundleEntityFormBase {
    * Prepares workflow options to be used in the 'checkboxes' form element.
    *
    * @return array
-   *   Array of options ready to be used in #options.
+   *   Array of options, ready to be used in #options.
    */
   protected function getWorkflowOptions() {
     /** @var \Drupal\access_records\AccessRecordTypeInterface $access_record_type */
@@ -306,6 +374,59 @@ class AccessRecordTypeForm extends BundleEntityFormBase {
     // Prepare workflow options to be used for 'checkboxes' form element.
     $keys = array_keys(array_filter($workflow_options));
     return array_combine($keys, $keys);
+  }
+
+  /**
+   * Get allowed field options.
+   *
+   * @return array
+   *   Array of options, ready to be used in #options.
+   */
+  protected function getAllowedFieldOptions(): array {
+    $options = [];
+    /** @var \Drupal\access_records\AccessRecordTypeInterface $ar_type */
+    $ar_type = $this->entity;
+    $target_type_id = $ar_type->getTargetTypeId();
+
+    if (isset($target_type_id)) {
+      foreach ($this->entityFieldManager->getFieldStorageDefinitions($target_type_id) as $field_storage_definition) {
+        $options[$field_storage_definition->getName()] = $field_storage_definition->getLabel() . ' (<em>' . $this->t('Machine name: @name', ['@name' => $field_storage_definition->getName()]) . '</em>)';
+      }
+      foreach (array_keys($this->bundleInfo->getBundleInfo($target_type_id)) as $bundle) {
+        foreach ($this->entityFieldManager->getFieldDefinitions($target_type_id, $bundle) as $field_definition) {
+          $options[$field_definition->getName()] = $field_definition->getLabel() . ' (<em>' . $this->t('Machine name: @name', ['@name' => $field_definition->getName()]) . '</em>)';
+        }
+      }
+    }
+
+    return $options;
+  }
+
+  /**
+   * Referesh the form with Ajax.
+   *
+   * @param array $form
+   *   The form array.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   *
+   * @return array
+   *   The form build.
+   */
+  public function ajax(array $form, FormStateInterface $form_state): array {
+    return $form;
+  }
+
+  /**
+   * Ajax submit handler that sets the form to rebuild.
+   *
+   * @param array $form
+   *   The form array.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   */
+  public static function ajaxSubmit(array $form, FormStateInterface $form_state): void {
+    $form_state->setRebuild();
   }
 
 }

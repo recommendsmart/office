@@ -1,0 +1,62 @@
+datatables_core:
+  version: 1.12.1
+  js:
+    //cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js: { type: external, minified: true }
+    //cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js: { type: external, minified: true }
+  css:
+    component:
+      //cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css: { type: external, minified: true }
+  dependencies:
+    - core/jquery
+
+datatables:
+  version: 1.x
+  js:
+    js/datatables.js: {}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupal
+    - core/drupalSettings
+
+bootstrapTable:
+  version: 1.21.0
+  js:
+    //unpkg.com/tableexport.jquery.plugin/tableExport.min.js: { type: external, minified: true, crossorigin: anonymous }
+    //unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.js: {type: external, minified: true }
+    //cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.21.0/extensions/mobile/bootstrap-table-mobile.min.js: {type: external, minified: true }
+    //cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.21.0/extensions/export/bootstrap-table-export.min.js: {type: external, minified: true }
+    //cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.21.0/extensions/copy-rows/bootstrap-table-copy-rows.min.js: {type: external, minified: true }
+    //cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.21.0/extensions/print/bootstrap-table-print.min.js: {type: external, minified: true }
+    js/bootstrap-tables.js: { }
+  css:
+    component:
+      //unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.css: { type: external, minified: true }
+
+googleCharts:
+  js:
+    //www.gstatic.com/charts/loader.js: { type: external }
+    js/googlecharts.js: {}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupal
+    - core/drupalSettings
+
+paste-clipboard:
+  js:
+    js/paste-clipboard.js: {}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupal
+    - core/drupalSettings
+
+paragraphsTable:
+  js:
+    js/paragraphsTable.js: {}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupal
+    - core/drupalSettings

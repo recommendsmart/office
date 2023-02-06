@@ -1,0 +1,71 @@
+paragraphs_item.ajax:
+  path: '/paragraphs_item/ajax/{field_name}/{host_type}/{host_id}'
+  defaults:
+    _controller: '\Drupal\paragraphs_table\Controller\AjaxController::ajax'
+  methods:  [GET]
+  requirements:
+    _permission: 'access content'
+paragraphs_item.json:
+  path: '/paragraphs_item/json/{field_name}/{host_type}/{host_id}'
+  defaults:
+    _controller: '\Drupal\paragraphs_table\Controller\AjaxController::json'
+  methods:  [GET]
+  requirements:
+    _permission: 'access content'
+paragraphs_item.jsonData:
+  path: '/paragraphs_item/jsondata/{field_name}/{host_type}/{host_id}'
+  defaults:
+    _controller: '\Drupal\paragraphs_table\Controller\AjaxController::jsondata'
+  methods:  [GET]
+  requirements:
+    _permission: 'access content'
+
+entity.paragraphs_item.canonical:
+  path: '/paragraphs_item/{paragraph}'
+  defaults:
+    _controller: '\Drupal\paragraphs_table\Controller\ParagraphsItemController::page'
+    _title_callback: '\Drupal\paragraphs_table\Controller\ParagraphsItemController::pageTitle'
+  requirements:
+    _permission: 'access content'
+  options:
+    parameters:
+      paragraph:
+        type: 'entity:paragraph'
+
+paragraphs_item.add_page:
+  path: '/paragraphs_item/add/{paragraph_type}/{entity_type}/{entity_field}/{entity_id}'
+  defaults:
+    _title_callback: '\Drupal\paragraphs_table\Controller\ParagraphsItemController::addPageTitle'
+    _controller: '\Drupal\paragraphs_table\Controller\ParagraphsItemController::add'
+    operation: 'create'
+  requirements:
+    _permission: 'access content'
+  options:
+    parameters:
+      paragraph_type:
+        type: entity:paragraphs_type
+
+entity.paragraphs_item.edit_form:
+  path: '/paragraphs_item/{paragraph}/edit'
+  defaults:
+    _entity_form: 'paragraph.entity_edit'
+  requirements:
+    _entity_access: 'paragraph.update'
+  options:
+    _admin_route: TRUE
+
+entity.paragraphs_item.delete_form:
+  path: '/paragraphs_item/{paragraph}/delete'
+  defaults:
+    _entity_form: 'paragraph.entity_delete'
+  requirements:
+    _entity_access: 'paragraph.delete'
+  options:
+    _admin_route: TRUE
+
+entity.paragraphs_item.clone_form:
+  path: '/paragraphs_item/clone/{paragraph}'
+  defaults:
+    _entity_form: 'paragraph.entity_clone'
+  requirements:
+    _entity_access: 'paragraph.update'

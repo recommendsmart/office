@@ -32,3 +32,12 @@ access_records.type.*:
       sequence:
         type: string
         label: 'Allowed operation'
+    field_access_enabled:
+      type: boolean
+      label: 'Field access enabled'
+    field_access_fields_allowed:
+      type: sequence
+      label: 'List of allowed fields to access'
+      sequence:
+        type: string
+        label: 'Field machine name'

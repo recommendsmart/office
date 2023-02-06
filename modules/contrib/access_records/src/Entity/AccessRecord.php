@@ -576,6 +576,7 @@ class AccessRecord extends EditorialContentEntityBase implements AccessRecordInt
    */
   public static function availableOperations(): array {
     $available = [
+      'create' => t('Create'),
       'view' => t('View'),
       'update' => t('Update'),
       'delete' => t('Delete'),

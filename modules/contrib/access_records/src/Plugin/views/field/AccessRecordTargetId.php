@@ -87,6 +87,10 @@ class AccessRecordTargetId extends FieldPluginBase {
     $queries = [];
     /** @var \Drupal\access_records\AccessRecordTypeInterface $ar_type */
     foreach ($type_storage->loadMultiple() as $ar_type) {
+      if (!$ar_type->status()) {
+        continue;
+      }
+
       if ($query = $this->accessRecordQueryBuilder->selectByType($ar_type, NULL, 'view', $query_options)) {
         $queries[$ar_type->id()] = $query;
       }

@@ -28,7 +28,7 @@ use Drupal\user\UserInterface;
  *     "form" = {
  *       "add" = "Drupal\access_records\Form\AccessRecordTypeForm",
  *       "edit" = "Drupal\access_records\Form\AccessRecordTypeForm",
- *       "delete" = "Drupal\Core\Entity\EntityDeleteForm",
+ *       "delete" = "Drupal\access_records\Form\AccessRecordTypeDeleteConfirm",
  *     },
  *     "list_builder" = "Drupal\access_records\AccessRecordTypeListBuilder",
  *     "route_provider" = {
@@ -60,7 +60,9 @@ use Drupal\user\UserInterface;
  *     "label_pattern",
  *     "subject_type",
  *     "target_type",
- *     "operations"
+ *     "operations",
+ *     "field_access_enabled",
+ *     "field_access_fields_allowed"
  *   }
  * )
  */
@@ -128,6 +130,22 @@ class AccessRecordType extends ConfigEntityBundleBase implements AccessRecordTyp
    * @var string[]
    */
   protected array $operations = [];
+
+  /**
+   * Whether field access is enabled.
+   *
+   * @var bool
+   */
+  protected bool $field_access_enabled = FALSE;
+
+  /**
+   * List of allowed fields to access.
+   *
+   * This is only relevant when field access is enabled (field_access_enabled).
+   *
+   * @var string[]
+   */
+  protected array $field_access_fields_allowed = [];
 
   /**
    * {@inheritdoc}
@@ -371,11 +389,14 @@ class AccessRecordType extends ConfigEntityBundleBase implements AccessRecordTyp
    * @param bool $quick_check
    *   (optional) By default, a quick check is performed to see whether it
    *   makes sense to even look for access record types.
+   * @param bool $field_access_check
+   *   (optional) When performing a field access check, then this flag needs to
+   *   be set to TRUE.
    *
    * @return \Drupal\access_records\AccessRecordTypeInterface[]
    *   The access record types. Can be empty.
    */
-  public static function loadForAccessCheck(EntityInterface $subject, string $target_type_id, string $operation, ?RefinableCacheableDependencyInterface $metadata = NULL, bool $quick_check = TRUE): array {
+  public static function loadForAccessCheck(EntityInterface $subject, string $target_type_id, string $operation, ?RefinableCacheableDependencyInterface $metadata = NULL, bool $quick_check = TRUE, bool $field_access_check = FALSE): array {
     $subject_type_id = $subject->getEntityTypeId();
 
     if (!isset($metadata)) {
@@ -401,13 +422,20 @@ class AccessRecordType extends ConfigEntityBundleBase implements AccessRecordTyp
     $ar_type_storage = $etm->getStorage('access_record_type');
     $metadata->addCacheTags(['config:access_record_type_list']);
 
-    $ar_type_ids = $ar_type_storage
+    $ar_type_query = $ar_type_storage
       ->getQuery()
       ->accessCheck(FALSE)
       ->condition('status', TRUE)
       ->condition('subject_type', $subject_type_id)
       ->condition('target_type', $target_type_id)
-      ->condition('operations.*', $operation)
+      ->condition('operations.*', $operation);
+
+    if ($field_access_check) {
+      $ar_type_query
+        ->condition('field_access_enabled', TRUE);
+    }
+
+    $ar_type_ids = $ar_type_query
       ->execute();
 
     if (empty($ar_type_ids)) {
@@ -433,7 +461,66 @@ class AccessRecordType extends ConfigEntityBundleBase implements AccessRecordTyp
       $metadata->mergeCacheMaxAge(0);
     }
 
-    return $ar_type_storage->loadMultiple($ar_type_ids);
+    $ar_types = $ar_type_storage->loadMultiple($ar_type_ids);
+    foreach ($ar_types as $ar_type) {
+      $metadata->addCacheableDependency($ar_type);
+    }
+
+    return $ar_types;
+  }
+
+  /**
+   * Returns all record types that should be accounted for a field access check.
+   *
+   * Additionally adds cacheability metadata to the given metadata object.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $subject
+   *   The subject, which is mostly a user entity.
+   * @param string $target_type_id
+   *   The entity type ID of the target.
+   * @param string $operation
+   *   The requested entity operation.
+   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface|null $metadata
+   *   (optional) The object that holds collected cacheability metadata.
+   * @param bool $quick_check
+   *   (optional) By default, a quick check is performed to see whether it
+   *   makes sense to even look for access record types.
+   *
+   * @return \Drupal\access_records\AccessRecordTypeInterface[]
+   *   The access record types. Can be empty.
+   */
+  public static function loadForFieldAccessCheck(EntityInterface $subject, string $target_type_id, string $operation, ?RefinableCacheableDependencyInterface $metadata = NULL, bool $quick_check = TRUE): array {
+    return static::loadForAccessCheck($subject, $target_type_id, $operation, $metadata, $quick_check, TRUE);
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getFieldAccessEnabled(): bool {
+    return $this->field_access_enabled;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function setFieldAccessEnabled(bool $enabled = TRUE): AccessRecordTypeInterface {
+    $this->field_access_enabled = $enabled;
+    return $this;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getFieldAccessFieldsAllowed(): array {
+    return $this->field_access_fields_allowed;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function setFieldAccessFieldsAllowed(array $field_names): AccessRecordTypeInterface {
+    $this->field_access_fields_allowed = array_values($field_names);
+    return $this;
   }
 
 }

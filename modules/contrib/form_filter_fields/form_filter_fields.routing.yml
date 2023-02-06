@@ -7,7 +7,7 @@ form_filter_fields.settings:
     _permission: "administer site configuration"
 
 form_filter_fields.delete:
-  path: '/admin/config/content/form_filter_fields/delete/{data_type}/{content_type_machine_name}/{control_field}/{target_field}'
+  path: '/admin/config/content/form_filter_fields/delete/{dataType}/{contentTypeMachineName}/{controlField}/{targetField}'
   defaults:
     _form: '\Drupal\form_filter_fields\Form\FormFilterFieldsDelete'
     _title: 'Delete form filter field dependency'

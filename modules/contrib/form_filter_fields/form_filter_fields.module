@@ -1,206 +1,228 @@
 <?php
 
+/**
+ * @file
+ * Form Filter Fields hooks.
+ */
+
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Views;
 use Drupal\Component\Utility\Html;
 
-// -------------------------------------------------------------------
+/**
+ * Form alter hook.
+ */
+function form_filter_fields_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // I don't think this will ever be false but you never know with Drupal.
+  if (isset($form["#form_id"])) {
+    // Get the configuration for this module.
+    $config = \Drupal::service("config.factory")->getEditable("form_filter_fields.settings");
+    $all_form_filter_field_dependencies = $config->get("form_filter_fields_settings");
 
-function form_filter_fields_form_alter(&$form, FormStateInterface $form_state, $form_id)
-{
-	// i don't think this will ever be false but you never know with Drupal
-	if (isset($form["#form_id"])) {
-		// get the configuration for this module
-		$config = \Drupal::service("config.factory")->getEditable("form_filter_fields.settings");
-		$all_form_filter_field_dependencies = $config->get("form_filter_fields_settings");
+    // Do we have any config?
+    if (!empty($all_form_filter_field_dependencies)) {
+      if ((preg_match("/^node_.*_form$/", $form_id)) && isset($all_form_filter_field_dependencies["content"])) {
+        // *************************************
+        // It's a node add/edit form.
+        // *************************************
+        // Check to see if it's the right class.
+        if (get_class($form_state->getFormObject()) == "Drupal\\node\NodeForm") {
 
-		// do we have any config?
-		if (!empty($all_form_filter_field_dependencies)) {
-			if ((preg_match("/^node_.*_form$/", $form_id)) && isset($all_form_filter_field_dependencies["content"])) {
-				// *************************************
-				// it's a node add/edit form
-				// *************************************
+          // Get what content type we are modifying.
+          $entity = $form_state->getFormObject()->getEntity();
+          $current_content_type_modifying = $entity->bundle();
 
-				// if we're not bulk deleting nodes
-				if (get_class($form_state->getFormObject()) != "Drupal\node\Form\DeleteMultiple") {
+          // Call the helper function that does all the work.
+          _form_filter_fields_work($form, $form_state, $all_form_filter_field_dependencies, "content", $current_content_type_modifying);
+        }
 
-					// get what content type we are modifying
-					$entity = $form_state->getFormObject()->getEntity();
-					$current_content_type_modifying = $entity->bundle();
+      }
+      elseif ((preg_match("/^media_.*_form$/", $form_id)) && isset($all_form_filter_field_dependencies["media"])) {
+        // *************************************
+        // It's a media add/edit form.
+        // *************************************
+        // Check to see if it's the right class.
+        if (get_class($form_state->getFormObject()) == "Drupal\media\MediaForm") {
+          // Get what media type we are modifying.
+          $entity = $form_state->getFormObject()->getEntity();
+          $current_media_type_modifying = $entity->bundle();
 
-					// call the helper function that does all the work
-					_form_filter_fields_work($form, $form_state, $all_form_filter_field_dependencies, "content", $current_content_type_modifying);
-				}
-
-			}
-			else if ((preg_match("/^media_.*_form$/", $form_id)) && isset($all_form_filter_field_dependencies["media"])) {
-				// *************************************
-				// it's a media add/edit form
-				// *************************************
-
-				// check to see if it's the right class
-				if (get_class($form_state->getFormObject()) == "Drupal\media\MediaForm") {
-					// get what media type we are modifying
-					$entity = $form_state->getFormObject()->getEntity();
-					$current_media_type_modifying = $entity->bundle();
-
-					// call the helper function that does all the work
-					_form_filter_fields_work($form, $form_state, $all_form_filter_field_dependencies, "media", $current_media_type_modifying);
-				}
-			}
-		}
-	}
+          // Call the helper function that does all the work.
+          _form_filter_fields_work($form, $form_state, $all_form_filter_field_dependencies, "media", $current_media_type_modifying);
+        }
+      }
+    }
+  }
 }
 
-// -------------------------------------------------------------------
+/**
+ * Inline Entity Form Alter hook.
+ */
+function form_filter_fields_inline_entity_form_entity_form_alter(&$form, &$form_state) {
+  // This is a hook in the Inline Entity Form module which affects the modal
+  // window to add a new node/media this should always be for NEW and not
+  // existing content.
+  if (isset($form["#id"])) {
+    $config = \Drupal::service("config.factory")->getEditable("form_filter_fields.settings");
+    $all_form_filter_field_dependencies = $config->get("form_filter_fields_settings");
 
-// this is a hook in the Inline Entity Form module which affects the modal window to add a new node/media
-// this should always be for NEW and not existing content
-function form_filter_fields_inline_entity_form_entity_form_alter(&$form, &$form_state)
-{
-	if (isset($form["#id"])) {
-		$config = \Drupal::service("config.factory")->getEditable("form_filter_fields.settings");
-		$all_form_filter_field_dependencies = $config->get("form_filter_fields_settings");
-
-		// do we have any config?
-		if (!empty($all_form_filter_field_dependencies)) {
-			if (isset($form["#entity_type"]) && isset($form["#bundle"]) && ($form["#entity_type"] == "node")) {
-				_form_filter_fields_work($form, $form_state, $all_form_filter_field_dependencies, "content", $form["#bundle"]);
-			}
-			else if (isset($form["#entity_type"]) && isset($form["#bundle"]) && ($form["#entity_type"] == "media")) {
-				_form_filter_fields_work($form, $form_state, $all_form_filter_field_dependencies, "media", $form["#bundle"]);
-			}
-		}
-	}
+    // Do we have any config?
+    if (!empty($all_form_filter_field_dependencies)) {
+      if (isset($form["#entity_type"]) && isset($form["#bundle"]) && ($form["#entity_type"] == "node")) {
+        _form_filter_fields_work($form, $form_state, $all_form_filter_field_dependencies, "content", $form["#bundle"]);
+      }
+      elseif (isset($form["#entity_type"]) && isset($form["#bundle"]) && ($form["#entity_type"] == "media")) {
+        _form_filter_fields_work($form, $form_state, $all_form_filter_field_dependencies, "media", $form["#bundle"]);
+      }
+    }
+  }
 }
 
-// -------------------------------------------------------------------
-
-// all this function does is return the form; the actual work is done in form_filter_fields_form_alter
+/**
+ * All this function does is return the form.
+ */
 function _form_filter_fields_callback(&$form, FormStateInterface $form_state) {
-	// call our cool hook just in case the people want to alter the form even further!
-	\Drupal::moduleHandler()->invokeAll("form_filter_fields_callback_alter", array(&$form, &$form_state));
+  // Call our hook just in case the people want to alter the form further!
+  \Drupal::moduleHandler()->invokeAll(
+    "form_filter_fields_callback_alter",
+    [&$form, &$form_state]
+  );
 
-	// just return the form
-	return $form;
+  // Just return the form.
+  return $form;
 }
 
-// -------------------------------------------------------------------
-
-// this function does the heavy lifting and populates and returns the form
+/**
+ * This function does the heavy lifting and populates and returns the form.
+ */
 function _form_filter_fields_populate_form(&$form, $control_field_config, $control_field_value) {
-	// loop through all the control field configuration
-	foreach ($control_field_config as $target_field => $view_id) {
-		$target_field_options = array();
+  // Loop through all the control field configuration.
+  foreach ($control_field_config as $target_field => $view_id) {
+    $target_field_options = [];
 
-		// if it's a select, we want to add a none option
-		if ($form[$target_field]["widget"]["#type"] == "select") {
-			$target_field_options = array("_none" => "- None -");
-		}
+    // If it's a select, we want to add a none option.
+    if ($form[$target_field]["widget"]["#type"] == "select") {
+      $target_field_options = ["_none" => "- None -"];
+    }
 
-		// call the function that gets all the options for the targeted field(s)
-		$target_field_options = $target_field_options + _form_filter_fields_get_target_field_options($view_id, array($control_field_value));
+    // Call the function that gets all the options for the targeted field(s)
+    $target_field_options = $target_field_options + _form_filter_fields_get_target_field_options(
+      $view_id,
+      [$control_field_value]
+    );
 
-		// if it's a radio button an error could be thrown on edits so we want to unset the default value
-		if ($form[$target_field]["widget"]["#type"] == "radios") {
-			if (isset($form[$target_field]["widget"]["#default_value"]) && !is_array($form[$target_field]["widget"]["#default_value"])) {
-				if (!array_key_exists($form[$target_field]["widget"]["#default_value"], $target_field_options)) {
-					unset($form[$target_field]["widget"]["#default_value"]);
-				}
-			}
-		}
+    // If it's a radio button an error could be thrown on edits so we want to
+    // unset the default value.
+    if ($form[$target_field]["widget"]["#type"] == "radios") {
+      if (isset($form[$target_field]["widget"]["#default_value"]) && !is_array($form[$target_field]["widget"]["#default_value"])) {
+        if (!array_key_exists($form[$target_field]["widget"]["#default_value"], $target_field_options)) {
+          unset($form[$target_field]["widget"]["#default_value"]);
+        }
+      }
+    }
 
-		// now finally assign it to its rightful element
-		$form[$target_field]["widget"]["#options"] = $target_field_options;
-	}
+    // Now finally assign it to its rightful element.
+    $form[$target_field]["widget"]["#options"] = $target_field_options;
+  }
 
-	return $form;
+  return $form;
 }
 
-// -------------------------------------------------------------------
+/**
+ * Outputs an array of options for the target field.
+ */
+function _form_filter_fields_get_target_field_options($view_info_string, array $contextual_filter) {
+  // @todo Is there a way to make this better?
+  // Can we use a different view type to just return an array?
+  // Get the view name and display id from the string.
+  $view_id_pieces = explode(":", $view_info_string);
+  $view_name_id = $view_id_pieces[0];
+  $view_display_id = $view_id_pieces[1];
 
-// takes a string of what view to use (in format view_id:view_display_id) and a contextual filter array
-// outputs an array of options for the target field
-function _form_filter_fields_get_target_field_options($view_info_string, array $contextual_filter)
-{
-	// TODO: is there a way to make this better? can we use a different view type to just return an array?
+  // Load the view we need.
+  $view = Views::getView($view_name_id);
 
-	// get the view name and display id from the string
-	$view_id_pieces = explode(":", $view_info_string);
-	$view_name_id = $view_id_pieces[0];
-	$view_display_id = $view_id_pieces[1];
+  // Render the view & do stuff to just get the array values.
+  $render_array = $view->buildRenderable($view_display_id, $contextual_filter);
+  $rendered = \Drupal::service("renderer")->renderRoot($render_array);
+  $straight_html = trim(strip_tags($rendered->jsonSerialize(), "<li>"));
+  $target_field_rough_html_pieces = explode("<li>", $straight_html);
 
-	// load the view we need
-	$view = Views::getView($view_name_id);
+  // What we will be returning.
+  $target_field_items = [];
 
-	// render the view & do stuff to just get the array values
-	$render_array = $view->buildRenderable($view_display_id, $contextual_filter);
-	$rendered = \Drupal::service("renderer")->renderRoot($render_array);
-	$straight_html = trim(strip_tags($rendered->jsonSerialize(), "<li>"));
-	$target_field_rough_html_pieces = explode("<li>", $straight_html);
+  // Loop through the html items we got to clean it up.
+  foreach ($target_field_rough_html_pieces as $rough_html) {
+    $rough_html = trim(strip_tags($rough_html));
 
-	// what we will be returning
-	$target_field_items = array();
+    if (!empty($rough_html)) {
+      // Now finally get the key values.
+      $rough_html_pieces = explode("|", $rough_html);
+      $target_field_items[$rough_html_pieces[0]] = Html::decodeEntities(
+        strip_tags($rough_html_pieces[1])
+      );
+    }
+  }
 
-	// loop through the html items we got to clean it up
-	foreach ($target_field_rough_html_pieces as $rough_html) {
-		$rough_html = trim(strip_tags($rough_html));
-
-		if (!empty($rough_html)) {
-			// now finally get the key values
-			$rough_html_pieces = explode("|", $rough_html);
-			$target_field_items[$rough_html_pieces[0]] = Html::decodeEntities(strip_tags($rough_html_pieces[1]));
-		}
-	}
-
-	return $target_field_items;
+  return $target_field_items;
 }
 
-// -------------------------------------------------------------------
+/**
+ * Does the actual work of filtering the fields.
+ */
+function _form_filter_fields_work(&$form, &$form_state, $all_form_filter_field_dependencies, $entity_type, $entity_bundle) {
+  // Check to make sure we have information for this content type.
+  if (isset($all_form_filter_field_dependencies[$entity_type][$entity_bundle])) {
 
-// does the actual work of filtering the fields
-function _form_filter_fields_work(&$form, &$form_state, $all_form_filter_field_dependencies, $entity_type, $entity_bundle)
-{
-	// check to make sure we have information for this content type
-	if (isset($all_form_filter_field_dependencies[$entity_type][$entity_bundle])) {
+    // Put the whole form around a div that we will use in the ajax to return
+    // the entire form.
+    $form["#prefix"] = "<div id=\"form_filter_fields_container\">";
+    $form["#suffix"] = "</div>";
 
-		// put the whole form around a div that we will use in the ajax to return the entire form
-		$form["#prefix"] = "<div id=\"form_filter_fields_container\">";
-		$form["#suffix"] = "</div>";
+    // Call our hook just in case the people want to alter the form before
+    // it's processed to sort out stuff futher.
+    \Drupal::moduleHandler()->invokeAll(
+      "form_filter_fields_load",
+      [&$form, &$form_state]
+    );
 
-		// call our hook just in case the people want to alter the form before it's processed to sort out stuff futher
-		\Drupal::moduleHandler()->invokeAll("form_filter_fields_load", array(&$form, &$form_state));
+    // Now loop through all the depend fields of that content type.
+    foreach ($all_form_filter_field_dependencies[$entity_type][$entity_bundle] as $control_field => $target_fields) {
 
-		// now loop through all the depend fields of that content type
-		foreach ($all_form_filter_field_dependencies[$entity_type][$entity_bundle] as $control_field => $target_fields) {
+      // Add an ajax command for each control field.
+      if (isset($form[$control_field])) {
+        $form[$control_field]["widget"]["#ajax"] = [
+          "callback" => "_form_filter_fields_callback",
+          "event" => "change",
+          "wrapper" => "form_filter_fields_container",
+        ];
 
-			// add an ajax command for each control field
-			if (isset($form[$control_field])) {
-				$form[$control_field]["widget"]["#ajax"] = array(
-					"callback" => "_form_filter_fields_callback",
-					"event" => "change",
-					"wrapper" => "form_filter_fields_container"
-				);
+        // If it's previously set then we need to filter out the values.
+        $state_values = $form_state->getValues();
+        if (!empty($state_values[$control_field][0]['target_id'])) {
+          // Call the function that does all the work.
+          $form = _form_filter_fields_populate_form(
+            $form,
+            $all_form_filter_field_dependencies[$entity_type][$entity_bundle][$control_field],
+            $state_values[$control_field][0]['target_id']
+          );
+        }
+      }
+    }
 
-				// if it's previously set then we need to filter out the values
-				if (!empty($form[$control_field]["widget"]["#default_value"][0])) {
-					// call the function that does all the work
-					$form = _form_filter_fields_populate_form($form, $all_form_filter_field_dependencies[$entity_type][$entity_bundle][$control_field], $form[$control_field]["widget"]["#default_value"][0]);
-				}
-			}
-		}
+    // Get the field that was just triggered, if one was triggered.
+    $element = $form_state->getTriggeringElement();
 
-		// get the field that was just triggered, if one was triggered
-		$element = $form_state->getTriggeringElement();
+    if (!empty($element) && isset($element["#field_name"])) {
+      // control_field is the field that was just changed.
+      $control_field = $element["#field_name"];
+      $control_field_value = $element["#value"];
 
-		if (!empty($element) && isset($element["#field_name"])) {
-			// control_field is the field that was just changed
-			$control_field = $element["#field_name"];
-			$control_field_value = $element["#value"];
-
-			$form = _form_filter_fields_populate_form($form, $all_form_filter_field_dependencies[$entity_type][$entity_bundle][$control_field], $control_field_value);
-		}
-	}
+      $form = _form_filter_fields_populate_form(
+        $form,
+        $all_form_filter_field_dependencies[$entity_type][$entity_bundle][$control_field],
+        $control_field_value
+      );
+    }
+  }
 }
-
-// -------------------------------------------------------------------

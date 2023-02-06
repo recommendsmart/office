@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * @file
+ * Access Records install file.
+ */
+
+/**
+ * Update existing access record types with extended configuration schema.
+ *
+ * Export your configuration after applying this update.
+ */
+function access_records_update_8001() {
+  /** @var \Drupal\access_records\AccessRecordTypeInterface $ar_type */
+  foreach (\Drupal::entityTypeManager()->getStorage('access_record_type')->loadMultiple() as $ar_type) {
+    $ar_type->setFieldAccessEnabled(FALSE);
+    $ar_type->setFieldAccessFieldsAllowed([]);
+    $ar_type->trustData()->save();
+  }
+}

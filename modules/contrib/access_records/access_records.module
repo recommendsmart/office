@@ -5,14 +5,11 @@
  * The Access Records module file.
  */
 
-use Drupal\access_records\Entity\AccessRecordType;
-use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\access_records\Access\AccessRecordsControlCenter;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
-use Drupal\Core\Entity\TranslatableInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
@@ -113,6 +110,8 @@ function access_records_entity_type_build(array &$entity_types) {
   }
 
   if ($module_handler->moduleExists('entity')) {
+    assert(class_exists('Drupal\entity\QueryAccess\QueryAccessEvent'));
+
     // Use contrib Entity API's enhanced handler for views data.
     $entity_type->setHandlerClass('views_data', 'Drupal\entity\EntityViewsData');
     // Also use contrib Entity API's query access handler.
@@ -127,75 +126,19 @@ function access_records_entity_type_build(array &$entity_types) {
  * Implements hook_entity_access().
  */
 function access_records_entity_access(EntityInterface $entity, $operation, AccountInterface $account) {
-  $etm = \Drupal::entityTypeManager();
-  // Target entity types are content entities only, and matching access records
-  // can only be done on persisted targets.
-  if (!($entity instanceof ContentEntityInterface) || $entity->isNew()) {
-    return AccessResult::neutral();
-  }
+  return AccessRecordsControlCenter::get()->checkEntityAccess($entity, $operation, $account);
+}
 
-  $target = $entity;
-  $target_type = $target->getEntityType();
-  $cacheability = new CacheableMetadata();
+/**
+ * Implements hook_entity_create_access().
+ */
+function access_records_entity_create_access(AccountInterface $account, array $context, $entity_bundle) {
+  return AccessRecordsControlCenter::get()->checkEntityCreateAccess($account, $context, $entity_bundle);
+}
 
-  /** @var \Drupal\user\UserInterface $subject */
-  if (!($subject = $etm->getStorage('user')->load($account->id()))) {
-    // When the subject has no stored entity, one is created on runtime here,
-    // and then lookup whether an access record type exists for the target type.
-    // If so, always revoke access, because matching records may only be valid
-    // for existing user entities.
-    $subject = $etm->getStorage('user')->create([
-      'uid' => $account->id(),
-      'status' => 0,
-      'name' => '',
-    ]);
-    return AccessRecordType::loadForAccessCheck($subject, $target_type->id(), $operation, $cacheability, FALSE) ? AccessResult::forbidden()->addCacheableDependency($cacheability) : AccessResult::neutral()->addCacheableDependency($cacheability);
-  }
-
-  // Either no configured access record type exists for this type of entity,
-  // or the user is an admin and thus has access anyway.
-  if (AccessRecordType::loadForAccessCheck($subject, $target_type->id(), $operation, $cacheability)) {
-    // As we are now aware of existing access record types that belong to this
-    // type of entity, we build up an entity query, which in turn includes the
-    // access check included by the Query Access API.
-    // @todo Wish I could do this without switching the account, though Query
-    // Access doesn't care about given account metadata. Sorry!
-    $count = 0;
-    $account_switched = FALSE;
-    if ((string) \Drupal::currentUser()->id() !== (string) $subject->id()) {
-      /** @var \Drupal\Core\Session\AccountSwitcherInterface $account_switcher */
-      $account_switcher = \Drupal::service('account_switcher');
-      $account_switcher->switchTo($subject);
-      $account_switched = TRUE;
-    }
-    try {
-      $query = $etm->getStorage($target_type->id())->getQuery()
-        ->addMetaData('op', $operation)
-        ->accessCheck(TRUE)
-        ->condition($target_type->getKey('id'), $target->id());
-      if ($target instanceof TranslatableInterface) {
-        $query->condition($target_type->getKey('langcode'), $target->language()->getId());
-      }
-      if ($query instanceof RevisionableInterface) {
-        $query->allRevisions();
-        $query->condition($target_type->getKey('revision'), $target->getRevisionId());
-      }
-      $count = $query->count()
-        ->accessCheck(TRUE)
-        ->execute();
-    }
-    finally {
-      if ($account_switched) {
-        $account_switcher->switchBack();
-        $account_switched = FALSE;
-      }
-    }
-
-    if ($count > 0) {
-      return AccessResult::allowed()->addCacheableDependency($cacheability);
-    }
-    return AccessResult::forbidden()->addCacheableDependency($cacheability);
-  }
-
-  return AccessResult::neutral()->addCacheableDependency($cacheability);
+/**
+* Implements hook_entity_field_access().
+*/
+function access_records_entity_field_access($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
+  return AccessRecordsControlCenter::get()->checkEntityFieldAccess($operation, $field_definition, $account, $items);
 }

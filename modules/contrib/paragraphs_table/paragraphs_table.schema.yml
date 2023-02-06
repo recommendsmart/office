@@ -1,0 +1,50 @@
+field.widget.settings.paragraphs_field_widget:
+  type: mapping
+  label: 'Paragraphs field widget widget settings'
+  mapping:
+    size:
+      type: integer
+      label: 'Size'
+    placeholder:
+      type: textfield
+      label: 'Placeholder'
+field.widget.settings.paragraphs_table_field_widget:
+  type: mapping
+  label: 'Paragraphs table field widget widget settings'
+  mapping:
+    size:
+      type: integer
+      label: 'Size'
+    placeholder:
+      type: textfield
+      label: 'Placeholder'
+field.widget.settings.paragraph_table_widget:
+  type: mapping
+  label: 'Paragraph table widget widget settings'
+  mapping:
+    size:
+      type: integer
+      label: 'Size'
+    placeholder:
+      type: textfield
+      label: 'Placeholder'
+field.widget.settings.paragraph_table_widget:
+  type: mapping
+  label: 'Paragraph table widget widget settings'
+  mapping:
+    size:
+      type: integer
+      label: 'Size'
+    placeholder:
+      type: textfield
+      label: 'Placeholder'
+field.widget.settings.paragraphs_table_widget:
+  type: mapping
+  label: 'Paragraphs table widget widget settings'
+  mapping:
+    size:
+      type: integer
+      label: 'Size'
+    placeholder:
+      type: textfield
+      label: 'Placeholder'

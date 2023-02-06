@@ -56,6 +56,79 @@ class AccessRecordsTest extends KernelTestBase {
   }
 
   /**
+   * Tests create access using access records.
+   */
+  public function testCreateAccess() {
+    /** @var \Drupal\Core\Session\AccountSwitcherInterface $account_switcher */
+    $account_switcher = \Drupal::service('account_switcher');
+
+    /** @var \Drupal\node\NodeAccessControlHandler $access_control_handler */
+    $access_control_handler = \Drupal::entityTypeManager()->getHandler('node', 'access');
+
+    $published_node = Node::create([
+      'type' => 'article',
+      'title' => 'Published node',
+      'langcode' => 'en',
+      'uid' => 2,
+      'status' => 1,
+    ]);
+    $published_node->save();
+
+    $this->assertFalse($published_node->access('view'));
+
+    $account_switcher->switchTo(User::load(2));
+    $this->assertFalse($access_control_handler->createAccess('article', NULL, ['entity_type_id' => 'node']));
+    $this->assertTrue($published_node->access('view'));
+
+    $account_switcher->switchBack();
+
+    $ar_type = AccessRecordType::create([
+      'langcode' => 'en',
+      'status' => TRUE,
+      'id' => 'node_access',
+      'label_pattern' => '[access_record:string_representation]',
+      'subject_type' => 'user',
+      'target_type' => 'node',
+      'operations' => ['create', 'view'],
+    ]);
+    $ar_type->save();
+    $ar_type->addDefaultFields();
+    \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
+
+    // Reset the runtime cache of node access to take effect.
+    $access_control_handler->resetCache();
+
+    $account_switcher->switchTo(User::load(2));
+    $this->assertFalse($access_control_handler->createAccess('article', NULL, ['entity_type_id' => 'node']));
+    $this->assertFalse($published_node->access('view'), "Access record type for node exists, access must be revoked in general when no access records exist.");
+    $account_switcher->switchBack();
+
+    $ar1 = AccessRecord::create([
+      'ar_type' => 'node_access',
+      'ar_enabled' => 1,
+      'ar_uid' => 1,
+      'target_type' => ['article'],
+      'subject_roles' => [AccountInterface::AUTHENTICATED_ROLE],
+    ]);
+    $ar1->save();
+
+    // Reset the runtime cache of node access to take effect.
+    $access_control_handler->resetCache();
+
+    $account_switcher->switchTo(User::load(2));
+    $this->assertTrue($access_control_handler->createAccess('article', NULL, ['entity_type_id' => 'node']), "Create access must be granted by access record.");
+    $this->assertTrue($published_node->access('view'), "View access must be granted by access record.");
+    $this->assertFalse($published_node->access('update'));
+    $this->assertFalse($published_node->access('delete'));
+    $account_switcher->switchBack();
+
+    $this->assertFalse($access_control_handler->createAccess('article', NULL, ['entity_type_id' => 'node']), "Create access must not be granted by access record.");
+    $this->assertFalse($published_node->access('view'));
+    $this->assertFalse($published_node->access('update'));
+    $this->assertFalse($published_node->access('delete'));
+  }
+
+  /**
    * Tests view access using access records.
    */
   public function testViewAccess() {
@@ -589,6 +662,79 @@ class AccessRecordsTest extends KernelTestBase {
     $this->assertFalse($unpublished_node->access('view'));
     $this->assertFalse($unpublished_node->access('update'));
     $this->assertFalse($unpublished_node->access('delete'));
+  }
+
+  /**
+   * Tests field access using access records.
+   */
+  public function testFieldAccess() {
+    /** @var \Drupal\Core\Session\AccountSwitcherInterface $account_switcher */
+    $account_switcher = \Drupal::service('account_switcher');
+
+    /** @var \Drupal\node\NodeAccessControlHandler $access_control_handler */
+    $access_control_handler = \Drupal::entityTypeManager()->getHandler('node', 'access');
+
+    $published_node = Node::create([
+      'type' => 'article',
+      'title' => 'Published node',
+      'langcode' => 'en',
+      'uid' => 2,
+      'status' => 1,
+    ]);
+    $published_node->save();
+
+    $this->assertFalse($published_node->access('view'));
+
+    $ar_type = AccessRecordType::create([
+      'langcode' => 'en',
+      'status' => TRUE,
+      'id' => 'node_access',
+      'label_pattern' => '[access_record:string_representation]',
+      'subject_type' => 'user',
+      'target_type' => 'node',
+      'operations' => ['create', 'view'],
+      'field_access_enabled' => TRUE,
+      'field_access_fields_allowed' => ['title'],
+    ]);
+    $ar_type->save();
+    $ar_type->addDefaultFields();
+    \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
+
+    // Reset the runtime cache of node access to take effect.
+    $access_control_handler->resetCache();
+
+    $account_switcher->switchTo(User::load(2));
+    $this->assertFalse($access_control_handler->createAccess('article', NULL, ['entity_type_id' => 'node']));
+    $this->assertFalse($published_node->access('view'), "Access record type for node exists, access must be revoked in general when no access records exist.");
+    $account_switcher->switchBack();
+
+    $ar1 = AccessRecord::create([
+      'ar_type' => 'node_access',
+      'ar_enabled' => 1,
+      'ar_uid' => 1,
+      'target_type' => ['article'],
+      'subject_roles' => [AccountInterface::AUTHENTICATED_ROLE],
+    ]);
+    $ar1->save();
+
+    // Reset the runtime cache of node access to take effect.
+    $access_control_handler->resetCache();
+
+    $account_switcher->switchTo(User::load(2));
+    $this->assertTrue($access_control_handler->createAccess('article', NULL, ['entity_type_id' => 'node']), "Create access must be granted by access record.");
+    $this->assertTrue($published_node->access('view'), "View access must be granted by access record.");
+    $this->assertFalse($published_node->access('update'));
+    $this->assertFalse($published_node->access('delete'));
+    $this->assertTrue($access_control_handler->fieldAccess('view', $published_node->get('title')->getFieldDefinition(), NULL, $published_node->get('title')));
+    $this->assertFalse($access_control_handler->fieldAccess('view', $published_node->get('status')->getFieldDefinition(), NULL, $published_node->get('status')));
+    $account_switcher->switchBack();
+
+    $this->assertFalse($access_control_handler->createAccess('article', NULL, ['entity_type_id' => 'node']), "Create access must not be granted by access record.");
+    $this->assertFalse($published_node->access('view'));
+    $this->assertFalse($published_node->access('update'));
+    $this->assertFalse($published_node->access('delete'));
+    $this->assertFalse($access_control_handler->fieldAccess('view', $published_node->get('title')->getFieldDefinition(), NULL, $published_node->get('title')));
+    $this->assertFalse($access_control_handler->fieldAccess('view', $published_node->get('status')->getFieldDefinition(), NULL, $published_node->get('status')));
   }
 
 }

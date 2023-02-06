@@ -1,0 +1,62 @@
+#field formatter settings for each field
+field.formatter.settings.paragraphs_table_formatter:
+  type: mapping
+  label: 'Paragraphs table field formatter settings.'
+  mapping:
+    view_mode:
+      type: string
+      label: 'View Mode'
+    vertical:
+      type: boolean
+      label: 'Table vertical'
+    caption:
+      type: string
+      label: 'Caption'
+    mode:
+      type: string
+      label: 'Table mode'
+    chart_type:
+      type: string
+      label: 'Chart type'
+    chart_width:
+      type: integer
+      label: 'Chart width'
+    chart_height:
+      type: integer
+      label: 'Chart height'
+    import:
+      type: string
+      label: 'Import'
+    empty_cell_value:
+      type: boolean
+      label: 'Fill blank cells in table'
+    empty:
+      type: boolean
+      label: 'Hide empty columns'
+    ajax:
+      type: boolean
+      label: 'Load table with ajax'
+    custom_class:
+      type: string
+      label: 'Set table class'
+    hide_line_operations:
+      type: boolean
+      label: 'Hide line operations'
+
+field.widget.settings.paragraphs_table_widget:
+  type: field.widget.settings.paragraphs
+  mapping:
+    vertical:
+      type: boolean
+      label: 'Table vertical'
+    paste_clipboard:
+      type: boolean
+      label: 'Paste from clipboard'
+    show_all:
+      type: boolean
+      label: 'Show all'
+    features:
+      type: sequence
+      label: 'Features'
+      sequence:
+        type: string

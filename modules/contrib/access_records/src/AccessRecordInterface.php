@@ -10,7 +10,7 @@ use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\user\UserInterface;
 
 /**
- * Interface for a access record entity.
+ * Interface for an access record entity.
  */
 interface AccessRecordInterface extends ContentEntityInterface, EntityOwnerInterface, EntityChangedInterface, RevisionLogInterface, EntityPublishedInterface {
 

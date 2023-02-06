@@ -4,7 +4,9 @@ namespace Drupal\access_records;
 
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Entity\Query\Sql\Query;
 use Drupal\Core\Session\AccountInterface;
 
@@ -61,7 +63,7 @@ class AccessRecordQueryBuilder {
    *
    * Important: This query object skips access checks regards data-sets that are
    * being joined together. If you use this query outside the scope of an
-   * access check, for example for print out the IDs to a user, you need to
+   * access check, for example for printing out the IDs to a user, you need to
    * take care on your own that the according user is only seeing what is
    * allowed to be seen.
    *
@@ -87,7 +89,7 @@ class AccessRecordQueryBuilder {
    *   The select query as object, or NULL when the type configuration is
    *   incomplete or invalid.
    */
-  public function selectByType(AccessRecordTypeInterface $ar_type, ?int $subject_id = NULL, string $operation = 'view', array $options = []) : ?SelectInterface {
+  public function selectByType(AccessRecordTypeInterface $ar_type, ?int $subject_id = NULL, string $operation = 'view', array $options = []): ?SelectInterface {
     $field_names = [
       'subject' => $ar_type->getSubjectFieldNames(),
       'target' => $ar_type->getTargetFieldNames(),
@@ -100,7 +102,11 @@ class AccessRecordQueryBuilder {
       return NULL;
     }
 
-    $all_fields = ['ar' => [], 'subject' => [], 'target' => []];
+    $all_fields = $grouped_fields = [
+      'ar' => [],
+      'subject' => [],
+      'target' => [],
+    ];
 
     $ar_entity_type_id = $ar_type->getEntityType()->getBundleOf();
     /** @var \Drupal\Core\Entity\EntityTypeInterface[] $types */
@@ -129,7 +135,7 @@ class AccessRecordQueryBuilder {
     $storages = [];
     /** @var \Drupal\Core\Entity\Query\Sql\Query[] $queries */
     $queries = [];
-    // Get all table mapping instances, as we need to check whether a field
+    // Get the table mappings, because we need to check, whether a field
     // is stored in a shared table amongst other fields. If so, we won't use
     // the column definitions of the field as it would otherwise break, because
     // entity queries automatically join further tables once column names are
@@ -139,6 +145,7 @@ class AccessRecordQueryBuilder {
     /** @var \Drupal\Core\Entity\Query\ConditionInterface[] $ors */
     $ors = [];
     foreach ($types as $key => $type) {
+      /** @var \Drupal\Core\Entity\Sql\SqlEntityStorageInterface $storage */
       $storage = $this->entityTypeManager->getStorage($type->id());
       $query = $storage->getQuery();
       if (!($query instanceof Query)) {
@@ -185,14 +192,15 @@ class AccessRecordQueryBuilder {
       $main_properties = [];
 
       foreach (['ar', 'subject', 'target'] as $scope) {
-        if (!isset($field_names[$scope][$ar_field_name])) {
+        if (!isset($field_names[$scope][$ar_field_name]) || !isset($field_names['ar'][$ar_field_name])) {
           continue;
         }
         $scope_field_name = $field_names[$scope][$ar_field_name];
         if ($table_mappings[$scope]->requiresDedicatedTableStorage($field_storage_definitions[$scope][$scope_field_name])) {
-          $col_names = array_keys($field_storage_definitions[$scope][$scope_field_name]->getColumns());
-          $property_names[$scope] = array_combine($col_names, $col_names);
           $main_properties[$scope] = $field_storage_definitions[$scope][$scope_field_name]->getMainPropertyName();
+          $col_names = array_keys($field_storage_definitions[$scope][$scope_field_name]->getColumns());
+          $col_names = array_unique(array_merge($col_names, [$main_properties[$scope]]));
+          $property_names[$scope] = array_combine($col_names, $col_names);
         }
         if (empty($property_names[$scope])) {
           $mapped_ar_field = $ar_field_name;
@@ -201,6 +209,7 @@ class AccessRecordQueryBuilder {
           }
           $fields[$scope] = [$mapped_ar_field => $scope_field_name];
           $all_fields[$scope][$mapped_ar_field] = $scope_field_name;
+          $grouped_fields[$scope][$ar_field_name][$mapped_ar_field] = $scope_field_name;
         }
         else {
           foreach ($property_names[$scope] as $property_name) {
@@ -214,6 +223,7 @@ class AccessRecordQueryBuilder {
             $col_field = $scope_field_name . '_' . $property_name;
             $fields[$scope][$mapped_ar_field] = $col_field;
             $all_fields[$scope][$mapped_ar_field] = $scope_field_name . '.' . $property_name;
+            $grouped_fields[$scope][$ar_field_name][$mapped_ar_field] = $scope_field_name . '.' . $property_name;
           }
         }
         foreach ($fields[$scope] as $mapped_ar_field => $col_field) {
@@ -232,7 +242,9 @@ class AccessRecordQueryBuilder {
       foreach ($scope_fields as $scope_field) {
         $or_group->condition($scope_field, NULL, 'IS NOT NULL');
       }
-      $queries[$scope]->condition($or_group);
+      if (!empty($scope_fields)) {
+        $queries[$scope]->condition($or_group);
+      }
     }
 
     // Sorry to do this, but we want to use the convenience to build entity
@@ -268,23 +280,34 @@ class AccessRecordQueryBuilder {
     $id_query->addField('ar', 'ar__ar_id', 'ar_id');
     $id_query->orderBy('ar_id');
     $id_query->groupBy('ar_id');
+
     foreach (['subject', 'target'] as $scope) {
-      if (empty($options["join_${scope}s"])) {
+      if (empty($options["join_" . $scope . "s"])) {
         continue;
       }
 
+      // Build up the join conditions.
       $join_conditions = [];
-      foreach (array_keys($all_fields[$scope]) as $mapped_ar_field) {
-        $join_conditions[] = "[${scope}].[${scope}__${mapped_ar_field}] = [ar].[ar__${mapped_ar_field}]";
+
+      // Properties of fields must be combined as AND conditions.
+      foreach ($grouped_fields[$scope] as $grouped_field_properties) {
+        $join_condition = [];
+        foreach (array_keys($grouped_field_properties) as $mapped_ar_field) {
+          $join_condition[] = "[" . $scope . "].[" . $scope . "__" . $mapped_ar_field . "] = [ar].[ar__" . $mapped_ar_field . "]";
+        }
+        $join_conditions[] = "(" . implode(' AND ', $join_condition) . ")";
       }
+
       // Extra care is taken for users as subjects (that is mostly the case):
       // Add a check for the user ID. If that one is 0, then it's anonymous
       // and otherwise it's an authenticated user. The according user role
       // is not stored in the database though, that's why we add it here.
       if (($scope === 'subject') && ($types[$scope]->id() === 'user') && ($mapped_ar_field = array_search('roles.target_id', $all_fields[$scope]))) {
-        $join_conditions[] = "([ar].[ar__${mapped_ar_field}] = '" . AccountInterface::ANONYMOUS_ROLE . "' AND [subject].[subject__uid] = 0)";
-        $join_conditions[] = "([ar].[ar__${mapped_ar_field}] = '" . AccountInterface::AUTHENTICATED_ROLE . "' AND [subject].[subject__uid] <> 0)";
+        $join_conditions[] = "([ar].[ar__" . $mapped_ar_field . "] = '" . AccountInterface::ANONYMOUS_ROLE . "' AND [subject].[subject__uid] = 0)";
+        $join_conditions[] = "([ar].[ar__" . $mapped_ar_field . "] = '" . AccountInterface::AUTHENTICATED_ROLE . "' AND [subject].[subject__uid] <> 0)";
       }
+
+      // Finally stringify the join conditions for the SQL query.
       $join_conditions = implode(' OR ', $join_conditions);
 
       $id_query->join($queries[$scope], $scope, $join_conditions);
@@ -295,6 +318,274 @@ class AccessRecordQueryBuilder {
     }
 
     return $id_query;
+  }
+
+  /**
+   * Builds a query for matching access records by the given type.
+   *
+   * When the type is properly configured, it returns an entity query as object.
+   *
+   * Important: This query object skips access checks. If you use this query
+   * outside the scope of an access check, for example for printing out the IDs
+   * to a user, you need to take care on your own that the according user is
+   * only seeing what is allowed to be seen.
+   *
+   * @param \Drupal\access_records\AccessRecordTypeInterface $ar_type
+   *   The access record type.
+   * @param \Drupal\Core\Entity\ContentEntityInterface|null $subject
+   *   (optional) When given, the query filters for access records matching
+   *   for the given subject.
+   * @param \Drupal\Core\Entity\ContentEntityInterface|null $target
+   *   (optional) When given, the query filters for access records matching
+   *   for the given target.
+   * @param string $operation
+   *   (optional) The requested operation, for example "view", "update" or
+   *   "delete". By default, the query looks out for matching "view" operations.
+   * @param array $options
+   *   (optional) Further options. This is currently not in use, but exists
+   *   for possible options added in the future.
+   *
+   * @return \Drupal\Core\Entity\Query\QueryInterface|null
+   *   The entity query as object, or NULL when the type configuration is
+   *   incomplete or invalid.
+   *
+   * @throws \InvalidArgumentException
+   *   When the given subject and/or target does not apply for the given
+   *   access record type.
+   */
+  public function queryByType(AccessRecordTypeInterface $ar_type, ?ContentEntityInterface $subject = NULL, ?ContentEntityInterface $target = NULL, string $operation = 'view', array $options = []): ?QueryInterface {
+    $field_names = [
+      'subject' => $ar_type->getSubjectFieldNames(),
+      'target' => $ar_type->getTargetFieldNames(),
+    ];
+
+    if (empty($field_names['subject']) || empty($field_names['target'])) {
+      // To avoid possible security implications due to wrong or incomplete
+      // configured access record types, do not build a condition group.
+      // This may happen for example when a field was (accidentally) removed.
+      return NULL;
+    }
+
+    $all_fields = $grouped_fields = [
+      'ar' => [],
+      'subject' => [],
+      'target' => [],
+    ];
+
+    $ar_entity_type_id = $ar_type->getEntityType()->getBundleOf();
+    /** @var \Drupal\Core\Entity\EntityTypeInterface[] $types */
+    $types = [
+      'ar' => $this->entityTypeManager->getDefinition($ar_entity_type_id),
+      'subject' => $ar_type->getSubjectType(),
+      'target' => $ar_type->getTargetType(),
+    ];
+
+    if ($subject && ($types['subject']->id() !== $subject->getEntityTypeId())) {
+      throw new \InvalidArgumentException("The given subject does not apply for the requested type of access records.");
+    }
+    if ($target && ($types['target']->id() !== $target->getEntityTypeId())) {
+      throw new \InvalidArgumentException("The given target does not apply for the requested type of access records.");
+    }
+
+    /** @var \Drupal\Core\Field\FieldStorageDefinitionInterface[][] $field_storage_definitions */
+    $field_storage_definitions = [
+      'subject' => $this->entityFieldManager->getFieldStorageDefinitions($types['subject']->id()),
+      'target' => $this->entityFieldManager->getFieldStorageDefinitions($types['target']->id()),
+    ];
+    foreach ($this->entityFieldManager->getFieldDefinitions($ar_entity_type_id, $ar_type->id()) as $field_name => $ar_field_defintion) {
+      $field_names['ar'][$field_name] = $field_name;
+      $field_storage_definitions['ar'][$field_name] = $ar_field_defintion->getFieldStorageDefinition();
+    }
+
+    /** @var \Drupal\Core\Entity\EntityStorageInterface[] $storages */
+    $storages = [];
+    /** @var \Drupal\Core\Entity\Query\Sql\Query[] $queries */
+    $queries = [];
+    // Get the table mappings, because we need to check, whether a field
+    // is stored in a shared table amongst other fields. If so, we won't use
+    // the column definitions of the field as it would otherwise break, because
+    // entity queries automatically join further tables once column names are
+    // explicitly used.
+    /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping[] $table_mappings */
+    $table_mappings = [];
+    /** @var \Drupal\Core\Entity\Query\ConditionInterface[] $ors */
+    $ors = [];
+    foreach ($types as $key => $type) {
+      /** @var \Drupal\Core\Entity\Sql\SqlEntityStorageInterface $storage */
+      $storage = $this->entityTypeManager->getStorage($type->id());
+      $query = $storage->getQuery();
+      if (!($query instanceof Query)) {
+        // As we need to work with a Select object later on, we can only be made
+        // sure it's available using the SQL-related Query class.
+        return NULL;
+      }
+      // Access checks are disabled because the condition that is being build
+      // here *is* about access checks.
+      $query->accessCheck(FALSE);
+      $storages[$key] = $storage;
+      $queries[$key] = $query;
+      $table_mappings[$key] = $storage->getTableMapping();
+      $ors[$key] = $query->orConditionGroup();
+    }
+
+    // Apply some initial filtering: Only use access records that match up
+    // for the given type, operation, are enabled and match between the
+    // specified subject type and target type.
+    $queries['ar']
+      ->condition('ar_type', $ar_type->id())
+      ->condition('ar_operation', $operation)
+      ->condition('ar_enabled', 1)
+      ->condition('ar_subject_type', $types['subject']->id())
+      ->condition('ar_target_type', $types['target']->id());
+
+    $query = $queries['ar'];
+
+    // Map the columns of subject or target to the mapped access record field.
+    foreach (array_keys($field_names['subject'] + $field_names['target']) as $ar_field_name) {
+      $fields = $property_names = ['ar' => [], 'subject' => [], 'target' => []];
+      $main_properties = [];
+
+      foreach (['ar', 'subject', 'target'] as $scope) {
+        if (!isset($field_names[$scope][$ar_field_name]) || !isset($field_names['ar'][$ar_field_name])) {
+          continue;
+        }
+        $scope_field_name = $field_names[$scope][$ar_field_name];
+        $main_properties[$scope] = $field_storage_definitions[$scope][$scope_field_name]->getMainPropertyName();
+        if ($table_mappings[$scope]->requiresDedicatedTableStorage($field_storage_definitions[$scope][$scope_field_name])) {
+          $col_names = array_keys($field_storage_definitions[$scope][$scope_field_name]->getColumns());
+          $col_names = array_unique(array_merge($col_names, [$main_properties[$scope]]));
+          $property_names[$scope] = array_combine($col_names, $col_names);
+        }
+        if (empty($property_names[$scope])) {
+          $mapped_ar_field = $ar_field_name;
+          if (!empty($main_properties['ar'])) {
+            $mapped_ar_field .= '.' . $main_properties['ar'];
+          }
+          if (!empty($main_properties[$scope])) {
+            $scope_field_name .= '.' . $main_properties[$scope];
+          }
+          $fields[$scope] = [$mapped_ar_field => $scope_field_name];
+          $all_fields[$scope][$mapped_ar_field] = $scope_field_name;
+          $grouped_fields[$scope][$ar_field_name][$mapped_ar_field] = $scope_field_name;
+        }
+        else {
+          foreach ($property_names[$scope] as $property_name) {
+            $mapped_ar_field = $ar_field_name;
+            if (isset($property_names['ar'][$property_name]) || $scope === 'ar') {
+              $mapped_ar_field .= '.' . $property_name;
+            }
+            elseif ((1 === count($property_names['ar'])) && (1 === count($property_names[$scope]))) {
+              $mapped_ar_field .= '.' . reset($property_names['ar']);
+            }
+            $scope_field_name .= '.' . $property_name;
+            $fields[$scope][$mapped_ar_field] = $scope_field_name;
+            $all_fields[$scope][$mapped_ar_field] = $scope_field_name;
+            $grouped_fields[$scope][$ar_field_name][$mapped_ar_field] = $scope_field_name;
+          }
+        }
+      }
+    }
+
+    // When no values are present (subject and/or target is empty), then the
+    // query will be build in a way that it never returns a row.
+    $has_values = ['subject' => NULL, 'target' => NULL];
+
+    $or_group = $ors['ar'];
+    foreach ($all_fields as $scope => $scope_fields) {
+      foreach (array_keys($scope_fields) as $mapped_ar_field) {
+        $or_group->condition($mapped_ar_field, NULL, 'IS NOT NULL');
+      }
+    }
+    if ($or_group->count()) {
+      $query->condition($or_group);
+    }
+
+    foreach (['subject' => $subject, 'target' => $target] as $scope => $entity) {
+      if (!$entity) {
+        continue;
+      }
+
+      // Initially assume not having any values.
+      $has_values[$scope] = FALSE;
+
+      $scope_group = $query->orConditionGroup();
+
+      foreach ($grouped_fields[$scope] as $ar_field_name => $grouped_field_properties) {
+        $scope_field_name = $field_names[$scope][$ar_field_name];
+        $items = $entity->get($scope_field_name);
+        if ($items->isEmpty()) {
+          continue;
+        }
+
+        $field_value_group = $query->orConditionGroup();
+
+        foreach ($items as $item) {
+          $field_property_group = $query->andConditionGroup();
+
+          foreach ($grouped_field_properties as $mapped_ar_field => $scope_field) {
+            $scope_field_parts = explode('.', $scope_field);
+            array_shift($scope_field_parts);
+            $value = NULL;
+
+            if (empty($scope_field_parts)) {
+              $value = $item->getValue();
+              $value = is_array($value) && (1 === count($value)) && (1 === count($grouped_field_properties)) ? reset($value) : (is_scalar($value) ? $value : NULL);
+            }
+            else {
+              while (NULL !== ($scope_field_part = array_shift($scope_field_parts))) {
+                if (NULL === ($value = $item->$scope_field_part ?? NULL)) {
+                  break;
+                }
+              }
+            }
+
+            if (is_scalar($value)) {
+              $has_values[$scope] = TRUE;
+              $field_property_group->condition($mapped_ar_field, $value);
+            }
+          }
+
+          if ($field_property_group->count()) {
+            $field_value_group->condition($field_property_group);
+          }
+        }
+
+        if ($field_value_group->count()) {
+          $scope_group->condition($field_value_group);
+        }
+      }
+
+      // Extra care is taken for users as subjects (that is mostly the case):
+      // Add a check for the user ID. If that one is 0, then it's anonymous
+      // and otherwise it's an authenticated user. The according user role
+      // is not stored in the database though, that's why we add it here.
+      if (($scope === 'subject') && ($types[$scope]->id() === 'user') && ($mapped_ar_field = array_search('roles.target_id', $all_fields[$scope]))) {
+        // Yes, there are official API methods that tell whether the user is
+        // anonymous or authenticated, but the behavior needs to be as close
+        // as possible to ::selectByType().
+        /** @var \Drupal\user\UserInterface $entity */
+        if (((string) $entity->id() === '0') && $entity->isAnonymous()) {
+          $scope_group->condition($mapped_ar_field, AccountInterface::ANONYMOUS_ROLE);
+          $has_values[$scope] = TRUE;
+        }
+        elseif (((int) $entity->id() > 0) && $entity->isAuthenticated()) {
+          $scope_group->condition($mapped_ar_field, AccountInterface::AUTHENTICATED_ROLE);
+          $has_values[$scope] = TRUE;
+        }
+      }
+
+      if ($scope_group->count()) {
+        $query->condition($scope_group);
+      }
+    }
+
+    // When no values are given, ensure to always have an empty result.
+    if (in_array(FALSE, $has_values, TRUE)) {
+      $query->condition('ar_enabled', 1);
+      $query->condition('ar_enabled', 0);
+    }
+
+    return $query;
   }
 
 }

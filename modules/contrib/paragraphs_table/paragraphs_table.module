@@ -1,0 +1,291 @@
+<?php
+
+/**
+ * @file
+ * Contains paragraphs_table.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Render\Element;
+use Drupal\paragraphs_table\Form\ParagraphCloneForm;
+use Drupal\paragraphs_table\Form\ParagraphDeleteForm;
+use Drupal\paragraphs_table\Form\ParagraphEditForm;
+
+/**
+ * Implements hook_help().
+ */
+function paragraphs_table_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the paragraphs_table module.
+    case 'help.page.paragraphs_table':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('This module provides both a field formatter and a widget table for the Paragraphs entity type') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Hide field label.
+ */
+function _paragraphs_table_hidden_label(&$field_form) {
+  if (!empty($field_form['#title_display'])) {
+    $field_form['#title_display'] = 'invisible';
+  }
+  // Remove title field date.
+  if (!empty($field_form['#type'])){
+    if (in_array($field_form['#type'], ['select', 'managed_file', 'entity_autocomplete'])) {
+      $field_form['#title_display'] = 'invisible';
+    }
+    if ($field_form['#type'] == 'datetime') {
+      $field_form['#title'] = '';
+    }
+    if (in_array($field_form['#type'], ['radios', 'checkboxes'])) {
+      return TRUE;
+    }
+  }
+  // Remove fieldset field date & time.
+  if (!empty($field_form["#theme_wrappers"][0]) && in_array($field_form["#theme_wrappers"][0], ['fieldset'])) {
+    array_shift($field_form["#theme_wrappers"]);
+  }
+  foreach (Element::children($field_form) as $child) {
+    _paragraphs_table_hidden_label($field_form[$child]);
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function paragraphs_table_preprocess_field_multiple_value_form(&$variables) {
+  $element = $variables['element'];
+  if (empty($element['#paragraphsTable'])) {
+    return FALSE;
+  }
+  if (!empty($variables['table'])) {
+    // Case number of values unlimited - cardinality = -1.
+    if (!empty($element['#paragraphsTable']) && !empty($variables["table"]["#tabledrag"])) {
+      if ($element["#paragraphsTable"]["#show_all"]) {
+        foreach (range(0, $element["#cardinality"] - 1) as $delta) {
+          if (empty($variables["table"]["#rows"][$delta])) {
+            $variables["table"]["#rows"][$delta] = $variables["table"]["#rows"][0];
+          }
+        }
+        // We don't need button add more anymore.
+        foreach (Element::children($variables["button"]) as $child) {
+          if (substr($child, 0, 16) === "add_more_button_") {
+            $variables["button"][$child]["#access"] = FALSE;
+            break;
+          }
+        }
+        $variables["button"]['#access'] = FALSE;
+      }
+      if (!$element["#paragraphsTable"]["#table_vertical"]) {
+        // Add caption header.
+        if (!empty($element["#title"])) {
+          $variables["table"]["#caption"] = $variables["element"]["#title"];
+        }
+        if (!empty($element["#title_display"]) && $element["#title_display"] == 'invisible') {
+          unset($variables["table"]["#caption"]);
+        }
+
+        $row_weight = end($variables["table"]["#header"]);
+        if ($element["#cardinality"] < 2) {
+          $element["#paragraphsTable"]["#show_all"] = FALSE;
+        }
+        elseif (!empty($element["#paragraphsTable"]["#show_all"])) {
+          unset($variables["table"]["#tabledrag"]);
+        }
+        $is_new = isset($variables['table']['#rows']) && count($variables['table']['#rows']) == 0;
+        $variables["table"]["#header"] = _paragraphs_table_header($element["#paragraphsTable"]["#fields"], $element["#paragraphsTable"]["#show_all"], $row_weight, $is_new);
+        $remove_row = FALSE;
+        foreach ($variables["table"]["#rows"] as $delta => $rows) {
+          $row = _paragraphs_table_row($element["#paragraphsTable"]["#fields"], $rows['data'], $element["#paragraphsTable"]["#show_all"]);
+          if (!empty($row)) {
+            $variables["table"]["#rows"][$delta]['data'] = $row;
+          }
+          else {
+            $remove_row = TRUE;
+            unset($variables["table"]["#rows"][$delta]);
+          }
+        }
+        if ($remove_row) {
+          $variables["table"]["#rows"] = array_merge($variables["table"]["#rows"]);
+        }
+        if (empty($variables["table"]["#rows"]) &&
+          !empty($element["#no_header"])) {
+          unset($variables["table"]["#header"]);
+          unset($variables["table"]["#caption"]);
+        }
+        elseif ($element["#paragraphsTable"]["#paste_clipboard"]) {
+          $variables['table']['#prefix'] = '<a class="paste-paragraphs-clipboard" data-table="'.$variables["table"]["#attributes"]["id"].'" href="#'.$variables["table"]["#attributes"]["id"].'" data-bs-toggle="tooltip" data-bs-title="'. t('Paste from excel').'"><i class="bi bi-clipboard-check"></i></a>';
+          $variables['table']['#attached']['library'][] = 'paragraphs_table/paste-clipboard';
+        }
+      }
+      else {
+        // Table vertical.
+        foreach ($variables["table"]["#rows"] as $delta => $rows) {
+          if (!empty($element["#paragraphsTable"]["#widget_state"]["paragraphs"][$delta]["mode"]) &&
+            $element["#paragraphsTable"]["#widget_state"]["paragraphs"][$delta]["mode"] == 'remove') {
+            continue;
+          }
+          if (!empty($rows["data"][1]["data"]["subform"])) {
+            $row = _paragraphs_table_vertical($element["#paragraphsTable"]["#fields"], $rows["data"][1]["data"]["subform"], $delta);
+            $variables["table"]["#rows"][$delta]["data"][1]["data"] = $row;
+            if (empty($element["#paragraphsTable"]["#show_all"]) && !empty($rows["data"][1]["data"]["top"]["actions"])) {
+              $actions = $rows["data"][1]["data"]["top"]["actions"];
+              if (!empty($actions["actions"]["collapse_button"])) {
+                unset($actions["actions"]["collapse_button"]);
+              }
+              $variables["table"]["#rows"][$delta]["data"][3]["data"] = $actions;
+            }
+          }
+          else {
+            unset($variables["table"]["#rows"][$delta]);
+          }
+        }
+        if (empty($element["#paragraphsTable"]["#show_all"])) {
+          $variables["table"]["#header"][] = [
+            'data' => '',
+            'class' => ['action'],
+          ];
+        }
+      }
+    }
+  }
+  elseif (!empty($element["#cardinality"]) && $element["#cardinality"] == 1) {
+    // Case single value.
+    if (!$element["#paragraphsTable"]["#table_vertical"]) {
+      $variables["elements"][0]["subform"] = _paragraphs_table_1_row($element["#paragraphsTable"]["#fields"], $variables["elements"][0]["subform"]);
+      $variables["elements"][0]["subform"]["#header"] = _paragraphs_table_header($element["#paragraphsTable"]["#fields"], TRUE);
+    }
+    else {
+      // Table vertical.
+      $variables["elements"][0]["subform"] = _paragraphs_table_vertical($element["#paragraphsTable"]["#fields"], $variables["elements"][0]["subform"]);
+    }
+  }
+}
+
+/**
+ * Get table header.
+ */
+function _paragraphs_table_header($fields, $show_all = FALSE, $rowWeightCol = FALSE, $is_new = FALSE) {
+  $header = empty($show_all) ? ['data' => ''] : [];
+  foreach ($fields as $field_name => $field) {
+    $header[] = [
+      'data' => $field->getLabel(),
+      'class' => [$field_name],
+    ];
+  }
+  if (empty($show_all) && !$is_new) {
+    $header[] = ['data' => '', 'class' => ['action']];
+    $header[] = $rowWeightCol;
+  }
+  if ($is_new) {
+    $header[0] = $header[1];
+  }
+  return $header;
+}
+
+/**
+ * Get table row.
+ */
+function _paragraphs_table_1_row($fields, $rows_data, $show_all = FALSE) {
+  $rows['#type'] = 'table';
+  foreach ($fields as $field_name => $field) {
+    $field_form = $rows_data[$field_name];
+    _paragraphs_table_hidden_label($field_form['widget']);
+    $rows[0][$field_name] = $field_form;
+  }
+  return $rows;
+}
+
+/**
+ * Generate table row.
+ */
+function _paragraphs_table_row($fields, $rows_data, $show_all = FALSE) {
+  if (empty($show_all)) {
+    $row[] = $rows_data[0];
+  }
+  if (isset($rows_data[1]["data"]["#access"]) &&
+    $rows_data[1]["data"]["#access"] === FALSE) {
+    return FALSE;
+  }
+  if (!empty($rows_data[1]["data"]["subform"]) && !empty($rows_data[1]['data']['#paragraph_type'])) {
+    $subform = $rows_data[1]["data"]["subform"];
+  }
+  else {
+    return FALSE;
+  }
+  foreach ($fields as $field_name => $field) {
+    if (!empty($subform[$field_name])) {
+      $field_form = $subform[$field_name];
+      if (!empty($field_form['widget'])) {
+        _paragraphs_table_hidden_label($field_form['widget']);
+      }
+      $row[$field_name] = [
+        'data' => $field_form,
+        'class' => $field_name,
+      ];
+      unset($subform[$field_name]);
+    }
+  }
+  if (empty($show_all)) {
+    $actions = !empty($rows_data[1]["data"]["top"]["actions"]) ? $rows_data[1]["data"]["top"]["actions"] : '';
+    if (!empty($actions["actions"]["collapse_button"])) {
+      unset($actions["actions"]["collapse_button"]);
+    }
+    $row[] = [
+      'data' => $actions,
+      'class' => ['action'],
+    ];
+  }
+  $row[] = $rows_data[2];
+  return $row;
+}
+
+/**
+ * Make subform table vertical.
+ */
+function _paragraphs_table_vertical($fields, $rows_data, $delta = 0) {
+  $subform = ["#type" => 'table'];
+  $row_index = 0;
+  foreach ($fields as $field_name => $field) {
+    $subform[$row_index]['_name'] = [
+      '#markup' => $field->getLabel(),
+    ];
+    $field_form = $rows_data[$field_name];
+    if (!empty($field_form['widget'])) {
+      _paragraphs_table_hidden_label($field_form['widget']);
+    }
+    $subform[$row_index++][$field_name] = $field_form;
+  }
+  return $subform;
+}
+
+/**
+ * Implements hook_entity_type_build().
+ */
+function paragraphs_table_entity_type_build(array &$entity_types) {
+  $entity_types['paragraph']->setFormClass('entity_edit', ParagraphEditForm::class);
+  $entity_types['paragraph']->setFormClass('entity_clone', ParagraphCloneForm::class);
+  $entity_types['paragraph']->setFormClass('entity_delete', ParagraphDeleteForm::class);
+}
+
+/**
+ * Implements hook_theme().
+ */
+function paragraphs_table_theme($existing, $type, $theme, $path) {
+  $variables = [
+    'paragraphs_table_chart' => [
+      'variables' => [
+        'id_field_name' => 'paragraphs-table-chart',
+        'settings' => NULL,
+      ],
+      'template' => 'paragraphs-table-chart',
+    ],
+  ];
+
+  return $variables;
+}

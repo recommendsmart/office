@@ -29,9 +29,13 @@ class AccessRecordFieldBuilder {
       $this->addEntityReferenceField($ar_type, 'user_role', 'subject_roles', 'Roles of subjects');
     }
 
-    $this->addTargetReferenceField($ar_type);
+    $create_only = (['create'] === $ar_type->getOperations());
+
+    if (!$create_only) {
+      $this->addTargetReferenceField($ar_type);
+    }
+
     if ($target_type = $ar_type->getTargetType()) {
-      $base_fields = $target_type->getClass()::baseFieldDefinitions($target_type);
       // Add a bundle field for the target.
       if ($target_type->hasKey('bundle')) {
         if ($target_type->hasKey('bundle') && ($bundle_entity_type = $target_type->getBundleEntityType())) {
@@ -39,23 +43,27 @@ class AccessRecordFieldBuilder {
           $this->addEntityReferenceField($ar_type, $bundle_entity_type, 'target_' . $target_type->getKey('bundle'), $bundle_label . ' of targets');
         }
       }
-      if ($target_type->hasKey('published')) {
-        $published_key = $target_type->getKey('published');
-        if (isset($base_fields[$published_key])) {
-          /** @var \Drupal\Core\Field\BaseFieldDefinition $base_field */
-          $base_field = $base_fields[$published_key];
-          $label = $base_field->getLabel() . ' targets';
-          $this->addBooleanField($ar_type, 'target_' . $published_key, $label);
+
+      if (!$create_only) {
+        $base_fields = $target_type->getClass()::baseFieldDefinitions($target_type);
+        if ($target_type->hasKey('published')) {
+          $published_key = $target_type->getKey('published');
+          if (isset($base_fields[$published_key])) {
+            /** @var \Drupal\Core\Field\BaseFieldDefinition $base_field */
+            $base_field = $base_fields[$published_key];
+            $label = $base_field->getLabel() . ' targets';
+            $this->addBooleanField($ar_type, 'target_' . $published_key, $label);
+          }
         }
-      }
-      if ($target_type->hasKey('owner')) {
-        // Add a field that matches subject ID to target's owner ID.
-        $owner_key = $target_type->getKey('owner');
-        if (isset($base_fields[$owner_key])) {
-          /** @var \Drupal\Core\Field\BaseFieldDefinition $base_field */
-          $base_field = $base_fields[$owner_key];
-          $label = 'Targets ' . strtolower($base_field->getLabel());
-          $this->addEntityReferenceField($ar_type, $subject_type->id(), 'subject_' . $subject_type->getKey('id') . '__target_' . $owner_key, $label);
+        if ($target_type->hasKey('owner')) {
+          // Add a field that matches subject ID to target's owner ID.
+          $owner_key = $target_type->getKey('owner');
+          if (isset($base_fields[$owner_key])) {
+            /** @var \Drupal\Core\Field\BaseFieldDefinition $base_field */
+            $base_field = $base_fields[$owner_key];
+            $label = 'Targets ' . strtolower($base_field->getLabel());
+            $this->addEntityReferenceField($ar_type, $subject_type->id(), 'subject_' . $subject_type->getKey('id') . '__target_' . $owner_key, $label);
+          }
         }
       }
     }

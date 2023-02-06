@@ -1,4 +1,7 @@
 services:
+  access_records.control_center:
+    class: Drupal\access_records\Access\AccessRecordsControlCenter
+    arguments: ['@entity_type.manager', '@current_user']
   access_check.access_record.revision:
     class: Drupal\access_records\Access\AccessRecordRevisionAccessCheck
     arguments: ['@entity_type.manager']

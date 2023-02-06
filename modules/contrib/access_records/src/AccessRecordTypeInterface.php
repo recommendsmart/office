@@ -146,4 +146,44 @@ interface AccessRecordTypeInterface extends ConfigEntityInterface, RevisionableE
    */
   public function addDefaultFields(): AccessRecordTypeInterface;
 
+  /**
+   * Whether field access is additionally enabled.
+   *
+   * @return bool
+   *   Returns TRUE if field access is enabled, FALSE otherwise.
+   */
+  public function getFieldAccessEnabled(): bool;
+
+  /**
+   * Enable or disable additional field access.
+   *
+   * @param bool $enabled
+   *   (optional) Set to TRUE to enable field access, FALSE to disable it.
+   *   Default is TRUE for enabling field access.
+   *
+   * @return $this
+   */
+  public function setFieldAccessEnabled(bool $enabled = TRUE): AccessRecordTypeInterface;
+
+  /**
+   * Returns a list of allowed fields to access.
+   *
+   * This is only relevant when field access is enabled.
+   * @see self::getFieldAccessEnabled().
+   *
+   * @return string[]
+   *   The allowed fields as array, where its values are field machine names.
+   */
+  public function getFieldAccessFieldsAllowed(): array;
+
+  /**
+   * Set the allowed fields to access.
+   *
+   * @param string[] $field_names
+   *   The allowed fields as array, where its values are field machine names.
+   *
+   * @return $this
+   */
+  public function setFieldAccessFieldsAllowed(array $field_names): AccessRecordTypeInterface;
+
 }

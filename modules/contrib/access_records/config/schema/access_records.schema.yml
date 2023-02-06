@@ -1,0 +1,18 @@
+access_record_action_config:
+  type: mapping
+  label: 'Access record action configuration'
+  mapping:
+    subject_id:
+      type: text
+      label: 'Subject ID'
+    target_id:
+      type: text
+      label: 'Target ID'
+
+action.configuration.ar_grant:*:
+  type: access_record_action_config
+  label: 'Grant access with access records'
+
+action.configuration.ar_revoke:*:
+  type: access_record_action_config
+  label: 'Revoke access with access records'

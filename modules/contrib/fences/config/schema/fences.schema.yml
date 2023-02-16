@@ -8,6 +8,12 @@ field.formatter.third_party.fences:
     fences_field_classes:
       type: string
       label: 'The field CSS classes'
+    fences_field_items_wrapper_tag:
+      type: string
+      label: 'The field items wrapper HTML tag'
+    fences_field_items_wrapper_classes:
+      type: string
+      label: 'The field items wrapper CSS classes'
     fences_field_item_tag:
       type: string
       label: 'The field item HTML tag'

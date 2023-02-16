@@ -3,7 +3,6 @@
 namespace Drupal\Tests\fences\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
-use Drupal\Tests\fences\Traits\StripWhitespaceTrait;
 
 /**
  * A fences integration test.
@@ -12,12 +11,16 @@ use Drupal\Tests\fences\Traits\StripWhitespaceTrait;
  */
 class IntegrationTest extends WebDriverTestBase {
 
-  use StripWhitespaceTrait;
-
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['node', 'field', 'field_ui', 'fences'];
+  protected static $modules = [
+    'test_page_test',
+    'node',
+    'field',
+    'field_ui',
+    'fences',
+  ];
 
   /**
    * An admin user.
@@ -25,6 +28,13 @@ class IntegrationTest extends WebDriverTestBase {
    * @var \Drupal\user\UserInterface
    */
   protected $adminUser;
+
+  /**
+   * A user with authenticated permissions.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $user;
 
   /**
    * A node.
@@ -41,15 +51,26 @@ class IntegrationTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp():void {
     parent::setUp();
-    $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
+    $this->config('system.site')->set('page.front', '/test-page')->save();
+
+    $this->createContentType(['type' => 'article', 'name' => 'Article']);
     $this->node = $this->drupalCreateNode([
       'title' => $this->randomString(),
       'type' => 'article',
       'body' => 'Body field value.',
     ]);
-    $this->adminUser = $this->drupalCreateUser(['access content', 'administer node display']);
+    $this->adminUser = $this->drupalCreateUser([
+      'access content',
+      'administer node display',
+      'edit fences formatter settings',
+    ]);
+    // User without "Edit fences formatter settings":
+    $this->user = $this->drupalCreateUser([
+      'access content',
+      'administer node display',
+    ]);
     $this->drupalLogin($this->adminUser);
   }
 
@@ -58,12 +79,11 @@ class IntegrationTest extends WebDriverTestBase {
    */
   public function testBasicSettings() {
     $session = $this->assertSession();
-    $manage_display = '/admin/structure/types/manage/article/display';
-    $this->drupalGet($manage_display);
+    $page = $this->getSession()->getPage();
+    $this->drupalGet('/admin/structure/types/manage/article/display');
+    $page->pressButton('edit-fields-body-settings-edit');
 
-    $this->submitForm([], 'body_settings_edit');
-    $session->assertWaitOnAjaxRequest();
-
+    $session->waitForElementVisible('css', 'div[id*="edit-fields-body-settings-edit-form"]');
     $this->submitForm([
       'fields[body][label]' => 'above',
       'fields[body][settings_edit_form][third_party_settings][fences][fences_field_tag]' => 'article',
@@ -73,9 +93,8 @@ class IntegrationTest extends WebDriverTestBase {
       'fields[body][settings_edit_form][third_party_settings][fences][fences_label_tag]' => 'h2',
       'fields[body][settings_edit_form][third_party_settings][fences][fences_label_classes]' => 'my-label-class',
     ], 'Update');
-    $session->assertWaitOnAjaxRequest();
-
-    $this->drupalPostForm(NULL, [], 'Save');
+    $session->waitForElementRemoved('css', 'div[id*="edit-fields-body-settings-edit-form"]');
+    $page->pressButton('edit-submit');
 
     $page = $this->drupalGet('/node/' . $this->node->id());
     $article = $session->elementExists('css', '.field--name-body');
@@ -84,6 +103,27 @@ class IntegrationTest extends WebDriverTestBase {
     $this->assertSame($label->getText(), 'Body', 'Field label is found in expected HTML element.');
     $body = $session->elementExists('css', 'code.my-field-item-class > p', $article);
     $this->assertSame($body->getText(), 'Body field value.', 'Field text is found in expected HTML element.');
+  }
+
+  /**
+   * Tests the "edit fences formatter settings" permission.
+   */
+  public function testEditFencesFormatterSettingsPermission() {
+    $session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+    // Go to display page and see if the fences settings are there:
+    $this->drupalGet('/admin/structure/types/manage/article/display');
+    $page->pressButton('edit-fields-body-settings-edit');
+    $session->waitForElementVisible('css', 'div[id*="edit-fields-body-settings-edit-form"]');
+    $session->elementExists('css', 'fieldset[id*="edit-fields-body-settings-edit-form-third-party-settings-fences"]');
+    $this->drupalLogout();
+    // Login with a user without the 'edit fences formatter settings'
+    // permission and see if the settings are NOT displayed anymore:
+    $this->drupalLogin($this->user);
+    $this->drupalGet('/admin/structure/types/manage/article/display');
+    $page->pressButton('edit-fields-body-settings-edit');
+    $session->waitForElementVisible('css', 'div[id*="edit-fields-body-settings-edit-form"]');
+    $session->elementNotExists('css', 'fieldset[id*="edit-fields-body-settings-edit-form-third-party-settings-fences"]');
   }
 
 }

@@ -63,7 +63,10 @@ class TagManager extends DefaultPluginManager implements TagManagerInterface, Pl
       TagManagerInterface::NO_MARKUP_VALUE => $this->t('None (No wrapping HTML)'),
     ];
     foreach ($this->getDefinitions() as $id => $definition) {
-      $options[$definition['group']][$id] = t('@label (@tag)', ['@label' => $definition['label'], '@tag' => $id]);
+      $options[$definition['group']][$id] = $this->t('@label (@tag)', [
+        '@label' => $definition['label'],
+        '@tag' => $id,
+      ]);
     }
     return $options;
   }

@@ -76,6 +76,7 @@ class FieldBulkCloneForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state, $entity_type_id = NULL, $bundle = NULL) {
     $field_ids = $this->entityTypeManager->getStorage('field_config')->getQuery()
+      ->accessCheck(FALSE)
       ->condition('entity_type', $entity_type_id)
       ->condition('bundle', $bundle)
       ->execute();
@@ -135,6 +136,7 @@ class FieldBulkCloneForm extends FormBase {
 
         // Check the field is not already on the destination bundle.
         $field_ids = $this->entityTypeManager->getStorage('field_config')->getQuery()
+          ->accessCheck(FALSE)
           ->condition('entity_type', $destination_entity_type)
           ->condition('bundle', $destination_bundle)
           ->condition('field_name', $field_config->getName())
@@ -154,6 +156,7 @@ class FieldBulkCloneForm extends FormBase {
         // Check the field is not already on the destination entity type but
         // with a different type.
         $existing_destination_field_storage_ids = $this->entityTypeManager->getStorage('field_storage_config')->getQuery()
+          ->accessCheck(FALSE)
           ->condition('entity_type', $destination_entity_type)
           ->condition('field_name', $field_config->getName())
           ->execute();

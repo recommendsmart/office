@@ -80,6 +80,7 @@ class AccessRecordsControlCenter {
     $target = $entity;
     $target_type = $target->getEntityType();
     $cacheability = new CacheableMetadata();
+    $cacheability->addCacheableDependency($target);
     $etm = $this->entityTypeManager;
 
     /** @var \Drupal\user\UserInterface $subject */
@@ -95,6 +96,8 @@ class AccessRecordsControlCenter {
       ]);
       return AccessRecordType::loadForAccessCheck($subject, $target_type->id(), $operation, $cacheability, FALSE) ? AccessResult::forbidden()->addCacheableDependency($cacheability) : AccessResult::neutral()->addCacheableDependency($cacheability);
     }
+
+    $cacheability->addCacheableDependency($subject);
 
     // Either no configured access record type exists for this type of entity,
     // or the user is an admin and thus has access anyway.
@@ -229,6 +232,7 @@ class AccessRecordsControlCenter {
     }
 
     $cacheability = new CacheableMetadata();
+    $cacheability->addCacheableDependency($target);
 
     /** @var \Drupal\user\UserInterface $subject */
     if (!($subject = $etm->getStorage('user')->load($account->id()))) {
@@ -243,6 +247,8 @@ class AccessRecordsControlCenter {
       ]);
       return AccessRecordType::loadForFieldAccessCheck($subject, $target_type->id(), $operation, $cacheability, FALSE) ? AccessResult::forbidden()->addCacheableDependency($cacheability) : AccessResult::neutral()->addCacheableDependency($cacheability);
     }
+
+    $cacheability->addCacheableDependency($subject);
 
     $ar_types = AccessRecordType::loadForFieldAccessCheck($subject, $target_type->id(), $operation, $cacheability, TRUE);
 

@@ -39,7 +39,7 @@ paragraphs_item.add_page:
     _controller: '\Drupal\paragraphs_table\Controller\ParagraphsItemController::add'
     operation: 'create'
   requirements:
-    _permission: 'access content'
+    _custom_access: '\Drupal\paragraphs_table\Controller\ParagraphAccessController::accessAdd'
   options:
     parameters:
       paragraph_type:
@@ -50,22 +50,30 @@ entity.paragraphs_item.edit_form:
   defaults:
     _entity_form: 'paragraph.entity_edit'
   requirements:
-    _entity_access: 'paragraph.update'
+    _custom_access: '\Drupal\paragraphs_table\Controller\ParagraphAccessController::access'
   options:
-    _admin_route: TRUE
+    parameters:
+      paragraph:
+        type: 'entity:paragraph'
 
 entity.paragraphs_item.delete_form:
   path: '/paragraphs_item/{paragraph}/delete'
   defaults:
     _entity_form: 'paragraph.entity_delete'
   requirements:
-    _entity_access: 'paragraph.delete'
+    _custom_access: '\Drupal\paragraphs_table\Controller\ParagraphAccessController::access'
   options:
-    _admin_route: TRUE
+    parameters:
+      paragraph:
+        type: 'entity:paragraph'
 
 entity.paragraphs_item.clone_form:
   path: '/paragraphs_item/clone/{paragraph}'
   defaults:
     _entity_form: 'paragraph.entity_clone'
   requirements:
-    _entity_access: 'paragraph.update'
+    _custom_access: '\Drupal\paragraphs_table\Controller\ParagraphAccessController::access'
+  options:
+    parameters:
+      paragraph:
+        type: 'entity:paragraph'

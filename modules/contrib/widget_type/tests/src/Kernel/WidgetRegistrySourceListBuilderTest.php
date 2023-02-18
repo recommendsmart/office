@@ -8,6 +8,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\widget_type\Entity\WidgetRegistrySource;
 use Drupal\widget_type\WidgetRegistrySourceListBuilder;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * Kernel tests for WidgetRegistrySourceListBuilder.
@@ -16,6 +17,8 @@ use Drupal\widget_type\WidgetRegistrySourceListBuilder;
  * @coversDefaultClass \Drupal\widget_type\WidgetRegistrySourceListBuilder
  */
 class WidgetRegistrySourceListBuilderTest extends KernelTestBase {
+
+  use ProphecyTrait;
 
   /**
    * {@inheritdoc}
@@ -56,8 +59,8 @@ class WidgetRegistrySourceListBuilderTest extends KernelTestBase {
     $this->installEntitySchema('user');
     $this->installConfig(['field', 'widget_type', 'user']);
     $this->theSut = new WidgetRegistrySourceListBuilder(
-      $this->prophesize(EntityTypeInterface::class)->reveal(),
-      $this->prophesize(EntityStorageInterface::class)->reveal()
+      $this->getProphet()->prophesize(EntityTypeInterface::class)->reveal(),
+      $this->getProphet()->prophesize(EntityStorageInterface::class)->reveal()
     );
     $this->entity = WidgetRegistrySource::create([
       'label' => 'The name',

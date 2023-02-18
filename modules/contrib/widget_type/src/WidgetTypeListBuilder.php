@@ -142,6 +142,7 @@ class WidgetTypeListBuilder extends EntityListBuilder {
 
     $total = $this->getStorage()
       ->getQuery()
+      ->accessCheck(TRUE)
       ->count()
       ->execute();
 
@@ -177,6 +178,7 @@ class WidgetTypeListBuilder extends EntityListBuilder {
     assert($entity instanceof WidgetTypeInterface);
     $status_text = $entity->isEnabled() ? $this->t('Enabled') : $this->t('Disabled');
     $source = $entity->widget_registry_source->entity;
+    assert($source instanceof WidgetRegistrySourceInterface);
     $source_label = $source ? $source->label() : $this->t('- Not available -');
     [$color, $complementary_color] = $source ? $source->calculateColors() : ['000000', 'FFFFFF'];
     $row = [

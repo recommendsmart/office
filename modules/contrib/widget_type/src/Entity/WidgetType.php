@@ -54,13 +54,6 @@ final class WidgetType extends ContentEntityBase implements WidgetTypeInterface 
   use StringTranslationTrait;
 
   /**
-   * The language handler.
-   *
-   * @var \Drupal\globalization_companion\Services\LanguageHandler
-   */
-  private $languageHandler;
-
-  /**
    * {@inheritdoc}
    */
   public function label() {
@@ -416,7 +409,7 @@ final class WidgetType extends ContentEntityBase implements WidgetTypeInterface 
       ->setLabel(t('Changed'))
       ->setDescription(t('The time that the widget type was last edited.'));
 
-    $fields += static::customBaseFieldDedfinitions();
+    $fields += static::customBaseFieldDefinitions();
     return $fields;
   }
 
@@ -426,7 +419,7 @@ final class WidgetType extends ContentEntityBase implements WidgetTypeInterface 
    * @return \Drupal\Core\Field\BaseFieldDefinition[]
    *   The definitions.
    */
-  public static function customBaseFieldDedfinitions(): array {
+  public static function customBaseFieldDefinitions(): array {
     $fields = [];
     $fields['remote_widget_id'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Remote Widget ID'))
@@ -473,6 +466,7 @@ final class WidgetType extends ContentEntityBase implements WidgetTypeInterface 
         'type' => 'string',
         'weight' => -2,
       ])
+      ->setDefaultValue(WidgetTypeInterface::REMOTE_STATUS_UNKNOWN)
       ->setDisplayConfigurable('view', FALSE)
       ->setReadOnly(TRUE);
 

@@ -12,4 +12,12 @@ interface MailerTestServiceInterface {
    */
   const STATE_KEY = 'mailer_test.emails';
 
+  /**
+   * Gets the emails that have been sent.
+   *
+   * @return \Drupal\symfony_mailer\EmailInterface[]
+   *   The emails.
+   */
+  public function getEmails();
+
 }

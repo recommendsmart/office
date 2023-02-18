@@ -14,7 +14,7 @@
   <div class="radio-details--updated">{{ element['#created_date'] }}</div>
   <div class="radio-details--status">{{ element['#status'] }}</div>
   <div
-    class="radio-details_remote-status radio-details_remote-status--{{ element['#remote_status'] }}">{{ element['#remote_status'] }}
+    class="radio-details_remote-status radio-details_remote-status--{{ element['#remote_status'] }}">{{ element['#remote_status']|capitalize }}
   </div>
   <div class="radio-details--preview-url">{{ element['#preview_url'] }}</div>
   <div class="radio-details--languages">{{ element['#remote_languages'] }}</div>

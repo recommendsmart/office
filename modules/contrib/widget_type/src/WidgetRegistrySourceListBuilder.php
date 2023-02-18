@@ -57,6 +57,7 @@ class WidgetRegistrySourceListBuilder extends ConfigEntityListBuilder {
 
     $total = $this->getStorage()
       ->getQuery()
+      ->accessCheck(TRUE)
       ->condition('status', TRUE)
       ->count()
       ->execute();

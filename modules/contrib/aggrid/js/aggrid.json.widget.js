@@ -3,7 +3,7 @@
  * JavaScript behaviors for aggrid JSON EDITOR integration.
  */
 
-(function ($, Drupal) {
+(function ($, Drupal, once) {
 
     'use strict';
 
@@ -15,15 +15,16 @@
     Drupal.behaviors.aggridJsonEditor = {
         attach: function (context) {
             // Aggrid JSON editor.
-            $(context).find('.aggrid-json-widget').once('aggridJsonEditor').each(function () {
+            once('aggridJsonEditor', '.aggrid-json-widget', context).forEach((jsonwidget) => {
+                const $jsonwidget = $(jsonwidget);
                 // Get the JSON data.
-                let jsonData = JSON.parse($(this).text());
+                let jsonData = JSON.parse($jsonwidget.text());
                 // Stringify it.
                 jsonData = JSON.stringify(jsonData, undefined, 2);
                 // Put it back.
-                $(this).text(jsonData);
-            });
+                $jsonwidget.text(jsonData);
+              });
         }
     };
 
-})(jQuery, Drupal);
+})(jQuery, Drupal, once);

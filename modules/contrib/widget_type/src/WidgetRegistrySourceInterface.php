@@ -14,7 +14,7 @@ interface WidgetRegistrySourceInterface extends ConfigEntityInterface {
    *
    * This is used to easily identify widgets coming from a source.
    *
-   * @return [string, string]
+   * @return array{0: string, 1: string}
    *   The hex representation of the colors.
    */
   public function calculateColors(): array;

@@ -2,6 +2,7 @@
 
 namespace Drupal\aggrid\Plugin\diff\Field;
 
+use Drupal\aggrid\Entity\Aggrid;
 use Drupal\aggrid\Entity;
 use Drupal\diff\FieldDiffBuilderBase;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -30,7 +31,7 @@ class AggridFieldBuilder extends FieldDiffBuilderBase {
       // Compare text formats.
       $aggridValue = json_decode($values['value']);
 
-      $aggridEntity = Entity\Aggrid::load($values['aggrid_id']);
+      $aggridEntity = Aggrid::load($values['aggrid_id']);
       $aggridDefault = json_decode($aggridEntity->get('aggridDefault'));
 
       $columns = [];

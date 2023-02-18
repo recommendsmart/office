@@ -56,8 +56,7 @@ trait BaseEmailTrait {
    */
   public function setAddress(string $name, $addresses) {
     assert(isset($this->addresses[$name]));
-    // See Mailer::doSend() for explanation of __disable_customize__.
-    if (($name == 'To') && !$this->getParam('__disable_customize__')) {
+    if ($name == 'To') {
       $this->valid(self::PHASE_BUILD);
     }
     $this->addresses[$name] = Address::convert($addresses);
@@ -186,6 +185,14 @@ trait BaseEmailTrait {
    */
   public function attachFromPath(string $path, string $name = NULL, string $mimeType = NULL) {
     $this->inner->attachFromPath($path, $name, $mimeType);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function attachNoPath(string $body, string $name = NULL, string $mimeType = NULL) {
+    $this->inner->attach($body, $name, $mimeType);
     return $this;
   }
 

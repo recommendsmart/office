@@ -1,7 +1,7 @@
 services:
   symfony_mailer:
     class: Drupal\symfony_mailer\Mailer
-    arguments: ['@event_dispatcher', '@renderer', '@language.default', '@language_manager', '@logger.factory', '@current_user', '@theme.manager', '@theme.initialization', '@account_switcher']
+    arguments: ['@event_dispatcher', '@renderer', '@language.default', '@language_manager', '@logger.factory', '@current_user', '@theme.manager', '@theme.initialization', '@account_switcher', '@symfony_mailer.transport_factory_manager']
   email_factory:
     class: Drupal\symfony_mailer\EmailFactory
     arguments: ['@plugin.manager.email_builder', '@plugin.manager.email_adjuster', '@module_handler']
@@ -21,3 +21,7 @@ services:
   symfony_mailer.legacy_helper:
     class: Drupal\symfony_mailer\LegacyMailerHelper
     arguments: ['@symfony_mailer.helper']
+  symfony_mailer.transport_factory_manager:
+    class: Drupal\symfony_mailer\TransportFactoryManager
+    tags:
+      - { name: service_collector, tag: mailer.transport_factory, call: addFactory }

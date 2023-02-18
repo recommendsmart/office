@@ -20,7 +20,7 @@ class AggridTest extends BrowserTestBase {
    *
    * @var array
    */
-  public static $modules = ['aggrid', 'aggrid_demo'];
+  protected static $modules = ['aggrid', 'aggrid_demo'];
 
   /**
    * The installation profile to use with this test.
@@ -102,16 +102,12 @@ class AggridTest extends BrowserTestBase {
     $this->clickLink('Add ag-Grid Config Entity');
     $aggrid_label = 'Test AG Table';
     $aggrid_machine_name = 'test_ag_table';
-    $this->drupalPostForm(
-      NULL,
-      [
-        'label' => $aggrid_label,
-        'id' => $aggrid_machine_name,
-        'aggridDefault' => '{}',
-        'addOptions' => '{}',
-      ],
-      'Save'
-    );
+    $this->submitForm([
+      'label' => $aggrid_label,
+      'id' => $aggrid_machine_name,
+      'aggridDefault' => '{}',
+      'addOptions' => '{}',
+    ], 'Save');
 
     // 4) Verify that our test ag table appears when we edit it.
     $this->drupalGet('/admin/structure/aggrid/' . $aggrid_machine_name .'/edit');
@@ -124,48 +120,41 @@ class AggridTest extends BrowserTestBase {
     $this->clickLink('Add ag-Grid Config Entity');
     $aggrid_machine_name = 'test_ag_table';
     $aggrid_label = 'Test AG Table';
-    $this->drupalPostForm(
-      NULL,
-      [
-        'label' => $aggrid_label,
-        'id' => $aggrid_machine_name,
-        'aggridDefault' => '{}',
-        'addOptions' => '{}',
-      ],
-      'Save'
-    );
+    $this->submitForm([
+      'label' => $aggrid_label,
+      'id' => $aggrid_machine_name,
+      'aggridDefault' => '{}',
+      'addOptions' => '{}',
+    ], 'Save');
     $this->drupalGet('/admin/structure/aggrid');
     $assert->pageTextContains($aggrid_label);
     $assert->pageTextContains($aggrid_machine_name);
+    $this->drupalGet(Url::fromRoute('entity.aggrid.add_form'));
 
     // Try to re-submit the same ag test, and verify that we see an error
     // message and not a PHP error.
-    $this->drupalPostForm(
-      Url::fromRoute('entity.aggrid.add_form'),
-      [
-        'label' => $aggrid_label,
-        'id' => $aggrid_machine_name,
-        'aggridDefault' => '{}',
-        'addOptions' => '{}',
-      ],
-      'Save'
-    );
+    $this->submitForm([
+      'label' => $aggrid_label,
+      'id' => $aggrid_machine_name,
+      'aggridDefault' => '{}',
+      'addOptions' => '{}',
+    ], 'Save');
     $assert->pageTextContains('The machine-readable name is already in use.');
 
     // 6) Verify that required links are present on respective paths.
     $this->drupalGet(Url::fromRoute('entity.aggrid.collection'));
-    $this->assertLinkByHref('/admin/structure/aggrid/add');
-    $this->assertLinkByHref('/admin/structure/aggrid/test_ag_table/edit');
-    $this->assertLinkByHref('/admin/structure/aggrid/test_ag_table/delete');
+    $this->assertSession()->linkByHrefExists('/admin/structure/aggrid/add');
+    $this->assertSession()->linkByHrefExists('/admin/structure/aggrid/test_ag_table/edit');
+    $this->assertSession()->linkByHrefExists('/admin/structure/aggrid/test_ag_table/delete');
 
     // Verify links on Add ag-Grid.
     $this->drupalGet('/admin/structure/aggrid/add');
-    $this->assertLinkByHref('/admin/structure/aggrid');
+    $this->assertSession()->linkByHrefExists('/admin/structure/aggrid');
 
     // Verify links on Edit ag-Grid.
     $this->drupalGet('/admin/structure/aggrid/test_ag_table/edit');
-    $this->assertLinkByHref('/admin/structure/aggrid/test_ag_table/delete');
-    $this->assertLinkByHref('/admin/structure/aggrid');
+    $this->assertSession()->linkByHrefExists('/admin/structure/aggrid/test_ag_table/delete');
+    $this->assertSession()->linkByHrefExists('/admin/structure/aggrid');
 
     // Verify links on Delete ag-Grid.
     $this->drupalGet('/admin/structure/aggrid/test_ag_table/delete');

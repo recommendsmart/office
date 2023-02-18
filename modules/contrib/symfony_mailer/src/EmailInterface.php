@@ -373,4 +373,12 @@ interface EmailInterface extends BaseEmailInterface {
    */
   public function getTransportDsn();
 
+  /**
+   * Gets the error message from sending the email.
+   *
+   * @return string
+   *   Error message, or NULL if there is no error.
+   */
+  public function getError();
+
 }

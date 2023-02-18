@@ -4,7 +4,7 @@ widget_type.admin:
   dependencies:
     - core/jquery
     - core/drupal
-    - core/jquery.once
+    - core/once
   css:
     component:
       css/admin.widget-type.css: { }

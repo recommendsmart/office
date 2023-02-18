@@ -1,5 +1,0 @@
-services:
-  aggrid.commands:
-    class: \Drupal\aggrid\Commands\AggridDrushCommands
-    tags:
-      - { name: drush.command }

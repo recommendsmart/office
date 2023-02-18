@@ -98,7 +98,6 @@
 .teaser__content .field--name-field-profile-summary > p {
   width: 100%;
   overflow: hidden;
-  white-space: nowrap;
   text-overflow: ellipsis;
 }
 

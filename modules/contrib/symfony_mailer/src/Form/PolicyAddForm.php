@@ -4,8 +4,10 @@ namespace Drupal\symfony_mailer\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\symfony_mailer\Entity\MailerPolicy;
 use Drupal\Core\Url;
+use Drupal\symfony_mailer\Entity\MailerPolicy;
+use Drupal\symfony_mailer\Processor\EmailBuilderManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Mailer policy add form.
@@ -13,12 +15,37 @@ use Drupal\Core\Url;
 class PolicyAddForm extends EntityForm {
 
   /**
+   * The email builder manager.
+   *
+   * @var \Drupal\symfony_mailer\Processor\EmailBuilderManagerInterface
+   */
+  protected $builderManager;
+
+  /**
+   * Constructs PolicyAddForm.
+   *
+   * @param \Drupal\symfony_mailer\Processor\EmailBuilderManagerInterface $email_builder_manager
+   *   The email builder manager.
+   */
+  public function __construct(EmailBuilderManagerInterface $email_builder_manager) {
+    $this->builderManager = $email_builder_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('plugin.manager.email_builder')
+    );
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
     $types = [];
-    $emailBuilderManager = \Drupal::service('plugin.manager.email_builder');
-    foreach ($emailBuilderManager->getDefinitions() as $id => $definition) {
+    foreach ($this->builderManager->getDefinitions() as $id => $definition) {
       if (empty($definition['sub_type'])) {
         $types[$id] = $definition['label'];
       }
@@ -45,7 +72,7 @@ class PolicyAddForm extends EntityForm {
 
     // This form is Ajax enabled, so fetch the existing values if present.
     if ($type = $form_state->getValue('type')) {
-      $definition = $emailBuilderManager->getDefinition($type);
+      $definition = $this->builderManager->getDefinition($type);
 
       $form['sub_type'] = [
         '#title' => $this->t('Sub-type'),

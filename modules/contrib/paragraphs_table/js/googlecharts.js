@@ -21,7 +21,7 @@
           } else {
             $.ajax({
               url: 'https://www.google.com/jsapi?callback',
-              cache: TRUE,
+              cache: true,
               dataType: 'script',
               success: function () {
                 google.load('visualization', '1', {
@@ -40,7 +40,7 @@
                     });
                   }
                 });
-                return TRUE;
+                return true;
               }
             });
           }

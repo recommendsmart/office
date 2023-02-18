@@ -229,17 +229,17 @@ class HtmlFormatterType extends FormatterBase {
         
       }
       else {
-        
+
         if ($items[$delta]->value == '' || $items[$delta]->value == '{}') {
           $aggridValue = $aggridDefault['default']->rowData;
         }
         else {
           $aggridValue = json_decode($items[$delta]->value);
         }
-        
+
         $pinnedTopRowData = @$aggridDefault['addOptions']->pinnedTopRowData;
         $pinnedBottomRowData = @$aggridDefault['addOptions']->pinnedBottomRowData;
-        
+
         $aggridRowSettings = $aggridDefault['aggridRowSettings'];
 
         // Set complimentary suppression variable
@@ -309,31 +309,31 @@ class HtmlFormatterType extends FormatterBase {
 
         // Close up the headers and start on data rows.
         $table_render .= '</thead><tbody>';
-        
+
         // Pinned Top Row Settings.
         $pinnedTopRowSettings[][][] = "";
         $pinnedTopRowSettings = $aggridConfigHelpers->getRowSettings($aggridRowSettings, $headers, $pinnedTopRowData, 't-');
-        
+
         // Pinned Top Rows.
         $table_render .= $this->createAggridRowData($pinnedTopRowSettings, $columns, $headers, $pinnedTopRowData);
 
         // (Data) Row Settings.
         $rowSettings = $aggridConfigHelpers->getRowSettings($aggridRowSettings, $headers, $rowData, '');
-        
+
         // Data rows.
         $table_render .= $this->createAggridRowData($rowSettings, $columns, $headers, $rowData);
         // Set the row suppression from after the actual rowData is run
         $rowSuppression = $this->rowSuppression;
-        
+
         // Pinned Bottom Row Settings.
         $pinnedBottomRowSettings = $aggridConfigHelpers->getRowSettings($aggridRowSettings, $headers, $pinnedBottomRowData, 'b-');
-        
+
         // Pinned Bottom Rows.
         $table_render .= $this->createAggridRowData($pinnedBottomRowSettings, $columns, $headers, $pinnedBottomRowData);
-        
+
         // Close up the table.
         $table_render .= '</tbody></table>';
-        
+
         $elements[$delta]['container'] = [
           '#theme' => 'aggrid_table',
           '#title' => $this->fieldDefinition->label(),
@@ -349,7 +349,7 @@ class HtmlFormatterType extends FormatterBase {
             ],
           ],
         ];
-        
+
         /*
          * Putting this code to the side for now. They're currently working on multiple headers
          * for the '#type' => 'table'

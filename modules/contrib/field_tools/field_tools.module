@@ -1,4 +1,12 @@
 <?php
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\field_tools\Form\FieldStorageConfigDeleteForm;
+use Drupal\field_tools\EntityHandler\FieldStorageConfigAccess;
+use Drupal\Core\Entity\Routing\AdminHtmlRouteProvider;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Url;
+
 /**
  * @file field_tools.module
  * Contains useful tools for working with fields.
@@ -7,7 +15,7 @@
 /**
  * Implements hook_help().
  */
-function field_tools_help($route_name, \Drupal\Core\Routing\RouteMatchInterface $route_match) {
+function field_tools_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {
     // Main module help.
     case 'help.page.field_tools':
@@ -58,16 +66,16 @@ function field_tools_entity_type_build(array &$entity_types) {
   // FieldConfig::linkTemplates(), but we can't hack into that.
 
   // Add a delete form and link to field storage config.
-  $entity_types['field_storage_config']->setFormClass('delete', Drupal\field_tools\Form\FieldStorageConfigDeleteForm::class);
+  $entity_types['field_storage_config']->setFormClass('delete', FieldStorageConfigDeleteForm::class);
   $entity_types['field_storage_config']->setLinkTemplate('delete-form', '/admin/reports/fields/tools/{field_storage_config}/delete');
-  $entity_types['field_storage_config']->setHandlerClass('access', Drupal\field_tools\EntityHandler\FieldStorageConfigAccess::class);
+  $entity_types['field_storage_config']->setHandlerClass('access', FieldStorageConfigAccess::class);
   // @todo Core forgot to add a direct way to manipulate route_provider, so
   // we have to do it the sloppy way for now.
   $route_providers = $entity_types['field_storage_config']->getRouteProviderClasses() ?: [];
   if (empty($route_providers['field_tools'])) {
     // This will only provide the delete route, as all the other link templates
     // aren't defined.
-    $route_providers['field_tools'] = \Drupal\Core\Entity\Routing\AdminHtmlRouteProvider::class;
+    $route_providers['field_tools'] = AdminHtmlRouteProvider::class;
     $entity_types['field_storage_config']->setHandlerClass('route_provider', $route_providers);
   }
 }
@@ -75,10 +83,10 @@ function field_tools_entity_type_build(array &$entity_types) {
 /**
  * Implements hook_entity_operation().
  */
-function field_tools_entity_operation(\Drupal\Core\Entity\EntityInterface $entity) {
+function field_tools_entity_operation(EntityInterface $entity) {
   $operations = [];
 
-  if ($entity->getEntityTypeId() == 'field_config') {
+  if ($entity->getEntityTypeId() == 'field_config' && $entity->access('update')) {
     $target_entity_type_id = $entity->getTargetEntityTypeId();
 
     $parameters = [
@@ -95,14 +103,15 @@ function field_tools_entity_operation(\Drupal\Core\Entity\EntityInterface $entit
     // Field clone operation.
     $operations['clone'] = array(
       'title' => t('Clone'),
-      'url' => \Drupal\Core\Url::fromRoute("entity.field_config.{$target_entity_type_id}_field_tools_clone_form", $parameters),
+      'url' => Url::fromRoute("entity.field_config.{$target_entity_type_id}_field_tools_clone_form", $parameters),
       'weight' => 50,
     );
   }
 
   // Add operation links to bundle entity lists for the tools tabs.
   $bundle_of_entity_type_id = $entity->getEntityType()->getBundleOf();
-  if ($bundle_of_entity_type_id) {
+  $has_permission = \Drupal::currentUser()->hasPermission('administer ' . $bundle_of_entity_type_id . ' fields');
+  if ($bundle_of_entity_type_id && $has_permission) {
     $bundle_of_entity_type = \Drupal::entityTypeManager()->getDefinition($bundle_of_entity_type_id);
 
     if ($bundle_of_entity_type->get('field_ui_base_route')) {
@@ -114,7 +123,7 @@ function field_tools_entity_operation(\Drupal\Core\Entity\EntityInterface $entit
 
       $operations['clone_fields'] = array(
         'title' => t('Clone fields'),
-        'url' => \Drupal\Core\Url::fromRoute("field_tools.field_bulk_clone_{$bundle_of_entity_type_id}", $parameters),
+        'url' => Url::fromRoute("field_tools.field_bulk_clone_{$bundle_of_entity_type_id}", $parameters),
         'weight' => 50,
       );
     }

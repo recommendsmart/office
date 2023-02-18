@@ -42,18 +42,6 @@ function template_preprocess_calendar_view_day(array &$variables) {
   $variables['date_pattern'] = $elements['#date_pattern'] ?? 'd';
   $variables['timestamp'] = $elements['#timestamp'] ?? NULL;
 
-  // Expose day start/end hours.
-  $options = $elements['#options'] ?? [];
-  $display_hours = $options['calendar_display_hours'] ?? FALSE;
-  $variables['hours']['display'] = $display_hours;
-  $variables['hours']['start'] = $options['calendar_day_hours_start'] ?? 0;
-  $variables['hours']['end'] = $options['calendar_day_hours_end'] ?? 24;
-
-  // Always hide hours if month calendar display.
-  if (($options['calendar_display'] ?? NULL) == 'month') {
-    $variables['hours']['display'] = FALSE;
-  }
-
   // Helpful $content variable for templates.
   foreach (Element::children($elements) as $key) {
     $variables['content'][$key] = $variables['elements'][$key];
@@ -61,20 +49,56 @@ function template_preprocess_calendar_view_day(array &$variables) {
 
   $variables['rows'] = [];
   foreach ($elements['#children'] ?? [] as $result) {
-    // Get values prepared in Calendar style plugin.
-    // @see \Drupal\calendar_view\Plugin\views/style\Calendar::processResults();
-    $values = $result['#calendar_view'] ?? [];
-    $row_timestamp = $values['from'] ?? 0;
-    $row_hour_start = strtotime(date('Y-m-d H:00:00', _calendar_view_convert_to_timestamp($row_timestamp)));
-
-    // Fake preprocessing result as if it were a default row.
-    // See issue: https://www.drupal.org/project/calendar_view/issues/3295385.
     $renderable = [];
     $renderable['view'] = $result['#view'];
     $renderable['rows'] = [$result];
+
+    // Fake preprocessing of result rows to mimic Views.
+    // See issue: https://www.drupal.org/project/calendar_view/issues/3295385.
     template_preprocess_views_view_unformatted($renderable);
 
-    $variables['rows'][$row_hour_start][] = reset($renderable['rows']);
+    $values = $result['#calendar_view'] ?? [];
+
+    // Identify multi-day-spanning events.
+    $row = reset($renderable['rows']);
+    $row['parent'] = $values['parent'] ?? NULL;
+    $row['instance'] = $row_instance = $values['instance'] ?? 0;
+    $row['instances'] = $row_instance_total = $values['instances'] ?? 0;
+    $row['attributes']->setAttribute('data-calendar-view-instance', $row_instance);
+    $row['attributes']->setAttribute('data-calendar-view-instances', $row_instance_total);
+    $row['attributes']->setAttribute('data-calendar-view-hash', $values['hash'] ?? NULL);
+
+    // Helpful information on hover.
+    if ($calendar_field = $values['calendar_field'] ?? NULL) {
+      $row['attributes']->setAttribute('title', $calendar_field->label());
+    }
+
+    $row_instance_classes = [];
+    if ($row_instance_total > 0) {
+      $row_instance_classes[] = 'is-multi';
+      if ($row_instance === 0) {
+        $row_instance_classes[] = 'is-multi--first';
+      }
+      elseif ($row_instance == $row_instance_total) {
+        $row_instance_classes[] = 'is-multi--last';
+      }
+      else {
+        $row_instance_classes[] = 'is-multi--middle';
+      }
+      $row['attributes']->addClass($row_instance_classes);
+    }
+
+    // Update row content.
+    $row_timestamp = $values['from'] ?? 0;
+    $variables['rows'][$row_timestamp][] = $row;
+  }
+
+  // Reorder rows in cell.
+  $list = &$variables['rows'];
+  if (count($list) > 1) {
+    array_multisort(array_map(function ($element) {
+      return $element[0]['parent'];
+    }, $list), SORT_ASC, $list);
   }
 }
 
@@ -141,21 +165,39 @@ function template_preprocess_calendar_view_pager(array &$variables) {
     '#url' => Url::fromRoute($route_name, [], [
       'query' => $parameters + ['calendar_timestamp' => $parameters['previous']],
     ]),
+    '#attributes' => [
+      'aria-label' => t('Previous month, @date', [
+        '@date' => $date_formatter->format(
+        $parameters['previous'],
+        'custom',
+        'F Y'
+        ),
+      ]),
+    ],
     // @todo limit in past?
     '#access' => TRUE,
   ];
+
   $variables['items']['current'] = [
     '#type' => 'item',
     '#markup' => $date_formatter->format($parameters['current'], $date_format, $date_pattern),
+    '#attributes' => [
+      'aria-label' => t('Current month, @date', [
+        '@date' => $date_formatter->format(
+        $parameters['current'],
+        'custom',
+        'F Y'
+        ),
+      ]),
+    ],
   ];
 
   // Reset button.
   if ($parameters['display_reset'] ?? FALSE) {
-    $now = time();
-    $now_year = date('Y', $now);
-    $now_month = date('m');
-    $now_start = strtotime("$now_year-$now_month-01");
-    if ($now_start !== (int) $parameters['current']) {
+    $date_time_now = new \DateTime();
+    $date_time_now->setTimestamp(time());
+    $now = strtotime($date_time_now->format('Y-m-01'));
+    if ($now !== (int) $parameters['current']) {
       $variables['items']['reset'] = [
         '#type' => 'link',
         '#title' => t('Today'),
@@ -163,7 +205,16 @@ function template_preprocess_calendar_view_pager(array &$variables) {
           'query' => $parameters + ['calendar_timestamp' => $now],
         ]),
         '#attributes' => [
-          'title' => t('Back to @today', ['@today' => $date_formatter->format($now, $date_format, $date_pattern)]),
+          'title' => t('Back to @today', [
+            '@today' => $date_formatter->format($now, $date_format, $date_pattern),
+          ]),
+          'aria-label' => t('Back to @today', [
+            '@today' => $date_formatter->format(
+            $now,
+            'custom',
+            'F Y'
+            ),
+          ]),
           'class' => ['pager__reset'],
         ],
       ];
@@ -176,6 +227,15 @@ function template_preprocess_calendar_view_pager(array &$variables) {
     '#url' => Url::fromRoute($route_name, [], [
       'query' => $parameters + ['calendar_timestamp' => $parameters['next']],
     ]),
+    '#attributes' => [
+      'aria-label' => t('Next month, @date', [
+        '@date' => $date_formatter->format(
+        $parameters['next'],
+        'custom',
+        'F Y'
+        ),
+      ]),
+    ],
     // @todo limit in future?
     '#access' => TRUE,
   ];
@@ -185,21 +245,14 @@ function template_preprocess_calendar_view_pager(array &$variables) {
 }
 
 /**
- * Implements hook_preprocess_views_view_fields().
+ * Implements hook_theme_suggestions_HOOK_alter().
  */
-function calendar_view_preprocess_views_view_fields(&$variables) {
+function calendar_view_theme_suggestions_views_view_alter(&$suggestions, array $variables) {
   $view = $variables['view'];
   if (($style = $view->getStyle()) instanceof CalendarStyle) {
-    $filters = $style->getDateFilters();
-    foreach ($style->options['calendar_filters'] as $filter_id) {
-      if ($filter = $filters[$filter_id] ?? NULL) {
-        $field_name = $style->getFilterFieldname($filter);
-        if (!isset($variables['fields'][$field_name])) {
-          continue;
-        }
-        $variables['fields'][$field_name]->wrapper_attributes->addClass('calendar-view-filter');
-      }
-    }
+    // Custom template for Views using Calendar style for easier theming.
+    // Useful when you want to place the pager somewhere else for instance.
+    $suggestions[] = $variables['theme_hook_original'] . '__' . 'style' . '__' . $style->getPluginId();
   }
 }
 
@@ -243,6 +296,6 @@ function calendar_view_theme_suggestions_calendar_view_pager_alter(&$suggestions
  * @return mixed
  *   The timestamp or the original value.
  */
-function _calendar_view_convert_to_timestamp(mixed $value) {
-  return !ctype_digit(strval($value)) ? strtotime($value) : $value;
+function _calendar_view_convert_to_timestamp($value) {
+  return !empty($value) && !ctype_digit(strval($value)) ? strtotime($value) : $value;
 }

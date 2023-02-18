@@ -10,6 +10,7 @@ use Drupal\Core\Theme\Registry;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\widget_type\Entity\WidgetType;
 use Drupal\widget_type\WidgetTypeViewBuilder;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * Kernel tests for WidgetTypeViewBuilder.
@@ -18,6 +19,8 @@ use Drupal\widget_type\WidgetTypeViewBuilder;
  * @coversDefaultClass \Drupal\widget_type\WidgetTypeViewBuilder
  */
 class WidgetTypeViewBuilderTest extends KernelTestBase {
+
+  use ProphecyTrait;
 
   /**
    * {@inheritdoc}
@@ -58,11 +61,11 @@ class WidgetTypeViewBuilderTest extends KernelTestBase {
     $this->installEntitySchema('user');
     $this->installConfig(['field', 'widget_type', 'user']);
     $this->theSut = new WidgetTypeViewBuilder(
-      $this->prophesize(EntityTypeInterface::class)->reveal(),
-      $this->prophesize(EntityRepositoryInterface::class)->reveal(),
-      $this->prophesize(LanguageManagerInterface::class)->reveal(),
-      $this->prophesize(Registry::class)->reveal(),
-      $this->prophesize(EntityDisplayRepositoryInterface::class)->reveal()
+      $this->getProphet()->prophesize(EntityTypeInterface::class)->reveal(),
+      $this->getProphet()->prophesize(EntityRepositoryInterface::class)->reveal(),
+      $this->getProphet()->prophesize(LanguageManagerInterface::class)->reveal(),
+      $this->getProphet()->prophesize(Registry::class)->reveal(),
+      $this->getProphet()->prophesize(EntityDisplayRepositoryInterface::class)->reveal()
     );
     $this->entity = WidgetType::create([
       'name' => 'The name',

@@ -86,6 +86,7 @@ class FieldConfigCloneForm extends EntityForm {
     // Get all the fields with the same name on the same entity type, to mark
     // their checkboxes as disabled.
     $field_ids = $this->entityTypeManager->getStorage('field_config')->getQuery()
+      ->accessCheck(FALSE)
       ->condition('field_name', $field_config->getName())
       ->execute();
     $other_bundle_fields = $this->entityTypeManager->getStorage('field_config')->loadMultiple($field_ids);

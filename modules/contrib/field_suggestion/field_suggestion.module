@@ -13,9 +13,11 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
 use Drupal\field_suggestion\Element\FieldSuggestionOperations;
+use Drupal\field_suggestion\Element\FieldSuggestionToggle;
 use Drupal\user\EntityOwnerInterface;
 
 /**
@@ -168,6 +170,7 @@ function field_suggestion_field_widget_single_element_form_alter(
   if ($config->get('collapsible')) {
     $element['suggestion'] = [
       '#type' => 'dropbutton',
+      '#subtype' => 'field_suggestion',
       '#attached' => ['library' => ['field_suggestion/ajax']],
       '#links' => [['title' => t('Suggestions')]],
     ];
@@ -389,6 +392,51 @@ function field_suggestion_element_info_alter(array &$info) {
     FieldSuggestionOperations::class,
     'preRender',
   ];
+}
+
+/**
+ * Implements hook_theme().
+ */
+function field_suggestion_theme($existing, $type, $theme, $path) {
+  return [
+    'bootstrap_dropdown__field_suggestion' => [
+      'base hook' => 'bootstrap_dropdown',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function field_suggestion_preprocess_bootstrap_dropdown__field_suggestion(&$variables) {
+  $attributes = &$variables['toggle']['#attributes'];
+  $attributes['class'][] = 'dropdown-toggle';
+  $attributes['id'] = substr($attributes['data-dropdown-target'], 1);
+
+  unset(
+    $attributes['formnovalidate'],
+    $attributes['data-dropdown-target'],
+    $variables['items']['#items'][0]
+  );
+
+  $attributes += [
+    'data-toggle' => 'dropdown',
+    'aria-haspopup' => 'true',
+    'aria-expanded' => 'false',
+  ];
+
+  $variables['toggle']['#value'] = Markup::create(
+    $variables['toggle']['#value'] . ' <span class="caret"></span>'
+  );
+
+  $variables['toggle']['#split'] = FALSE;
+
+  $variables['toggle']['#pre_render'][] = [
+    FieldSuggestionToggle::class,
+    'preRender',
+  ];
+
+  $variables['items']['#attributes']['aria-labelledby'] = $attributes['id'];
 }
 
 /**

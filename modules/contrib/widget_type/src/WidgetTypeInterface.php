@@ -12,6 +12,38 @@ use Drupal\file\FileInterface;
 interface WidgetTypeInterface extends ContentEntityInterface, EntityChangedInterface {
 
   /**
+   * REMOTE_STATUS_<status> const denotes the status of the widget and its
+   * readiness for production. It's a map of the js-widgets registry schema.
+   *
+   * @see https://js-widgets.github.io/js-widgets/registry-schema/#_items_status
+   */
+  /**
+   * Widget status is stable.
+   */
+  const REMOTE_STATUS_STABLE = 'stable';
+
+  /**
+   * Widget status is beta.
+   */
+  const REMOTE_STATUS_BETA = 'beta';
+
+  /**
+   * Widget status is work in progress (WIP).
+   */
+  const REMOTE_STATUS_WIP = 'wip';
+
+  /**
+   * Widget status is deprecated.
+   */
+  const REMOTE_STATUS_DEPRECATED = 'deprecated';
+
+  /**
+   * Widget status is unknown. There is no way to establish the status. It's not
+   * defined in the registry.
+   */
+  const REMOTE_STATUS_UNKNOWN = 'unknown';
+
+  /**
    * Gets the widget type name.
    *
    * @return string

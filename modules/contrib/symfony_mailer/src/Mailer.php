@@ -19,6 +19,7 @@ use Drupal\symfony_mailer\Exception\SkipMailException;
 use Drupal\user\Entity\User;
 use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -92,6 +93,13 @@ class Mailer implements MailerInterface {
   protected $accountSwitcher;
 
   /**
+   * The transport manager.
+   *
+   * @var \Symfony\Component\Mailer\Transport
+   */
+  protected $transportManager;
+
+  /**
    * Constructs the Mailer object.
    *
    * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher
@@ -112,8 +120,10 @@ class Mailer implements MailerInterface {
    *   The theme initialization.
    * @param \Drupal\Core\Session\AccountSwitcherInterface $account_switcher
    *   The account switcher service.
+   * @param \Drupal\symfony_mailer\TransportFactoryManagerInterface $transport_factory_manager
+   *   The transport factory manager.
    */
-  public function __construct(EventDispatcherInterface $dispatcher, RendererInterface $renderer, LanguageDefault $language_default, LanguageManagerInterface $language_manager, LoggerChannelFactoryInterface $logger_factory, AccountInterface $account, ThemeManagerInterface $theme_manager, ThemeInitializationInterface $theme_initialization, AccountSwitcherInterface $account_switcher) {
+  public function __construct(EventDispatcherInterface $dispatcher, RendererInterface $renderer, LanguageDefault $language_default, LanguageManagerInterface $language_manager, LoggerChannelFactoryInterface $logger_factory, AccountInterface $account, ThemeManagerInterface $theme_manager, ThemeInitializationInterface $theme_initialization, AccountSwitcherInterface $account_switcher, TransportFactoryManagerInterface $transport_factory_manager) {
     $this->dispatcher = $dispatcher;
     $this->renderer = $renderer;
     $this->languageDefault = $language_default;
@@ -123,6 +133,7 @@ class Mailer implements MailerInterface {
     $this->themeManager = $theme_manager;
     $this->themeInitialization = $theme_initialization;
     $this->accountSwitcher = $account_switcher;
+    $this->transportManager = new Transport($transport_factory_manager->getFactories());
   }
 
   /**
@@ -160,19 +171,15 @@ class Mailer implements MailerInterface {
    * @internal
    */
   public function doSend(InternalEmailInterface $email) {
+    // LegacyEmailBuilder sets the theme during the process phase. Save the
+    // active theme so we can change back.
+    $active_theme_name = $this->themeManager->getActiveTheme()->getName();
+
     // Process the build phase.
     // @see \Drupal\symfony_mailer\EmailInterface::PHASE_BUILD
     $email->process();
 
     // Do switching.
-    $theme_name = $email->getTheme();
-    $active_theme_name = $this->themeManager->getActiveTheme()->getName();
-    $must_switch_theme = $theme_name !== $active_theme_name;
-
-    if ($must_switch_theme) {
-      $this->changeTheme($theme_name);
-    }
-
     $current_langcode = $this->languageManager->getCurrentLanguage()->getId();
     if ($email->getParam('__disable_customize__')) {
       // Undocumented setting for use from LegacyEmailBuilder only for
@@ -187,6 +194,8 @@ class Mailer implements MailerInterface {
       $account = $this->account;
     }
     else {
+      $this->changeTheme($email->getTheme());
+
       // Determine langcode and account from the to address, if there is
       // agreement.
       $langcodes = $accounts = [];
@@ -238,21 +247,20 @@ class Mailer implements MailerInterface {
         $this->changeActiveLanguage($current_langcode);
       }
 
-      if ($must_switch_theme) {
-        $this->changeTheme($active_theme_name);
-      }
+      $this->changeTheme($active_theme_name);
     }
 
     try {
       // Send.
+      $symfony_email = $email->getSymfonyEmail();
       $transport_dsn = $email->getTransportDsn();
       if (empty($transport_dsn)) {
         throw new MissingTransportException();
       }
 
-      $transport = Transport::fromDsn($transport_dsn);
+      $dsn = Dsn::fromString($transport_dsn);
+      $transport = $this->transportManager->fromDsnObject($dsn);
       $mailer = new SymfonyMailer($transport, NULL, $this->dispatcher);
-      $symfony_email = $email->getSymfonyEmail();
 
       // ksm($email, $symfony_email->getHeaders());
       $mailer->send($symfony_email);
@@ -267,6 +275,7 @@ class Mailer implements MailerInterface {
       else {
         $message = $e->getMessage();
       }
+      $email->setError($message);
 
       // Log.
       $params = ['%message' => $message];
@@ -287,6 +296,18 @@ class Mailer implements MailerInterface {
     $email->process();
 
     return $result;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function changeTheme(string $theme_name) {
+    $active_theme_name = $this->themeManager->getActiveTheme()->getName();
+    if ($theme_name !== $active_theme_name) {
+      $this->themeManager->setActiveTheme($this->themeInitialization->initTheme($theme_name));
+    }
+
+    return $active_theme_name;
   }
 
   /**
@@ -324,16 +345,6 @@ class Mailer implements MailerInterface {
       $string_translation->setDefaultLangcode($language->getId());
       $string_translation->reset();
     }
-  }
-
-  /**
-   * Changes the active theme for email.
-   *
-   * @param string $theme_name
-   *   The theme name.
-   */
-  protected function changeTheme(string $theme_name) {
-    $this->themeManager->setActiveTheme($this->themeInitialization->initTheme($theme_name));
   }
 
 }

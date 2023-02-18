@@ -52,6 +52,15 @@ class MailerTestService implements MailerTestServiceInterface, EmailProcessorInt
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function getEmails() {
+    $emails = $this->emails;
+    $this->emails = [];
+    return $emails;
+  }
+
+  /**
    * Post-render function.
    *
    * @param \Drupal\symfony_mailer\EmailInterface $email

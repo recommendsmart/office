@@ -5,6 +5,7 @@ namespace Drupal\Tests\widget_type\Unit;
 use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Tests\UnitTestCase;
 use Drupal\widget_type\WidgetTypeConfiguration;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * Unit tests for the WidgetTypeConfiguration.
@@ -16,12 +17,14 @@ use Drupal\widget_type\WidgetTypeConfiguration;
  */
 final class WidgetTypeConfigurationTest extends UnitTestCase {
 
+  use ProphecyTrait;
+
   /**
    * @covers ::shouldIngestAssets
    * @dataProvider shouldIngestAssetsProvider
    */
   public function testShouldIngestAssets($name, $config, $expected) {
-    $config_object = $this->prophesize(ImmutableConfig::class);
+    $config_object = $this->getProphet()->prophesize(ImmutableConfig::class);
     [$allowed, $disallowed] = $config;
     $config_object->get('download_assets.allowed_list')->willReturn($allowed);
     $config_object->get('download_assets.disallowed_list')->willReturn($disallowed);

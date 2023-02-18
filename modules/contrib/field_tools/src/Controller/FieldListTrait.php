@@ -69,7 +69,7 @@ trait FieldListTrait {
       '#type' => 'checkboxes',
       '#title' => $this->t('Host entity and bundle'),
       '#options' => $bundle_options,
-      '#default_value' => $this->requestStack->getCurrentRequest()->query->get('host_entity_bundle') ?? [],
+      '#default_value' => $this->requestStack->getCurrentRequest()->query->all('host_entity_bundle') ?? [],
     ];
 
     return $element;

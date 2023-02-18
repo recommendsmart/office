@@ -184,21 +184,21 @@
         },
         {
             "name": "commerceguys/addressing",
-            "version": "v1.4.1",
-            "version_normalized": "1.4.1.0",
+            "version": "v1.4.2",
+            "version_normalized": "1.4.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/commerceguys/addressing.git",
-                "reference": "8b1bcd45971733e8f4224e539cb92838f18c4d06"
+                "reference": "406c7b5f0fbe4f6a64155c0fe03b1adb34d01308"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/commerceguys/addressing/zipball/8b1bcd45971733e8f4224e539cb92838f18c4d06",
-                "reference": "8b1bcd45971733e8f4224e539cb92838f18c4d06",
+                "url": "https://api.github.com/repos/commerceguys/addressing/zipball/406c7b5f0fbe4f6a64155c0fe03b1adb34d01308",
+                "reference": "406c7b5f0fbe4f6a64155c0fe03b1adb34d01308",
                 "shasum": ""
             },
             "require": {
-                "doctrine/collections": "^1.2",
+                "doctrine/collections": "^1.2 || ^2.0",
                 "php": ">=7.3"
             },
             "require-dev": {
@@ -211,7 +211,7 @@
             "suggest": {
                 "symfony/validator": "to validate addresses"
             },
-            "time": "2022-08-09T11:42:51+00:00",
+            "time": "2023-02-15T10:11:14+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -245,7 +245,7 @@
             ],
             "support": {
                 "issues": "https://github.com/commerceguys/addressing/issues",
-                "source": "https://github.com/commerceguys/addressing/tree/v1.4.1"
+                "source": "https://github.com/commerceguys/addressing/tree/v1.4.2"
             },
             "install-path": "../commerceguys/addressing"
         },
@@ -1152,18 +1152,18 @@
         },
         {
             "name": "drupal/access_records",
-            "version": "1.0.0-beta8",
-            "version_normalized": "1.0.0.0-beta8",
+            "version": "1.0.0-beta9",
+            "version_normalized": "1.0.0.0-beta9",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/access_records.git",
-                "reference": "1.0.0-beta8"
+                "reference": "1.0.0-beta9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/access_records-1.0.0-beta8.zip",
-                "reference": "1.0.0-beta8",
-                "shasum": "0879fa5c4d9a9d70829332295ba9825e617ec852"
+                "url": "https://ftp.drupal.org/files/projects/access_records-1.0.0-beta9.zip",
+                "reference": "1.0.0-beta9",
+                "shasum": "0129c625e4472001bd83c70b9a987348e9b50314"
             },
             "require": {
                 "drupal/core": "^9.3 || ^10",
@@ -1172,8 +1172,8 @@
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "1.0.0-beta8",
-                    "datestamp": "1675611743",
+                    "version": "1.0.0-beta9",
+                    "datestamp": "1675858432",
                     "security-coverage": {
                         "status": "not-covered",
                         "message": "Beta releases are not covered by Drupal security advisories."
@@ -1569,30 +1569,30 @@
         },
         {
             "name": "drupal/aggrid",
-            "version": "1.0.0-alpha46",
-            "version_normalized": "1.0.0.0-alpha46",
+            "version": "1.0.0-rc6",
+            "version_normalized": "1.0.0.0-RC6",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/aggrid.git",
-                "reference": "8.x-1.0-alpha46"
+                "reference": "8.x-1.0-rc6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/aggrid-8.x-1.0-alpha46.zip",
-                "reference": "8.x-1.0-alpha46",
-                "shasum": "6ed618337278293e9aab377d7b62c39028eed1bd"
+                "url": "https://ftp.drupal.org/files/projects/aggrid-8.x-1.0-rc6.zip",
+                "reference": "8.x-1.0-rc6",
+                "shasum": "ad34c51d826c088ace9dd6b2e13ab8279222b561"
             },
             "require": {
-                "drupal/core": "^8 || ^9"
+                "drupal/core": "^8 || ^9 || ^10"
             },
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "8.x-1.0-alpha46",
-                    "datestamp": "1635464981",
+                    "version": "8.x-1.0-rc6",
+                    "datestamp": "1676326697",
                     "security-coverage": {
                         "status": "not-covered",
-                        "message": "Alpha releases are not covered by Drupal security advisories."
+                        "message": "RC releases are not covered by Drupal security advisories."
                     }
                 },
                 "drush": {
@@ -2250,27 +2250,27 @@
         },
         {
             "name": "drupal/calendar_view",
-            "version": "2.0.2",
-            "version_normalized": "2.0.2.0",
+            "version": "2.0.5",
+            "version_normalized": "2.0.5.0",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/calendar_view.git",
-                "reference": "2.0.2"
+                "reference": "2.0.5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/calendar_view-2.0.2.zip",
-                "reference": "2.0.2",
-                "shasum": "879e59463a967cddd20c1e19cf52c567f792b09c"
+                "url": "https://ftp.drupal.org/files/projects/calendar_view-2.0.5.zip",
+                "reference": "2.0.5",
+                "shasum": "ba97392d57dddaa7304c8c5269f8a4845e47ad30"
             },
             "require": {
-                "drupal/core": "^8 || ^9 || ^10"
+                "drupal/core": "^8.8 || ^9 || ^10"
             },
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "2.0.2",
-                    "datestamp": "1675178747",
+                    "version": "2.0.5",
+                    "datestamp": "1676557946",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
@@ -3816,6 +3816,54 @@
                 "source": "https://git.drupalcode.org/project/consumers"
             },
             "install-path": "../../modules/contrib/consumers"
+        },
+        {
+            "name": "drupal/content_entity_clone",
+            "version": "1.0.1",
+            "version_normalized": "1.0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupalcode.org/project/content_entity_clone.git",
+                "reference": "1.0.1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/content_entity_clone-1.0.1.zip",
+                "reference": "1.0.1",
+                "shasum": "fbcd5e594a2e9f09985b1ac5a2be7781279c0d7d"
+            },
+            "require": {
+                "drupal/core": "^9 || ^10"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "drupal": {
+                    "version": "1.0.1",
+                    "datestamp": "1659682087",
+                    "security-coverage": {
+                        "status": "covered",
+                        "message": "Covered by Drupal's security advisory policy"
+                    }
+                }
+            },
+            "installation-source": "dist",
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "orakili",
+                    "homepage": "https://www.drupal.org/u/orakili"
+                }
+            ],
+            "description": "Provides cloning of content entity types.",
+            "homepage": "https://www.drupal.org/project/content_entity_clone",
+            "support": {
+                "source": "https://git.drupal.org/project/content_entity_clone.git",
+                "issues": "https://www.drupal.org/project/issues/content_entity_clone"
+            },
+            "install-path": "../../modules/contrib/content_entity_clone"
         },
         {
             "name": "drupal/content_to_group",
@@ -6053,6 +6101,57 @@
             "install-path": "../../modules/contrib/entity_reference_tree"
         },
         {
+            "name": "drupal/entity_type_clone",
+            "version": "3.0.1",
+            "version_normalized": "3.0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupalcode.org/project/entity_type_clone.git",
+                "reference": "3.0.1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/entity_type_clone-3.0.1.zip",
+                "reference": "3.0.1",
+                "shasum": "5076627d27aa5f54310397075b515f985ff42d74"
+            },
+            "require": {
+                "drupal/core": "^8 || ^9 || ^10"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "drupal": {
+                    "version": "3.0.1",
+                    "datestamp": "1675596789",
+                    "security-coverage": {
+                        "status": "covered",
+                        "message": "Covered by Drupal's security advisory policy"
+                    }
+                }
+            },
+            "installation-source": "dist",
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "ajay_reddy",
+                    "homepage": "https://www.drupal.org/user/3261994"
+                },
+                {
+                    "name": "vuil",
+                    "homepage": "https://www.drupal.org/user/3568458"
+                }
+            ],
+            "description": "This module provide option to clone entity types and role.",
+            "homepage": "https://www.drupal.org/project/entity_type_clone",
+            "support": {
+                "source": "https://git.drupalcode.org/project/entity_type_clone"
+            },
+            "install-path": "../../modules/contrib/entity_type_clone"
+        },
+        {
             "name": "drupal/entity_version",
             "version": "1.1.0",
             "version_normalized": "1.1.0.0",
@@ -6902,18 +7001,18 @@
         },
         {
             "name": "drupal/field_suggestion",
-            "version": "1.0.0-alpha7",
-            "version_normalized": "1.0.0.0-alpha7",
+            "version": "1.0.0-alpha8",
+            "version_normalized": "1.0.0.0-alpha8",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/field_suggestion.git",
-                "reference": "1.0.0-alpha7"
+                "reference": "1.0.0-alpha8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/field_suggestion-1.0.0-alpha7.zip",
-                "reference": "1.0.0-alpha7",
-                "shasum": "9981789714eb95d6684e3efe2d186873ea53a3ea"
+                "url": "https://ftp.drupal.org/files/projects/field_suggestion-1.0.0-alpha8.zip",
+                "reference": "1.0.0-alpha8",
+                "shasum": "84ef291e9e914fe9be1ee0c45b9a0bb98bda1856"
             },
             "require": {
                 "drupal/core": "^9.2 || ^10",
@@ -6922,8 +7021,8 @@
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "1.0.0-alpha7",
-                    "datestamp": "1663998599",
+                    "version": "1.0.0-alpha8",
+                    "datestamp": "1676205008",
                     "security-coverage": {
                         "status": "not-covered",
                         "message": "Alpha releases are not covered by Drupal security advisories."
@@ -6950,27 +7049,27 @@
         },
         {
             "name": "drupal/field_tools",
-            "version": "1.0.0-alpha9",
-            "version_normalized": "1.0.0.0-alpha9",
+            "version": "1.0.0-alpha10",
+            "version_normalized": "1.0.0.0-alpha10",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/field_tools.git",
-                "reference": "8.x-1.0-alpha9"
+                "reference": "8.x-1.0-alpha10"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/field_tools-8.x-1.0-alpha9.zip",
-                "reference": "8.x-1.0-alpha9",
-                "shasum": "2528d48ee2fa796c50c7c0fdf91f80dba173a4b2"
+                "url": "https://ftp.drupal.org/files/projects/field_tools-8.x-1.0-alpha10.zip",
+                "reference": "8.x-1.0-alpha10",
+                "shasum": "21f50bf9fa8bb10f5161b3a3366a06f431f73c69"
             },
             "require": {
-                "drupal/core": "^8 || ^9"
+                "drupal/core": "^8.9 || ^9 || ^10"
             },
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "8.x-1.0-alpha9",
-                    "datestamp": "1645310211",
+                    "version": "8.x-1.0-alpha10",
+                    "datestamp": "1676563317",
                     "security-coverage": {
                         "status": "not-covered",
                         "message": "Project has not opted into security advisory coverage!"
@@ -7691,27 +7790,27 @@
         },
         {
             "name": "drupal/fullcalendar_view",
-            "version": "5.1.10",
-            "version_normalized": "5.1.10.0",
+            "version": "5.1.11",
+            "version_normalized": "5.1.11.0",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/fullcalendar_view.git",
-                "reference": "5.1.10"
+                "reference": "5.1.11"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/fullcalendar_view-5.1.10.zip",
-                "reference": "5.1.10",
-                "shasum": "13c8fcfe0d66d1504b0cd9fcc09e50dc0183c93d"
+                "url": "https://ftp.drupal.org/files/projects/fullcalendar_view-5.1.11.zip",
+                "reference": "5.1.11",
+                "shasum": "966bdadb7213a03886050ac36efbf0613bbf4157"
             },
             "require": {
-                "drupal/core": "^8 || ^9 || ^10"
+                "drupal/core": "^9.2.0 || ^10"
             },
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "5.1.10",
-                    "datestamp": "1675318146",
+                    "version": "5.1.11",
+                    "datestamp": "1676726166",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
@@ -10545,18 +10644,18 @@
         },
         {
             "name": "drupal/paragraphs_table",
-            "version": "1.16.0",
-            "version_normalized": "1.16.0.0",
+            "version": "1.18.0",
+            "version_normalized": "1.18.0.0",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/paragraphs_table.git",
-                "reference": "8.x-1.16"
+                "reference": "8.x-1.18"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/paragraphs_table-8.x-1.16.zip",
-                "reference": "8.x-1.16",
-                "shasum": "946745761cf512017d94a8d3e3e63356dfc4c589"
+                "url": "https://ftp.drupal.org/files/projects/paragraphs_table-8.x-1.18.zip",
+                "reference": "8.x-1.18",
+                "shasum": "2d12e926decd617636f0faead873d314c4a2b619"
             },
             "require": {
                 "drupal/core": "^8 || ^9 || ^10",
@@ -10565,8 +10664,8 @@
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "8.x-1.16",
-                    "datestamp": "1673549432",
+                    "version": "8.x-1.18",
+                    "datestamp": "1676602451",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
@@ -12349,18 +12448,18 @@
         },
         {
             "name": "drupal/socialbase",
-            "version": "2.4.6",
-            "version_normalized": "2.4.6.0",
+            "version": "2.4.7",
+            "version_normalized": "2.4.7.0",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/socialbase.git",
-                "reference": "2.4.6"
+                "reference": "2.4.7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/socialbase-2.4.6.zip",
-                "reference": "2.4.6",
-                "shasum": "9e2a0a04848c4a81096859e81d2a40504a5bee41"
+                "url": "https://ftp.drupal.org/files/projects/socialbase-2.4.7.zip",
+                "reference": "2.4.7",
+                "shasum": "d612d18228a5b6c06a07aad784a6c34a8d106432"
             },
             "require": {
                 "drupal/bootstrap": "3.25",
@@ -12369,8 +12468,8 @@
             "type": "drupal-theme",
             "extra": {
                 "drupal": {
-                    "version": "2.4.6",
-                    "datestamp": "1675433406",
+                    "version": "2.4.7",
+                    "datestamp": "1676472829",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
@@ -12907,10 +13006,10 @@
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/switch_theme.git",
-                "reference": "cbb1b53179d9cd45f6a3c9f4f81c7c7aa59bdff5"
+                "reference": "989aa8116c30e8291798f4a524d185982886f183"
             },
             "require": {
-                "drupal/core": "^8 || ^9 || ^10"
+                "drupal/core": "^9 || ^10"
             },
             "type": "drupal-module",
             "extra": {
@@ -12918,8 +13017,8 @@
                     "dev-1.0.x": "1.0.x-dev"
                 },
                 "drupal": {
-                    "version": "1.0.x-dev",
-                    "datestamp": "1673738479",
+                    "version": "1.0.0+1-dev",
+                    "datestamp": "1676386689",
                     "security-coverage": {
                         "status": "not-covered",
                         "message": "Project has not opted into security advisory coverage!"
@@ -12937,7 +13036,7 @@
                     "homepage": "https://www.drupal.org/user/3709377"
                 }
             ],
-            "description": "Provides Theme negociator depending roles and regex URL pattern",
+            "description": "Provides Theme negociator depending on role and URL regex pattern to provide the correct theme corresponding with the configuration",
             "homepage": "https://www.drupal.org/project/switch_theme",
             "support": {
                 "source": "https://git.drupalcode.org/project/switch_theme"
@@ -12946,18 +13045,18 @@
         },
         {
             "name": "drupal/symfony_mailer",
-            "version": "1.2.0-beta2",
-            "version_normalized": "1.2.0.0-beta2",
+            "version": "1.2.0-rc1",
+            "version_normalized": "1.2.0.0-RC1",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/symfony_mailer.git",
-                "reference": "1.2.0-beta2"
+                "reference": "1.2.0-rc1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/symfony_mailer-1.2.0-beta2.zip",
-                "reference": "1.2.0-beta2",
-                "shasum": "39325edd12036189ce47921d2f11815747ba4506"
+                "url": "https://ftp.drupal.org/files/projects/symfony_mailer-1.2.0-rc1.zip",
+                "reference": "1.2.0-rc1",
+                "shasum": "28493011d0740adbe1d0c2674b2adcdf5af24001"
             },
             "require": {
                 "drupal/core": "^9.4 || ^10",
@@ -12968,8 +13067,8 @@
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "1.2.0-beta2",
-                    "datestamp": "1673606001",
+                    "version": "1.2.0-rc1",
+                    "datestamp": "1676716557",
                     "security-coverage": {
                         "status": "not-covered",
                         "message": "Project has not opted into security advisory coverage!"
@@ -14135,27 +14234,27 @@
         },
         {
             "name": "drupal/widget_type",
-            "version": "1.5.12",
-            "version_normalized": "1.5.12.0",
+            "version": "1.5.14",
+            "version_normalized": "1.5.14.0",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/widget_type.git",
-                "reference": "1.5.12"
+                "reference": "1.5.14"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/widget_type-1.5.12.zip",
-                "reference": "1.5.12",
-                "shasum": "3870b9efd67a88530f2299ae08cdf511b210a254"
+                "url": "https://ftp.drupal.org/files/projects/widget_type-1.5.14.zip",
+                "reference": "1.5.14",
+                "shasum": "42ddf8bafec911b08ada6493b3e192a204f1f57c"
             },
             "require": {
-                "drupal/core": "^8.8.0 || ^9.0"
+                "drupal/core": "^9 || ^10"
             },
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "1.5.12",
-                    "datestamp": "1669714929",
+                    "version": "1.5.14",
+                    "datestamp": "1676456170",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
@@ -15793,17 +15892,17 @@
         },
         {
             "name": "league/oauth2-server",
-            "version": "8.3.6",
-            "version_normalized": "8.3.6.0",
+            "version": "8.4.0",
+            "version_normalized": "8.4.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/oauth2-server.git",
-                "reference": "28c5441716c10d0c936bd731860dc385d0f6d1a8"
+                "reference": "539f4340c14eca8d44578fd118f6bdc0ad16d1ce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/oauth2-server/zipball/28c5441716c10d0c936bd731860dc385d0f6d1a8",
-                "reference": "28c5441716c10d0c936bd731860dc385d0f6d1a8",
+                "url": "https://api.github.com/repos/thephpleague/oauth2-server/zipball/539f4340c14eca8d44578fd118f6bdc0ad16d1ce",
+                "reference": "539f4340c14eca8d44578fd118f6bdc0ad16d1ce",
                 "shasum": ""
             },
             "require": {
@@ -15827,7 +15926,7 @@
                 "phpunit/phpunit": "^8.5.13",
                 "roave/security-advisories": "dev-master"
             },
-            "time": "2022-11-14T19:42:00+00:00",
+            "time": "2023-02-15T16:08:35+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -15872,7 +15971,7 @@
             ],
             "support": {
                 "issues": "https://github.com/thephpleague/oauth2-server/issues",
-                "source": "https://github.com/thephpleague/oauth2-server/tree/8.3.6"
+                "source": "https://github.com/thephpleague/oauth2-server/tree/8.4.0"
             },
             "funding": [
                 {

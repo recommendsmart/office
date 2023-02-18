@@ -8,7 +8,7 @@ dependencies:
   - drupal:user
   - dynamic_entity_reference:dynamic_entity_reference
 
-# Information added by Drupal.org packaging script on 2022-09-24
-version: '1.0.0-alpha7'
+# Information added by Drupal.org packaging script on 2023-02-12
+version: '1.0.0-alpha8'
 project: 'field_suggestion'
-datestamp: 1663998603
+datestamp: 1676205010

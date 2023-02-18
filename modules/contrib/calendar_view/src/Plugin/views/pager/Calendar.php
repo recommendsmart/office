@@ -91,16 +91,8 @@ class Calendar extends BasePager {
    * Perform any needed actions just before rendering.
    */
   public function preRender(&$result) {
-    $style = $this->view->getStyle();
-    if (!$style instanceof CalendarStyle) {
-      return;
-    }
-
     // Allow other plugins to use/alter timestamp.
     $this->view->calendar_timestamp = $this->getCalendarTimestamp();
-
-    // Prepare calendars now to get proper navigation.
-    $this->view->calendars = $style->buildCalendars($result);
   }
 
   /**
@@ -109,18 +101,18 @@ class Calendar extends BasePager {
   public function render($input) {
     $selected_timestamp = $this->view->calendar_timestamp;
 
-    $month = date('m', $selected_timestamp);
-    $year = date('Y', $selected_timestamp);
-    $month_start = strtotime("$year-$month-01");
+    $now = new \DateTime();
+    $now->setTimestamp($selected_timestamp);
 
-    $previous = strtotime(date('Y-m-d', $month_start) . ' -1 month');
-    $current = strtotime(date('Y-m-d', $month_start));
-    $next = strtotime(date('Y-m-d', $month_start) . ' +1 month');
+    $last_month = clone $now;
+    $last_month->modify('-1 month');
 
-    $input['calendars'] = array_keys($this->view->calendars);
-    $input['previous'] = date('U', $previous);
-    $input['current'] = date('U', $current);
-    $input['next'] = date('U', $next);
+    $next_month = clone $now;
+    $next_month->modify('+1 month');
+
+    $input['previous'] = $last_month->getTimestamp();
+    $input['current'] = $now->getTimestamp();
+    $input['next'] = $next_month->getTimestamp();
 
     $date_formatter = \Drupal::service('date.formatter');
     $date_format = 'custom';

@@ -49,8 +49,7 @@
 	{% endblock %}
 
   {% block day_content %}
-	  {# Simple list #}
-    {% if rows and not hours.display %}
+    {% if rows %}
       <ul class="calendar-view-day__rows">
         {% for timestamp,results in rows %}
           {% for row in results %}
@@ -59,24 +58,6 @@
               {{- row.content -}}
             </li>
           {% endfor %}
-        {% endfor %}
-      </ul>
-    {% endif %}
-
-    {# Event by hour #}
-    {% if hours.display %}
-      <div class="calendar-view-day__allday">
-        {# @todo All day events #}
-      </div>
-
-      <ul class="calendar-view-day__hours">
-        {# Given datetime events #}
-        {% for h in range(hours.start, hours.end) %}
-          {% set time_now = timestamp + (3600 * h) %}
-          <li class="calendar-view-day__hour">
-            <time datetime="{{ time_now|date('Y-m-d\TH:i:s') }}">{{ '%02d:00'|format(h) }}</time>
-            <div>{{ rows[time_now] }}</div>
-          </li>
         {% endfor %}
       </ul>
     {% endif %}

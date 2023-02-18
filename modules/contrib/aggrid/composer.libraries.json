@@ -23,25 +23,18 @@
       "Drupal\\aggrid\\": "src/"
     }
   },
-  "extra": {
-    "drush": {
-      "services": {
-        "drush.services.yml": "^9"
-      }
-    }
-  },
   "repositories": {
     "ag-grid-community": {
       "type": "package",
       "package": {
         "name": "ag-grid-community/ag-grid-community",
-        "version": "20.2.0",
+        "version": "29.0.0",
         "type": "drupal-library",
         "extra": {
           "installer-name": "ag-grid-community"
         },
         "dist": {
-          "url": "https://registry.npmjs.org/ag-grid-community/-/ag-grid-community-20.2.0.tgz",
+          "url": "https://registry.npmjs.org/ag-grid-community/-/ag-grid-community-29.0.0.tgz",
           "type": "tar"
         },
         "require": {
@@ -53,13 +46,13 @@
       "type": "package",
       "package": {
         "name": "ag-grid-enterprise/ag-grid-enterprise",
-        "version": "20.2.0",
+        "version": "29.0.0",
         "type": "drupal-library",
         "extra": {
           "installer-name": "ag-grid-enterprise"
         },
         "dist": {
-          "url": "https://registry.npmjs.org/ag-grid-enterprise/-/ag-grid-enterprise-20.2.0.tgz",
+          "url": "https://registry.npmjs.org/ag-grid-enterprise/-/ag-grid-enterprise-29.0.0.tgz",
           "type": "tar"
         },
         "require": {
@@ -69,7 +62,7 @@
     }
   },
   "require": {
-    "ag-grid-community/ag-grid-community": "20.2.0",
-    "ag-grid-enterprise/ag-grid-enterprise": "20.2.0"
+    "ag-grid-community/ag-grid-community": "*",
+    "ag-grid-enterprise/ag-grid-enterprise": "*"
   }
 }

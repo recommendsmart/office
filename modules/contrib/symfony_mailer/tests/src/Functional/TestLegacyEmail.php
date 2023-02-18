@@ -43,8 +43,8 @@ class TestLegacyEmail extends SymfonyMailerTestBase {
     $this->readMail();
 
     // Check email recipients.
-    $this->assertTo('test@example.com', '');
-    $this->assertCc('cc@example.com', '');
+    $this->assertTo('test@example.com');
+    $this->assertCc('cc@example.com');
 
     // Check email contents.
     $this->assertSubject("Legacy email sent via hook_mail().");

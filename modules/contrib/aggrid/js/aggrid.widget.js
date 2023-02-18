@@ -1,7 +1,7 @@
 /**
  * Behavior for 'aggrid_widget_type' widget.
  */
-(function ($, Drupal, drupalSettings) {
+(function ($, Drupal, drupalSettings, once) {
   'use strict';
   var aggridFieldName = [];
   var aggridDataEdit = [];
@@ -127,8 +127,8 @@
 
         // If aggrid instance is already registered on Element. There is no
         // need to register it again.
-        if (aggridDiv.once('' + aggridDiv + '').length !== aggridDiv.length) {
-          return;
+        if (once('aggridDiv', aggridDiv).length !== aggridDiv.length) {
+           return;
         }
 
         // Get the data from Drupal.
@@ -1506,7 +1506,7 @@
         let aggridTable = $('#' + item);
 
         // Only run this once.
-        if (aggridTable.once('' + aggridTable + '').length !== aggridTable.length) {
+        if (once('aggridTable', aggridTable).length !== aggridTable.length) {
           return;
         }
 
@@ -1566,4 +1566,4 @@
     // No submit on aggrid with enter (allow enter cell for edit).
     if (e.keyCode === 13) { e.preventDefault(); }
   });
-})(jQuery, Drupal, drupalSettings);
+})(jQuery, Drupal, drupalSettings, once);

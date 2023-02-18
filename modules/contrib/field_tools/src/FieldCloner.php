@@ -71,6 +71,7 @@ class FieldCloner {
     if ($destination_entity_type_id != $field_config_target_entity_type_id) {
       // Check there isn't already a field storage on the target entity type.
       $field_storage_config_ids = $this->entityTypeManager->getStorage('field_storage_config')->getQuery()
+        ->accessCheck(FALSE)
         ->condition('entity_type', $destination_entity_type_id)
         ->condition('field_name', $field_config->getName())
         ->execute();

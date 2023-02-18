@@ -41,3 +41,14 @@ views.field.access_record_target_id:
     link:
       type: boolean
       label: 'Link to the target page'
+
+views.access.access_records:
+  type: mapping
+  label: 'Access Records'
+  mapping:
+    ar_types:
+      type: sequence
+      label: 'List of selected access record types'
+      sequence:
+        type: string
+        label: 'Access record type ID'

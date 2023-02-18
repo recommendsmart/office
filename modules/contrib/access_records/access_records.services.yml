@@ -21,3 +21,7 @@ services:
   access_records.query_builder:
     class: Drupal\access_records\AccessRecordQueryBuilder
     arguments: ['@entity_type.manager', '@entity_field.manager']
+  access_check.access_records.route_check:
+    class: Drupal\access_records\Access\AccessRecordsRouteAccessCheck
+    tags:
+      - { name: access_check, applies_to: _access_record }

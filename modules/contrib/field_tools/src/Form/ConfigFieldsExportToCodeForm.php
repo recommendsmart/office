@@ -2,6 +2,7 @@
 
 namespace Drupal\field_tools\Form;
 
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
@@ -132,7 +133,7 @@ class ConfigFieldsExportToCodeForm extends FormBase {
       $code[] = "  ->setRequired(TRUE)";
     }
 
-    if ($field instanceof \Drupal\Core\Field\FieldStorageDefinitionInterface) {
+    if ($field instanceof FieldStorageDefinitionInterface) {
       if ($field->isRevisionable()) {
         $code[] = "  ->setRevisionable(TRUE)";
       }

@@ -499,10 +499,14 @@ class ParagraphsTableFormatter extends EntityReferenceFormatterBase {
     $bundles = $selectionHandler->entityTypeBundleInfo->getBundleInfo($targetType);
 
     $type = key($handler["target_bundles"]);
+    $entityType = $entity->bundle();
+    if (method_exists($entity, 'getType')) {
+      $entityType = $entity->getType();
+    }
     $context = [
       'paragraph_name' => $bundles[$type]['label'],
       'paragraph_type' => $type,
-      'entity_type' => $entity->getEntityTypeId() != 'user' ? $entity->getType() : 'user',
+      'entity_type' => $entityType,
       'entity_field' => $field_name_current,
       'entity_id' => $entityId,
     ];
@@ -1010,7 +1014,7 @@ class ParagraphsTableFormatter extends EntityReferenceFormatterBase {
     $rows = [];
     foreach ($entities as $delta => $entity) {
       $entity_bundle = $entity->bundle();
-      if ($bundle != $entity_bundle) {
+      if ($bundle != $entity_bundle || empty($renderer)) {
         continue;
       }
       $table_entity = $renderer->build($entity);

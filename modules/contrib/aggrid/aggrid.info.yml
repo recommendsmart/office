@@ -2,13 +2,13 @@ name: 'ag-Grid'
 type: module
 description: 'Adds ag-Grid to Drupal 8 Form API'
 core: 8.x
-core_version_requirement: ^8 || ^9
+core_version_requirement: ^8 || ^9 || ^10
 package: 'ag-Grid'
 dependencies:
   - drupal:field
   - drupal:node
 
-# Information added by Drupal.org packaging script on 2021-10-28
-version: '8.x-1.0-alpha46'
+# Information added by Drupal.org packaging script on 2023-02-13
+version: '8.x-1.0-rc6'
 project: 'aggrid'
-datestamp: 1635464983
+datestamp: 1676326699

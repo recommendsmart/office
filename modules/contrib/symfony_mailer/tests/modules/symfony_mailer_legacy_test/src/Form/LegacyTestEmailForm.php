@@ -5,6 +5,7 @@ namespace Drupal\symfony_mailer_legacy_test\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Mail\MailManagerInterface;
+use Drupal\Core\Theme\ThemeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -20,13 +21,23 @@ class LegacyTestEmailForm extends FormBase {
   protected $mailManager;
 
   /**
+   * The theme manager service.
+   *
+   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   */
+  protected $themeManager;
+
+  /**
    * Constructs TestMailForm.
    *
    * @param \Drupal\Core\Mail\MailManagerInterface $mail_manager
    *   The mail manager service.
+   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
+   *   The theme manager service.
    */
-  public function __construct(MailManagerInterface $mail_manager) {
+  public function __construct(MailManagerInterface $mail_manager, ThemeManagerInterface $theme_manager) {
     $this->mailManager = $mail_manager;
+    $this->themeManager = $theme_manager;
   }
 
   /**
@@ -34,7 +45,8 @@ class LegacyTestEmailForm extends FormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('plugin.manager.mail')
+      $container->get('plugin.manager.mail'),
+      $container->get('theme.manager')
     );
   }
 
@@ -54,9 +66,7 @@ class LegacyTestEmailForm extends FormBase {
       '#type' => 'submit',
       '#value' => 'Send test email',
     ];
-    /** @var \Drupal\Core\Theme\ThemeManagerInterface $theme_manager */
-    $theme_manager = \Drupal::service('theme.manager');
-    $current_theme = $theme_manager->getActiveTheme()->getName();
+    $current_theme = $this->themeManager->getActiveTheme()->getName();
     $form['current_theme'] = [
       '#markup' => 'Current theme: ' . $current_theme,
     ];

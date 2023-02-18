@@ -3,7 +3,7 @@
  * JSON:API Extras resources behaviors.
  */
 
-(function ($, Drupal) {
+(function ($, Drupal, once) {
 
   'use strict';
 
@@ -12,7 +12,7 @@
    */
   Drupal.behaviors.resourcesTableFilterByText = {
     attach: function (context, settings) {
-      var $input = $('input.input-filter-text', context).once('input-filter-text');
+      var $input = $(once('input-filter-text', 'input.input-filter-text', context));
       var $table = $($input.attr('data-table'));
       var $rows;
 
@@ -50,4 +50,4 @@
     };
   });
 
-}(jQuery, Drupal));
+}(jQuery, Drupal, once));

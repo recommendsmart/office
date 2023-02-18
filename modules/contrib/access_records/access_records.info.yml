@@ -8,7 +8,7 @@ dependencies:
   - drupal:options
   - entity:entity
 
-# Information added by Drupal.org packaging script on 2023-02-05
-version: '1.0.0-beta8'
+# Information added by Drupal.org packaging script on 2023-02-08
+version: '1.0.0-beta9'
 project: 'access_records'
-datestamp: 1675611745
+datestamp: 1675858436

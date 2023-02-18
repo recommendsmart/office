@@ -1,10 +1,14 @@
-calendar_view:
+calendar:
   version: VERSION
   css:
     component:
       css/calendar-view.css: {}
       css/calendar-view.default.css: {}
+
+multiday:
+  version: VERSION
+  js:
+    js/multiday.js: {}
   dependencies:
     - core/drupal
-    - core/drupalSettings
     - core/once

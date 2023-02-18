@@ -12,7 +12,7 @@ use Symfony\Component\Yaml\Yaml;
 function aggrid_update_8001()
 {
   
-  $file_path = drupal_get_path('module', 'aggrid') . '/config/install/aggrid.general.yml';
+  $file_path = \Drupal::service('extension.list.module')->getPath('aggrid') . '/config/install/aggrid.general.yml';
   
   $file_contents = file_get_contents($file_path);
   $ymldata = Yaml::parse($file_contents);

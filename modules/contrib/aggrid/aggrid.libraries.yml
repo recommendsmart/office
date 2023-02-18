@@ -8,7 +8,7 @@ aggrid.widget:
     - core/jquery
     - core/drupal
     - core/drupalSettings
-    - core/jquery.once
+    - core/once
     - core/jquery.ui.datepicker
     - core/drupal.dialog
 
@@ -20,48 +20,48 @@ aggrid.json.widget:
       css/aggrid.json.widget.css: {}
   dependencies:
     - core/jquery
-    - core/jquery.once
+    - core/once
 
 ag-grid-community:
   js:
-    /libraries/ag-grid/ag-grid-community.min.noStyle.js: { minified: true }
+    /libraries/ag-grid-community/dist/ag-grid-community.min.noStyle.js: { minified: true }
   css:
     theme:
-      /libraries/ag-grid/css/aggrid.css: {}
-      /libraries/ag-grid/css/ag-theme-balham.css: {}
+      /libraries/ag-grid-community/styles/ag-grid.css: {}
+      /libraries/ag-grid-community/styles/ag-theme-balham.css: {}
 
 ag-grid-enterprise:
   js:
-    /libraries/ag-grid/ag-grid-enterprise.min.noStyle.js: { minified: true }
+    /libraries/ag-grid-enterprise/dist/ag-grid-enterprise.min.noStyle.js: { minified: true }
   css:
     theme:
-      /libraries/ag-grid/css/ag-grid.css: {}
-      /libraries/ag-grid/css/ag-theme-balham.css: {}
+      /libraries/ag-grid-enterprise/styles//ag-grid.css: {}
+      /libraries/ag-grid-enterprise/styles/ag-theme-balham.css: {}
 
 ag-grid-community.cdn:
-  remote: https://github.com/ag-grid/ag-grid/raw/master/packages/ag-grid-community/dist/ag-grid-community.min.noStyle.js
-  version: 21.0.0
+  remote: https://cdn.jsdelivr.net/npm/ag-grid-community@29.0.0/dist/ag-grid-community.min.noStyle.js
+  version: 29.0.0
   license:
     name: MIT
     url: https://github.com/ag-grid/ag-grid/blob/master/LICENSE.txt
     gpl-compatible: true
   js:
-    //unpkg.com/ag-grid-community@21.0.0/dist/ag-grid-community.min.noStyle.js: { type: external, minified: true }
+    https://cdn.jsdelivr.net/npm/ag-grid-community@29.0.0/dist/ag-grid-community.min.noStyle.js: { type: external, minified: true }
   css:
     theme:
-      //unpkg.com/ag-grid-community@21.0.0/dist/styles/ag-grid.css: { type: external }
-      //unpkg.com/ag-grid-community@21.0.0/dist/styles/ag-theme-balham.css: { type: external }
+      https://cdn.jsdelivr.net/npm/ag-grid-community@29.0.0/styles/ag-grid.css: { type: external }
+      https://cdn.jsdelivr.net/npm/ag-grid-community@29.0.0/styles/ag-theme-balham.css: { type: external }
 
 ag-grid-enterprise.cdn:
-  remote: https://github.com/ag-grid/ag-grid/raw/master/packages/ag-grid-enterprise/dist/ag-grid-enterprise.min.noStyle.js
-  version: 21.0.0
+  remote: https://cdn.jsdelivr.net/npm/ag-grid-enterprise@29.0.0/dist/ag-grid-enterprise.min.noStyle.js
+  version: 29.0.0
   license:
     name: MIT
     url: https://github.com/ag-grid/ag-grid/blob/master/LICENSE.txt
     gpl-compatible: true
   js:
-    //unpkg.com/ag-grid-enterprise@21.0.0/dist/ag-grid-enterprise.min.noStyle.js: { type: external, minified: true }
+    https:///cdn.jsdelivr.net/npm/ag-grid-enterprise@29.0.0/dist/ag-grid-enterprise.min.noStyle.js: { type: external, minified: true }
   css:
     theme:
-      //unpkg.com/ag-grid-community@21.0.0/dist/styles/ag-grid.css: { type: external }
-      //unpkg.com/ag-grid-community@21.0.0/dist/styles/ag-theme-balham.css: { type: external }
+      https://cdn.jsdelivr.net/npm/ag-grid-enterprise@29.0.0/styles/ag-grid.css: { type: external }
+      https://cdn.jsdelivr.net/npm/ag-grid-enterprise@29.0.0/styles/ag-theme-balham.css: { type: external }

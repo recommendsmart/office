@@ -7,6 +7,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\widget_type\Entity\WidgetType;
 use Drupal\widget_type\WidgetTypeAccessControlHandler;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * Kernel tests for WidgetTypeAccessControlHandler.
@@ -15,6 +16,8 @@ use Drupal\widget_type\WidgetTypeAccessControlHandler;
  * @coversDefaultClass \Drupal\widget_type\WidgetTypeAccessControlHandler
  */
 class WidgetTypeAccessControlHandlerTest extends KernelTestBase {
+
+  use ProphecyTrait;
 
   /**
    * {@inheritdoc}
@@ -55,7 +58,7 @@ class WidgetTypeAccessControlHandlerTest extends KernelTestBase {
     $this->installEntitySchema('user');
     $this->installConfig(['field', 'widget_type', 'user']);
     $this->theSut = new WidgetTypeAccessControlHandler(
-      $this->prophesize(EntityTypeInterface::class)->reveal()
+      $this->getProphet()->prophesize(EntityTypeInterface::class)->reveal()
     );
     $this->entity = WidgetType::create([
       'name' => 'The name',
@@ -72,7 +75,7 @@ class WidgetTypeAccessControlHandlerTest extends KernelTestBase {
    * @SuppressWarnings(PHPMD.StaticAccess)
    */
   public function testCheckAccess() {
-    $account = $this->prophesize(AccountInterface::class);
+    $account = $this->getProphet()->prophesize(AccountInterface::class);
     $this->assertFalse(
       $this->theSut->access($this->entity, 'view', $account->reveal())
     );

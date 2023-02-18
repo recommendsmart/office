@@ -53,14 +53,18 @@ class EmailFactory implements EmailFactoryInterface {
    * {@inheritdoc}
    */
   public function sendTypedEmail(string $module, string $sub_type, ...$params) {
-    return $this->newTypedEmail($module, $sub_type, ...$params)->send();
+    $email = $this->newTypedEmail($module, $sub_type, ...$params);
+    $email->send();
+    return $email;
   }
 
   /**
    * {@inheritdoc}
    */
   public function sendEntityEmail(ConfigEntityInterface $entity, string $sub_type, ...$params) {
-    return $this->newEntityEmail($entity, $sub_type, ...$params)->send();
+    $email = $this->newEntityEmail($entity, $sub_type, ...$params);
+    $email->send();
+    return $email;
   }
 
   /**

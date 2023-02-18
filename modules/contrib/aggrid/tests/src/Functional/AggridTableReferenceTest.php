@@ -20,7 +20,7 @@ class AggridTableReferenceTest extends BrowserTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'aggrid'
     , 'aggrid_demo'
     , 'node'
@@ -58,7 +58,7 @@ class AggridTableReferenceTest extends BrowserTestBase {
 
     // - Under "Reference" select "other".
     // - Choose a label and click continue.
-    $this->drupalPostForm(NULL, [
+    $this->submitForm([
       'new_storage_type' => 'entity_reference',
       'field_name' => 'aggrid',
       'label' => 'ag-Grid',
@@ -66,7 +66,7 @@ class AggridTableReferenceTest extends BrowserTestBase {
     $assert->statusCodeEquals(200);
 
     // - Under configuration select "aggrid".
-    $this->drupalPostForm(NULL, [
+    $this->submitForm([
       'settings[target_type]' => 'aggrid',
     ], 'Save field settings');
     $assert->statusCodeEquals(200);
@@ -77,7 +77,8 @@ class AggridTableReferenceTest extends BrowserTestBase {
     $aggrid = Aggrid::loadMultiple();
     /* @var aggrid \Drupal\aggrid\Entity\Aggrid */
     $aggrid = reset($aggrid);
-    $this->drupalPostForm(Url::fromRoute('node.add', ['node_type' => $type->id()]), [
+    $this->drupalGet(Url::fromRoute('node.add', ['node_type' => $type->id()]));
+    $this->submitForm([
       'title[0][value]' => 'title',
       'field_aggrid[0][target_id]' => $aggrid->label(),
     ], 'Save');

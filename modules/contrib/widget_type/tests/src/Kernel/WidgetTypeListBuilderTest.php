@@ -9,6 +9,7 @@ use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\widget_type\Entity\WidgetType;
 use Drupal\widget_type\WidgetTypeListBuilder;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * Kernel tests for WidgetTypeListBuilder.
@@ -17,6 +18,8 @@ use Drupal\widget_type\WidgetTypeListBuilder;
  * @coversDefaultClass \Drupal\widget_type\WidgetTypeListBuilder
  */
 class WidgetTypeListBuilderTest extends KernelTestBase {
+
+  use ProphecyTrait;
 
   /**
    * {@inheritdoc}
@@ -57,10 +60,10 @@ class WidgetTypeListBuilderTest extends KernelTestBase {
     $this->installEntitySchema('user');
     $this->installConfig(['field', 'widget_type', 'user']);
     $this->theSut = new WidgetTypeListBuilder(
-      $this->prophesize(EntityTypeInterface::class)->reveal(),
-      $this->prophesize(EntityStorageInterface::class)->reveal(),
-      $this->prophesize(DateFormatterInterface::class)->reveal(),
-      $this->prophesize(RedirectDestinationInterface::class)->reveal()
+      $this->getProphet()->prophesize(EntityTypeInterface::class)->reveal(),
+      $this->getProphet()->prophesize(EntityStorageInterface::class)->reveal(),
+      $this->getProphet()->prophesize(DateFormatterInterface::class)->reveal(),
+      $this->getProphet()->prophesize(RedirectDestinationInterface::class)->reveal()
     );
     $this->entity = WidgetType::create([
       'name' => 'The name',

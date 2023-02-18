@@ -3818,54 +3818,6 @@
             "install-path": "../../modules/contrib/consumers"
         },
         {
-            "name": "drupal/content_entity_clone",
-            "version": "1.0.1",
-            "version_normalized": "1.0.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://git.drupalcode.org/project/content_entity_clone.git",
-                "reference": "1.0.1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/content_entity_clone-1.0.1.zip",
-                "reference": "1.0.1",
-                "shasum": "fbcd5e594a2e9f09985b1ac5a2be7781279c0d7d"
-            },
-            "require": {
-                "drupal/core": "^9 || ^10"
-            },
-            "type": "drupal-module",
-            "extra": {
-                "drupal": {
-                    "version": "1.0.1",
-                    "datestamp": "1659682087",
-                    "security-coverage": {
-                        "status": "covered",
-                        "message": "Covered by Drupal's security advisory policy"
-                    }
-                }
-            },
-            "installation-source": "dist",
-            "notification-url": "https://packages.drupal.org/8/downloads",
-            "license": [
-                "GPL-2.0+"
-            ],
-            "authors": [
-                {
-                    "name": "orakili",
-                    "homepage": "https://www.drupal.org/u/orakili"
-                }
-            ],
-            "description": "Provides cloning of content entity types.",
-            "homepage": "https://www.drupal.org/project/content_entity_clone",
-            "support": {
-                "source": "https://git.drupal.org/project/content_entity_clone.git",
-                "issues": "https://www.drupal.org/project/issues/content_entity_clone"
-            },
-            "install-path": "../../modules/contrib/content_entity_clone"
-        },
-        {
             "name": "drupal/content_to_group",
             "version": "1.0.0-alpha2",
             "version_normalized": "1.0.0.0-alpha2",
@@ -6099,57 +6051,6 @@
                 "source": "https://git.drupalcode.org/project/entity_reference_tree"
             },
             "install-path": "../../modules/contrib/entity_reference_tree"
-        },
-        {
-            "name": "drupal/entity_type_clone",
-            "version": "3.0.1",
-            "version_normalized": "3.0.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://git.drupalcode.org/project/entity_type_clone.git",
-                "reference": "3.0.1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/entity_type_clone-3.0.1.zip",
-                "reference": "3.0.1",
-                "shasum": "5076627d27aa5f54310397075b515f985ff42d74"
-            },
-            "require": {
-                "drupal/core": "^8 || ^9 || ^10"
-            },
-            "type": "drupal-module",
-            "extra": {
-                "drupal": {
-                    "version": "3.0.1",
-                    "datestamp": "1675596789",
-                    "security-coverage": {
-                        "status": "covered",
-                        "message": "Covered by Drupal's security advisory policy"
-                    }
-                }
-            },
-            "installation-source": "dist",
-            "notification-url": "https://packages.drupal.org/8/downloads",
-            "license": [
-                "GPL-2.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "ajay_reddy",
-                    "homepage": "https://www.drupal.org/user/3261994"
-                },
-                {
-                    "name": "vuil",
-                    "homepage": "https://www.drupal.org/user/3568458"
-                }
-            ],
-            "description": "This module provide option to clone entity types and role.",
-            "homepage": "https://www.drupal.org/project/entity_type_clone",
-            "support": {
-                "source": "https://git.drupalcode.org/project/entity_type_clone"
-            },
-            "install-path": "../../modules/contrib/entity_type_clone"
         },
         {
             "name": "drupal/entity_version",
@@ -11272,6 +11173,63 @@
                 "source": "https://git.drupalcode.org/project/profile"
             },
             "install-path": "../../modules/contrib/profile"
+        },
+        {
+            "name": "drupal/quick_node_clone",
+            "version": "1.15.0",
+            "version_normalized": "1.15.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupalcode.org/project/quick_node_clone.git",
+                "reference": "8.x-1.15"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/quick_node_clone-8.x-1.15.zip",
+                "reference": "8.x-1.15",
+                "shasum": "bac562133cfab05c207d4e45daa95cd36a7fad51"
+            },
+            "require": {
+                "drupal/core": "^8.8 || ^9"
+            },
+            "require-dev": {
+                "drupal/paragraphs": "1.x-dev"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "drupal": {
+                    "version": "8.x-1.15",
+                    "datestamp": "1651684801",
+                    "security-coverage": {
+                        "status": "covered",
+                        "message": "Covered by Drupal's security advisory policy"
+                    }
+                }
+            },
+            "installation-source": "dist",
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "vilepickle",
+                    "homepage": "https://www.drupal.org/u/vilepickle",
+                    "role": "Maintainer"
+                },
+                {
+                    "name": "Neslee Canil Pinto",
+                    "homepage": "https://www.drupal.org/u/neslee-canil-pinto",
+                    "role": "Maintainer"
+                }
+            ],
+            "description": "Quickly clone a node with regular fields.",
+            "homepage": "https://www.drupal.org/project/quick_node_clone",
+            "support": {
+                "source": "https://git.drupalcode.org/project/quick_node_clone",
+                "issues": "https://www.drupal.org/project/issues/quick_node_clone"
+            },
+            "install-path": "../../modules/contrib/quick_node_clone"
         },
         {
             "name": "drupal/quote",

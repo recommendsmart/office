@@ -2,14 +2,13 @@
 
 namespace Drupal\flow\Plugin;
 
-use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
  * The manager for flow subject plugins.
  */
-class FlowSubjectManager extends DefaultPluginManager {
+class FlowSubjectManager extends FlowPluginManager {
 
   /**
    * The FlowSubjectManager constructor.
@@ -23,9 +22,15 @@ class FlowSubjectManager extends DefaultPluginManager {
    *   The module handler to invoke the alter hook with.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/flow/Subject', $namespaces, $module_handler, 'Drupal\flow\Plugin\FlowSubjectInterface', 'Drupal\flow\Annotation\FlowSubject');
-    $this->alterInfo('flow_subject');
-    $this->setCacheBackend($cache_backend, 'flow_subject');
+    parent::__construct(
+      'flow_subject',
+      'Plugin/flow/Subject',
+      $namespaces,
+      $cache_backend,
+      $module_handler,
+      'Drupal\flow\Plugin\FlowSubjectInterface',
+      'Drupal\flow\Annotation\FlowSubject'
+    );
   }
 
   /**

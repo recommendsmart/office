@@ -18,21 +18,21 @@ class TemperatureTest extends UnitTestCase {
    *
    * @var \Drupal\physical\Temperature
    */
-  protected $temperatureKelvin;
+  protected Temperature $temperatureKelvin;
 
   /**
    * The Celsius temperature.
    *
    * @var \Drupal\physical\Temperature
    */
-  protected $temperatureCelsius;
+  protected Temperature $temperatureCelsius;
 
   /**
    * The Fahrenheit temperature.
    *
    * @var \Drupal\physical\Temperature
    */
-  protected $temperatureFahrenheit;
+  protected Temperature $temperatureFahrenheit;
 
   /**
    * {@inheritdoc}

@@ -621,16 +621,6 @@ parameters:
 			path: modules/custom/activity_creator/src/Plugin/ActivityActionBase.php
 
 		-
-			message: "#^Method Drupal\\\\activity_creator\\\\Plugin\\\\ActivityActionBase\\:\\:isValidEntity\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: modules/custom/activity_creator/src/Plugin/ActivityActionBase.php
-
-		-
-			message: "#^Method Drupal\\\\activity_creator\\\\Plugin\\\\ActivityActionBase\\:\\:isValidEntity\\(\\) has parameter \\$entity with no type specified\\.$#"
-			count: 1
-			path: modules/custom/activity_creator/src/Plugin/ActivityActionBase.php
-
-		-
 			message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
 			count: 1
 			path: modules/custom/activity_creator/src/Plugin/ActivityActionBase.php
@@ -652,16 +642,6 @@ parameters:
 
 		-
 			message: "#^Method Drupal\\\\activity_creator\\\\Plugin\\\\ActivityActionInterface\\:\\:createMessage\\(\\) has parameter \\$entity with no type specified\\.$#"
-			count: 1
-			path: modules/custom/activity_creator/src/Plugin/ActivityActionInterface.php
-
-		-
-			message: "#^Method Drupal\\\\activity_creator\\\\Plugin\\\\ActivityActionInterface\\:\\:isValidEntity\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: modules/custom/activity_creator/src/Plugin/ActivityActionInterface.php
-
-		-
-			message: "#^Method Drupal\\\\activity_creator\\\\Plugin\\\\ActivityActionInterface\\:\\:isValidEntity\\(\\) has parameter \\$entity with no type specified\\.$#"
 			count: 1
 			path: modules/custom/activity_creator/src/Plugin/ActivityActionInterface.php
 
@@ -941,22 +921,7 @@ parameters:
 			path: modules/custom/activity_logger/src/Service/ActivityLoggerFactory.php
 
 		-
-			message: "#^Method Drupal\\\\activity_logger\\\\Service\\\\ActivityLoggerFactory\\:\\:checkIfMessageExist\\(\\) should return int but returns bool\\.$#"
-			count: 1
-			path: modules/custom/activity_logger/src/Service/ActivityLoggerFactory.php
-
-		-
 			message: "#^Method Drupal\\\\activity_logger\\\\Service\\\\ActivityLoggerFactory\\:\\:createFieldInstances\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: modules/custom/activity_logger/src/Service/ActivityLoggerFactory.php
-
-		-
-			message: "#^Method Drupal\\\\activity_logger\\\\Service\\\\ActivityLoggerFactory\\:\\:createMessages\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: modules/custom/activity_logger/src/Service/ActivityLoggerFactory.php
-
-		-
-			message: "#^Parameter \\#5 \\$uid of method Drupal\\\\activity_logger\\\\Service\\\\ActivityLoggerFactory\\:\\:checkIfMessageExist\\(\\) expects string, int\\|string\\|null given\\.$#"
 			count: 1
 			path: modules/custom/activity_logger/src/Service/ActivityLoggerFactory.php
 
@@ -1796,47 +1761,47 @@ parameters:
 			path: modules/custom/entity_access_by_field/src/Plugin/search_api/processor/EntityAccessByField.php
 
 		-
-			message: "#^Call to an undefined method Prophecy\\\\Prophecy\\\\ObjectProphecy\\:\\:bundle\\(\\)\\.$#"
+			message: "#^Call to an undefined method Prophecy\\\\Prophecy\\\\ObjectProphecy\\<Drupal\\\\Core\\\\Session\\\\AccountInterface\\>\\:\\:hasPermission\\(\\)\\.$#"
 			count: 3
 			path: modules/custom/entity_access_by_field/tests/src/Unit/EntityAccessTest.php
 
 		-
-			message: "#^Call to an undefined method Prophecy\\\\Prophecy\\\\ObjectProphecy\\:\\:get\\(\\)\\.$#"
+			message: "#^Call to an undefined method Prophecy\\\\Prophecy\\\\ObjectProphecy\\<Drupal\\\\Core\\\\Session\\\\AccountInterface\\>\\:\\:id\\(\\)\\.$#"
 			count: 3
 			path: modules/custom/entity_access_by_field/tests/src/Unit/EntityAccessTest.php
 
 		-
-			message: "#^Call to an undefined method Prophecy\\\\Prophecy\\\\ObjectProphecy\\:\\:getCacheContexts\\(\\)\\.$#"
+			message: "#^Call to an undefined method Prophecy\\\\Prophecy\\\\ObjectProphecy\\<Drupal\\\\Core\\\\Session\\\\AccountInterface\\>\\:\\:isAuthenticated\\(\\)\\.$#"
+			count: 3
+			path: modules/custom/entity_access_by_field/tests/src/Unit/EntityAccessTest.php
+
+		-
+			message: "#^Call to an undefined method Prophecy\\\\Prophecy\\\\ObjectProphecy\\<Drupal\\\\node\\\\NodeInterface\\>\\:\\:bundle\\(\\)\\.$#"
+			count: 3
+			path: modules/custom/entity_access_by_field/tests/src/Unit/EntityAccessTest.php
+
+		-
+			message: "#^Call to an undefined method Prophecy\\\\Prophecy\\\\ObjectProphecy\\<Drupal\\\\node\\\\NodeInterface\\>\\:\\:get\\(\\)\\.$#"
+			count: 3
+			path: modules/custom/entity_access_by_field/tests/src/Unit/EntityAccessTest.php
+
+		-
+			message: "#^Call to an undefined method Prophecy\\\\Prophecy\\\\ObjectProphecy\\<Drupal\\\\node\\\\NodeInterface\\>\\:\\:getCacheContexts\\(\\)\\.$#"
 			count: 2
 			path: modules/custom/entity_access_by_field/tests/src/Unit/EntityAccessTest.php
 
 		-
-			message: "#^Call to an undefined method Prophecy\\\\Prophecy\\\\ObjectProphecy\\:\\:getEntityTypeId\\(\\)\\.$#"
+			message: "#^Call to an undefined method Prophecy\\\\Prophecy\\\\ObjectProphecy\\<Drupal\\\\node\\\\NodeInterface\\>\\:\\:getEntityTypeId\\(\\)\\.$#"
 			count: 3
 			path: modules/custom/entity_access_by_field/tests/src/Unit/EntityAccessTest.php
 
 		-
-			message: "#^Call to an undefined method Prophecy\\\\Prophecy\\\\ObjectProphecy\\:\\:getFieldDefinitions\\(\\)\\.$#"
+			message: "#^Call to an undefined method Prophecy\\\\Prophecy\\\\ObjectProphecy\\<Drupal\\\\node\\\\NodeInterface\\>\\:\\:getFieldDefinitions\\(\\)\\.$#"
 			count: 4
 			path: modules/custom/entity_access_by_field/tests/src/Unit/EntityAccessTest.php
 
 		-
-			message: "#^Call to an undefined method Prophecy\\\\Prophecy\\\\ObjectProphecy\\:\\:getOwnerId\\(\\)\\.$#"
-			count: 3
-			path: modules/custom/entity_access_by_field/tests/src/Unit/EntityAccessTest.php
-
-		-
-			message: "#^Call to an undefined method Prophecy\\\\Prophecy\\\\ObjectProphecy\\:\\:hasPermission\\(\\)\\.$#"
-			count: 3
-			path: modules/custom/entity_access_by_field/tests/src/Unit/EntityAccessTest.php
-
-		-
-			message: "#^Call to an undefined method Prophecy\\\\Prophecy\\\\ObjectProphecy\\:\\:id\\(\\)\\.$#"
-			count: 3
-			path: modules/custom/entity_access_by_field/tests/src/Unit/EntityAccessTest.php
-
-		-
-			message: "#^Call to an undefined method Prophecy\\\\Prophecy\\\\ObjectProphecy\\:\\:isAuthenticated\\(\\)\\.$#"
+			message: "#^Call to an undefined method Prophecy\\\\Prophecy\\\\ObjectProphecy\\<Drupal\\\\node\\\\NodeInterface\\>\\:\\:getOwnerId\\(\\)\\.$#"
 			count: 3
 			path: modules/custom/entity_access_by_field/tests/src/Unit/EntityAccessTest.php
 
@@ -2389,41 +2354,6 @@ parameters:
 			message: "#^Method Drupal\\\\social_ajax_comments\\\\Routing\\\\RouteSubscriber\\:\\:alterRoutes\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: modules/custom/social_ajax_comments/src/Routing/RouteSubscriber.php
-
-		-
-			message: "#^Function social_file_private_requirements\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: modules/custom/social_file_private/social_file_private.install
-
-		-
-			message: "#^Function social_file_private_requirements\\(\\) has parameter \\$phase with no type specified\\.$#"
-			count: 1
-			path: modules/custom/social_file_private/social_file_private.install
-
-		-
-			message: "#^Variable \\$field in PHPDoc tag @var does not match assigned variable \\$unprotected_fields\\.$#"
-			count: 1
-			path: modules/custom/social_file_private/social_file_private.install
-
-		-
-			message: "#^Variable \\$plugin in PHPDoc tag @var does not match assigned variable \\$file_private_fields_config_override\\.$#"
-			count: 1
-			path: modules/custom/social_file_private/social_file_private.install
-
-		-
-			message: "#^Method Drupal\\\\social_file_private\\\\SocialFilePrivateFieldsConfigOverride\\:\\:createConfigObject\\(\\) should return Drupal\\\\Core\\\\Config\\\\StorableConfigBase but returns null\\.$#"
-			count: 1
-			path: modules/custom/social_file_private/src/SocialFilePrivateFieldsConfigOverride.php
-
-		-
-			message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
-			count: 1
-			path: modules/custom/social_file_private/src/SocialFilePrivateFieldsConfigOverride.php
-
-		-
-			message: "#^Method Drupal\\\\social_file_private\\\\SocialFilePrivateTextEditorConfigOverride\\:\\:createConfigObject\\(\\) should return Drupal\\\\Core\\\\Config\\\\StorableConfigBase but returns null\\.$#"
-			count: 1
-			path: modules/custom/social_file_private/src/SocialFilePrivateTextEditorConfigOverride.php
 
 		-
 			message: "#^Function social_font_install\\(\\) has no return type specified\\.$#"
@@ -3911,12 +3841,12 @@ parameters:
 			path: modules/social_features/social_album/social_album.module
 
 		-
-			message: "#^Function social_album_post_update\\(\\) has no return type specified\\.$#"
+			message: "#^Function social_album_post_presave\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: modules/social_features/social_album/social_album.module
 
 		-
-			message: "#^Function social_album_post_presave\\(\\) has no return type specified\\.$#"
+			message: "#^Function social_album_post_update\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: modules/social_features/social_album/social_album.module
 
@@ -4736,11 +4666,6 @@ parameters:
 			path: modules/social_features/social_comment_upload/src/SocialCommentUploadConfigOverride.php
 
 		-
-			message: "#^Cannot access property \\$field_subtitle on Drupal\\\\Core\\\\Entity\\\\EntityInterface\\|null\\.$#"
-			count: 1
-			path: modules/social_features/social_content_block/modules/social_content_block_landing_page/src/Service/SocialContentBlockLandingPageContentBuilder.php
-
-		-
 			message: "#^Method Drupal\\\\social_content_block_landing_page\\\\SocialContentBlockLandingPageConfigOverride\\:\\:createConfigObject\\(\\) should return Drupal\\\\Core\\\\Config\\\\StorableConfigBase but returns null\\.$#"
 			count: 1
 			path: modules/social_features/social_content_block/modules/social_content_block_landing_page/src/SocialContentBlockLandingPageConfigOverride.php
@@ -4907,16 +4832,6 @@ parameters:
 
 		-
 			message: "#^Function social_content_block_form_block_content_custom_content_list_form_alter\\(\\) has parameter \\$form_id with no type specified\\.$#"
-			count: 1
-			path: modules/social_features/social_content_block/social_content_block.module
-
-		-
-			message: "#^Function social_content_block_preprocess_block\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: modules/social_features/social_content_block/social_content_block.module
-
-		-
-			message: "#^Function social_content_block_preprocess_block\\(\\) has parameter \\$variables with no type specified\\.$#"
 			count: 1
 			path: modules/social_features/social_content_block/social_content_block.module
 
@@ -5864,11 +5779,6 @@ parameters:
 			message: "#^Function social_core_post_update_8702_enable_select2\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: modules/social_features/social_core/social_core.post_update.php
-
-		-
-			message: "#^Method Drupal\\\\social_core\\\\ContentTranslationConfigOverrideBase\\:\\:createConfigObject\\(\\) should return Drupal\\\\Core\\\\Config\\\\StorableConfigBase but returns null\\.$#"
-			count: 1
-			path: modules/social_features/social_core/src/ContentTranslationConfigOverrideBase.php
 
 		-
 			message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
@@ -9043,11 +8953,6 @@ parameters:
 			path: modules/social_features/social_follow_taxonomy/modules/social_follow_tag/src/Plugin/ActivityContext/FollowTagActivityContext.php
 
 		-
-			message: "#^Method Drupal\\\\social_follow_tag\\\\SocialFollowTagLazyBuilder\\:\\:lazyBuild\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: modules/social_features/social_follow_taxonomy/modules/social_follow_tag/src/SocialFollowTagLazyBuilder.php
-
-		-
 			message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
 			count: 1
 			path: modules/social_features/social_follow_taxonomy/modules/social_follow_tag/src/SocialFollowTagLazyBuilder.php
@@ -9134,11 +9039,6 @@ parameters:
 
 		-
 			message: "#^Function social_follow_taxonomy_theme\\(\\) has parameter \\$type with no type specified\\.$#"
-			count: 1
-			path: modules/social_features/social_follow_taxonomy/social_follow_taxonomy.module
-
-		-
-			message: "#^Function social_follow_taxonomy_theme_suggestions_activity_alter\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: modules/social_features/social_follow_taxonomy/social_follow_taxonomy.module
 
@@ -14698,16 +14598,6 @@ parameters:
 			path: modules/social_features/social_profile/social_profile.install
 
 		-
-			message: "#^Property Drupal\\\\file\\\\Entity\\\\File\\:\\:\\$status \\(Drupal\\\\Core\\\\Field\\\\FieldItemListInterface\\) does not accept int\\.$#"
-			count: 1
-			path: modules/social_features/social_profile/social_profile.install
-
-		-
-			message: "#^Property Drupal\\\\file\\\\Entity\\\\File\\:\\:\\$uuid \\(Drupal\\\\Core\\\\Field\\\\FieldItemListInterface\\) does not accept string\\.$#"
-			count: 1
-			path: modules/social_features/social_profile/social_profile.install
-
-		-
 			message: "#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:get\\(\\)\\.$#"
 			count: 1
 			path: modules/social_features/social_profile/social_profile.module
@@ -15608,37 +15498,7 @@ parameters:
 			path: modules/social_features/social_tagging/social_tagging.module
 
 		-
-			message: "#^Function _social_tagging_entity_validate\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: modules/social_features/social_tagging/social_tagging.module
-
-		-
-			message: "#^Function _social_tagging_entity_validate\\(\\) has parameter \\$form with no type specified\\.$#"
-			count: 1
-			path: modules/social_features/social_tagging/social_tagging.module
-
-		-
-			message: "#^Function _social_tagging_node_form_defaults_values\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: modules/social_features/social_tagging/social_tagging.module
-
-		-
 			message: "#^Function social_tagging_entity_delete\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: modules/social_features/social_tagging/social_tagging.module
-
-		-
-			message: "#^Function social_tagging_form_alter\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: modules/social_features/social_tagging/social_tagging.module
-
-		-
-			message: "#^Function social_tagging_form_alter\\(\\) has parameter \\$form with no type specified\\.$#"
-			count: 1
-			path: modules/social_features/social_tagging/social_tagging.module
-
-		-
-			message: "#^Function social_tagging_form_alter\\(\\) has parameter \\$form_id with no type specified\\.$#"
 			count: 1
 			path: modules/social_features/social_tagging/social_tagging.module
 
@@ -15698,21 +15558,6 @@ parameters:
 			path: modules/social_features/social_tagging/social_tagging.module
 
 		-
-			message: "#^Function social_tagging_inline_entity_form_entity_form_alter\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: modules/social_features/social_tagging/social_tagging.module
-
-		-
-			message: "#^Function social_tagging_inline_entity_form_entity_form_alter\\(\\) has parameter \\$entity_form with no type specified\\.$#"
-			count: 1
-			path: modules/social_features/social_tagging/social_tagging.module
-
-		-
-			message: "#^Function social_tagging_inline_entity_form_entity_form_alter\\(\\) has parameter \\$form_state with no type specified\\.$#"
-			count: 1
-			path: modules/social_features/social_tagging/social_tagging.module
-
-		-
 			message: "#^Function social_tagging_preprocess_profile\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: modules/social_features/social_tagging/social_tagging.module
@@ -15748,11 +15593,6 @@ parameters:
 			path: modules/social_features/social_tagging/social_tagging.module
 
 		-
-			message: "#^Offset 'social_tagging' on array in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: modules/social_features/social_tagging/social_tagging.module
-
-		-
 			message: "#^Parameter \\#2 \\$value of method Drupal\\\\Core\\\\Database\\\\Query\\\\Delete\\:\\:condition\\(\\) expects array\\|Drupal\\\\Core\\\\Database\\\\Query\\\\SelectInterface\\|string\\|null, int\\|string\\|null given\\.$#"
 			count: 2
 			path: modules/social_features/social_tagging/social_tagging.module
@@ -15764,11 +15604,6 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$tid of method Drupal\\\\taxonomy\\\\TermStorage\\:\\:loadParents\\(\\) expects int, int\\|string\\|null given\\.$#"
-			count: 1
-			path: modules/social_features/social_tagging/src/SocialTaggingService.php
-
-		-
-			message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
 			count: 1
 			path: modules/social_features/social_tagging/src/SocialTaggingService.php
 
@@ -16841,3 +16676,13 @@ parameters:
 			message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
 			count: 2
 			path: modules/social_features/social_user_export/src/Plugin/Action/ExportUser.php
+
+		-
+			message: "#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\FieldItemListInterface\\:\\:\\$date\\.$#"
+			count: 4
+			path: modules/social_features/social_event/src/SocialEventTrait.php
+
+		-
+			message: "#^\\\\Drupal calls should be avoided in classes, use dependency injection instead$#"
+			count: 1
+			path: modules/social_features/social_core/src/ContentTranslationConfigOverrideBase.php

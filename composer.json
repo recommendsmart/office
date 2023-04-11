@@ -6,7 +6,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": "^7.4 || ^8.0",
+        "php": "^8.0",
         "drupal/access_records": "^1.0@beta",
         "drupal/aggrid": "^1.0@alpha",
         "drupal/allowed_formats": "^1.5",
@@ -27,6 +27,7 @@
         "drupal/cshs": "^3.5",
         "drupal/custom_pub": "^1.0@beta",
         "drupal/datafield": "^1.0",
+        "drupal/date_filter": "^1.0",
         "drupal/description_list_field": "^1.0@alpha",
         "drupal/designs": "^1.0",
         "drupal/dxpr_theme": "^1.2",
@@ -108,7 +109,7 @@
         "drupal/yasm": "^2.0",
         "drupal/yasm_blocks": "^2.0",
         "drupal/yasm_charts": "^2.0",
-        "goalgorilla/open_social": "11.7.1",
+        "goalgorilla/open_social": "~11.8.0",
         "monolog/monolog": "^2.3.5"
     },
     "repositories": [

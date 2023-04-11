@@ -544,7 +544,10 @@ abstract class ModellerBpmnBase extends ModellerBase {
       $templates[] = $this->properties($condition, 'condition', 'bpmn:SequenceFlow', $condition->buildConfigurationForm([], $form_state));
     }
     foreach ($this->actionServices->actions() as $action) {
-      $templates[] = $this->properties($action, 'action', 'bpmn:Task', $this->actionServices->getConfigurationForm($action, $form_state));
+      $form = $this->actionServices->getConfigurationForm($action, $form_state);
+      if ($form !== NULL) {
+        $templates[] = $this->properties($action, 'action', 'bpmn:Task', $form);
+      }
     }
     return $templates;
   }
@@ -737,6 +740,9 @@ abstract class ModellerBpmnBase extends ModellerBase {
     // @todo Add support for nested form fields like e.g. in container/fieldset.
     $fields = [];
     foreach ($form as $key => $definition) {
+      if (!is_array($definition)) {
+        continue;
+      }
       $label = $definition['#title'] ?? Modellers::convertKeyToLabel($key);
       $description = $definition['#description'] ?? NULL;
       $value = $definition['#default_value'] ?? '';

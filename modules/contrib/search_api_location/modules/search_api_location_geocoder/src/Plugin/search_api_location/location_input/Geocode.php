@@ -3,6 +3,7 @@
 namespace Drupal\search_api_location_geocoder\Plugin\search_api_location\location_input;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\geocoder\Geocoder;
@@ -36,6 +37,13 @@ class Geocode extends LocationInputPluginBase implements ContainerFactoryPluginI
   protected $geocoderConfig;
 
   /**
+   * The entity storage class.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $geocoderProviderStorage;
+
+  /**
    * Constructs a Geocode Location input Plugin.
    *
    * @param array $configuration
@@ -49,17 +57,25 @@ class Geocode extends LocationInputPluginBase implements ContainerFactoryPluginI
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   A config factory for retrieving required config objects.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, Geocoder $geocoder, ConfigFactoryInterface $config_factory) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, Geocoder $geocoder, ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager) {
     $this->geocoder = $geocoder;
     $this->geocoderConfig = $config_factory->get('geocoder.settings');
+    $this->geocoderProviderStorage = $entity_type_manager->getStorage('geocoder_provider');
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static($configuration, $plugin_id, $plugin_definition, $container->get('geocoder'), $container->get('config.factory'));
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('geocoder'),
+      $container->get('config.factory'),
+      $container->get('entity_type.manager')
+    );
   }
 
   /**
@@ -77,8 +93,8 @@ class Geocode extends LocationInputPluginBase implements ContainerFactoryPluginI
       $geocoded_addresses = $this->geocoder
         ->geocode($input['value'], $active_plugins, $plugin_options);
       if ($geocoded_addresses) {
-        return $geocoded_addresses->first()
-          ->getLatitude() . ',' . $geocoded_addresses->first()
+        return $geocoded_addresses->first()->getCoordinates()
+          ->getLatitude() . ',' . $geocoded_addresses->first()->getCoordinates()
           ->getLongitude();
       }
     }
@@ -108,11 +124,10 @@ class Geocode extends LocationInputPluginBase implements ContainerFactoryPluginI
     $configuration = parent::defaultConfiguration();
     $configuration['plugins'] = [];
 
-    $geocoderpluginmanager = \Drupal::service('plugin.manager.geocoder.provider');
-
-    foreach ($geocoderpluginmanager->getPluginsAsOptions() as $plugin_id => $plugin_name) {
-      $configuration['plugins'][$plugin_id]['checked'] = 0;
-      $configuration['plugins'][$plugin_id]['weight'] = 0;
+    $geocoder_providers = $this->geocoderProviderStorage->loadMultiple();
+    foreach ($geocoder_providers as $geocoder_provider) {
+      $configuration['plugins'][$geocoder_provider->id()]['checked'] = 0;
+      $configuration['plugins'][$geocoder_provider->id()]['weight'] = 0;
     }
 
     return $configuration;
@@ -122,9 +137,6 @@ class Geocode extends LocationInputPluginBase implements ContainerFactoryPluginI
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-
-    $geocoderpluginmanager = \Drupal::service('plugin.manager.geocoder.provider');
-
     $form['plugins'] = [
       '#type' => 'table',
       '#header' => [$this->t('Geocoder plugins'), $this->t('Weight')],
@@ -137,19 +149,20 @@ class Geocode extends LocationInputPluginBase implements ContainerFactoryPluginI
       '#caption' => $this->t('Select the Geocoder plugins to use, you can reorder them. The first one to return a valid value will be used.'),
     ];
 
-    foreach ($geocoderpluginmanager->getPluginsAsOptions() as $plugin_id => $plugin_name) {
-      $form['plugins'][$plugin_id] = [
+    $geocoder_providers = $this->geocoderProviderStorage->loadMultiple();
+    foreach ($geocoder_providers as $geocoder_provider) {
+      $form['plugins'][$geocoder_provider->id()] = [
         'checked' => [
           '#type' => 'checkbox',
-          '#title' => $plugin_name,
-          '#default_value' => $this->configuration['plugins'][$plugin_id]['checked'],
+          '#title' => $geocoder_provider->label(),
+          '#default_value' => $this->configuration['plugins'][$geocoder_provider->id()]['checked'],
         ],
         'weight' => [
           '#type' => 'weight',
-          '#title' => $this->t('Weight for @title', ['@title' => $plugin_name]),
+          '#title' => $this->t('Weight for @title', ['@title' => $geocoder_provider->label()]),
           '#title_display' => 'invisible',
           '#attributes' => ['class' => ['plugins-order-weight']],
-          '#default_value' => $this->configuration['plugins'][$plugin_id]['weight'],
+          '#default_value' => $this->configuration['plugins'][$geocoder_provider->id()]['weight'],
         ],
         '#attributes' => ['class' => ['draggable']],
       ];
@@ -170,7 +183,7 @@ class Geocode extends LocationInputPluginBase implements ContainerFactoryPluginI
    *   The current state of the complete form.
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
-    // TODO: Implement validateConfigurationForm() method.
+    // @todo Implement validateConfigurationForm() method.
   }
 
   /**
@@ -183,7 +196,7 @@ class Geocode extends LocationInputPluginBase implements ContainerFactoryPluginI
    *   The current state of the complete form.
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    // TODO: Implement submitConfigurationForm() method.
+    // @todo Implement submitConfigurationForm() method.
   }
 
 }

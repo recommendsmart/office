@@ -375,6 +375,14 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
       ->getStorage('commerce_product_variation_type')
       ->load($this->bundle());
 
+    // Variation 'bundle' can be 'commerce_product_variation' in some cases:
+    // Migration stub entities in sub processes, tests. In that case, this
+    // variable will be NULL.
+    // @see https://www.drupal.org/project/commerce/issues/3342331
+    if (!$variation_type instanceof ProductVariationTypeInterface) {
+      return;
+    }
+
     if ($variation_type->shouldGenerateTitle()) {
       $title = $this->generateTitle();
       $this->setTitle($title);

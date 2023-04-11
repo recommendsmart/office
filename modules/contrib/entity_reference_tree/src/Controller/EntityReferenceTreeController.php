@@ -5,13 +5,13 @@ namespace Drupal\entity_reference_tree\Controller;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Form\FormBuilder;
+use Drupal\entity_reference_tree\Ajax\OpenEntityReferenceTreeModalDialogCommand;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\OpenModalDialogCommand;
 
 /**
  * EntityReferenceTreeController class.
@@ -70,7 +70,7 @@ class EntityReferenceTreeController extends ControllerBase {
     $modal_form = $this->formBuilder->getForm('Drupal\entity_reference_tree\Form\SearchForm', $field_edit_id, $bundle, $entity_type, $theme, $dots);
 
     // Add an AJAX command to open a modal dialog with the form as the content.
-    $response->addCommand(new OpenModalDialogCommand($dialog_title, $modal_form, ['width' => '800']));
+    $response->addCommand(new OpenEntityReferenceTreeModalDialogCommand($dialog_title, $modal_form, ['width' => '800']));
 
     return $response;
   }

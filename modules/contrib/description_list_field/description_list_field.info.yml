@@ -3,9 +3,9 @@ description: Contains the Description list field type.
 package: OpenEuropa
 
 type: module
-core_version_requirement: ^9.3
+core_version_requirement: ^9.4 || ^10
 
-# Information added by Drupal.org packaging script on 2022-08-02
-version: '1.0.0-alpha4'
+# Information added by Drupal.org packaging script on 2023-04-11
+version: '1.0.0-alpha5'
 project: 'description_list_field'
-datestamp: 1659428457
+datestamp: 1681214029

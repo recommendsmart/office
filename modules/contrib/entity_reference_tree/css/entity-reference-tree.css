@@ -2,3 +2,30 @@
   font-weight: 600;
   margin-top: 1em;
 }
+
+/**
+ * Align button label with autocomplete field.
+ */
+.field--widget-entity-reference-tree {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex: 0 1 auto;
+  padding-bottom: 1.5rem;
+  max-width: 100%;
+}
+
+.field--widget-entity-reference-tree .form-type--entity-autocomplete {
+  margin-right: 1em;
+  margin-bottom: 0;
+}
+
+.field--widget-entity-reference-tree input {
+  width: 100%;
+}
+
+.field--widget-entity-reference-tree .button {
+  margin: 2.95rem 0 0;
+  flex-basis: 20%;
+  display: block;
+}

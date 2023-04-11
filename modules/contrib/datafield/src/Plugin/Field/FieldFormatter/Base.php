@@ -134,8 +134,8 @@ abstract class Base extends FormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function settingsForm(array $form, FormStateInterface $form_state): array {
-    $formatter_settings_default = [
+  public static function formatterDefault() {
+    return [
       'hidden' => FALSE,
       'show_label' => FALSE,
       'link' => FALSE,
@@ -151,6 +151,13 @@ abstract class Base extends FormatterBase {
       'image_style' => 'medium',
       'sum_column' => FALSE,
     ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state): array {
+    $formatter_settings_default = self::formatterDefault();
     $settings = $this->getSetting('formatter_settings');
     $field_settings = $this->getFieldSettings();
     $types = DataFieldItem::subfieldTypes();
@@ -228,6 +235,7 @@ abstract class Base extends FormatterBase {
           '#title' => $this->t('Date format'),
           '#description' => $this->t('Choose a format for displaying the date.'),
           '#options' => $options,
+          '#empty_option' => $this->t('- Select -'),
           '#default_value' => $settings[$subfield]['format_type'],
         ];
         $element['formatter_settings'][$subfield]['custom_date_format'] = [
@@ -240,6 +248,20 @@ abstract class Base extends FormatterBase {
               'select[name$="[' . $subfield . '][format_type]"]' => ['value' => 'custom'],
             ],
           ],
+        ];
+      }
+      elseif (in_array($type, ['text', 'string'])) {
+        $element['formatter_settings'][$subfield]['format_type'] = [
+          '#type' => 'select',
+          '#title' => $this->t('String format'),
+          '#description' => $this->t('Format for displaying the text.'),
+          '#options' => [
+            'text_trimmed' => $this->t("Trimmed"),
+            'medium' => $this->t("Medium text"),
+            'text_twig' => $this->t("With twig text"),
+          ],
+          '#empty_option' => $this->t('- Select -'),
+          '#default_value' => $settings[$subfield]['format_type'],
         ];
       }
       else {
@@ -272,7 +294,6 @@ abstract class Base extends FormatterBase {
 
       if ($type == 'numeric' || $type == 'float' || $type == 'integer') {
         $options = [
-          '' => $this->t('- None -'),
           '.' => $this->t('Decimal point'),
           ',' => $this->t('Comma'),
           ' ' => $this->t('Space'),
@@ -283,6 +304,7 @@ abstract class Base extends FormatterBase {
           '#type' => 'select',
           '#title' => $this->t('Thousand marker'),
           '#options' => $options,
+          '#empty_option' => $this->t('- Select -'),
           '#default_value' => $settings[$subfield]['thousand_separator'],
         ];
       }
@@ -301,6 +323,7 @@ abstract class Base extends FormatterBase {
             '.' => $this->t('Decimal point'),
             ',' => $this->t('Comma'),
           ],
+          '#empty_option' => $this->t('- Select -'),
           '#default_value' => $settings[$subfield]['decimal_separator'],
         ];
         $element['formatter_settings'][$subfield]['scale'] = [
@@ -331,6 +354,7 @@ abstract class Base extends FormatterBase {
             'entity_reference_entity_view' => $this->t('Rendered entity'),
             'entity_reference_entity_id' => $this->t('Entity ID'),
           ],
+          '#empty_option' => $this->t('- Select -'),
           '#default_value' => $settings[$subfield]['plugin_type'],
         ];
         $extract = explode(':', $field_settings["field_settings"][$subfield]["entity_reference_type"]);
@@ -340,6 +364,7 @@ abstract class Base extends FormatterBase {
           '#options' => $options,
           '#title' => $this->t('View mode'),
           '#description' => $this->t('Output entity in this view mode.'),
+          '#empty_option' => $this->t('- Select -'),
           '#default_value' => $settings[$subfield]['view_mode'],
           '#states' => [
             'visible' => [
@@ -486,7 +511,7 @@ abstract class Base extends FormatterBase {
 
     $field_settings = $this->getFieldSettings();
     $settings = $this->getSettings();
-    $subfields = $storage = $field_settings["columns"];
+    $subfields = $columns = $field_settings["columns"];
     if (!empty($setting = $settings['formatter_settings'])) {
       uasort($setting, [
         'Drupal\Component\Utility\SortArray',
@@ -496,12 +521,13 @@ abstract class Base extends FormatterBase {
     }
     foreach ($items as $delta => $item) {
       foreach (array_keys($subfields) as $subfield) {
-        if (empty($storage[$subfield])) {
+        if (empty($columns[$subfield])) {
           continue;
         }
         $storage = $field_settings["columns"][$subfield];
-
-        if (!empty($settings['formatter_settings']) && $settings['formatter_settings'][$subfield]['hidden']) {
+        $field_setting = $field_settings["field_settings"][$subfield];
+        $setting = $settings['formatter_settings'][$subfield] ?? self::formatterDefault();
+        if ($setting['hidden']) {
           $item->{$subfield} = NULL;
         }
         else {
@@ -547,10 +573,10 @@ abstract class Base extends FormatterBase {
               }
             }
 
-            $formatType = $settings['formatter_settings'][$subfield]['format_type'] ?? 'short';
+            $formatType = $setting['format_type'] ?? 'short';
             $customFormat = '';
-            if (!empty($settings['formatter_settings'][$subfield]['custom_date_format'])) {
-              $customFormat = $settings['formatter_settings'][$subfield]['custom_date_format'];
+            if (!empty($setting['custom_date_format'])) {
+              $customFormat = $setting['custom_date_format'];
             }
 
             $date = $this->dateFormatter->format($timestamp, $formatType, $customFormat, $timezone);
@@ -573,16 +599,16 @@ abstract class Base extends FormatterBase {
           }
 
           $original_value[$subfield] = $item->{$subfield};
-          if (!empty($field_settings["field_settings"]) && $field_settings["field_settings"][$subfield]['list']) {
+          if (!empty($field_settings["field_settings"]) && $field_setting['list']) {
             // @todo Remove the fallback in 5.x.
-            $display_key = $settings['formatter_settings'][$subfield]['key'] ?? FALSE;
+            $display_key = $setting['key'] ?? FALSE;
             if (!$display_key) {
               // Replace the value with its label if possible.
-              $item->{$subfield} = $field_settings["field_settings"][$subfield]['allowed_values'][$item->{$subfield}] ?? NULL;
+              $item->{$subfield} = $field_setting['allowed_values'][$item->{$subfield}] ?? NULL;
             }
           }
 
-          if (!empty($settings['formatter_settings']) && !empty($settings['formatter_settings'][$subfield]['link'])) {
+          if (!empty($setting['link'])) {
             $value = $original_value[$subfield] ?: $item->{$subfield};
             switch ($type) {
               case 'email':
@@ -617,7 +643,7 @@ abstract class Base extends FormatterBase {
             }
           }
 
-          if ($type == 'entity_reference' && !empty($settings['formatter_settings'][$subfield]['plugin_type'])) {
+          if ($type == 'entity_reference' && !empty($setting['plugin_type'])) {
             $explode = explode(':', $field_settings['field_settings'][$subfield]["entity_reference_type"]);
             $reference_type = end($explode);
             $entity_id = $item->{$subfield};
@@ -671,7 +697,7 @@ abstract class Base extends FormatterBase {
               continue;
             }
             $url = $this->fileUrlGenerator->generate($file->getFileUri());
-            if (!empty($plugin_type = $settings['formatter_settings'][$subfield]['plugin_type'])) {
+            if (!empty($plugin_type = $setting['plugin_type'])) {
               switch ($plugin_type) {
                 case 'file_default':
                   $item->{$subfield} = [
@@ -709,7 +735,7 @@ abstract class Base extends FormatterBase {
                   break;
 
                 case 'image':
-                  if (empty($setting[$subfield]['image_style'])) {
+                  if (empty($setting['image_style'])) {
                     $item->{$subfield} = [
                       '#theme' => 'image',
                       '#uri' => $file->getFileUri(),
@@ -719,7 +745,7 @@ abstract class Base extends FormatterBase {
                   else {
                     $item->{$subfield} = [
                       '#theme' => 'image_style',
-                      '#style_name' => $setting[$subfield]['image_style'],
+                      '#style_name' => $setting['image_style'],
                       '#uri' => $file->getFileUri(),
                       "#attributes" => [
                         'class' => ['img-fluid', 'img-thumbnail'],
@@ -734,7 +760,7 @@ abstract class Base extends FormatterBase {
                 case 'image_url':
                   $image_uri = $file->getFileUri();
                   $image_style = $this->entityTypeManager->getStorage('image_style')
-                    ->load($setting[$subfield]['image_style']);
+                    ->load($setting['image_style']);
                   $url = $image_style ? $this->fileUrlGenerator->transformRelative($image_style->buildUrl($image_uri)) : $this->fileUrlGenerator->generateString($image_uri);
 
                   $item->{$subfield} = [
@@ -782,12 +808,38 @@ abstract class Base extends FormatterBase {
               ],
             ];
           }
-          if ($type == 'text') {
-            $item->{$subfield} = [
-              '#type' => 'inline_template',
-              '#template' => $item->{$subfield},
-            ];
+
+          if (in_array($type, ['text', 'string'])) {
+            $formatType = $setting['format_type'] ?? FALSE;
+            switch ($formatType) {
+              case 'text_twig':
+                $item->{$subfield} = [
+                  '#type' => 'inline_template',
+                  '#template' => $item->{$subfield},
+                ];
+                break;
+
+              case 'text_trimmed':
+                $item->{$subfield} = [
+                  '#type' => 'processed_text',
+                  '#text' => $item->{$subfield},
+                  '#format' => $item->format ?? 'full_html',
+                  '#langcode' => $item->getLangcode(),
+                  '#text_summary_trim_length' => 600,
+                ];
+                break;
+
+              case 'medium':
+                $item->{$subfield} = [
+                  '#type' => 'processed_text',
+                  '#text' => $item->{$subfield},
+                  '#format' => $item->format ?? 'full_html',
+                  '#langcode' => $item->getLangcode(),
+                ];
+                break;
+            }
           }
+
         }
 
       }
@@ -801,10 +853,10 @@ abstract class Base extends FormatterBase {
   protected function numberFormat(string $subfield, string $number): string {
     $formatterSettings = $this->getSetting('formatter_settings');
     $settings = $formatterSettings[$subfield] ?? [
-        'scale' => 0,
-        'decimal_separator' => '.',
-        'thousand_separator' => ',',
-      ];
+      'scale' => 0,
+      'decimal_separator' => '.',
+      'thousand_separator' => ',',
+    ];
     if ($this->getFieldSetting('columns')[$subfield]['type'] == 'integer') {
       $settings['scale'] = 0;
     }

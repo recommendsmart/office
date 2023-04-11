@@ -1,0 +1,49 @@
+<?php
+
+/**
+ * @file
+ * Main module file.
+ */
+
+declare(strict_types=1);
+
+use Drupal\date_filter\Plugin\views\filter\DateTimestamp;
+use Drupal\date_filter\Plugin\views\filter\DateTime;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function date_filter_help($route_name, RouteMatchInterface $route_match): ?string {
+  switch ($route_name) {
+    // Main module help for the date_filter module.
+    case 'help.page.date_filter':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Welcome to the help page for the Views Date Filter module! This module is designed to replace the core date and datetime filters with greatly improved veersions having a common code base, making it easier for site builders to manage date filtering.') . '</p>';
+      $output .= '<p>' . t('Here are some of the key features and improvements of this module compared to the core date filters:') . '</p>';
+      $output .= '<ul>';
+      $output .= '<li>' . t('Datepickers for exposed filter value selection: This module adds datepickers to make it easier for users to select dates when using exposed filters.') . '</li>';
+      $output .= '<li>' . t('Improved field labels for between option: The "min" and "max" labels are replaced with "from" and "to" labels to make it clearer what the user needs to input.') . '</li>';
+      $output .= '<li>' . t('Obsolete input type selection removed: This module removes the input type selection for offset or date, as it is no longer necessary.') . '</li>';
+      $output .= '<li>' . t('Mapping of offset default values to dates: In cases where there are offset default values, this module maps them to dates in the exposed filter datepickers, making it easier for users to understand what date range they are selecting.') . '</li>';
+      $output .= '</ul>';
+      $output .= '<p>' . t('The overall goal of this module is to make it easier for site builders to manage date filtering, without having to install additional modules. With this module, you can replace the core date filters with a more advanced and user-friendly solution that will help your users find the information they need.') . '</p>';
+      return $output;
+  }
+
+  return NULL;
+}
+
+/**
+ * Implements hook_views_plugins_filter_alter().
+ */
+function date_filter_views_plugins_filter_alter(array &$plugins): void {
+  // Use the module filter class for both date and datetime filters.
+  if (\array_key_exists('date', $plugins)) {
+    $plugins['date']['class'] = DateTimestamp::class;
+  }
+  if (\array_key_exists('datetime', $plugins)) {
+    $plugins['datetime']['class'] = DateTime::class;
+  }
+}

@@ -9,6 +9,7 @@ use Drupal\Core\Config\Entity\ThirdPartySettingsInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\type_tray\Controller\TypeTrayController;
+use Drupal\Core\Url;
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
@@ -122,6 +123,7 @@ function type_tray_theme($existing, $type, $theme, $path) {
         'items' => NULL,
         'layout' => NULL,
         'category_labels' => NULL,
+        'node_add_page_url' => Url::fromRoute('node.add_page')->toString(),
       ],
     ],
   ];

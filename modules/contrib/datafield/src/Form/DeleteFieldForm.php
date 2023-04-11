@@ -2,9 +2,13 @@
 
 namespace Drupal\datafield\Form;
 
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides delete form.
@@ -12,6 +16,29 @@ use Drupal\Core\Form\FormStateInterface;
  * @internal
  */
 class DeleteFieldForm extends FormBase {
+
+  /**
+   * The request stack.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected $requestStack;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct(RequestStack $request_stack) {
+    $this->requestStack = $request_stack;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('request_stack')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -34,6 +61,37 @@ class DeleteFieldForm extends FormBase {
       '#value' => $this->t('Delete'),
       '#button_type' => 'danger',
     ];
+    $query = $this->requestStack->getCurrentRequest()->query;
+    $url = NULL;
+    if ($query->has('destination')) {
+      $options = UrlHelper::parse($query->get('destination'));
+      try {
+        $url = Url::fromUserInput('/' . ltrim($options['path'], '/'), $options);
+      }
+      catch (\InvalidArgumentException $e) {
+        // Suppress the exception and fall back to the form's cancel url.
+      }
+    }
+    if (!$url) {
+      $url = $entity->toUrl();
+    }
+    $form['actions']['cancel'] = [
+      '#type' => 'link',
+      '#title' => $this->t('Cancel'),
+      '#attributes' => ['class' => ['button', 'dialog-cancel']],
+      '#url' => $url,
+      '#cache' => [
+        'contexts' => [
+          'url.query_args:destination',
+        ],
+      ],
+    ];
+
+    $item = $field_name . ' #' . $delta;
+    $form['#title'] = $this->t('Are you sure you want to delete this @item?', ['@item' => $item]);
+    $form['#attributes']['class'][] = 'confirmation';
+    $form['description'] = ['#markup' => $this->t('This action cannot be undone.')];
+
     return $form;
   }
 

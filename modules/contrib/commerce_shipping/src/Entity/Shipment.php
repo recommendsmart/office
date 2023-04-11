@@ -506,6 +506,28 @@ class Shipment extends ContentEntityBase implements ShipmentInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    parent::postDelete($storage, $entities);
+
+    $profiles_to_delete = [];
+    // Delete the shipping profiles referenced by the shipments being deleted.
+    /** @var \Drupal\commerce_shipping\Entity\ShipmentInterface $shipment */
+    foreach ($entities as $shipment) {
+      $shipping_profile = $shipment->getShippingProfile();
+      if ($shipping_profile && !$shipping_profile->getOwnerId()) {
+        $profiles_to_delete[] = $shipping_profile;
+      }
+    }
+    if ($profiles_to_delete) {
+      /** @var \Drupal\profile\ProfileStorageInterface $profile_storage */
+      $profile_storage = \Drupal::service('entity_type.manager')->getStorage('profile');
+      $profile_storage->delete($profiles_to_delete);
+    }
+  }
+
+  /**
    * Ensures that the package_type and weight fields are populated.
    */
   protected function prepareFields() {

@@ -272,4 +272,28 @@ class ProductVariationTest extends CommerceKernelTestBase {
     $variation->delete();
   }
 
+  /**
+   * Tests that preSave doesn't throw exception on missing bundle entity.
+   *
+   * E.g.: during migration 'migrate_lookup' plugin can create stub entity for
+   * future reference. This stub entity can have bundle that is the same as
+   * entity type ID - 'commerce_product_variation'. In that case, entity should
+   * gracefully skip title generation.
+   *
+   * @see https://www.drupal.org/project/commerce/issues/3342331
+   *
+   * @covers ::preSave
+   */
+  public function testPreSaveWithMissingBundleEntity(): void {
+    $variation = ProductVariation::create([
+      // This is 'missing' bundle which is used as fallback by Drupal core and
+      // Migrations.
+      'type' => 'commerce_product_variation',
+      'sku' => strtolower($this->randomMachineName()),
+      'title' => $this->randomString(),
+    ])->save();
+
+    self::assertSame($variation, SAVED_NEW);
+  }
+
 }

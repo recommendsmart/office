@@ -39,6 +39,13 @@ class LegacyEmailBuilder extends EmailBuilderBase implements ContainerFactoryPlu
   protected $mailer;
 
   /**
+   * The theme.
+   *
+   * @var string
+   */
+  protected $theme = '';
+
+  /**
    * Constructor.
    *
    * @param array $configuration

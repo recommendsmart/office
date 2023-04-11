@@ -45,14 +45,14 @@ class EcaExecutionFormSubscriber extends EcaBase {
       $form_state = $event->getFormState();
       $form_object = $form_state->getFormObject();
       if ($form_object instanceof EntityFormInterface) {
-        // Only build automatically when the form state is submitted and has no
-        // errors. For any other case, there is "eca_form_build_entity".
-        if ($event->getForm() && $form_state->isSubmitted() && $form_state->isValidationComplete() && !$form_state->hasAnyErrors()) {
-          if (empty($form_state->getValues())) {
-            // @see \Drupal\eca_form\Plugin\Action\FormBuildEntity::execute()
-            $form_state = clone $form_state;
-            $form_state->setValues($form_state->getUserInput());
-          }
+        // Only build automatically when the form is properly submitted, and has
+        // no errors. For any other case, there is "eca_form_build_entity".
+        if ($event->getForm()
+          && $form_state->isSubmitted()
+          && $form_state->isValidationComplete()
+          && !$form_state::hasAnyErrors()
+          && !$form_state->isRebuilding()
+          && !empty($form_state->getValues())) {
           // Building the entity creates a clone of it.
           $entity = $form_object->buildEntity($event->getForm(), $form_state);
         }

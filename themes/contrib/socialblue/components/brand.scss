@@ -702,7 +702,9 @@ html:not(.js) .navbar-default {
 }
 
 #sliding-popup {
-  background-color: #1f7ea7 !important;
+  .popup-footer {
+    background-color: $brand-primary;
+  }
 }
 
 .marker-cluster,
@@ -779,6 +781,11 @@ html:not(.js) .navbar-default {
       }
     }
   }
+}
+
+.badge.badge-primary,
+.node--unpublished__label {
+   background-color: $brand-primary;
 }
 
 .badge.badge-active {

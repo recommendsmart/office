@@ -68,6 +68,18 @@ class ConfigReadTest extends Base {
 
     /** @var \Drupal\eca_config\Plugin\Action\ConfigRead $action */
     $action = $action_manager->createInstance('eca_config_read', [
+        'config_name' => 'system.site',
+        'config_key' => 'page.front',
+        'token_name' => 'my_config_value',
+        'include_overridden' => FALSE,
+      ] + $defaults);
+    $action->execute();
+    $this->assertEquals('/node', $token_services->replace('[my_config_value]'));
+
+    /**
+     * @var \Drupal\eca_config\Plugin\Action\ConfigRead $action
+     */
+    $action = $action_manager->createInstance('eca_config_read', [
       'config_name' => 'node.type.article',
       'config_key' => 'name',
       'token_name' => 'my_config_value',

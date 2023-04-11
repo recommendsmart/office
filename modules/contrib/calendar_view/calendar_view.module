@@ -5,7 +5,7 @@
  * Contains calendar_view.module.
  */
 
-use Drupal\calendar_view\Plugin\views\style\Calendar as CalendarStyle;
+use Drupal\calendar_view\Plugin\views\style\CalendarViewInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
 
@@ -14,10 +14,44 @@ use Drupal\Core\Url;
  */
 function calendar_view_theme() {
   return [
+    // Provide a default template for Views using Calendar View style.
+    'views_view__style__calendar' => [
+      'base hook' => 'views_view',
+    ],
+    // Allow other modules/themes to alter Calendar View table cells.
     'calendar_view_day' => [
       'render element' => 'elements',
     ],
   ];
+}
+
+/**
+ * Prepares variables for Calendar views rows templates.
+ *
+ * Default template: views-view-calendar.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - view: The view object.
+ *   - rows: An array of row items. Each row is an array of content.
+ *
+ * @see template_preprocess_views_view_unformatted()
+ */
+function template_preprocess_views_view_calendar(array &$variables) {
+  // Default implementation to add default attributes on rows.
+  template_preprocess_views_view_unformatted($variables);
+
+  $view = $variables['view'];
+  if (($style = $view->getStyle()) instanceof CalendarViewInterface) {
+    foreach ($style->options as $key => $value) {
+      if (strpos($key, 'calendar_') === 0) {
+        $variables['options'][str_replace('calendar_', '', $key)] = $value;
+      }
+    }
+  }
+
+  // Exposed calendar render arrays to Twig.
+  $variables['calendars'] = $view->calendars;
 }
 
 /**
@@ -94,41 +128,14 @@ function template_preprocess_calendar_view_day(array &$variables) {
   }
 
   // Reorder rows in cell.
+  $sort_order_option = $elements['#options']['calendar_sort_order'] ?? 'ASC';
+  $sort_order = $sort_order_option == 'ASC' ? SORT_ASC : SORT_DESC;
   $list = &$variables['rows'];
   if (count($list) > 1) {
     array_multisort(array_map(function ($element) {
       return $element[0]['parent'];
-    }, $list), SORT_ASC, $list);
+    }, $list), $sort_order);
   }
-}
-
-/**
- * Prepares variables for Calendar views rows templates.
- *
- * Default template: views-view-calendar.html.twig.
- *
- * @param array $variables
- *   An associative array containing:
- *   - view: The view object.
- *   - rows: An array of row items. Each row is an array of content.
- *
- * @see template_preprocess_views_view_unformatted()
- */
-function template_preprocess_views_view_calendar(array &$variables) {
-  // Default implementation to add default attributes on rows.
-  template_preprocess_views_view_unformatted($variables);
-
-  $view = $variables['view'];
-  if (($style = $view->getStyle()) instanceof CalendarStyle) {
-    foreach ($style->options as $key => $value) {
-      if (strpos($key, 'calendar_') === 0) {
-        $variables['options'][str_replace('calendar_', '', $key)] = $value;
-      }
-    }
-  }
-
-  // Exposed calendar render arrays to Twig.
-  $variables['calendar'] = $view->calendars;
 }
 
 /**
@@ -156,21 +163,31 @@ function template_preprocess_calendar_view_pager(array &$variables) {
   $date_format = $parameters['date_format'] ?? 'custom';
   $date_pattern = $parameters['date_pattern'] ?? 'F';
 
+  $previous_label = $date_formatter->format($parameters['previous'], $date_format, $date_pattern);
+  $current_label = $date_formatter->format($parameters['current'], $date_format, $date_pattern);
+  $next_label = $date_formatter->format($parameters['next'], $date_format, $date_pattern);
+
+  if ($parameters['use_previous_next'] ?? FALSE) {
+    $previous_label = t('Previous');
+    $current_label = t('Now');
+    $next_label = t('Next');
+  }
+
   // Build navigation.
   $variables['items'] = [];
 
   $variables['items']['previous'] = [
     '#type' => 'link',
-    '#title' => $date_formatter->format($parameters['previous'], $date_format, $date_pattern),
+    '#title' => $previous_label,
     '#url' => Url::fromRoute($route_name, [], [
-      'query' => $parameters + ['calendar_timestamp' => $parameters['previous']],
+      'query' => ['calendar_timestamp' => $parameters['previous']] + $parameters,
     ]),
     '#attributes' => [
       'aria-label' => t('Previous month, @date', [
         '@date' => $date_formatter->format(
-        $parameters['previous'],
-        'custom',
-        'F Y'
+          $parameters['previous'],
+          'custom',
+          'F Y'
         ),
       ]),
     ],
@@ -180,13 +197,13 @@ function template_preprocess_calendar_view_pager(array &$variables) {
 
   $variables['items']['current'] = [
     '#type' => 'item',
-    '#markup' => $date_formatter->format($parameters['current'], $date_format, $date_pattern),
+    '#markup' => $current_label,
     '#attributes' => [
       'aria-label' => t('Current month, @date', [
         '@date' => $date_formatter->format(
-        $parameters['current'],
-        'custom',
-        'F Y'
+          $parameters['current'],
+          'custom',
+          'F Y'
         ),
       ]),
     ],
@@ -202,7 +219,7 @@ function template_preprocess_calendar_view_pager(array &$variables) {
         '#type' => 'link',
         '#title' => t('Today'),
         '#url' => Url::fromRoute($route_name, [], [
-          'query' => $parameters + ['calendar_timestamp' => $now],
+          'query' => ['calendar_timestamp' => $now] + $parameters,
         ]),
         '#attributes' => [
           'title' => t('Back to @today', [
@@ -210,9 +227,9 @@ function template_preprocess_calendar_view_pager(array &$variables) {
           ]),
           'aria-label' => t('Back to @today', [
             '@today' => $date_formatter->format(
-            $now,
-            'custom',
-            'F Y'
+              $now,
+              'custom',
+              'F Y'
             ),
           ]),
           'class' => ['pager__reset'],
@@ -223,16 +240,16 @@ function template_preprocess_calendar_view_pager(array &$variables) {
 
   $variables['items']['next'] = [
     '#type' => 'link',
-    '#title' => $date_formatter->format($parameters['next'], $date_format, $date_pattern),
+    '#title' => $next_label,
     '#url' => Url::fromRoute($route_name, [], [
-      'query' => $parameters + ['calendar_timestamp' => $parameters['next']],
+      'query' => ['calendar_timestamp' => $parameters['next']] + $parameters,
     ]),
     '#attributes' => [
       'aria-label' => t('Next month, @date', [
         '@date' => $date_formatter->format(
-        $parameters['next'],
-        'custom',
-        'F Y'
+          $parameters['next'],
+          'custom',
+          'F Y'
         ),
       ]),
     ],
@@ -249,9 +266,10 @@ function template_preprocess_calendar_view_pager(array &$variables) {
  */
 function calendar_view_theme_suggestions_views_view_alter(&$suggestions, array $variables) {
   $view = $variables['view'];
-  if (($style = $view->getStyle()) instanceof CalendarStyle) {
+  if (($style = $view->getStyle()) instanceof CalendarViewInterface) {
     // Custom template for Views using Calendar style for easier theming.
     // Useful when you want to place the pager somewhere else for instance.
+    $suggestions[] = $variables['theme_hook_original'] . '__' . 'style' . '__' . 'calendar';
     $suggestions[] = $variables['theme_hook_original'] . '__' . 'style' . '__' . $style->getPluginId();
   }
 }
@@ -285,17 +303,4 @@ function calendar_view_theme_suggestions_calendar_view_pager_alter(&$suggestions
     $suggestions[] = 'calendar_view_pager__' . $view->id() . '__' . $view->current_display;
   }
   return $suggestions;
-}
-
-/**
- * Helper method to make sure a timestamp is a timestamp.
- *
- * @param mixed $value
- *   A given value.
- *
- * @return mixed
- *   The timestamp or the original value.
- */
-function _calendar_view_convert_to_timestamp($value) {
-  return !empty($value) && !ctype_digit(strval($value)) ? strtotime($value) : $value;
 }

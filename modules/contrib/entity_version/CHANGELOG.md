@@ -1,7 +1,13 @@
 # Changelog
 
-## [8.x-1.1](https://github.com/openeuropa/entity_version/tree/8.x-1.1) (2022-11-04)
+## [8.x-1.2](https://github.com/openeuropa/entity_version/tree/8.x-1.2) (2023-02-22)
+[Full Changelog](https://github.com/openeuropa/entity_version/compare/8.x-1.1...8.x-1.2)
 
+**Merged pull requests:**
+
+- EWPP-2990: Drupal 10 compatibility. [\#55](https://github.com/openeuropa/entity_version/pull/55) ([brummbar](https://github.com/brummbar))
+
+## [8.x-1.1](https://github.com/openeuropa/entity_version/tree/8.x-1.1) (2022-11-04)
 [Full Changelog](https://github.com/openeuropa/entity_version/compare/8.x-1.0...8.x-1.1)
 
 **Merged pull requests:**

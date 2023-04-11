@@ -10,7 +10,8 @@ use Drupal\user\Entity\Role;
  *
  * @EcaCondition(
  *   id = "eca_current_user_role",
- *   label = "Role of current user"
+ *   label = @Translation("Role of current user"),
+ *   description = @Translation("Checks, whether the current user has a given role.")
  * )
  */
 class CurrentUserRole extends BaseUser {
@@ -46,6 +47,7 @@ class CurrentUserRole extends BaseUser {
     $form['role'] = [
       '#type' => 'select',
       '#title' => $this->t('User role'),
+      '#description' => $this->t('The user role to check, like <em>editor</em> or <em>administrator</em>.'),
       '#default_value' => $this->configuration['role'],
       '#options' => $roles,
       '#weight' => -10,

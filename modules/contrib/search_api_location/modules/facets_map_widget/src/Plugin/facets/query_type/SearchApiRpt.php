@@ -66,7 +66,7 @@ class SearchApiRpt extends QueryTypePluginBase {
     }
 
     $facet_results = [];
-    foreach ($this->results as $key => $result) {
+    foreach ($this->results as $result) {
       if ($result['count'] || $query_operator == 'or') {
         $count = $result['count'];
         $result = new Result($this->facet, $result['filter'], "heatmap", $count);

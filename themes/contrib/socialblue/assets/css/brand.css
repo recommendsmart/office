@@ -615,8 +615,8 @@ html:not(.js) .navbar-default .dropdown:hover > button .navbar-nav__icon {
   fill: #002f67;
 }
 
-#sliding-popup {
-  background-color: #1f7ea7 !important;
+#sliding-popup .popup-footer {
+  background-color: #29abe2;
 }
 
 .marker-cluster:after,
@@ -675,6 +675,11 @@ html:not(.js) .navbar-default .dropdown:hover > button .navbar-nav__icon {
 
 .course__navigation .course_nav-toggle:hover svg, .course__navigation .course_nav-toggle:active svg, .course__navigation .course_nav-toggle:focus svg {
   fill: #ffc142;
+}
+
+.badge.badge-primary,
+.node--unpublished__label {
+  background-color: #29abe2;
 }
 
 .badge.badge-active {

@@ -122,6 +122,9 @@ class ParagraphAccessController extends ControllerBase {
     return AccessResult::allowedIf(FALSE);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function accessAdd(AccountInterface $account) {
     $paragraph_type = $this->currentRouteMatch->getParameter('paragraph_type');
     $entity_type = $this->currentRouteMatch->getParameter('entity_type');
@@ -131,7 +134,7 @@ class ParagraphAccessController extends ControllerBase {
       ->getStorage($entity_type)
       ->load($entity_id);
     if ($this->moduleHandler->moduleExists('paragraphs_type_permissions')) {
-      $bundle = $paragraph_type->bundle();
+      $bundle = $paragraph_type->getOriginalId();
       $entityAccess = $account->hasPermission('create paragraph content ' . $bundle);
       return AccessResult::allowedIf($entityAccess);
     }
@@ -144,10 +147,12 @@ class ParagraphAccessController extends ControllerBase {
       $bundle_fields = $this->entityFieldManager->getFieldDefinitions($entity_type, $entity->bundle());
       $field_definition = $bundle_fields[$field_name];
       $permissionSetting = $field_definition->getFieldStorageDefinition();
-      if ($permissionSetting == 'custom') {
+      $field_permissions_type = $permissionSetting->getThirdPartySettings('field_permissions');
+      $permission = !empty($field_permissions_type['permission_type']) ? $field_permissions_type['permission_type'] : FALSE;
+      if ($permission == 'custom') {
         $field_permission = $account->hasPermission('create ' . $field_name);
       }
-      if ($permissionSetting == 'private') {
+      if ($permission == 'private') {
         $field_permission = FALSE;
       }
       return AccessResult::allowedIf($field_permission);

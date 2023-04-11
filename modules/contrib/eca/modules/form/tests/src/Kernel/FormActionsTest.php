@@ -635,24 +635,24 @@ class FormActionsTest extends KernelTestBase {
     ] + $form_state->getValues());
     $form_builder->submitForm($form_object, $form_state);
 
-    $this->assertFalse($build_access_result, "First access attempt must fail, because the form is not submitted on first build.");
+    $this->assertTrue($build_access_result, "Building the entity must be allowed when working on an entity form, even when the for was not submitted yet.");
     $this->assertTrue($build_node instanceof NodeInterface);
     /** @var \Drupal\node\NodeInterface $build_node */
     $this->assertEquals($title_value, $build_node->label());
     $this->assertEquals($body_value, $build_node->body->value);
-    $this->assertEquals($field_string_multi_value, $build_node->field_string_multi->value);
+    $this->assertEquals('Original string multi value', $build_node->field_string_multi->value, "The original value must remain the same, because field_string_multi is not shown in the default node form.");
 
     $this->assertTrue($process_node instanceof NodeInterface);
     /** @var \Drupal\node\NodeInterface $process_node */
     $this->assertEquals($title_value, $process_node->label());
     $this->assertEquals($body_value, $process_node->body->value);
-    $this->assertEquals($field_string_multi_value, $process_node->field_string_multi->value);
+    $this->assertEquals('Original string multi value', $process_node->field_string_multi->value, "The original value must remain the same, because field_string_multi is not shown in the default node form.");
 
     $this->assertTrue($validate_node instanceof NodeInterface);
     /** @var \Drupal\node\NodeInterface $validate_node */
     $this->assertEquals($title_value, $validate_node->label());
     $this->assertEquals($body_value, $validate_node->body->value);
-    $this->assertEquals($field_string_multi_value, $process_node->field_string_multi->value);
+    $this->assertEquals('Original string multi value', $validate_node->field_string_multi->value, "The original value must remain the same, because field_string_multi is not shown in the default node form.");
 
     $this->assertTrue($submit_node instanceof NodeInterface);
     /** @var \Drupal\node\NodeInterface $submit_node */
@@ -1006,8 +1006,8 @@ class FormActionsTest extends KernelTestBase {
     $this->assertTrue($access_result);
     $this->assertTrue($form_state->hasAnyErrors());
     $errors = $form_state->getErrors();
-    $this->assertTrue(isset($errors['title']));
-    $this->assertEquals('Custom title error', $errors['title']);
+    $this->assertTrue(isset($errors['title][0][value']));
+    $this->assertEquals('Custom title error', $errors['title][0][value']);
   }
 
   /**

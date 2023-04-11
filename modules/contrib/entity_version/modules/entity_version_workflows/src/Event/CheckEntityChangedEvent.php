@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\entity_version_workflows\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Dispatched by EntityVersionWorkflowManager::isEntityChanged().

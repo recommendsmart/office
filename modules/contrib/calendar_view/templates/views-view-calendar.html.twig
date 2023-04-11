@@ -26,15 +26,9 @@
   {{ attach_library ('calendar_view/multiday') }}
 {% endblock %}
 
-{% block title %}
-  {% if title %}
-    <h3>{{ title }}</h3>
-  {% endif %}
-{% endblock %}
-
-{% block calendar %}
+{% block calendars %}
   <div class="view-calendar">
-    {{ calendar }}
+    {{ calendars }}
   </div>
 {% endblock %}
 

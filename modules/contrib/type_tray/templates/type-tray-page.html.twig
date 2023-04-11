@@ -10,6 +10,7 @@
  * - layout: How the page should be laid out, either 'list' or 'grid'.
  * - category_labels: An associative array where keys are category machine
  *   names, and values their user-facing labels.
+ * - node_add_page_url: A URL for the node add page using the routing system.
  */
 #}
 <div class="type-tray-page layout--{{ layout }}">
@@ -18,7 +19,7 @@
       {% if layout == 'grid' %}
         <span class="layout-link current-layout">Grid</span>
       {% else %}
-        <a href="/node/add?layout=grid" link-text="{{ 'Click this for a row style layout.'|t }}" class="layout-link">Grid</a>
+        <a href="{{ node_add_page_url }}?layout=grid" link-text="{{ 'Click this for a row style layout.'|t }}" class="layout-link">Grid</a>
       {% endif %}
 
       |
@@ -26,7 +27,7 @@
       {% if layout == 'list' %}
         <span class="layout-link current-layout">List</span>
       {% else %}
-        <a href="/node/add?layout=list" link-text="{{ 'Click this for a column style layout.'|t }}" class="layout-link">List</a>
+        <a href="{{ node_add_page_url }}?layout=list" link-text="{{ 'Click this for a column style layout.'|t }}" class="layout-link">List</a>
       {% endif %}
     </div>
 

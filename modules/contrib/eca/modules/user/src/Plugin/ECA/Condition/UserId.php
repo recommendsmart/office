@@ -7,7 +7,8 @@ namespace Drupal\eca_user\Plugin\ECA\Condition;
  *
  * @EcaCondition(
  *   id = "eca_user_id",
- *   label = "ID of user"
+ *   label = @Translation("ID of user"),
+ *   description = @Translation("Compares a user ID with a loaded ID of a given user account.")
  * )
  */
 class UserId extends CurrentUserId {

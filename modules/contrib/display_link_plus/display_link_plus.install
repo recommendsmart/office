@@ -1,0 +1,42 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Display Link Plus module.
+ */
+
+/**
+ * Enable new append destination option, which is disabled by default.
+ */
+function display_link_plus_update_9000() : void {
+  $config_factory = \Drupal::configFactory();
+  $display_types = [
+    'header',
+    'footer',
+  ];
+  foreach ($config_factory->listAll('views.view.') as $view_config_name) {
+    $view = $config_factory->getEditable($view_config_name);
+    $save = FALSE;
+    /** @var array $view_displays */
+    $view_displays = $view->get('display');
+    foreach ($view_displays as $display_name => $display) {
+      foreach ($display_types as $display_type) {
+        if (isset($display['display_options'][$display_type])) {
+          foreach ($display['display_options'][$display_type] as $area_plugin_id => $area_plugin) {
+            if ($area_plugin['plugin_id'] == 'display_link_plus') {
+              $display['display_options'][$display_type][$area_plugin_id]['append_destination'] = TRUE;
+              $save = TRUE;
+            }
+          }
+        }
+      }
+
+      if ($save) {
+        $view->set("display.$display_name", $display);
+      }
+    }
+    if ($save) {
+      $view->save();
+    }
+  }
+}

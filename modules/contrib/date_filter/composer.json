@@ -1,0 +1,21 @@
+{
+  "name": "drupal/date_filter",
+  "type": "drupal-module",
+  "description": "Plug and play module replacing core date filters",
+  "homepage": "http://drupal.org/project/date_filter",
+  "authors": [
+    {
+      "name": "Marcin Grabias",
+      "homepage": "https://www.drupal.org/u/graber"
+    }
+  ],
+  "support": {
+    "issues": "https://drupal.org/project/issues/date_filter",
+    "source": "https://git.drupalcode.org/project/date_filter"
+  },
+  "license": "GPL-2.0-or-later",
+  "minimum-stability": "dev",
+  "require": {
+    "drupal/core": "^9 || ^10"
+  }
+}

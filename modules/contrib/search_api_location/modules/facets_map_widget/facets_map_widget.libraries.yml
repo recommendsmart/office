@@ -13,4 +13,3 @@ facets_map:
   dependencies:
     - core/drupal
     - core/drupalSettings
-    - core/jquery.once

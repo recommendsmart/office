@@ -135,10 +135,29 @@ class FormAddAjax extends FormFieldActionBase {
     ];
     $element['#executes_submit_callback'] = TRUE;
 
-    $validate_fields = trim($this->configuration['validate_fields']) !== '' ? DataTransferObject::buildArrayFromUserInput((string) $this->tokenServices->replace($this->configuration['validate_fields'])) : [];
+    if ($this->configuration['disable_validation_errors']) {
+      $element['#limit_validation_errors'] = [];
+    }
 
-    if (!empty($validate_fields) || $this->configuration['disable_validation_errors']) {
-      $element['#limit_validation_errors'] = array_values($validate_fields);
+    $validate_fields = trim($this->configuration['validate_fields']) !== '' ? DataTransferObject::buildArrayFromUserInput((string) $this->tokenServices->replace($this->configuration['validate_fields'])) : [];
+    if (!empty($validate_fields)) {
+      // These are the supported separators. The first one is the official one,
+      // the others are unofficially supported.
+      // @see \Drupal\eca\Plugin\FormFieldPluginTrait::getTargetElement()
+      $separators = ['][', ':', '.'];
+
+      foreach ($validate_fields as $validate_field) {
+        foreach ($separators as $separator) {
+          if (mb_strpos($validate_field, $separator) !== FALSE) {
+            $validate_field = explode($separator, $validate_field);
+            break;
+          }
+        }
+        if (!is_array($validate_field)) {
+          $validate_field = [$validate_field];
+        }
+        $element['#limit_validation_errors'][] = $validate_field;
+      }
     }
 
     $submit_handler = [HookHandler::class, 'submit'];

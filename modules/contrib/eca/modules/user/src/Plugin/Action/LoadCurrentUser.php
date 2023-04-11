@@ -31,6 +31,7 @@ class LoadCurrentUser extends ConfigurableActionBase {
     $form['token_name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Name of token'),
+      '#description' => $this->t('The loaded current user will be stored into this token.'),
       '#default_value' => $this->configuration['token_name'],
     ];
     return $form;

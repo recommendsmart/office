@@ -86,8 +86,8 @@ abstract class LocationInputPluginBase extends ConfigurablePluginBase implements
    */
   public function getForm(array $form, FormStateInterface $form_state, array $options) {
     $plugin_settings = $options['plugin-' . $options['plugin']];
-
-    $is_views_ui_form = ($form_state->getBuildInfo()['form_id'] == 'views_ui_config_item_form');
+    $build_info = $form_state->getBuildInfo();
+    $is_views_ui_form = (!empty($build_info['form_id']) && $build_info['form_id'] == 'views_ui_config_item_form');
     $operator_prefix = '';
 
     if ($is_views_ui_form) {

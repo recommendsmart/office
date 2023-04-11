@@ -40,6 +40,10 @@ class HookHandler extends BaseHookHandler {
       // @see https://www.drupal.org/project/eca/issues/3305797
       return;
     }
+    if ($form_state->has('skip_eca')) {
+      // When flagged by a component to skip ECA, then skip it.
+      return;
+    }
     $this->triggerEvent->dispatchFromPlugin('form:form_build', $form, $form_state);
     // Add the handlers on class-level, to avoid expensive and possibly faulty
     // serialization of nested object references during form submissions.
@@ -91,7 +95,9 @@ class HookHandler extends BaseHookHandler {
    *   The form array.
    */
   public static function process(array $form, FormStateInterface $form_state): array {
-    static::get()->triggerEvent->dispatchFromPlugin('form:form_process', $form, $form_state);
+    if (!$form_state->has('skip_eca')) {
+      static::get()->triggerEvent->dispatchFromPlugin('form:form_process', $form, $form_state);
+    }
     return $form;
   }
 
@@ -107,7 +113,9 @@ class HookHandler extends BaseHookHandler {
    *   The form array.
    */
   public static function afterBuild(array $form, FormStateInterface $form_state): array {
-    static::get()->triggerEvent->dispatchFromPlugin('form:form_after_build', $form, $form_state);
+    if (!$form_state->has('skip_eca')) {
+      static::get()->triggerEvent->dispatchFromPlugin('form:form_after_build', $form, $form_state);
+    }
     return $form;
   }
 
@@ -120,7 +128,9 @@ class HookHandler extends BaseHookHandler {
    *   The form state.
    */
   public static function validate(array $form, FormStateInterface $form_state): void {
-    static::get()->triggerEvent->dispatchFromPlugin('form:form_validate', $form, $form_state);
+    if (!$form_state->has('skip_eca')) {
+      static::get()->triggerEvent->dispatchFromPlugin('form:form_validate', $form, $form_state);
+    }
   }
 
   /**
@@ -132,7 +142,9 @@ class HookHandler extends BaseHookHandler {
    *   The form state.
    */
   public static function submit(array $form, FormStateInterface $form_state): void {
-    static::get()->triggerEvent->dispatchFromPlugin('form:form_submit', $form, $form_state);
+    if (!$form_state->has('skip_eca')) {
+      static::get()->triggerEvent->dispatchFromPlugin('form:form_submit', $form, $form_state);
+    }
   }
 
 }

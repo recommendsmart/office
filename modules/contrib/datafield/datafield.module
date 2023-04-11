@@ -6,7 +6,25 @@
  */
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function datafield_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the datafield module.
+    case 'help.page.datafield':
+      $output = '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Create a field with multiple values under default table form.
+      Base on module triple field and paragraphs table but there is more features.') . '</p>';
+      return $output;
+    default:
+      break;
+  }
+}
 
 /**
  * Implements hook_theme().
@@ -30,7 +48,7 @@ function datafield_theme(): array {
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
  */
-function datafield_form_field_storage_config_edit_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+function datafield_form_field_storage_config_edit_form_alter(&$form, FormStateInterface $form_state, $form_id) {
 
   if (($field_config = $form_state->get('field_config')) && $field_config->get('field_type') == 'data_field') {
     array_unshift(
@@ -52,7 +70,7 @@ function template_preprocess_data_field_item(array &$variables): void {
     if (!empty($variables["settings"][$subfield]["show_label"])) {
       $variables['item'][$subfield] = [
         '#theme' => 'data_field_subfield',
-        '#subfield' =>  $variables['elements']['#item']->$subfield,
+        '#subfield' => $variables['elements']['#item']->$subfield,
         '#index' => $subfield,
         '#field_name' => $subfield,
         '#label' => $variables['field_settings'][$subfield]["label"] ?? '',
@@ -90,13 +108,13 @@ function template_preprocess_data_field_definition_list(array &$variables): void
  */
 function datafield_field_storage_config_update(EntityInterface $entity): void {
 
-  /* @var \Drupal\field\Entity\FieldStorageConfig $entity */
+  /** @var \Drupal\field\Entity\FieldStorageConfig $entity */
   if ($entity->getType() == 'data_field') {
     $settings = $entity->getSettings();
     $original_settings = $entity->original->getSettings();
 
     $isChanged = FALSE;
-    foreach ($settings['columns'] as $index=>$storage) {
+    foreach ($settings['columns'] as $storage) {
       $subfield = $storage['name'];
       if (!empty($original_settings['columns'][$subfield]) && $storage['type'] != $original_settings['columns'][$subfield]['type']) {
         $isChanged = TRUE;

@@ -486,12 +486,14 @@ class ParagraphsTableFormatter extends EntityReferenceFormatterBase {
     }
     $entities = $this->getEntitiesToView($items, $langcode);
     $fieldName = $field_definition->getName();
-    $hasPermission = $this->checkPermissionOperation($entity, $fieldName);
-    if (!$hasPermission && !empty($this->customPermissions['view'])) {
-      $hasPermission = TRUE;
-    }
     if (!empty($setting['hide_line_operations'])) {
       $hasPermission = FALSE;
+    }
+    else {
+      $hasPermission = $this->checkPermissionOperation($entity, $fieldName);
+      if (!$hasPermission && !empty($this->customPermissions['view'])) {
+        $hasPermission = TRUE;
+      }
     }
 
     // Context for header or footer.
@@ -1131,6 +1133,9 @@ class ParagraphsTableFormatter extends EntityReferenceFormatterBase {
       if (!$this->customPermissions['view']) {
         unset($operation['#links']['view']);
       }
+      if (!$this->customPermissions['delete']) {
+        unset($operation['#links']['delete']);
+      }
     }
 
     // Alter row operation.
@@ -1394,48 +1399,115 @@ class ParagraphsTableFormatter extends EntityReferenceFormatterBase {
    * Check permission Operation.
    */
   public static function checkPermissionOperation($entity, $fieldName) {
-    $hasPermission = FALSE;
     $user = \Drupal::currentUser();
     $permissions = [
       'bypass node access',
       'administer nodes',
       'administer paragraphs_item fields',
-      'create ' . $fieldName,
-      'edit ' . $fieldName,
-      'edit own ' . $fieldName,
     ];
     foreach ($permissions as $permission) {
       if ($user->hasPermission($permission)) {
-        $hasPermission = TRUE;
-        break;
+        return TRUE;
+      }
+    }
+    $moduleHandler = \Drupal::service('module_handler');
+    // Check paragraphs permission.
+    if ($moduleHandler->moduleExists('paragraphs_type_permissions')) {
+      if ($user->hasPermission('bypass paragraphs type content access')) {
+        return TRUE;
+      }
+      if (method_exists($entity, 'bundle')) {
+        $bundle = $entity->bundle();
+        $permissions = [
+          'create paragraph content ' . $bundle,
+          'update paragraph content ' . $bundle,
+          'delete paragraph content ' . $bundle,
+        ];
+        foreach ($permissions as $permission) {
+          if ($user->hasPermission($permission)) {
+            return TRUE;
+          }
+        }
+      }
+    }
+    // Check field permission.
+    if ($moduleHandler->moduleExists('field_permissions')) {
+      if ($user->hasPermission('access private fields')) {
+        return TRUE;
+      }
+      $permissions = [
+        'create ' . $fieldName,
+        'edit ' . $fieldName,
+        'edit own ' . $fieldName,
+      ];
+      foreach ($permissions as $permission) {
+        if ($user->hasPermission($permission)) {
+          return TRUE;
+        }
       }
     }
     $entityType = $entity->getEntityTypeId();
-    if (!$hasPermission && $entityType != 'user') {
-      $uid = $entity->getOwnerId();
-      if ($user->hasPermission($permission) && $uid && $uid == $user->id()) {
-        $hasPermission = TRUE;
+    if ($entityType != 'user') {
+      $bundle = $entity->bundle();
+      $permissions = [
+        "create $bundle content",
+        "update $bundle content",
+        "delete $bundle content",
+      ];
+      foreach ($permissions as $permission) {
+        if ($user->hasPermission($permission)) {
+          return TRUE;
+        }
       }
     }
-    return $hasPermission;
+    return FALSE;
   }
 
   /**
    * Set Custom Permissions.
    */
   private function setCustomPermissions(FieldDefinitionInterface $field_definition, FieldItemListInterface $items) {
+    // Check paragraphs permission.
+    if ($this->moduleHandler->moduleExists('paragraphs_type_permissions')) {
+      if ($this->currentUser->hasPermission('bypass paragraphs type content access')) {
+        $this->customPermissions = [
+          'create' => TRUE,
+          'view' => TRUE,
+          'edit' => TRUE,
+          'delete' => TRUE,
+        ];
+        return TRUE;
+      }
+
+      $target_bundles = $field_definition->getSettings()["handler_settings"]["target_bundles"];
+      if (!empty($target_bundles)) {
+        $target_bundle = current($target_bundles);
+        $this->customPermissions = [
+          'create' => $this->currentUser->hasPermission('create paragraph content ' . $target_bundle),
+          'view' => $this->currentUser->hasPermission('view paragraph content ' . $target_bundle),
+          'edit' => $this->currentUser->hasPermission('update paragraph content ' . $target_bundle),
+          'delete' => $this->currentUser->hasPermission('delete paragraph content ' . $target_bundle),
+        ];
+        return TRUE;
+      }
+    }
+
     $field_permissions_type = $field_definition->getFieldStorageDefinition()
       ->getThirdPartySettings('field_permissions');
     $this->typePermission = !empty($field_permissions_type['permission_type']) ? $field_permissions_type['permission_type'] : FALSE;
     if ($this->typePermission == 'custom') {
-      $user = $this->currentUser;
       $fieldName = $field_definition->getName();
-      $this->customPermissions['create'] = $user->hasPermission('create ' . $fieldName);
-      $this->customPermissions['view'] = $user->hasPermission('view ' . $fieldName);
-      $this->customPermissions['view own'] = $user->hasPermission('view own ' . $fieldName);
-      $this->customPermissions['edit'] = $user->hasPermission('edit ' . $fieldName);
-      $this->customPermissions['edit own'] = $user->hasPermission('edit own ' . $fieldName);
+      $this->customPermissions = [
+        'create' => $this->currentUser->hasPermission('create ' . $fieldName),
+        'view' => $this->currentUser->hasPermission('view ' . $fieldName),
+        'view own' => $this->currentUser->hasPermission('view own ' . $fieldName),
+        'edit' => $this->currentUser->hasPermission('edit ' . $fieldName),
+        'edit own' => $this->currentUser->hasPermission('edit own ' . $fieldName),
+        'delete' => $this->currentUser->hasPermission('create ' . $fieldName),
+      ];
+      return TRUE;
     }
+    return FALSE;
   }
 
 }

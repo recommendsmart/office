@@ -106,7 +106,7 @@ class EndpointResponseEvent extends EndpointEventBase implements DataProviderInt
             'path' => $this->request->getPathInfo(),
             'query' => $this->request->query->all(),
             'headers' => $this->request->headers->all(),
-            'content-type' => $this->request->getContentType(),
+            'content-type' => method_exists($this->request, 'getContentTypeFormat') ? $this->request->getContentTypeFormat() : $this->request->getContentType(),
             'content' => (string) $this->request->getContent(),
             'ip' => $this->request->getClientIp(),
           ],

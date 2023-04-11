@@ -2,14 +2,13 @@
 
 namespace Drupal\flow\Plugin;
 
-use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
  * The manager for flow task plugins.
  */
-class FlowTaskManager extends DefaultPluginManager {
+class FlowTaskManager extends FlowPluginManager {
 
   /**
    * The FlowTaskManager constructor.
@@ -23,9 +22,15 @@ class FlowTaskManager extends DefaultPluginManager {
    *   The module handler to invoke the alter hook with.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/flow/Task', $namespaces, $module_handler, 'Drupal\flow\Plugin\FlowTaskInterface', 'Drupal\flow\Annotation\FlowTask');
-    $this->alterInfo('flow_task');
-    $this->setCacheBackend($cache_backend, 'flow_task');
+    parent::__construct(
+      'flow_task',
+      'Plugin/flow/Task',
+      $namespaces,
+      $cache_backend,
+      $module_handler,
+      'Drupal\flow\Plugin\FlowTaskInterface',
+      'Drupal\flow\Annotation\FlowTask'
+    );
   }
 
   /**

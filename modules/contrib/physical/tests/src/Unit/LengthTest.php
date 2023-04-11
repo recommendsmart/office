@@ -18,7 +18,7 @@ class LengthTest extends UnitTestCase {
    *
    * @var \Drupal\physical\Length
    */
-  protected $length;
+  protected Length $length;
 
   /**
    * {@inheritdoc}

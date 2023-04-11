@@ -21,9 +21,9 @@ class ContentEntityPrepareForm extends ContentEntityBaseEntity implements FormEv
   /**
    * The operation.
    *
-   * @var string
+   * @var string|null
    */
-  protected string $operation;
+  protected ?string $operation;
 
   /**
    * The form state.
@@ -39,12 +39,12 @@ class ContentEntityPrepareForm extends ContentEntityBaseEntity implements FormEv
    *   The entity.
    * @param \Drupal\eca\Service\ContentEntityTypes $entity_types
    *   The entity types.
-   * @param string $operation
+   * @param string|null $operation
    *   The operation.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    */
-  public function __construct(ContentEntityInterface $entity, ContentEntityTypes $entity_types, string $operation, FormStateInterface $form_state) {
+  public function __construct(ContentEntityInterface $entity, ContentEntityTypes $entity_types, ?string $operation, FormStateInterface $form_state) {
     parent::__construct($entity, $entity_types);
     $this->operation = $operation;
     $this->formState = $form_state;
@@ -53,10 +53,10 @@ class ContentEntityPrepareForm extends ContentEntityBaseEntity implements FormEv
   /**
    * Gets the operation.
    *
-   * @return string
+   * @return string|null
    *   The operation.
    */
-  public function getOperation(): string {
+  public function getOperation(): ?string {
     return $this->operation;
   }
 

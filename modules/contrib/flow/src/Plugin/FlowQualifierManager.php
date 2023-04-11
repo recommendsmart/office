@@ -2,14 +2,13 @@
 
 namespace Drupal\flow\Plugin;
 
-use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
  * The manager for flow qualifier plugins.
  */
-class FlowQualifierManager extends DefaultPluginManager {
+class FlowQualifierManager extends FlowPluginManager {
 
   /**
    * The FlowQualifierManager constructor.
@@ -23,9 +22,15 @@ class FlowQualifierManager extends DefaultPluginManager {
    *   The module handler to invoke the alter hook with.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/flow/Qualifier', $namespaces, $module_handler, 'Drupal\flow\Plugin\FlowQualifierInterface', 'Drupal\flow\Annotation\FlowQualifier');
-    $this->alterInfo('flow_qualifier');
-    $this->setCacheBackend($cache_backend, 'flow_qualifier');
+    parent::__construct(
+      'flow_qualifier',
+      'Plugin/flow/Qualifier',
+      $namespaces,
+      $cache_backend,
+      $module_handler,
+      'Drupal\flow\Plugin\FlowQualifierInterface',
+      'Drupal\flow\Annotation\FlowQualifier'
+    );
   }
 
   /**

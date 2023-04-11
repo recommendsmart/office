@@ -1497,7 +1497,7 @@
 # modules/social_features/social_user_export/config/install/system.action.user_export_user_action.yml: n/a
 #
 msgid ""
-msgstr "Project-Id-Version: Open Social\nPOT-Creation-Date: 2023-01-05 09:46+0000\nPO-Revision-Date: 2023-01-10 05:01+0000\nLast-Translator: Greenwire Team CH <greenwire@greenpeace.ch>\nLanguage-Team: German (Switzerland) <https://translate.getopensocial.com/projects/gpch/distribution/de_CH/>\nLanguage: de_CH\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=n != 1;\nX-Generator: Weblate 4.14\n"
+msgstr "Project-Id-Version: Open Social\nPOT-Creation-Date: 2023-01-10 09:26+0000\nPO-Revision-Date: 2023-01-30 20:37+0000\nLast-Translator: Greenwire Team CH <greenwire@greenpeace.ch>\nLanguage-Team: German (Switzerland) <https://translate.getopensocial.com/projects/gpch/distribution/de_CH/>\nLanguage: de_CH\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=n != 1;\nX-Generator: Weblate 4.14\n"
 
 #: modules/social_features/social_user/src/Form/SocialUserLoginForm.php:258
 msgid ""
@@ -1790,12 +1790,8 @@ msgstr[1] "@count ausgewählte Mitglieder wurden erfolgreich exportiert"
 msgid "1 selected enrollee has been removed from the event successfully"
 msgid_plural ""
 "@count selected enrollees have been removed from the event successfully"
-msgstr[0] ""
-"1 ausgewählte(r) Teilnehmer*in wurde erfolgreich von der Veranstaltung "
-"entfernt"
-msgstr[1] ""
-"@count ausgewählte Teilnehmer*innen wurden erfolgreich von der Veranstaltung "
-"entfernt"
+msgstr[0] "1 ausgewählte(r) Teilnehmer:in wurde erfolgreich von der Veranstaltung entfernt"
+msgstr[1] "@count ausgewählte Teilnehmer:innen wurden erfolgreich von der Veranstaltung entfernt"
 
 #: translations.php:143
 msgid "1 selected enrollee has not been exported successfully"
@@ -1807,12 +1803,8 @@ msgstr[1] "@count ausgewählte Mitglieder wurden nicht erfolgreich exportiert"
 msgid "1 selected enrollee has not been removed from the event successfully"
 msgid_plural ""
 "@count selected enrollees have not been removed from the event successfully"
-msgstr[0] ""
-"1 ausgewählte(r) Teilnehmer*in wurde nicht erfolgreich von der Veranstaltung "
-"entfernt"
-msgstr[1] ""
-"@count ausgewählte Teilnehmer*innen wurden nicht erfolgreich von der "
-"Veranstaltung entfernt"
+msgstr[0] "1 ausgewählte(r) Teilnehmer:in wurde nicht erfolgreich von der Veranstaltung entfernt"
+msgstr[1] "@count ausgewählte Teilnehmer:innen wurden nicht erfolgreich von der Veranstaltung entfernt"
 
 #: translations.php:148
 msgid "1 selected member has been exported successfully"
@@ -3060,11 +3052,9 @@ msgstr[1] ""
 #: modules/social_features/social_content_report/src/EventSubscriber/FlagSubscriber.php:116
 msgid ""
 "@entity_type @entity_id could not be unpublished after a user reported it."
-msgstr ""
-"@entity_type @entity_id konnte nicht veröffentlicht werden, weil Nutzer*in "
-"diesen gemeldet hat."
+msgstr "@entity_type @entity_id konnte nicht veröffentlicht werden, weil Nutzer:in diesen gemeldet hat."
 
-#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:163
+#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:167
 msgid "@entity_type type: @bundle"
 msgstr ""
 
@@ -3133,10 +3123,8 @@ msgstr[1] "@total Personen haben sich angemeldet @spots_left"
 #: modules/social_features/social_event/modules/social_event_managers/src/Element/SocialEnrollmentAutocomplete.php:126
 msgid "@usernames is already enrolled, you can't add them again"
 msgid_plural "@usernames are already enrolled, you can't add them again"
-msgstr[0] ""
-"@usernames ist bereits angemeldet, du kannst sie*ihn nicht erneut hinzufügen"
-msgstr[1] ""
-"@usernames sind bereits angemeldet, du kannst sie nicht erneut hinzufügen"
+msgstr[0] "@usernames ist bereits angemeldet, du kannst sie:ihn nicht erneut hinzufügen"
+msgstr[1] "@usernames sind bereits angemeldet, du kannst sie nicht erneut hinzufügen"
 
 #: modules/social_features/social_event/modules/social_event_managers/src/Element/SocialEnrollmentAutocomplete.php:133
 msgid "@usernames is already invited or enrolled, you can't invite them again"
@@ -4550,7 +4538,7 @@ msgstr ""
 msgid "Allow category split"
 msgstr "Kategorieaufteilung zulassen"
 
-#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:95
+#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:96
 msgid "Allow category split."
 msgstr "Kategorieaufteilung zulassen."
 
@@ -4697,7 +4685,7 @@ msgstr ""
 msgid "Allow to set the Group settings in Open Social."
 msgstr ""
 
-#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:102
+#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:103
 msgid "Allow use a parent of category."
 msgstr ""
 
@@ -4735,7 +4723,7 @@ msgstr "Usern erlauben die Veranstaltung mit anderen zu teilen"
 msgid "Allow users to skip the confirmation step when joining any @grouptype."
 msgstr ""
 
-#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:89
+#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:90
 msgid "Allow users to tag content in content."
 msgstr "Benutzern erlauben, im Text zu verschlagworten."
 
@@ -4911,9 +4899,7 @@ msgstr ""
 msgid ""
 "Altering the visibility options could result in changes in access for "
 "content within this group and the group itself."
-msgstr ""
-"Das Ändern der Sichtbarkeit kann zu Änderungen beim Zugriff auf die Gruppe "
-"selbst und auf Inhalte innerhalb dieser Gruppe führen."
+msgstr "Verändern der Sichtbarkeitsoptionen kann den Zugriff auf Inhalte innerhalb dieser Gruppe und für die Gruppe selbst verändern."
 
 #: modules/custom/alternative_frontpage/alternative_frontpage.info.yml:0
 #: modules/custom/alternative_frontpage/src/Entity/AlternativeFrontpage.php:8
@@ -4955,7 +4941,7 @@ msgstr "Anzahl der Nutzer:innen, welche der Gruppe hinzugefügt wurden"
 
 #: modules/social_features/social_post/social_post.admin.inc:168
 msgid "An error occurred and processing did not complete."
-msgstr "Es trat ein Fehler auf und die Verarbeitung wurde nicht abgeschlossen."
+msgstr "Ein Fehler ist aufgetreten, die Verarbeitung wurde nicht abgeschlossen."
 
 #: modules/social_features/social_group/modules/social_group_invite/src/Form/SocialBulkGroupInvitation.php:462
 msgid "An error occurred during processing"
@@ -5202,7 +5188,7 @@ msgstr ""
 #: modules/social_features/social_page/config/install/field.field.node.page.field_files.yml:0
 #: modules/social_features/social_topic/config/install/field.field.node.topic.field_files.yml:0
 msgid "Attachment"
-msgstr ""
+msgstr "Anhang"
 
 #: translations.php:80
 #: modules/social_features/social_core/social_core.module:989
@@ -5597,8 +5583,16 @@ msgstr "Abgebrochene \"%action\"."
 msgid "Categories and terms used to tag content"
 msgstr "Kategorien und Begriffe zum Kennzeichnen von Inhalten"
 
+#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:277
+msgid "Categories ordering"
+msgstr ""
+
 #: modules/social_features/social_profile/src/Plugin/Field/FieldWidget/CategorizedOptionsbuttonsWidget.php:9
 msgid "Categorized check boxes/radio buttons"
+msgstr ""
+
+#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:288
+msgid "Category"
 msgstr ""
 
 #: modules/social_features/social_core/social_core.links.menu.yml:0
@@ -5688,7 +5682,7 @@ msgstr ""
 msgid "Changing groups is disabled when translating."
 msgstr ""
 
-#: modules/social_features/social_group/src/Plugin/Field/FieldWidget/SocialGroupSelectorWidget.php:311
+#: modules/social_features/social_group/src/Plugin/Field/FieldWidget/SocialGroupSelectorWidget.php:342
 msgid ""
 "Changing the group may have impact on the <strong>visibility settings</"
 "strong> and may cause <strong>author/co-authors</strong> to lose access."
@@ -5791,7 +5785,7 @@ msgstr "Auswahl auf allen Seiten aufheben"
 msgid "Clear selection when exposed filters change"
 msgstr ""
 
-#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:195
+#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:199
 msgid "Click here to go to the social tagging overview"
 msgstr ""
 "Hier klicken, um zur Übersichtsseite für Verschlagwortung in Open Social zu "
@@ -7184,7 +7178,7 @@ msgstr ""
 "oder als einzelnes Tag-Feld verwendet werden, wenn Tags auf einem Profil "
 "verwendet werden."
 
-#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:97
+#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:98
 msgid ""
 "Determine if the main categories of the vocabury will be used as seperate "
 "tag fields or as a single tag field when using tags on content."
@@ -7195,7 +7189,7 @@ msgstr ""
 
 #: modules/social_features/social_profile/src/Form/SocialProfileSettingsForm.php:148
 #: modules/social_features/social_tagging/config/schema/social_tagging.schema.yml:0
-#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:104
+#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:105
 msgid "Determine if the parent of categories will be used with children tags."
 msgstr ""
 
@@ -7211,9 +7205,7 @@ msgstr ""
 msgid ""
 "Determine whether content managers are allowed to add @profile_tags terms to "
 "the users profile."
-msgstr ""
-"Legt fest, ob Content Manager*innen @profile_tags Begriffe zu Nutzerprofilen "
-"hinzufügen dürfen."
+msgstr "Legt fest, ob Content Manager:innen @profile_tags Begriffe zu Nutzerprofilen hinzufügen dürfen."
 
 #: modules/social_features/social_profile/src/Form/SocialProfileSettingsForm.php:127
 msgid ""
@@ -7223,7 +7215,7 @@ msgstr ""
 "Legt fest, ob gewöhnliche Nutzer Profiltags zu ihren eigenen Profilen "
 "hinzufügen dürfen."
 
-#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:190
+#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:194
 msgid ""
 "Determine whether users are allowed to tag content, view tags and filter on "
 "tags in content. (@content)"
@@ -7434,6 +7426,10 @@ msgstr "Anzahl der Downloads"
 #: modules/social_features/social_user_export/src/Plugin/Action/ExportUser.php:209
 msgid "Download file"
 msgstr "Datei herunterladen"
+
+#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:278
+msgid "Drag-and-drop to change the order"
+msgstr ""
 
 #: modules/custom/dropdown/dropdown.info.yml:0
 msgid "Dropdown"
@@ -8421,7 +8417,7 @@ msgstr ""
 
 #: modules/social_features/social_landing_page/src/Plugin/Field/FieldWidget/BlockFieldWidget.php:56
 msgid "Extra"
-msgstr ""
+msgstr "Zusatz"
 
 #: modules/custom/social_font/config/install/field.field.font.font.field_fallback.yml:0
 msgid "Fallback"
@@ -10275,7 +10271,7 @@ msgstr ""
 #: modules/social_features/social_activity/social_activity.tokens.inc:81
 #: modules/social_features/social_activity/templates/message-post-teaser.html.twig:13
 msgid "Leave a comment"
-msgstr "Schreibe einen Kommentar"
+msgstr "Ansehen"
 
 #: modules/social_features/social_post/social_post.module:46;47
 msgid "Leave a message to @name"
@@ -10956,7 +10952,7 @@ msgstr ""
 msgid "Moved event or topic between groups"
 msgstr "Veranstaltung oder Inhalt zwischen Gruppen verschoben"
 
-#: modules/social_features/social_group/src/Plugin/Field/FieldWidget/SocialGroupSelectorWidget.php:248
+#: modules/social_features/social_group/src/Plugin/Field/FieldWidget/SocialGroupSelectorWidget.php:276
 msgid ""
 "Moving content after creation function has been disabled. In order to move "
 "this content, please contact a site manager."
@@ -11203,7 +11199,7 @@ msgstr ""
 
 #: modules/social_features/social_album/config/install/views.view.albums.yml:0
 msgid "No albums found for this user"
-msgstr "Keine Alben für diese*n Benutzer*in gefunden"
+msgstr "Keine Alben für diese:n Benutzer:in gefunden"
 
 #: modules/social_features/social_album/config/install/views.view.albums.yml:0
 msgid "No albums in this group"
@@ -11334,7 +11330,7 @@ msgstr "Keine Veranstaltungen für die du zugesagt hast"
 
 #: modules/custom/social_graphql/src/Plugin/GraphQL/DataProducer/Edge/EdgeNode.php:9
 #: modules/social_features/social_event/modules/social_event_invite/src/Plugin/Block/SocialEventInviteLocalActionsBlock.php:17
-#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:139
+#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:143
 msgid "Node"
 msgstr "Node"
 
@@ -11774,7 +11770,7 @@ msgstr "Organisator:innen Block"
 #: modules/social_features/social_group/config/install/views.view.group_manage_members.yml:0
 #: modules/social_features/social_profile/config/install/field.field.profile.profile.field_profile_organization.yml:0
 msgid "Organization"
-msgstr "Organisation (Büro oder Ort der Regionalgruppe)"
+msgstr "Organisation"
 
 #: modules/social_features/social_profile/modules/social_profile_organization_tag/src/Plugin/UserExportPlugin/OrganizationTag.php:23;8
 msgid "Organization Tag"
@@ -11866,7 +11862,7 @@ msgstr "Übersicht über alle gemeldeten Inhalte."
 #: modules/custom/social_queue_storage/src/QueueStorageEntityListBuilder.php:23
 #: modules/social_features/social_profile/src/Plugin/Field/FieldFormatter/SocialProfileAvatarFormatter.php:67
 msgid "Owner"
-msgstr "Eigentümer"
+msgstr "Eigentümer:in"
 
 #: modules/custom/activity_basics/src/Plugin/ActivityContext/OwnerActivityContext.php:14
 msgid "Owner activity context"
@@ -12616,7 +12612,7 @@ msgstr "Profil-Tags"
 #: modules/social_features/social_page/config/install/core.base_field_override.node.page.promote.yml:0
 #: modules/social_features/social_topic/config/install/core.base_field_override.node.topic.promote.yml:0
 msgid "Promoted to front page"
-msgstr ""
+msgstr "Zur Startseite befördert"
 
 #: modules/social_features/social_search/social_search.info.yml:0
 msgid "Provide Search API configuration and Search Views."
@@ -12974,7 +12970,7 @@ msgstr "Ausgewählte Kommentare veröffentlichen"
 #: modules/social_features/social_topic/social_topic.module:94;127
 #: config/install/views.view.content.yml:0;0
 msgid "Published"
-msgstr "veröffentlicht"
+msgstr "Veröffentlicht"
 
 #: modules/social_features/social_comment/config/install/views.view.comment.yml:0
 msgid "Published comments"
@@ -13331,11 +13327,11 @@ msgstr "Auf Private Nachrichten antworten"
 #: modules/social_features/social_comment/social_comment.tokens.inc:288
 #: modules/social_features/social_mentions/social_mentions.tokens.inc:243
 msgid "Reply to this comment"
-msgstr "Auf diesen Kommentar antworten"
+msgstr "Ansehen"
 
 #: modules/social_features/social_private_message/social_private_message.tokens.inc:46
 msgid "Reply to this message"
-msgstr "Auf diese Nachricht antworten"
+msgstr "Antworten"
 
 #: translations.php:111
 #: modules/social_features/social_user/src/Plugin/Action/SocialSendEmail.php:236
@@ -15272,7 +15268,7 @@ msgstr ""
 msgid "Social font module."
 msgstr ""
 
-#: modules/social_features/social_group/src/Plugin/Field/FieldWidget/SocialGroupSelectorWidget.php:26
+#: modules/social_features/social_group/src/Plugin/Field/FieldWidget/SocialGroupSelectorWidget.php:27
 msgid "Social group select list"
 msgstr ""
 
@@ -16492,6 +16488,10 @@ msgstr "Es @link um dieser Veranstaltung beizutreten."
 msgid "There @link to join this group."
 msgstr "Es @link um dieser Gruppe beizutreten."
 
+#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:301
+msgid "There are currently no terms in the vocabulary."
+msgstr ""
+
 #: modules/social_features/social_group/src/Controller/SocialGroupListBuilder.php:154
 msgid "There are no groups yet."
 msgstr "Es gibt bisher keine Gruppen."
@@ -16984,7 +16984,7 @@ msgstr "Type"
 msgid "Type a message on resending invites"
 msgstr ""
 
-#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:121
+#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:125
 msgid "Type configuration"
 msgstr "Artkonfiguration"
 
@@ -17570,7 +17570,7 @@ msgstr "Managernotizen auf dem Profil eines Nutzers anzeigen"
 #: modules/custom/activity_viewer/src/Plugin/Field/FieldFormatter/ActivityEntityReferenceFormatter.php:75
 #: modules/social_features/social_profile/config/schema/social_profile.schema.yml:0
 msgid "View mode"
-msgstr "Ansichtsmodus"
+msgstr "Ansichtmodus"
 
 #: modules/social_features/social_album/social_album.module:545
 msgid "View my albums"
@@ -17789,6 +17789,14 @@ msgstr ""
 msgid "Weekly"
 msgstr "Wöchentlich"
 
+#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:289
+msgid "Weight"
+msgstr ""
+
+#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:326
+msgid "Weight for @title"
+msgstr ""
+
 #: modules/social_features/social_group/modules/social_group_welcome_message/social_group_welcome_message.module:102
 msgid "Welcome message"
 msgstr "Begrüssungsnachricht"
@@ -17837,11 +17845,11 @@ msgid ""
 "their language preference."
 msgstr ""
 
-#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:114
+#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:115
 msgid "When filtering use AND condition."
 msgstr "AND-Bedingung beim Filtern benutzen."
 
-#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:116
+#: modules/social_features/social_tagging/src/Form/SocialTaggingSettingsForm.php:117
 msgid "When filtering with multiple terms use AND condition in the query."
 msgstr ""
 "Beim Filtern mit mehreren Suchbegriffen AND-Bedingung in der Anfrage "
@@ -17915,9 +17923,7 @@ msgstr ""
 msgid ""
 "Whether the content is immediately unpublished if a user reports it as "
 "inappropriate."
-msgstr ""
-"Ob ein Inhalt unmittelbar zurückgezogen wird, wenn ein*e Benutzer*in diesen "
-"als unangemessen meldet."
+msgstr "Ob ein Inhalt unmittelbar zurückgezogen wird, wenn ein:e Benutzer:in diesen als unangemessen meldet."
 
 #: modules/social_features/social_event/modules/social_event_max_enroll/config/schema/social_event_max_enroll.schema.yml:0
 msgid "Whether the maximum event enrollments field is required"
@@ -18051,7 +18057,7 @@ msgstr ""
 "Du kannst Inhalt einer Gruppe nicht kommentieren, wenn du kein Mitglied der "
 "Gruppe bist."
 
-#: modules/social_features/social_group/src/Plugin/Field/FieldWidget/SocialGroupSelectorWidget.php:256
+#: modules/social_features/social_group/src/Plugin/Field/FieldWidget/SocialGroupSelectorWidget.php:284
 msgid "You are not allowed to edit this field!"
 msgstr "Du darfst dieses Feld nicht bearbeiten!"
 
@@ -18738,7 +18744,7 @@ msgstr "für diese:n Benutzer:in"
 
 #: modules/social_features/social_profile/modules/social_profile_organization_tag/social_profile_organization_tag.module:96
 msgid "from @org"
-msgstr "von @org"
+msgstr "(@org)"
 
 #: modules/social_features/social_group/modules/social_group_invite/config/optional/views.view.social_group_user_invitations.yml:0
 msgid "ginvite/{{ id }}/accept?destination=/user/{{ uid }}/invitations"
@@ -18948,7 +18954,7 @@ msgstr "Mehr anzeigen"
 #: modules/custom/group_core_comments/src/Plugin/Field/FieldFormatter/CommentGroupContentFormatter.php:273
 #: modules/social_features/social_post/src/Plugin/Field/FieldFormatter/CommentPostFormatter.php:145
 msgid "sign up"
-msgstr "Registrieren"
+msgstr "registrieren"
 
 #: modules/social_features/social_user/src/Form/SocialUserPasswordForm.php:95;95
 msgid "site administrator"
@@ -19218,11 +19224,11 @@ msgstr ""
 #: modules/social_features/social_topic/config/install/views.view.topics.yml:0
 #: modules/social_features/social_user/config/install/views.view.user_admin_people.yml:0
 msgid "‹ Previous"
-msgstr "‹ Vorherige"
+msgstr "‹ Zurück"
 
 #: modules/social_features/social_comment/config/install/views.view.comment.yml:0
 msgid "‹ previous"
-msgstr ""
+msgstr "‹ Zurück"
 
 #: modules/social_features/social_activity/config/install/views.view.activity_stream_notifications.yml:0
 #: modules/social_features/social_activity/config/optional/views.view.activity_stream.yml:0

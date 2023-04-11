@@ -5,6 +5,7 @@
  * Exposes global functionality for creating image styles.
  */
 
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\File\FileSystemInterface;
@@ -144,7 +145,7 @@ function image_file_download($uri) {
   if (strpos($path, 'styles/') === 0) {
     $args = explode('/', $path);
 
-    // Discard "styles", style name, and scheme from the path
+    // Discard "styles", style name, and scheme from the path.
     $args = array_slice($args, 3);
 
     // Then the remaining parts are the path to the image.
@@ -169,6 +170,114 @@ function image_file_download($uri) {
     }
     return -1;
   }
+
+  // Private file access for image fields' default images.
+  // Default images are displayed as a fallback when an image is not uploaded to
+  // an image field.
+  if (strpos($path, 'default_images/') === 0) {
+    $image = \Drupal::service('image.factory')->get($uri);
+    $user = \Drupal::currentUser();
+    $default_images = image_get_default_image_fields();
+    $has_access = FALSE;
+
+    // If the image being requested for download is being used as the default
+    // image for any fields, then grant access if the user has 'view' access to
+    // at least one of those fields.
+    if (isset($default_images[$uri])) {
+      foreach ($default_images[$uri] as $field_config_id) {
+        $field = \Drupal::entityTypeManager()
+          ->getStorage('field_config')
+          ->load($field_config_id);
+        $field_definition = $field->getItemDefinition()->getFieldDefinition();
+        $access_control_handler = \Drupal::entityTypeManager()
+          ->getAccessControlHandler($field->get('entity_type'));
+
+        if ($has_access = $access_control_handler->fieldAccess('view', $field_definition, $user)) {
+          // As long as the user has view access to at least one of the fields,
+          // that uses this image as a default, we can exit this foreach loop,
+          // and grant access.
+          break;
+        }
+      }
+    }
+    if ($image->isValid() && $has_access) {
+      return [
+        // Send headers describing the image's size, and MIME-type.
+        'Content-Type' => $image->getMimeType(),
+        'Content-Length' => $image->getFileSize(),
+        // By not explicitly setting them here, this uses normal Drupal
+        // Expires, Cache-Control and ETag headers to prevent proxy or
+        // browser caching of private images.
+      ];
+    }
+  }
+}
+
+/**
+ * Map default values for image fields, and those fields' configuration IDs.
+ *
+ * This is used in image_file_download() to determine whether to grant access to
+ * an image stored in the private file storage.
+ *
+ * @return array
+ *   An associative array, where the keys are image file URIs, and the values
+ *   are arrays of field configuration IDs which use that image file as their
+ *   default image. For example,
+ *
+ * @code [
+ *     'private://default_images/astronaut.jpg' => [
+ *       'node.article.field_image',
+ *       'user.user.field_portrait',
+ *     ],
+ *   ]
+ * @code
+ */
+function image_get_default_image_fields() {
+  $defaults = &drupal_static(__FUNCTION__);
+  $cid = 'image:default_images';
+
+  if (!isset($defaults)) {
+    if ($cache = \Drupal::cache()->get($cid)) {
+      $defaults = $cache->data;
+    }
+    else {
+      // Save a map of all default image UUIDs and their corresponding field
+      // configuration IDs for quick lookup.
+      $defaults = [];
+      $fields = \Drupal::entityTypeManager()
+        ->getStorage('field_config')
+        ->loadMultiple();
+
+      foreach ($fields as $field) {
+        if ($field->getType() == 'image') {
+          // Check if there is a default image in the field config.
+          if ($field_uuid = $field->getSetting('default_image')['uuid']) {
+            $file = \Drupal::service('entity.repository')
+              ->loadEntityByUuid('file', $field_uuid);
+
+            // A default image could be used by multiple field configs.
+            $defaults[$file->getFileUri()][] = $field->get('id');
+          }
+
+          // Field storage config can also have a default image.
+          if ($storage_uuid = $field->getFieldStorageDefinition()->getSetting('default_image')['uuid']) {
+            $file = \Drupal::service('entity.repository')
+              ->loadEntityByUuid('file', $storage_uuid);
+
+            // Use the field config id since that is what we'll be using to
+            // check access in image_file_download().
+            $defaults[$file->getFileUri()][] = $field->get('id');
+          }
+        }
+      }
+
+      // Cache the default image list.
+      \Drupal::cache()
+        ->set($cid, $defaults, CacheBackendInterface::CACHE_PERMANENT, ['image_default_images']);
+    }
+  }
+
+  return $defaults;
 }
 
 /**
@@ -222,6 +331,7 @@ function image_style_options($include_empty = TRUE) {
   if (empty($options)) {
     $options[''] = t('No defined styles');
   }
+
   return $options;
 }
 

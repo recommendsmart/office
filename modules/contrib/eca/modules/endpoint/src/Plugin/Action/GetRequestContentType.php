@@ -16,7 +16,11 @@ class GetRequestContentType extends RequestActionBase {
    * {@inheritdoc}
    */
   protected function getRequestValue() {
-    return $this->getRequest()->getContentType();
+    if ($request = $this->getRequest()) {
+      // @phpstan-ignore-next-line
+      return method_exists($request, 'getContentTypeFormat') ? $request->getContentTypeFormat() : $request->getContentType();
+    }
+    return '';
   }
 
 }

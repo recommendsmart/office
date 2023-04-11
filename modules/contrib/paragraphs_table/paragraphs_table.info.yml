@@ -6,7 +6,7 @@ package: Paragraphs
 dependencies:
   - paragraphs
 
-# Information added by Drupal.org packaging script on 2023-02-17
-version: '8.x-1.18'
+# Information added by Drupal.org packaging script on 2023-02-18
+version: '8.x-1.20'
 project: 'paragraphs_table'
-datestamp: 1676602455
+datestamp: 1676733933

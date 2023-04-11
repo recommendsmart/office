@@ -44,12 +44,15 @@
 	{# Calendar day #}
 	{% block day_number %}
     <time class="calendar-view-day__number" datetime="{{ timestamp|date('Y-m-d\TH:i:s') }}" title="{{ day_title|trim }}">
-      {{ timestamp|date('d') }}
+      {{ timestamp|date('j') }}
     </time>
 	{% endblock %}
 
   {% block day_content %}
-    {% if rows %}
+   {# Empty #}
+    {% if not rows or rows|length == 0 %}
+      <div class="calendar-view-day__rows empty"></div>
+    {% else %}
       <ul class="calendar-view-day__rows">
         {% for timestamp,results in rows %}
           {% for row in results %}

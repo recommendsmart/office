@@ -7,7 +7,7 @@ dependencies:
   - flow:flow
   - context_stack:context_stack
 
-# Information added by Drupal.org packaging script on 2022-12-08
-version: '1.0.0-beta15'
+# Information added by Drupal.org packaging script on 2023-04-07
+version: '1.0.0-beta17'
 project: 'flow'
-datestamp: 1670490927
+datestamp: 1680907630

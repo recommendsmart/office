@@ -1,7 +1,7 @@
 name: Entity Version Workflows Example
 description: Example module to test the entity version content workflow functionalities.
 type: module
-core_version_requirement: ^9.3
+core_version_requirement: ^9.4 || ^10
 
 dependencies:
   - entity_version_workflows:entity_version_workflows
@@ -13,7 +13,7 @@ config_devel:
     - node.type.entity_version_workflows_example
     - workflows.workflow.example_workflow
 
-# Information added by Drupal.org packaging script on 2022-11-04
-version: '8.x-1.1'
+# Information added by Drupal.org packaging script on 2023-02-22
+version: '8.x-1.2'
 project: 'entity_version'
-datestamp: 1667569667
+datestamp: 1677081701

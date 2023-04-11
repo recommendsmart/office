@@ -3,7 +3,6 @@
 namespace Drupal\eca\Service;
 
 use Drupal\Component\Plugin\ConfigurableInterface;
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Action\ActionInterface as CoreActionInterface;
 use Drupal\Core\Action\ActionManager;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -120,15 +119,24 @@ class Actions {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    *
-   * @return array
-   *   The list of fields for this action.
+   * @return array|null
+   *   The list of fields for this action. If the plugin causes issues being
+   *   loaded, this returns NULL.
    */
-  public function getConfigurationForm(CoreActionInterface $action, FormStateInterface $form_state): array {
+  public function getConfigurationForm(CoreActionInterface $action, FormStateInterface $form_state): ?array {
+    $form = [];
     if ($action instanceof PluginFormInterface) {
-      $form = $action->buildConfigurationForm([], $form_state);
+      try {
+        $form = $action->buildConfigurationForm([], $form_state);
+      }
+      catch (\Throwable | \AssertionError | \Exception $e) {
+        $this->logger->error('The configuration form of %label action plugin can not be loaded. Plugin ignored.', [
+          '%label' => $action->getPluginId(),
+        ]);
+        return NULL;
+      }
     }
     elseif ($action instanceof ConfigurableInterface) {
-      $form = [];
       foreach ($action->defaultConfiguration() as $key => $value) {
         $form[$key] = [
           '#type' => 'textfield',
@@ -136,9 +144,6 @@ class Actions {
           '#default_value' => $value,
         ];
       }
-    }
-    else {
-      $form = [];
     }
 
     try {
@@ -168,8 +173,11 @@ class Actions {
         ];
       }
     }
-    catch (PluginNotFoundException $e) {
-      // Can be ignore as we set $exception_on_invalid to FALSE.
+    catch (\Throwable | \AssertionError | \Exception $e) {
+      $this->logger->error('There is an issue with the %label action plugin. Plugin ignored.', [
+        '%label' => $action->getPluginId(),
+      ]);
+      return NULL;
     }
 
     return $form;

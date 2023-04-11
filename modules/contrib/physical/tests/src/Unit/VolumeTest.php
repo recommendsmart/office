@@ -18,7 +18,7 @@ class VolumeTest extends UnitTestCase {
    *
    * @var \Drupal\physical\Volume
    */
-  protected $volume;
+  protected Volume $volume;
 
   /**
    * {@inheritdoc}

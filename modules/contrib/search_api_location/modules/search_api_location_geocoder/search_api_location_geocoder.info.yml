@@ -2,13 +2,13 @@ type: module
 name: 'Search API location geocoder'
 description: 'Adds support for the geocoder module to Search API location.'
 package: Search
-core_version_requirement: ^8.8 || ^9
+core_version_requirement: ^8.8 || ^9 || ^10
 dependencies:
   - search_api:search_api
   - search_api_location:search_api_location
   - geocoder:geocoder
 
-# Information added by Drupal.org packaging script on 2020-10-13
-version: '8.x-1.0-alpha2'
+# Information added by Drupal.org packaging script on 2023-02-22
+version: '8.x-1.0-alpha3'
 project: 'search_api_location'
-datestamp: 1602614415
+datestamp: 1677056999

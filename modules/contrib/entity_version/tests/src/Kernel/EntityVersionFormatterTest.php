@@ -43,7 +43,7 @@ class EntityVersionFormatterTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'entity_version',
     'entity_test',
     'field',
@@ -55,13 +55,13 @@ class EntityVersionFormatterTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->installEntitySchema('entity_test');
     $this->installEntitySchema('user');
     $this->installConfig(['system']);
-    $this->installSchema('system', ['sequences', 'key_value']);
+    $this->installSchema('system', ['sequences']);
 
     // Create a generic field for validation.
     $this->fieldStorage = FieldStorageConfig::create([
@@ -99,7 +99,6 @@ class EntityVersionFormatterTest extends KernelTestBase {
     $display = EntityViewDisplay::collectRenderDisplay($entity, 'default');
     $build = $display->build($entity);
     $output = $this->container->get('renderer')->renderRoot($build);
-    $this->verbose($output);
     $this->assertStringContainsString('<div>0.0.0</div>', (string) $output);
 
     // Change the minimum version number category to minor.
@@ -108,7 +107,6 @@ class EntityVersionFormatterTest extends KernelTestBase {
 
     $build = $display->build($entity);
     $output = $this->container->get('renderer')->renderRoot($build);
-    $this->verbose($output);
     $this->assertStringContainsString('<div>0.0</div>', (string) $output);
 
     // Change the minimum version number category to major.
@@ -116,7 +114,6 @@ class EntityVersionFormatterTest extends KernelTestBase {
     $display->setComponent('version', $this->displayOptions)->save();
     $build = $display->build($entity);
     $output = $this->container->get('renderer')->renderRoot($build);
-    $this->verbose($output);
     $this->assertStringContainsString('<div>0</div>', (string) $output);
   }
 

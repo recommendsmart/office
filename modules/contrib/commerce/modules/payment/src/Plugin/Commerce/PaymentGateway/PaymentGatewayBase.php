@@ -487,7 +487,7 @@ abstract class PaymentGatewayBase extends PluginBase implements PaymentGatewayIn
    */
   public function getRemoteCustomerId(UserInterface $account) {
     $remote_id = NULL;
-    if ($account->isAuthenticated()) {
+    if (!$account->isAnonymous()) {
       $provider = $this->parentEntity->id() . '|' . $this->getMode();
       /** @var \Drupal\commerce\Plugin\Field\FieldType\RemoteIdFieldItemListInterface $remote_ids */
       $remote_ids = $account->get('commerce_remote_id');

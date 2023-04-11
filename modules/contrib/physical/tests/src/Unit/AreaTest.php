@@ -18,7 +18,7 @@ class AreaTest extends UnitTestCase {
    *
    * @var \Drupal\physical\Area
    */
-  protected $area;
+  protected Area $area;
 
   /**
    * {@inheritdoc}

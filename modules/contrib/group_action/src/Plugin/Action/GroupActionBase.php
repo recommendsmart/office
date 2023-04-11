@@ -219,7 +219,7 @@ abstract class GroupActionBase extends ConfigurableActionBase implements Contain
         '#default_value' => $this->configuration['entity_id'] ?? '',
       ];
     }
-    if ($default_config['values'] === '') {
+    if (($default_config['values'] === '') && ($default_config['operation'] !== 'delete')) {
       $values = $this->configuration['values'] ?? [];
       if (is_string($values)) {
         $values = $this->decodeValues($values);
@@ -231,7 +231,7 @@ abstract class GroupActionBase extends ConfigurableActionBase implements Contain
           $values[$k] = $vs;
         }
         foreach ($vs as $v) {
-          $values_string .= "${k}: ${v}\n";
+          $values_string .= $k . ': ' . $v . "\n";
         }
       }
       $form['values'] = [
@@ -281,7 +281,7 @@ abstract class GroupActionBase extends ConfigurableActionBase implements Contain
     if ($default_config['content_plugin'] === '') {
       $this->configuration['content_plugin'] = $form_state->getValue('content_plugin');
     }
-    if ($default_config['values'] === '') {
+    if (($default_config['values'] === '') && ($default_config['operation'] !== 'delete')) {
       $this->configuration['values'] = $this->decodeValues($form_state->getValue('values', ''));
     }
     if (($this->configuration['operation'] === 'create') && $form_state->hasValue('add_method')) {

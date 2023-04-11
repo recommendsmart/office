@@ -36,6 +36,7 @@ class DrupalUrl extends EmbedCKEditorPluginBase {
       'DrupalUrl_dialogTitleAdd' => t('Insert Url'),
       'DrupalUrl_dialogTitleEdit' => t('Edit Url'),
       'DrupalUrl_buttons' => $this->getButtons(),
+      'DrupalUrlEmbed_previewCsrfToken' => \Drupal::csrfToken()->get('X-Drupal-EmbedPreview-CSRF-Token'),
     );
   }
 

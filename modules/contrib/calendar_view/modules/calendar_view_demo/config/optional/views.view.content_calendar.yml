@@ -232,7 +232,8 @@ display:
         type: calendar
         options:
           offset: 0
-          month_date_format: F
+          label_format: F
+          use_previous_next: 1
           display_reset: 1
       exposed_form:
         type: basic
@@ -511,14 +512,11 @@ display:
           row_class: ''
           default_row_class: true
           calendar_display_rows: 0
-          calendar_filters: {  }
+          calendar_fields:
+            changed: changed
           calendar_weekday_start: '1'
           calendar_sort_order: ASC
           calendar_timestamp: 'this month'
-          calendar_display: month
-          calendar_display_hours: 1
-          calendar_day_hours_start: 8
-          calendar_day_hours_end: 18
       row:
         type: fields
       query:

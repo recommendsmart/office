@@ -26,6 +26,7 @@ class LocationInputPluginManager extends DefaultPluginManager {
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
     parent::__construct('Plugin/search_api_location/location_input', $namespaces, $module_handler, 'Drupal\search_api_location\LocationInput\LocationInputInterface', 'Drupal\search_api_location\Annotation\LocationInput');
     $this->alterInfo('search_api_location_input_info');
+    $this->setCacheBackend($cache_backend, 'search_api_location_input_backends');
   }
 
   /**

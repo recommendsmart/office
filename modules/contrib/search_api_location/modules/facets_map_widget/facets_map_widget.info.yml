@@ -1,7 +1,7 @@
 name: 'Facets Map Widget'
 type: module
 description: 'Provides a map interface that can be used to narrow down Geo-Spatial search results.'
-core_version_requirement: ^8.8 || ^9
+core_version_requirement: ^8.8 || ^9 || ^10
 package: Search
 configure: facets.overview
 dependencies:
@@ -9,7 +9,7 @@ dependencies:
   - search_api:search_api
   - search_api_location:search_api_location
 
-# Information added by Drupal.org packaging script on 2020-10-13
-version: '8.x-1.0-alpha2'
+# Information added by Drupal.org packaging script on 2023-02-22
+version: '8.x-1.0-alpha3'
 project: 'search_api_location'
-datestamp: 1602614415
+datestamp: 1677056999

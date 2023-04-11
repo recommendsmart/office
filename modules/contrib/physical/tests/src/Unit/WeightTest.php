@@ -18,7 +18,7 @@ class WeightTest extends UnitTestCase {
    *
    * @var \Drupal\physical\Weight
    */
-  protected $weight;
+  protected Weight $weight;
 
   /**
    * {@inheritdoc}

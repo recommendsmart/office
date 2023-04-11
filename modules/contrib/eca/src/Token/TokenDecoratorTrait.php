@@ -308,6 +308,14 @@ trait TokenDecoratorTrait {
         $real_token_type = 'menu-link';
       }
 
+      // The token contrib module defines the book token type which is an alias
+      // for the node token type. We need to keep the alias, otherwise tokens
+      // would break.
+      // @see https://www.drupal.org/project/eca/issues/3340582
+      if ($type === 'book') {
+        $real_token_type = 'book';
+      }
+
       // Check whether we hold aliased Token data. Exclude the alias mapping if
       // the "token_type" key is set, which comes from the contrib Token module
       // and is set within the scope of generic entity tokens. Otherwise, since

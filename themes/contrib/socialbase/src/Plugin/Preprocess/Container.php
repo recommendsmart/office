@@ -91,12 +91,20 @@ class Container extends PreprocessBase implements ContainerFactoryPluginInterfac
       $variables['exposed_form'] = TRUE;
     }
 
-    // When we are dealing with the administration toolbar, we should not
-    // set bare to TRUE because it will remove necessary classes from the admin
-    // toolbar.
-    if (isset($variables['element']['administration_menu'])) {
-      $variables['bare'] = FALSE;
-    }
+      // When we are dealing with the administration toolbar, we should not
+      // set bare to TRUE because it will remove necessary classes from the admin
+      // toolbar.
+      if (isset($variables['element']['administration_menu'])) {
+        $variables['bare'] = FALSE;
+        // For the administration menu, which is the key of the render array we
+        // use in SocialAdminMenuAdministratorMenuLinkTreeManipulators.php
+        // we want to remove the url.path.is_front cache context.
+        if (!empty($variables['#cache']['contexts'])) {
+          if (($is_front = array_search('url.path.is_front', $variables['#cache']['contexts'])) !== FALSE) {
+            unset($variables['#cache']['contexts'][$is_front]);
+          }
+        }
+      }
 
   }
 

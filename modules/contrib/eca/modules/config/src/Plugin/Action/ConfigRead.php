@@ -57,10 +57,12 @@ class ConfigRead extends ConfigActionBase {
       if ($config_key !== '') {
         $key_parts = explode('.', $config_key);
         while (($key = array_shift($key_parts)) !== NULL) {
-          foreach ($value as $k => $element) {
-            if ($k === $key) {
-              $value = $element;
-              break;
+          if (is_iterable($value)) {
+            foreach ($value as $k => $element) {
+              if ($k === $key) {
+                $value = $element;
+                continue 2;
+              }
             }
           }
           $value = NULL;

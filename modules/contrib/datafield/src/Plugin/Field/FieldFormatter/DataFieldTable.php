@@ -198,7 +198,7 @@ class DataFieldTable extends Base {
         $header = [];
         break;
       }
-      $header[$subfield] = $setting[$subfield]['column_label'] ?: $components[$subfield]['name'];
+      $header[$subfield] = $setting[$subfield]['column_label'] ?? $field_settings["field_settings"][$subfield]["label"];
     }
     if (!empty($settings['caption'])) {
       $table['#caption'] = [

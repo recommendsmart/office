@@ -1,0 +1,7 @@
+views.filter.datetime_proper:
+  type: views.filter.date
+  include_time:
+    type: boolean
+
+views.filter_value.datetime_proper:
+  type: views.filter_value.date

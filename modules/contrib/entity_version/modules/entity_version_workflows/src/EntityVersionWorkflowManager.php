@@ -152,7 +152,7 @@ class EntityVersionWorkflowManager {
     $field_blacklist = $this->getFieldsToSkipFromEntityChangesCheck($entity);
     $event = new CheckEntityChangedEvent();
     $event->setFieldBlacklist($field_blacklist);
-    $this->eventDispatcher->dispatch(CheckEntityChangedEvent::EVENT, $event);
+    $this->eventDispatcher->dispatch($event, CheckEntityChangedEvent::EVENT);
     $field_blacklist = $event->getFieldBlacklist();
 
     // We consider the latest revision as original to compare with the entity.

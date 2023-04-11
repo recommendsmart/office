@@ -14,7 +14,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @Action(
  *   id = "eca_switch_account",
- *   label = @Translation("User: switch current account")
+ *   label = @Translation("User: switch current account"),
+ *   description = @Translation("Switch to given user account.")
  * )
  */
 class SwitchAccount extends ConfigurableActionBase implements CleanupInterface {
@@ -61,6 +62,7 @@ class SwitchAccount extends ConfigurableActionBase implements CleanupInterface {
       '#type' => 'textfield',
       '#title' => $this->t('User ID (UID)'),
       '#default_value' => $this->configuration['user_id'],
+      '#description' => $this->t('The numeric ID of the user account to switch to. This field supports tokens.'),
       '#weight' => -10,
     ];
     return $form;

@@ -21,6 +21,10 @@
   border-collapse: collapse;
 }
 
+.calendar-view-table[data-calendar-hide-weekend] {
+  --calendar-view-columns: 5;
+}
+
 .calendar-view-table tr,
 .calendar-view-table thead,
 .calendar-view-table tbody {
@@ -85,9 +89,9 @@
   width: 1.5rem;
   border-radius: 50%;
   font-size: 0.65em;
-  line-height: 1;
+  line-height: 1.2;
   margin-bottom: 0.25rem;
-  padding: 0.5rem 0.25rem;
+  padding: 0.5rem 0.15rem;
   cursor: help;
   text-align: center;
   background: var(--calendar-view-color-dark);

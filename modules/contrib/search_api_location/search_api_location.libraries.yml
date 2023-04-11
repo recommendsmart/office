@@ -9,4 +9,4 @@ location-picker:
     - core/drupal
     - core/drupalSettings
     - core/jquery.ui.slider
-    - core/jquery.once
+    - core/once

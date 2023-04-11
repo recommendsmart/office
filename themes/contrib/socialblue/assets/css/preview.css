@@ -2868,6 +2868,10 @@ html:not(.js) .navbar-default .dropdown:hover > button .navbar-nav__icon {
   fill: #ffc142;
 }
 
+.badge.badge-primary {
+  background-color: #29abe2;
+}
+
 .badge.badge-active {
   color: #343434;
   background-color: #ffc142;

@@ -5,9 +5,13 @@ namespace Drupal\display_link_plus\Plugin\views\area;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Access\AccessManagerInterface;
+use Drupal\Core\EventSubscriber\AjaxResponseSubscriber;
+use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
+use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RedirectDestinationTrait;
 use Drupal\views\Plugin\views\area\AreaPluginBase;
+use Drupal\views\Plugin\views\display\PathPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 
@@ -79,6 +83,8 @@ class DisplayLinkPlus extends AreaPluginBase {
     $options['class'] = ['default' => NULL];
     $options['target'] = ['default' => ''];
     $options['width'] = ['default' => '600'];
+    $options['append_destination'] = ['default' => FALSE];
+    $options['arguments_mapping'] = ['default' => []];
     return $options;
   }
 
@@ -94,7 +100,7 @@ class DisplayLinkPlus extends AreaPluginBase {
     $displays = [];
 
     foreach($display_objects as $display_object) {
-      if ($display_object->display['display_plugin'] == 'page') {
+      if ($this->isPathBasedDisplay($display_object->display['id'])) {
         $displays[$display_object->display['id']] = $display_object->display['display_title'];
       }
     }
@@ -143,6 +149,57 @@ class DisplayLinkPlus extends AreaPluginBase {
         ],
       ],
     ];
+    $form['append_destination'] = [
+      '#title' => $this->t('Append destination parameter'),
+      '#description' => $this->t('If a destination query parameter should be added to the link.'),
+      '#type' => 'checkbox',
+      '#default_value' => $this->options['append_destination'],
+    ];
+
+    $display_arguments = $display_objects->get($this->view->current_display)->getHandlers('argument');
+    if (!empty($display_arguments)) {
+      $form['arguments_mapping'] = [
+        '#type' => 'details',
+        '#title' => $this->t('Arguments mapping'),
+        '#tree' => TRUE,
+      ];
+
+      foreach ($display_arguments as $argument_machine_name => $argument) {
+        $form['arguments_mapping'][$argument_machine_name] = [
+          '#type' => 'details',
+          '#title' => $this->t('Argument mapping for %argument_title', [
+            '%argument_title' => $argument->adminLabel(),
+          ]),
+          '#open' => TRUE,
+        ];
+        $form['arguments_mapping'][$argument_machine_name]['enabled'] = [
+          '#type' => 'checkbox',
+          '#title' => $this->t('Enable mapping'),
+          '#default_value' => $this->options['arguments_mapping'][$argument_machine_name]['enabled'] ?? FALSE,
+        ];
+        $form['arguments_mapping'][$argument_machine_name]['query_string'] = [
+          '#type' => 'textfield',
+          '#title' => $this->t('The query string to use for this argument'),
+          '#default_value' => $this->options['arguments_mapping'][$argument_machine_name]['query_string'] ?? '',
+          '#states' => [
+            'invisible' => [
+              ':input[name="options[arguments_mapping][' . $argument_machine_name . '][enabled]"]' => ['checked' => FALSE],
+            ],
+          ],
+        ];
+        $form['arguments_mapping'][$argument_machine_name]['is_multiple'] = [
+          '#type' => 'checkbox',
+          '#title' => $this->t('Multiple'),
+          '#description' => $this->t('If multiple values should be handled. If left unchecked and the contextual filter allows multiple values, the first one will be used.'),
+          '#default_value' => $this->options['arguments_mapping'][$argument_machine_name]['is_multiple'] ?? FALSE,
+          '#states' => [
+            'invisible' => [
+              ':input[name="options[arguments_mapping][' . $argument_machine_name . '][enabled]"]' => ['checked' => FALSE],
+            ],
+          ],
+        ];
+      }
+    }
   }
 
   /**
@@ -152,10 +209,15 @@ class DisplayLinkPlus extends AreaPluginBase {
     if ($empty && empty($this->options['display_id'])) {
       return [];
     }
+
+    if (!$this->isPathBasedDisplay($this->options['display_id'])) {
+      return [];
+    }
+
     $account = $this->currentUser;
     $access = $this->view->access($this->options['display_id'], $account);
     $url = $this->view->getUrl(NULL, $this->options['display_id']);
-    $url->setOption('query', $this->getDestinationArray());
+    $url->setOption('query', $this->getQueryParameter());
 
     if (empty($this->options['label'])) {
       $display_objects = $this->view->displayHandlers;
@@ -205,6 +267,77 @@ class DisplayLinkPlus extends AreaPluginBase {
       }
     }
     return $element;
+  }
+
+  /**
+   * Prepare the link query parameter.
+   *
+   * @return array
+   */
+  protected function getQueryParameter() : array {
+    $query = $this->view->getExposedInput();
+    if ($current_page = $this->view->getCurrentPage()) {
+      $query['page'] = $current_page;
+    }
+
+    // @todo Remove this parsing once these are removed from the request in
+    //   https://www.drupal.org/node/2504709.
+    foreach ([
+      'view_name',
+      'view_display_id',
+      'view_args',
+      'view_path',
+      'view_dom_id',
+      'pager_element',
+      'view_base_path',
+      AjaxResponseSubscriber::AJAX_REQUEST_PARAMETER,
+      FormBuilderInterface::AJAX_FORM_REQUEST,
+      MainContentViewSubscriber::WRAPPER_FORMAT,
+    ] as $key) {
+      unset($query[$key]);
+    }
+
+    foreach ($this->options['arguments_mapping'] as $argument_machine_name => $argument_mapping) {
+      if (!$argument_mapping['enabled'] || empty($argument_mapping['query_string'])) {
+        continue;
+      }
+
+      if (!isset($this->view->argument[$argument_machine_name])) {
+        continue;
+      }
+      if (empty($this->view->argument[$argument_machine_name]->value)) {
+        continue;
+      }
+
+      $argument_values = $this->view->argument[$argument_machine_name]->value;
+
+      if ($argument_mapping['is_multiple']) {
+        $query[$argument_mapping['query_string']] = $argument_values;
+      }
+      else {
+        $query[$argument_mapping['query_string']] = array_shift($argument_values);
+      }
+    }
+
+    if ($this->options['append_destination']) {
+      $query = array_merge($query, $this->getDestinationArray());
+    }
+
+    return $query;
+  }
+
+  /**
+   * Check if a views display is a path-based display.
+   *
+   * @param string $display_id
+   *   The display ID to check.
+   *
+   * @return bool
+   *   Whether the display ID is an allowed display or not.
+   */
+  protected function isPathBasedDisplay($display_id) {
+    $loaded_display = $this->view->displayHandlers->get($display_id);
+    return $loaded_display instanceof PathPluginBase;
   }
 
 }

@@ -80,6 +80,7 @@ class DataFieldTable extends DataField {
     $cardinality = $this->fieldDefinition->getFieldStorageDefinition()
       ->getCardinality();
     $parents = $form['#parents'];
+    $elements = [];
     switch ($cardinality) {
       case FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED:
         $field_state = static::getWidgetState($parents, $field_name, $form_state);
@@ -109,8 +110,8 @@ class DataFieldTable extends DataField {
           $header[] = ['data' => ['#markup' => '']];
           continue;
         }
-        $header[] = $field_settings[$subfield]["label"] ?? $item['name'];
       }
+      $header[] = $field_settings[$subfield]["label"] ?? $item['name'];
     }
     foreach (range(0, $max) as $delta) {
       if (empty($items[$delta])) {

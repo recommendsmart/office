@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\facets_map_widget\Unit\Plugin\processor;
 
+use Prophecy\PhpUnit\ProphecyTrait;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Routing\UrlGeneratorInterface;
@@ -21,6 +22,7 @@ use Drupal\Tests\UnitTestCase;
  */
 class RptMapProcessorTest extends UnitTestCase {
 
+  use ProphecyTrait;
   /**
    * Contains RptMapProcessor object.
    *
@@ -31,7 +33,7 @@ class RptMapProcessorTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->processor = new RptMapProcessor([], 'rpt', []);
 

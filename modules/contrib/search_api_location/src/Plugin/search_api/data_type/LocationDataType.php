@@ -33,4 +33,14 @@ class LocationDataType extends DataTypePluginBase {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getFallbackType() {
+    // By returning NULL, we prevent that this data type is handled as a string
+    // and e.g. text processors won't run on this value since string is the
+    // default fallback type.
+    return NULL;
+  }
+
 }

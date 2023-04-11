@@ -40,6 +40,7 @@ paragraphs_item.add_page:
     operation: 'create'
   requirements:
     _custom_access: '\Drupal\paragraphs_table\Controller\ParagraphAccessController::accessAdd'
+    #_permission: 'access content'
   options:
     parameters:
       paragraph_type:

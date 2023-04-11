@@ -15,7 +15,7 @@ class RptMapWidgetTest extends WidgetTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->widget = new RptMapWidget([], 'rpt_map_widget', []);
   }

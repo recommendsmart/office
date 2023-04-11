@@ -352,7 +352,11 @@ class DataField extends FieldItemBase {
       'file_extensions' => 'jpg jpeg gif png txt doc xls pdf ppt pps odt ods odp',
     ];
     if ($form_state->isRebuilding()) {
-      $field_settings = $form_state->getValue('settings')['field_settings'];
+      $formSettings = $form_state->getValue('settings');
+      if (empty($formSettings)) {
+        $formSettings = $form_state->getUserInput()['settings'];
+      }
+      $field_settings = $formSettings['field_settings'] ?? [];
       $settings['field_settings'] = $field_settings;
     }
     else {
@@ -520,6 +524,7 @@ class DataField extends FieldItemBase {
           $entity_type_id = end($explode);
           $entity_type = \Drupal::entityTypeManager()
             ->getDefinition($entity_type_id);
+          $titleBundle = $entity_type->getBundleLabel() ?? $this->t('Wait after select type');
           $bundles = \Drupal::service('entity_type.bundle.info')
             ->getBundleInfo($entity_type_id);
           if (!empty($bundles)) {
@@ -527,15 +532,15 @@ class DataField extends FieldItemBase {
             foreach ($bundles as $bundle_name => $bundle_info) {
               $bundle_options[$bundle_name] = $bundle_info['label'];
             }
-            $element['field_settings'][$subfield]['target_bundles'] = [
-              '#type' => 'select',
-              '#title' => $entity_type->getBundleLabel(),
-              '#options' => $bundle_options,
-              '#default_value' => $field_settings[$subfield]['target_bundles'] ?? '',
-              '#required' => TRUE,
-            ];
-
           }
+          $element['field_settings'][$subfield]['target_bundles'] = [
+            '#type' => 'select',
+            '#title' => $titleBundle,
+            '#options' => $bundle_options ?? [],
+            '#empty_option' => $this->t('- Select a bundle -'),
+            '#default_value' => $field_settings[$subfield]['target_bundles'] ?? '',
+            '#required' => TRUE,
+          ];
         }
       }
 
@@ -1238,6 +1243,13 @@ class DataField extends FieldItemBase {
   public static function removeSubmit(array &$form, FormStateInterface $form_state) {
     $form_state->set('remove', $form_state->getTriggeringElement()['#delta']);
     $form_state->setRebuild();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function mainPropertyName() {
+    return NULL;
   }
 
 }

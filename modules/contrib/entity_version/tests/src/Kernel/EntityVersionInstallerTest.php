@@ -40,7 +40,7 @@ class EntityVersionInstallerTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->installConfig([
@@ -54,7 +54,7 @@ class EntityVersionInstallerTest extends KernelTestBase {
     ]);
     $this->installEntitySchema('node');
     $this->installEntitySchema('content_moderation_state');
-    $this->installSchema('system', ['sequences', 'key_value']);
+    $this->installSchema('system', ['sequences']);
 
     $this->nodeType = $this->container->get('entity_type.manager')->getStorage('node_type')->create([
       'name' => 'Test node type',

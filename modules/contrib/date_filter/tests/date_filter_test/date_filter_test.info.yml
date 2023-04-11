@@ -1,0 +1,14 @@
+name: Date filter test
+type: module
+description: 'Provides config for module automated tests.'
+core_version_requirement: ^9 || ^10
+dependencies:
+  - drupal:node
+  - drupal:views
+  - drupal:datetime
+  - drupal:menu_ui
+  - drupal:date_filter
+# Information added by Drupal.org packaging script on 2023-03-17
+version: '1.0.0'
+project: 'date_filter'
+datestamp: 1679038610

@@ -1,15 +1,21 @@
-# Changelog
+# Change Log
 
-## [1.0.0-alpha4](https://github.com/openeuropa/description_list_field/tree/1.0.0-alpha4) (2022-07-29)
+## [1.0.0-alpha5](https://github.com/openeuropa/description_list_field/tree/1.0.0-alpha5) (2023-04-11)
+[Full Changelog](https://github.com/openeuropa/description_list_field/compare/1.0.0-alpha4...1.0.0-alpha5)
 
+**Merged pull requests:**
+
+- EWPP-3009: D10 compatibility. [\#15](https://github.com/openeuropa/description_list_field/pull/15) ([upchuk](https://github.com/upchuk))
+
+## [1.0.0-alpha4](https://github.com/openeuropa/description_list_field/tree/1.0.0-alpha4) (2022-08-02)
 [Full Changelog](https://github.com/openeuropa/description_list_field/compare/1.0.0-alpha3...1.0.0-alpha4)
 
 **Merged pull requests:**
 
+- Prepare release 1.0.0-alpha4. [\#14](https://github.com/openeuropa/description_list_field/pull/14) ([imanoleguskiza](https://github.com/imanoleguskiza))
 - EWPP-2358: Drupal 9.4 support. [\#13](https://github.com/openeuropa/description_list_field/pull/13) ([yenyasinn](https://github.com/yenyasinn))
 
 ## [1.0.0-alpha3](https://github.com/openeuropa/description_list_field/tree/1.0.0-alpha3) (2022-02-10)
-
 [Full Changelog](https://github.com/openeuropa/description_list_field/compare/1.0.0-alpha2...1.0.0-alpha3)
 
 **Merged pull requests:**

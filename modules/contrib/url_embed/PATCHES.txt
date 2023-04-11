@@ -13,3 +13,7 @@ Support for Facebook/Instagram API changes - add access token settings
 Source: https://www.drupal.org/files/issues/2021-07-14/url_embed-add-facebook-access-token-config-3177860-opensocial-2.patch
 
 
+Embed Preview throws 403 forbidden
+Source: https://www.drupal.org/files/issues/2023-03-17/url_embed-preview-403-3285139-10.patch
+
+

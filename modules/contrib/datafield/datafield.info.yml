@@ -1,12 +1,12 @@
 name: Data Field
 type: module
 description: Add multi data for field
-package: Field
+package: Fields
 core_version_requirement: ^9 || ^10
 dependencies:
-  - field_ui
+  - drupal:field_ui
 
-# Information added by Drupal.org packaging script on 2023-01-08
-version: '1.0.8'
+# Information added by Drupal.org packaging script on 2023-03-08
+version: '1.0.11'
 project: 'datafield'
-datestamp: 1673212920
+datestamp: 1678296018

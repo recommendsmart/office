@@ -216,6 +216,9 @@ class DocsCommands extends DrushCommands {
       return;
     }
     $values = $this->getPluginValues($plugin);
+    if ($values === NULL) {
+      return;
+    }
     $id = str_replace(':', '_', $plugin->getPluginId());
     $values['idfs'] = $id;
     $this->modules[$values['provider']] = $values;
@@ -251,10 +254,10 @@ class DocsCommands extends DrushCommands {
    * @param \Drupal\Component\Plugin\PluginInspectionInterface $plugin
    *   The ECA plugin for which values should be extracted.
    *
-   * @return array
+   * @return array|null
    *   The extracted values.
    */
-  private function getPluginValues(PluginInspectionInterface $plugin): array {
+  private function getPluginValues(PluginInspectionInterface $plugin): ?array {
     $values = $plugin->getPluginDefinition();
     if ($values['provider'] === 'core') {
       $values['provider_name'] = 'Drupal core';
@@ -285,6 +288,9 @@ class DocsCommands extends DrushCommands {
       $weight = 3;
       $type = 'action';
       $form = $this->actionServices->getConfigurationForm($plugin, $form_state);
+      if ($form === NULL) {
+        return NULL;
+      }
     }
     else {
       $weight = 4;

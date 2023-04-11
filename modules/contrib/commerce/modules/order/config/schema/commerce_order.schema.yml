@@ -112,6 +112,9 @@ commerce_order.commerce_order_type.*:
     receiptBcc:
       type: string
       label: 'The receipt BCC email'
+    receiptSubject:
+      type: string
+      label: 'The receipt subject'
 
 commerce_order.commerce_order_item_type.*:
   type: commerce_config_entity_bundle

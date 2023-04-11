@@ -863,6 +863,7 @@ class Order extends CommerceContentEntityBase implements OrderInterface {
           'override_labels' => TRUE,
           'label_singular' => t('order item'),
           'label_plural' => t('order items'),
+          'removed_reference' => 'delete',
         ],
       ])
       ->setDisplayOptions('view', [

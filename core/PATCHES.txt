@@ -77,3 +77,7 @@ Image derivative generation does not work if effect "Convert" in use and file st
 Source: https://www.drupal.org/files/issues/2022-09-23/2786735-39.patch
 
 
+Issue #2107455: Image field default value not shown when upload destination set to private file storage
+Source: https://www.drupal.org/files/issues/2022-06-24/2107455-75.patch
+
+

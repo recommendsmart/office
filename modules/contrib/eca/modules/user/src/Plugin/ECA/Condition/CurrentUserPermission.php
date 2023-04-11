@@ -9,7 +9,8 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @EcaCondition(
  *   id = "eca_current_user_permission",
- *   label = "Current user has permission"
+ *   label = @Translation("Current user has permission"),
+ *   description = @Translation("Checks, whether the current user has a given permission.")
  * )
  */
 class CurrentUserPermission extends BaseUser {
@@ -44,6 +45,7 @@ class CurrentUserPermission extends BaseUser {
     $form['permission'] = [
       '#type' => 'select',
       '#title' => $this->t('Permission'),
+      '#description' => $this->t('The permission to check, like <em>administer node display</em>.'),
       '#default_value' => $this->configuration['permission'],
       '#options' => $permissions,
       '#weight' => -10,

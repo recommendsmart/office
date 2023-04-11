@@ -71,6 +71,7 @@ trait UserTrait {
     $form['account'] = [
       '#type' => 'textfield',
       '#title' => $this->t('User account'),
+      '#description' => $this->t('The ID of an account or a token with a stored account entity.'),
       '#default_value' => $this->configuration['account'],
       '#weight' => -20,
     ];

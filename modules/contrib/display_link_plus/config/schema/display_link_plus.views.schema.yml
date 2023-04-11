@@ -17,3 +17,25 @@ views.area.display_link_plus:
     width:
       type: integer
       label: 'Width to use for the dialog.'
+    append_destination:
+      type: boolean
+      label: 'Append destination query parameter'
+    arguments_mapping:
+      type: sequence
+      label: 'Mapping of arguments into query.'
+      sequence:
+        type: display_link_plus_argument_mapping
+
+display_link_plus_argument_mapping:
+  type: mapping
+  label: 'Argument mapping'
+  mapping:
+    enabled:
+      type: boolean
+      label: 'Enabled'
+    query_string:
+      type: string
+      label: 'The query string to use for this argument'
+    is_multiple:
+      type: boolean
+      label: 'If multiple values should be handled'

@@ -85,6 +85,8 @@ class SearchApiFilterLocation extends FilterPluginBase {
       ],
     ];
 
+    $options['require'] = FALSE;
+
     return $options;
   }
 
@@ -126,6 +128,13 @@ class SearchApiFilterLocation extends FilterPluginBase {
       $form["plugin-$id"] += $plugin->buildConfigurationForm($form["plugin-$id"], $form_state);
     }
 
+    $form['require'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Require successfull location resolving'),
+      '#description' => $this->t('Abort the search if no coordinates were extracted from the input.'),
+      '#default_value' => $this->options['require'],
+    ];
+
     return $form;
   }
 
@@ -149,9 +158,9 @@ class SearchApiFilterLocation extends FilterPluginBase {
    */
   public function operatorOptions() {
     $options = [
-      '<' => t('less than'),
-      'between' => t('between'),
-      '>' => t('more than'),
+      '<' => $this->t('less than'),
+      'between' => $this->t('between'),
+      '>' => $this->t('more than'),
     ];
 
     return $options;
@@ -194,7 +203,12 @@ class SearchApiFilterLocation extends FilterPluginBase {
 
     $location = $plugin->getParsedInput($this->value);
     if (!$location) {
-      $this->messenger()->addWarning($this->t('The location %location could not be resolved and was ignored.', ['%location' => $this->value['value']]));
+      if ($this->options['require']) {
+        $this->query->abort($this->t('The location @location could not be resolved.', ['@location' => $this->value['value']]));
+      }
+      else {
+        $this->messenger()->addWarning($this->t('The location %location could not be resolved and was ignored.', ['%location' => $this->value['value']]));
+      }
       return;
     }
     $location = explode(',', $location, 2);

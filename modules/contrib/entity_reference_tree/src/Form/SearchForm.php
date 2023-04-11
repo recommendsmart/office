@@ -5,9 +5,9 @@ namespace Drupal\entity_reference_tree\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\CloseModalDialogCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Ajax\InvokeCommand;
+use Drupal\entity_reference_tree\Ajax\CloseEntityReferenceTreeModalDialogCommand;
 
 /**
  * ModalForm class.
@@ -182,7 +182,7 @@ class SearchForm extends FormBase {
     }
     else {
       $response->addCommand(new InvokeCommand(NULL, 'entitySearchDialogAjaxCallback', [$form_state->getValue('field_id'), $form_state->getValue('selected_node')]));
-      $response->addCommand(new CloseModalDialogCommand());
+      $response->addCommand(new CloseEntityReferenceTreeModalDialogCommand());
     }
 
     return $response;

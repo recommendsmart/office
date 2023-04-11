@@ -188,7 +188,13 @@ trait FormFieldPluginTrait {
     $key = array_pop($name_array);
     foreach ($this->lookupFormElements($form, $key) as &$element) {
       if (empty($name_array) || (isset($element['#parents']) && array_intersect($name_array, $element['#parents']) === $name_array) || (isset($element['#array_parents']) && array_intersect($name_array, $element['#array_parents']) === $name_array)) {
-        // Found the element due to defined parents or array_parents.
+        // Found an element due to defined parents or array_parents.
+        if (!isset($element['#type']) && Element::children($element)) {
+          // Some field widgets are additionally nested. And since we need
+          // a form field element here, catch the first defined child element.
+          $element = &$this->jumpToFirstFieldChild($element);
+        }
+
         return $element;
       }
 
@@ -202,7 +208,14 @@ trait FormFieldPluginTrait {
       $parents = [];
       $lookup = static function (array &$elements, array &$name_array) use (&$lookup, &$parents) {
         if ($parent = &NestedArray::getValue($elements, $name_array)) {
-          $parents[] = &$parent;
+          if (isset($parent['widget'])) {
+            // Automatically jump to the widget form element, as it's being
+            // build by \Drupal\Core\Field\WidgetBase::form().
+            $parents[] = &$parent['widget'];
+          }
+          else {
+            $parents[] = &$parent;
+          }
         }
         else {
           foreach (Element::children($elements) as $c_key) {
@@ -243,6 +256,9 @@ trait FormFieldPluginTrait {
    * @param array &$element
    *   The form element that may contain the child. This variable will be
    *   changed as it is being passed as reference.
+   *
+   * @return array
+   *   The child element as reference.
    */
   protected function &jumpToFirstFieldChild(array &$element): array {
     if (isset($element['widget'])) {

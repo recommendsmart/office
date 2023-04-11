@@ -95,7 +95,7 @@ class GroupGroupReferenceItemList extends EntityReferenceFieldItemList {
    */
   public function postSave($update) {
     if ($this->valueComputed) {
-      $node = $this->getEntity();
+      $entity = $this->getEntity();
 
       // Index-Array for wanted groups ( gid => gid )
       $gids_wanted = [];
@@ -113,7 +113,7 @@ class GroupGroupReferenceItemList extends EntityReferenceFieldItemList {
       /** @var \Drupal\group\Entity\Storage\GroupContentStorageInterface $storage */
       $storage = \Drupal::entityTypeManager()->getStorage('group_content');
       // Loads all groups with a relation to the node
-      $activeGroupListEntity = $storage->loadByEntity($node);
+      $activeGroupListEntity = $storage->loadByEntity($entity);
       foreach ($activeGroupListEntity as $groupContent) {
         // fill Index-Array with existing groups gid => gid
         $gids_existing[$groupContent->getGroup()->id()] = $groupContent->getGroup()->id();
@@ -133,18 +133,40 @@ class GroupGroupReferenceItemList extends EntityReferenceFieldItemList {
       // = (Union for existing and wanted) minus wanted
       $gids_delete = array_diff($gids_union, $gids_wanted);
 
+      /** @var \Drupal\group\Entity\Storage\GroupContentTypeStorageInterface $storage */
+      $storage = \Drupal::entityTypeManager()->getStorage('group_content_type');
+
+      $group_content_types = $storage->loadByEntityTypeId($entity->getEntityTypeId());
+
+      $default_plugin_type = 'group_' . $entity->getEntityTypeId();
+
       foreach ($gids_create as $gid) {
         // Skip -none- option
         if ($gid == '_none') {
           continue;
         }
         $group = Group::load($gid);
-        /** @var \Drupal\group\Plugin\GroupContentEnablerInterface $plugin */
-        $plugin = $group->getGroupType()->getContentPlugin('group_node:'.$node->bundle());
+
+        $plugin_type = $default_plugin_type;
+
+        foreach ($group_content_types as $group_content_type) {
+          if ($group_content_type->getGroupTypeId() === $group->bundle()) {
+            $plugin_type = $group_content_type
+              ->getContentPlugin()
+              ->getPluginDefinition()['id'];
+
+            break;
+          }
+        }
+
+        $plugin = $group
+          ->getGroupType()
+          ->getContentPlugin($plugin_type . ':' . $entity->bundle());
+
         $group_content = GroupContent::create([
           'type' => $plugin->getContentTypeConfigId(),
           'gid' => $group->id(),
-          'entity_id' => $node->id(),
+          'entity_id' => $entity->id(),
         ]);
         $group_content->save();
       }
@@ -158,8 +180,6 @@ class GroupGroupReferenceItemList extends EntityReferenceFieldItemList {
       }
     }
     return parent::postSave($update);
-
-    // @fixme Also care that we got correct referencable entities in widget.
   }
 
 }

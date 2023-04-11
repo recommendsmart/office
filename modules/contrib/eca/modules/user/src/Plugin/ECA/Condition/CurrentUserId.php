@@ -9,7 +9,8 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @EcaCondition(
  *   id = "eca_current_user_id",
- *   label = "ID of current user"
+ *   label = @Translation("Current user ID"),
+ *   description = @Translation("Compares a user ID with the current user ID.")
  * )
  */
 class CurrentUserId extends BaseUser {
@@ -45,6 +46,7 @@ class CurrentUserId extends BaseUser {
     $form['user_id'] = [
       '#type' => 'textfield',
       '#title' => $this->t('User ID'),
+      '#description' => $this->t('The user ID, which gets compared. This value supports tokens.'),
       '#default_value' => $this->configuration['user_id'],
       '#weight' => -10,
     ];

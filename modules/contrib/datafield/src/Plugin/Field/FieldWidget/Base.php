@@ -98,20 +98,27 @@ abstract class Base extends WidgetBase {
   /**
    * {@inheritdoc}
    */
-  public function settingsForm(array $form, FormStateInterface $form_state): array {
-    $widget_settings_default = [
+  public static function widgetDefault() {
+    return [
       'type' => NULL,
       'label_display' => 'block',
       'field_display' => TRUE,
       'size' => 30,
       'placeholder' => '',
-      'label' => $this->t('Ok'),
+      'label' => t('Ok'),
       'cols' => 10,
       'rows' => 5,
       'plugin' => '',
       'file_extensions' => 'jpg jpeg gif png txt doc xls pdf ppt pps odt ods odp docx xlsx pptx',
       'preview_image_style' => 'thumbnail',
     ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state): array {
+    $widget_settings_default = self::widgetDefault();
     $field_settings = $this->getFieldSetting('field_settings');
     $settings = $this->getSettings();
     $widget_settings = $settings['widget_settings'];
@@ -150,6 +157,7 @@ abstract class Base extends WidgetBase {
         '#title' => $this->t('Widget'),
         '#default_value' => $widget_settings[$subfield]["type"] ?? $widget_settings_default['type'],
         '#required' => TRUE,
+        '#empty_option' => $this->t('- Select -'),
         '#options' => $this->getSubwidgets($type, $field_settings[$subfield]['list'] ?? FALSE, $item['datetime_type'] ?? FALSE),
       ];
 
@@ -166,6 +174,7 @@ abstract class Base extends WidgetBase {
         '#title' => $this->t('Label'),
         '#default_value' => $widget_settings[$subfield]['label_display'] ?? $widget_settings_default['label_display'],
         '#options' => $options,
+        '#empty_option' => $this->t('- Select -'),
         '#access' => static::isLabelSupported($item['type']),
       ];
       $element['widget_settings'][$subfield]['field_display'] = [
@@ -370,7 +379,7 @@ abstract class Base extends WidgetBase {
             $value[$subfield] = current($value[$subfield]);
           }
         }
-        if (empty($value[$subfield])) {
+        if (!is_numeric($values[$delta][$subfield]) && empty($value[$subfield])) {
           $values[$delta][$subfield] = NULL;
         }
         elseif ($value[$subfield] instanceof DrupalDateTime) {
@@ -440,6 +449,15 @@ abstract class Base extends WidgetBase {
           if ($type == 'time') {
             $type = 'time';
           }
+        }
+        break;
+
+      case 'date':
+        if ($storage_setting["datetime_type"] == 'datetime') {
+          $type = 'datetime';
+        }
+        if ($storage_setting["datetime_type"] == 'date') {
+          $type = 'date';
         }
         break;
 
@@ -600,7 +618,7 @@ abstract class Base extends WidgetBase {
   }
 
   /**
-   * Determines whether or not widget can render subfield label.
+   * Determines whether widget can render subfield label.
    */
   public static function isLabelSupported(string $widget_type = NULL): bool {
     return $widget_type != 'checkbox';
@@ -678,8 +696,8 @@ abstract class Base extends WidgetBase {
       if (empty($storage[$subfield])) {
         continue;
       }
-      if (!empty($settings["widget_settings"][$subfield]) && empty($settings["widget_settings"][$subfield]["field_display"])) {
-        continue;
+      if (!empty($settings["widget_settings"][$subfield]) && count($settings["widget_settings"][$subfield]) <= 1) {
+        $settings["widget_settings"][$subfield] = self::widgetDefault();
       }
       // $item = $storage[$subfield];
       $field_default = !empty($field_widget_default[$delta]) ? $field_widget_default[$delta][$subfield] : '';
@@ -730,7 +748,7 @@ abstract class Base extends WidgetBase {
           case 'options_buttons':
           case 'options_select':
             $entity_storage = $this->entityTypeManager->getStorage($reference_type);
-            if ($reference_type == 'taxonomy_term') {
+            if ($reference_type == 'taxonomy_term' && !empty($field_settings[$subfield]["target_bundles"])) {
               $entities = $entity_storage->loadByProperties([
                 'vid' => $field_settings[$subfield]["target_bundles"],
               ]);
@@ -740,7 +758,7 @@ abstract class Base extends WidgetBase {
                 'status' => 1,
               ]);
             }
-            else {
+            elseif (!empty($field_settings[$subfield]["target_bundles"])) {
               $entities = $entity_storage->loadByProperties(['type' => $field_settings[$subfield]["target_bundles"]]);
             }
             $options = [];
@@ -798,6 +816,13 @@ abstract class Base extends WidgetBase {
             }
             break;
 
+          default:
+            if ($reference_type == 'taxonomy_term' && !empty($field_settings[$subfield]["target_bundles"])) {
+              $widget[$delta][$subfield]['#type'] = 'select';
+              $widget[$delta][$subfield]['#options'] = $this->loadVoc($field_settings[$subfield]["target_bundles"]);
+              $widget[$delta][$subfield]['#empty_option'] = $this->t('- Select -');
+            }
+            break;
         }
       }
 
@@ -1016,6 +1041,50 @@ abstract class Base extends WidgetBase {
       }
     }
     return $widget;
+  }
+
+  /**
+   * Loads the tree of a vocabulary.
+   *
+   * {@inheritdoc}
+   */
+  public function loadVoc($vocabulary) {
+    $terms = $this->entityTypeManager->getStorage('taxonomy_term')->loadTree($vocabulary);
+    $tree = [];
+    foreach ($terms as $tree_object) {
+      $this->buildTree($tree, $tree_object, $vocabulary);
+    }
+
+    return $tree;
+  }
+
+  /**
+   * Populates a tree array given a taxonomy term tree object.
+   *
+   * {@inheritdoc}
+   */
+  protected function buildTree(&$tree, $object, $vocabulary, $level = 1) {
+    if ($object->depth != 0 || $object->status == 0) {
+      return;
+    }
+    $tree[$object->tid] = $object->name;
+    $children = $this->entityTypeManager->getStorage('taxonomy_term')
+      ->loadChildren($object->tid);
+    if (!$children) {
+      return;
+    }
+
+    $child_tree_objects = $this->entityTypeManager->getStorage('taxonomy_term')
+      ->loadTree($vocabulary, $object->tid);
+
+    foreach ($children as $child) {
+      foreach ($child_tree_objects as $child_tree_object) {
+        if ($child_tree_object->tid == $child->id()) {
+          $child_tree_object->name = str_repeat('-', $level) . $child_tree_object->name;
+          $this->buildTree($tree, $child_tree_object, $vocabulary, $level + 1);
+        }
+      }
+    }
   }
 
 }

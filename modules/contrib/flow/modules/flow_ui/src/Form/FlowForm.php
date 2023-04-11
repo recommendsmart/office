@@ -228,6 +228,16 @@ class FlowForm extends EntityForm {
           ]),
         ];
       }
+      else {
+        $form['add_qualifier']['table'][0]['link'] = [
+          '#type' => 'button',
+          '#attributes' => [
+            'class' => ['button', 'button-action', 'button--primary'],
+          ],
+          '#value' => $this->t('Add qualifier'),
+          '#disabled' => TRUE,
+        ];
+      }
     }
 
     $mode = $custom ? $custom['baseMode'] : $flow->getTaskMode();
@@ -450,6 +460,16 @@ class FlowForm extends EntityForm {
         ]),
       ];
     }
+    else {
+      $form['add_task']['table'][0]['link'] = [
+        '#type' => 'button',
+        '#attributes' => [
+          'class' => ['button', 'button-action', 'button--primary'],
+        ],
+        '#value' => $this->t('Add task'),
+        '#disabled' => TRUE,
+      ];
+    }
 
     $form['actions']['#weight'] = $weight++;
     return $form;
@@ -528,15 +548,24 @@ class FlowForm extends EntityForm {
     $task_plugins = [];
     $qualifier_plugins = $config->isCustom() ? $config->getQualifiers(Flow::$filter) : [];
     if ($task_plugin_id !== '_none') {
-      $task_plugins[] = $this->taskManager->createInstance($task_plugin_id, $flow_keys);
+      $task_plugin = $this->taskManager->createInstance($task_plugin_id, $flow_keys);
+      if (FlowCompatibility::validate($config, $task_plugin)) {
+        $task_plugins[] = $task_plugin;
+      }
     }
     else {
       foreach (array_keys($this->taskManager->getDefinitions()) as $task_plugin_id) {
-        $task_plugins[] = $this->taskManager->createInstance($task_plugin_id, $flow_keys);
+        $task_plugin = $this->taskManager->createInstance($task_plugin_id, $flow_keys);
+        if (FlowCompatibility::validate($config, $task_plugin)) {
+          $task_plugins[] = $task_plugin;
+        }
       }
     }
     foreach ($this->subjectManager->getDefinitions() as $id => $definition) {
       $plugin = $this->subjectManager->createInstance($id, $flow_keys);
+      if (!FlowCompatibility::validate($config, $plugin)) {
+        continue;
+      }
       if ($config->isCustom()) {
         if (strpos($id, 'qualified:') === FALSE) {
           // Only qualified subjects and items from qualified subjects are
@@ -571,6 +600,9 @@ class FlowForm extends EntityForm {
         $options[$id] = $definition['label'];
       }
     }
+    uasort($options, static function ($a, $b) {
+      return strnatcasecmp((string) $a, (string) $b);
+    });
     return $options;
   }
 
@@ -598,17 +630,24 @@ class FlowForm extends EntityForm {
     $subject_plugin_id = $form_state->getValue(['add_task', 'subject'], '_none');
     $subject_plugins = [];
     if ($subject_plugin_id !== '_none') {
-      $subject_plugins[] = $this->subjectManager->createInstance($subject_plugin_id, $flow_keys);
+      $subject_plugin = $this->subjectManager->createInstance($subject_plugin_id, $flow_keys);
+      if (FlowCompatibility::validate($config, $subject_plugin)) {
+        $subject_plugins[] = $subject_plugin;
+      }
     }
     else {
-      foreach (array_keys($this->getSubjectOptions($form, $form_state)) as $subject_plugin_id) {
-        if ($subject_plugin_id !== '_none') {
-          $subject_plugins[] = $this->subjectManager->createInstance($subject_plugin_id, $flow_keys);
+      foreach (array_keys($this->subjectManager->getDefinitions()) as $subject_plugin_id) {
+        $subject_plugin = $this->subjectManager->createInstance($subject_plugin_id, $flow_keys);
+        if (FlowCompatibility::validate($config, $subject_plugin)) {
+          $subject_plugins[] = $subject_plugin;
         }
       }
     }
     foreach ($this->taskManager->getDefinitions() as $id => $definition) {
       $plugin = $this->taskManager->createInstance($id, $flow_keys);
+      if (!FlowCompatibility::validate($config, $plugin)) {
+        continue;
+      }
       $is_compatible = FALSE;
       foreach ($subject_plugins as $subject_plugin) {
         if (FlowCompatibility::validate($config, $plugin, $subject_plugin)) {
@@ -620,6 +659,9 @@ class FlowForm extends EntityForm {
         $options[$id] = $definition['label'];
       }
     }
+    uasort($options, static function ($a, $b) {
+      return strnatcasecmp((string) $a, (string) $b);
+    });
     return $options;
   }
 
@@ -647,15 +689,24 @@ class FlowForm extends EntityForm {
     $subject_plugin_id = $form_state->getValue(['add_qualifier', 'subject'], '_none');
     $subject_plugins = [];
     if ($subject_plugin_id !== '_none') {
-      $subject_plugins[] = $this->subjectManager->createInstance($subject_plugin_id, $flow_keys);
+      $subject_plugin = $this->subjectManager->createInstance($subject_plugin_id, $flow_keys);
+      if (FlowCompatibility::validate($config, $subject_plugin)) {
+        $subject_plugins[] = $subject_plugin;
+      }
     }
     else {
       foreach (array_keys($this->subjectManager->getDefinitions()) as $subject_plugin_id) {
-        $subject_plugins[] = $this->subjectManager->createInstance($subject_plugin_id, $flow_keys);
+        $subject_plugin = $this->subjectManager->createInstance($subject_plugin_id, $flow_keys);
+        if (FlowCompatibility::validate($config, $subject_plugin)) {
+          $subject_plugins[] = $subject_plugin;
+        }
       }
     }
     foreach ($this->qualifierManager->getDefinitions() as $id => $definition) {
       $plugin = $this->qualifierManager->createInstance($id, $flow_keys);
+      if (!FlowCompatibility::validate($config, $plugin)) {
+        continue;
+      }
       $is_compatible = FALSE;
       foreach ($subject_plugins as $subject_plugin) {
         if (FlowCompatibility::validate($config, $plugin, $subject_plugin)) {
@@ -667,6 +718,9 @@ class FlowForm extends EntityForm {
         $options[$id] = $definition['label'];
       }
     }
+    uasort($options, static function ($a, $b) {
+      return strnatcasecmp((string) $a, (string) $b);
+    });
     return $options;
   }
 
@@ -694,15 +748,24 @@ class FlowForm extends EntityForm {
     $qualifier_plugin_id = $form_state->getValue(['add_qualifier', 'qualifier'], '_none');
     $qualifier_plugins = [];
     if ($qualifier_plugin_id !== '_none') {
-      $qualifier_plugins[] = $this->qualifierManager->createInstance($qualifier_plugin_id, $flow_keys);
+      $qualifier_plugin = $this->qualifierManager->createInstance($qualifier_plugin_id, $flow_keys);
+      if (FlowCompatibility::validate($config, $qualifier_plugin)) {
+        $qualifier_plugins[] = $qualifier_plugin;
+      }
     }
     else {
       foreach (array_keys($this->qualifierManager->getDefinitions()) as $qualifier_plugin_id) {
-        $qualifier_plugins[] = $this->qualifierManager->createInstance($qualifier_plugin_id, $flow_keys);
+        $qualifier_plugin = $this->qualifierManager->createInstance($qualifier_plugin_id, $flow_keys);
+        if (FlowCompatibility::validate($config, $qualifier_plugin)) {
+          $qualifier_plugins[] = $qualifier_plugin;
+        }
       }
     }
     foreach ($this->subjectManager->getDefinitions() as $id => $definition) {
       $plugin = $this->subjectManager->createInstance($id, $flow_keys);
+      if (!FlowCompatibility::validate($config, $plugin)) {
+        continue;
+      }
       if (strpos($id, 'qualified:') !== FALSE) {
         // Qualifying subjects cannot be already qualified.
         continue;
@@ -718,6 +781,9 @@ class FlowForm extends EntityForm {
         $options[$id] = $definition['label'];
       }
     }
+    uasort($options, static function ($a, $b) {
+      return strnatcasecmp((string) $a, (string) $b);
+    });
     return $options;
   }
 

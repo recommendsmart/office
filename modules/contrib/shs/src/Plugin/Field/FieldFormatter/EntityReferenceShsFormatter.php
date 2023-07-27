@@ -9,6 +9,7 @@ use Drupal\Core\Field\Plugin\Field\FieldFormatter\EntityReferenceLabelFormatter;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\shs\StringTranslationTrait;
 use Drupal\taxonomy\TermStorageInterface;
+use Drupal\Core\Entity\Exception\MissingBundleClassException;
 
 /**
  * Plugin implementation of the 'entity reference taxonomy term SHS' formatter.
@@ -86,11 +87,11 @@ class EntityReferenceShsFormatter extends EntityReferenceLabelFormatter {
         /** @var \Drupal\taxonomy\TermStorageInterface $storage */
         $storage = \Drupal::entityTypeManager()->getStorage($entity->getEntityTypeId());
         if ((!$storage instanceof TermStorageInterface)) {
-          throw new Exception('Expected TermStorageInterface for storage, got ' . get_class($storage));
+          throw new MissingBundleClassException('Expected TermStorageInterface for storage, got ' . get_class($storage));
         }
         $parents = $storage->loadAllParents($entity->id());
       }
-      catch (Exception $ex) {
+      catch (MissingBundleClassException  $ex) {
         $parents = [];
       }
 

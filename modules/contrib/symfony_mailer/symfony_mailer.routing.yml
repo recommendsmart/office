@@ -36,6 +36,7 @@ entity.mailer_transport.set_default:
     _controller: '\Drupal\symfony_mailer\Controller\SymfonyMailerController::setAsDefault'
   requirements:
     _permission: 'administer mailer'
+    _csrf_token: 'TRUE'
 
 entity.mailer_policy.collection:
   path: '/admin/config/system/mailer'
@@ -91,6 +92,7 @@ symfony_mailer.import.all:
     _title: 'Import all'
   requirements:
     _permission: 'administer mailer'
+    _csrf_token: 'TRUE'
 
 symfony_mailer.import.import:
   path: '/admin/config/system/mailer/import/{id}'
@@ -99,6 +101,7 @@ symfony_mailer.import.import:
     _title: 'Import'
   requirements:
     _permission: 'administer mailer'
+    _csrf_token: 'TRUE'
 
 symfony_mailer.import.skip:
   path: '/admin/config/system/mailer/import/{id}/skip'
@@ -107,6 +110,7 @@ symfony_mailer.import.skip:
     _title: 'Skip'
   requirements:
     _permission: 'administer mailer'
+    _csrf_token: 'TRUE'
 
 symfony_mailer.test:
   path: '/admin/config/system/mailer/test'

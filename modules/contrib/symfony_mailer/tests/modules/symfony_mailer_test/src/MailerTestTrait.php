@@ -127,9 +127,6 @@ trait MailerTestTrait {
   /**
    * Checks the most recently sent email was successful.
    *
-   * @param string $error
-   *   The error.
-   *
    * @return $this
    */
   public function assertNoError() {

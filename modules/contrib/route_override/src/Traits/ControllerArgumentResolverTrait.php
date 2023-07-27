@@ -11,6 +11,8 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 /**
  * Controller argument resolver trait.
  *
+ * @api
+ *
  * It seems Drupal has 2 ArgumentResolver architectures.
  * This is for @http_kernel.controller.argument_resolver,
  * used in @early_rendering_controller_wrapper_subscriber.

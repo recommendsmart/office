@@ -75,12 +75,19 @@
   min-height: 7.5rem;
   min-width: calc(100% / var(--calendar-view-columns));
 }
+.calendar-view-table td:hover {
+  background-color: var(--calendar-view-color-white);
+}
+
 
 /** Cells **/
 .calendar-view-table .calendar-view-day {
   display: flex;
   flex-direction: column;
   flex: 1;
+}
+.calendar-view-table .calendar-view-day:hover .calendar-view-day__number {
+  border-radius: 0;
 }
 
 .calendar-view-table .calendar-view-day__number {
@@ -96,6 +103,13 @@
   text-align: center;
   background: var(--calendar-view-color-dark);
   color: var(--calendar-view-color-white);
+  transition: border-radius 0.2s linear;
+}
+.past .calendar-view-day {
+  opacity: 0.8;
+}
+.today .calendar-view-day__number {
+  font-weight: bold;
 }
 
 .calendar-view-day__rows {
@@ -210,6 +224,7 @@
   /** Multi-day events **/
   .calendar-view-day__row.is-multi {
     --calendar-view-day-multi-offset: calc(-1rem - 1px);
+    padding-left: calc(var(--calendar-view-day-multi-offset) * -1);
   }
 
   .calendar-view-day__row.is-multi:not(.is-multi--first) > * {

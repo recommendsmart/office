@@ -615,10 +615,6 @@ html:not(.js) .navbar-default .dropdown:hover > button .navbar-nav__icon {
   fill: #002f67;
 }
 
-#sliding-popup .popup-footer {
-  background-color: #29abe2;
-}
-
 .marker-cluster:after,
 .marker-cluster-small:after {
   background: #1f80aa;

@@ -19,6 +19,7 @@ function commerce_product_taxonomy_filter_uninstall() {
  */
 function commerce_product_taxonomy_filter_install() {
   $query = \Drupal::entityQuery('commerce_product')
+    ->accessCheck(TRUE)
     ->condition('status', 1);
   $product_ids = $query->execute();
   foreach ($product_ids as $key => $product_id) {

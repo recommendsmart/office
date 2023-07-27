@@ -12,11 +12,15 @@ use Drupal\simple_oauth\Service\KeyGeneratorService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Provides a form to generate keys.
+ *
  * @internal
  */
 class Oauth2GenerateKeyForm extends FormBase {
 
   /**
+   * The key generator.
+   *
    * @var \Drupal\simple_oauth\Service\KeyGeneratorService
    */
   private $keyGen;
@@ -25,6 +29,7 @@ class Oauth2GenerateKeyForm extends FormBase {
    * Oauth2GenerateKeyForm constructor.
    *
    * @param \Drupal\simple_oauth\Service\KeyGeneratorService $key_generator_service
+   *   The key generator.
    */
   public function __construct(KeyGeneratorService $key_generator_service) {
     $this->keyGen = $key_generator_service;
@@ -102,12 +107,15 @@ class Oauth2GenerateKeyForm extends FormBase {
   /**
    * Generate public and private keys.
    *
-   * @param $form
+   * @param array $form
+   *   An associative array containing the structure of the form.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
+   *   An AJAX response.
    */
-  public function generateKeys(&$form, FormStateInterface $form_state) {
+  public function generateKeys(array &$form, FormStateInterface $form_state) {
     $response = new AjaxResponse();
 
     // Get all the values.

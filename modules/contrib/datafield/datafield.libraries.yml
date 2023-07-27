@@ -132,3 +132,7 @@ jquery_jsonview:
 paste_clipboard:
   js:
     js/paste_clipboard.js: { }
+
+hierarchical_select:
+  js:
+    js/hierarchical_select.js: { }

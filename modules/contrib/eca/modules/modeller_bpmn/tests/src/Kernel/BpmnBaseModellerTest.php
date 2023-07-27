@@ -159,7 +159,7 @@ class BpmnBaseModellerTest extends Base {
           else {
             $name = $property['binding']['name'];
             $label = $property['label'];
-            $this->assertEquals(self::getExpectedOptionFields($name, $label, $property['value'], $property['choices'], $property['description'] ?? ''),
+            $this->assertEquals(self::getExpectedOptionFields($name, $label, $property['value'], $property['choices'], $property['description'] ?? '', $property['constraints'] ?? NULL),
               $property, "Option list $name for plugin $label should be properly prepared.");
           }
         }
@@ -180,11 +180,13 @@ class BpmnBaseModellerTest extends Base {
    *   The available options for the field.
    * @param string $description
    *   The optional description.
+   * @param array|null $constraints
+   *   The optional constraints.
    *
    * @return array
    *   The expected option field definition.
    */
-  private static function getExpectedOptionFields(string $name, string $label, string $value, array $choices, string $description): array {
+  private static function getExpectedOptionFields(string $name, string $label, string $value, array $choices, string $description, ?array $constraints = NULL): array {
     $options = [
       'label' => $label,
       'type' => 'Dropdown',
@@ -198,6 +200,9 @@ class BpmnBaseModellerTest extends Base {
     ];
     if (!empty($description)) {
       $options['description'] = $description;
+    }
+    if ($constraints !== NULL) {
+      $options['constraints'] = $constraints;
     }
     return $options;
   }

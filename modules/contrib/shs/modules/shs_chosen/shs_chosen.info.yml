@@ -4,10 +4,10 @@ description: 'Integrates Chosen with Simple hierarchical select.'
 dependencies:
   - chosen:chosen
   - shs:shs
-core_version_requirement: ^8.8 || ^9
+core_version_requirement: ^8.8 || ^9 || ^10
 package: User interface
 
-# Information added by Drupal.org packaging script on 2022-03-09
-version: '2.0.0-rc3'
+# Information added by Drupal.org packaging script on 2023-04-11
+version: '2.0.0-rc4'
 project: 'shs'
-datestamp: 1646804410
+datestamp: 1681242242

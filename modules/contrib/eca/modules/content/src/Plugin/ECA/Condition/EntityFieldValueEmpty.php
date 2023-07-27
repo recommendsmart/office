@@ -40,6 +40,7 @@ class EntityFieldValueEmpty extends ConditionBase {
 
     if ($entity instanceof EntityInterface) {
       $is_empty = NULL;
+      $property = NULL;
       while ($property_path && !($property = $this->getTypedProperty($entity->getTypedData(), $property_path, $options))) {
         $is_empty = TRUE; // Property does not exist, which means it's empty.
         $property_path = implode('.', array_slice(explode('.', $property_path), 0, -1));

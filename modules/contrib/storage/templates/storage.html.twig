@@ -9,6 +9,7 @@
  * Available variables:
  * - content: A list of content items. Use 'content' to print all content, or
  * - attributes: HTML attributes for the container element.
+ * - title_suffix: Additional output populated by modules.
  *
  * @see template_preprocess_storage()
  *
@@ -16,6 +17,7 @@
  */
 #}
 <div{{ attributes.addClass('storage') }}>
+  {{ title_suffix }}
   {% if content %}
     {{- content -}}
   {% endif %}

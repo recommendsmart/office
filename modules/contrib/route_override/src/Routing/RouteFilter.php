@@ -13,9 +13,11 @@ use Symfony\Component\Routing\RouteCollection;
 /**
  * Filter routes.
  *
+ * @internal
+ *
  * @see \Drupal\Core\Routing\Router::matchRequest
  */
-class RouteFilter implements FilterInterface {
+final class RouteFilter implements FilterInterface {
 
   use ThrowMethodTrait;
 

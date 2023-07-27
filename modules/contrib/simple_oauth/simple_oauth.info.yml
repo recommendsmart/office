@@ -9,7 +9,7 @@ dependencies:
   - consumers:consumers
   - drupal:options
 
-# Information added by Drupal.org packaging script on 2022-12-02
-version: '6.0.0-beta3'
+# Information added by Drupal.org packaging script on 2023-04-18
+version: '6.0.0-beta4'
 project: 'simple_oauth'
-datestamp: 1669990930
+datestamp: 1681831449

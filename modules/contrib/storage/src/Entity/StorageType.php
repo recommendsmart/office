@@ -29,6 +29,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     "route_provider" = {
  *       "html" = "Drupal\storage\StorageTypeHtmlRouteProvider",
  *     },
+*     "access" = "Drupal\storage\StorageTypeAccessControlHandler",
  *   },
  *   config_prefix = "storage_type",
  *   admin_permission = "administer site configuration",
@@ -40,7 +41,6 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     "status" = "status",
  *   },
  *   links = {
- *     "canonical" = "/admin/structure/storage_types/{storage_type}",
  *     "add-form" = "/admin/structure/storage_types/add",
  *     "edit-form" = "/admin/structure/storage_types/{storage_type}/edit",
  *     "delete-form" = "/admin/structure/storage_types/{storage_type}/delete",

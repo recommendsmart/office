@@ -45,7 +45,11 @@ class StoragePermissions {
     $type_id = $type->id();
     $type_params = ['%type_name' => $type->label()];
 
-    return [
+    return array_map(static function ($perm) use ($type) {
+        $perm['dependencies'][$type->getConfigDependencyKey()][] = $type->getConfigDependencyName();
+        return $perm;
+      },
+      [
       "add $type_id storage entities" => [
         'title' => $this->t('Add new %type_name Storage entities', $type_params),
       ],
@@ -86,7 +90,7 @@ class StoragePermissions {
         'description' => $this->t('To delete a revision, you also need permission to delete the Storage item.'),
         'restrict access' => TRUE,
       ],
-    ];
+    ]);
   }
 
 }

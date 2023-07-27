@@ -5,7 +5,7 @@
  * @see Drupal.shs.AppModel
  */
 
-(function ($, _, Backbone, Drupal) {
+(function ($, _, Backbone, Drupal, once) {
 
   'use strict';
 
@@ -41,7 +41,7 @@
       // Initialize event listeners.
       this.listenTo(this.collection, 'initialize:shs', this.renderWidgets);
 
-      this.$el.once('shs').addClass('hidden');
+      $(once("shs", this.$el)).addClass('hidden');
     },
     /**
      * Main render function of Simple hierarchical select.
@@ -205,4 +205,4 @@
     model: Drupal.shs.ContainerModel
   });
 
-}(jQuery, _, Backbone, Drupal));
+}(jQuery, _, Backbone, Drupal, once));

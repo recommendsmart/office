@@ -69,6 +69,7 @@ class SingleNodeTypeDeleteConfirm extends EntityDeleteForm {
     $storage = $this->entityTypeManager->getStorage('node');
     $ids = $storage->getQuery()
       ->condition('type', $this->entity->id())
+      ->accessCheck(FALSE)
       ->execute();
 
     if (!empty($ids)) {

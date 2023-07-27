@@ -191,6 +191,8 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
     if (!$this->get('list_price')->isEmpty()) {
       return $this->get('list_price')->first()->toPrice();
     }
+
+    return NULL;
   }
 
   /**
@@ -207,6 +209,8 @@ class ProductVariation extends CommerceContentEntityBase implements ProductVaria
     if (!$this->get('price')->isEmpty()) {
       return $this->get('price')->first()->toPrice();
     }
+
+    return NULL;
   }
 
   /**

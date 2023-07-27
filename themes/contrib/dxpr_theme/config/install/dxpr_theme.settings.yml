@@ -52,13 +52,13 @@ blockquote_font_size: '21'
 blockquote_line_height: '1.5'
 headings_letter_spacing: '0'
 headings_uppercase: 0
+headings_bold: 0
 body_mobile_font_size: '14'
 nav_mobile_font_size: '14'
 h1_mobile_font_size: '52'
 h2_mobile_font_size: '38'
 h3_mobile_font_size: '29'
 h4_mobile_font_size: '24'
-preload_local_fonts: false
 body_font_face: '0Source+Sans+Pro:'
 body_font_face_selector: body
 headings_font_face: '0Source+Sans+Pro:300'

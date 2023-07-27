@@ -5,7 +5,7 @@
  * @see Drupal.shs.AppModel
  */
 
-(function ($, _, Backbone, Drupal) {
+(function ($, _, Backbone, Drupal, once) {
 
   'use strict';
 
@@ -26,10 +26,10 @@
       // Initialize event listeners.
       this.listenTo(this.collection, 'initialize:shs', this.renderWidgets);
 
-      this.$el.once('shs')
+      $(once("shs", this.$el))
               .addClass('hidden')
               .addClass('chosen-disable');
     }
   });
 
-}(jQuery, _, Backbone, Drupal));
+}(jQuery, _, Backbone, Drupal, once));

@@ -12,6 +12,7 @@ use Drupal\Core\Form\FormStateInterface;
  * @ViewsStyle(
  *   id = "calendar_week",
  *   title = @Translation("Calendar by week"),
+ *   short_title = @Translation("Week"),
  *   help = @Translation("Displays rows in a calendar by week."),
  *   theme = "views_view_calendar",
  *   display_types = {"normal"}
@@ -24,7 +25,7 @@ class CalendarViewWeek extends CalendarViewBase {
    */
   public static function getDefaultOptions() {
     $options = parent::getDefaultOptions();
-    $options['work_week'] = 0;
+    $options['calendar_work_week'] = 0;
     return $options;
   }
 
@@ -34,10 +35,10 @@ class CalendarViewWeek extends CalendarViewBase {
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
 
-    $form['work_week'] = [
+    $form['calendar_work_week'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Hide weekend'),
-      '#default_value' => $this->options['work_week'] ?? 0,
+      '#default_value' => $this->options['calendar_work_week'] ?? 0,
     ];
   }
 
@@ -47,7 +48,7 @@ class CalendarViewWeek extends CalendarViewBase {
   public function buildTable($year, $week) {
     $days = $this->getOrderedDays();
 
-    $hide_weekend = ($this->options['work_week'] ?? NULL) == 1;
+    $hide_weekend = ($this->options['calendar_work_week'] ?? NULL) == 1;
 
     $headers = [];
     foreach ($days as $number => $name) {
@@ -79,6 +80,13 @@ class CalendarViewWeek extends CalendarViewBase {
     $selected_day = key($days);
     $counter_date->modify($weekdays[$selected_day] . ' this week');
 
+    // Get back one week before if selected day is in the future.
+    // @see https://www.drupal.org/project/calendar_view/issues/3350579.
+    $now = time();
+    if ($counter_date->getTimestamp() > $now) {
+      $counter_date->modify('previous ' . $weekdays[$selected_day]);
+    }
+
     foreach (array_keys($headers) as $number) {
       $time_now = $counter_date->format('U');
       $counter_date->modify('+1 day');
@@ -89,7 +97,7 @@ class CalendarViewWeek extends CalendarViewBase {
       }
 
       $cells[$time_now] = $this->getCell($time_now);
-      $cells[$time_now]['class'] = ['current-month'];
+      $cells[$time_now]['class'][] = 'current-month';
     }
 
     // Populate one-line table row.
@@ -131,34 +139,6 @@ class CalendarViewWeek extends CalendarViewBase {
     $week = date('W', $selected_timestamp);
     $calendars[$year . 'W' . $week] = $this->buildTable($year, $week);
     return $calendars;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public function getQueryDatetimeStart(\Datetime $now): \Datetime {
-    $start = clone $now;
-
-    $start
-      ->modify('-1 week')
-      ->modify('last day of this week')
-      ->setTime(23, 59, 59);
-
-    return $start;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public function getQueryDatetimeEnd(\Datetime $now): \Datetime {
-    $end = clone $now;
-
-    $end
-      ->modify('+1 week')
-      ->modify('first day of this week')
-      ->setTime(0, 0, 0);
-
-    return $end;
   }
 
 }

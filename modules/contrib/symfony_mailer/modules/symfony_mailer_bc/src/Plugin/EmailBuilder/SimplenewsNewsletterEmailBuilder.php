@@ -6,6 +6,7 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\simplenews\SubscriberInterface;
 use Drupal\simplenews\Entity\Newsletter;
 use Drupal\symfony_mailer\Address;
+use Drupal\symfony_mailer\EmailFactoryInterface;
 use Drupal\symfony_mailer\EmailInterface;
 use Drupal\symfony_mailer\Entity\MailerPolicy;
 
@@ -18,7 +19,7 @@ use Drupal\symfony_mailer\Entity\MailerPolicy;
  *     "node" = @Translation("Issue"),
  *   },
  *   has_entity = TRUE,
- *   proxy = TRUE,
+ *   proxy = {"simplenews.node", "simplenews.test"},
  *   common_adjusters = {"email_subject", "email_from"},
  *   import = @Translation("Simplenews newsletter settings"),
  * )
@@ -47,6 +48,14 @@ class SimplenewsNewsletterEmailBuilder extends SimplenewsEmailBuilderBase {
       ->setParam('newsletter', $issue->simplenews_issue->entity)
       ->setParam($issue->getEntityTypeId(), $issue)
       ->setVariable('test', $test);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fromArray(EmailFactoryInterface $factory, array $message) {
+    $mail = $message['params']['simplenews_mail'];
+    return $factory->newEntityEmail($mail->getNewsletter(), 'node', $mail->getIssue(), $mail->getSubscriber(), ($mail->getKey() == 'test'));
   }
 
   /**

@@ -66,7 +66,8 @@ abstract class LimitBundle extends Bundle {
     parent::valueForm($form, $form_state);
 
     // Disable the checkboxes on the config form.
-    if ($form_state->getFormObject()->getFormId() === 'views_ui_config_item_form') {
+    $formObject = $form_state->getFormObject();
+    if ($formObject !== NULL && $formObject->getFormId() === 'views_ui_config_item_form') {
       $form['value']['#disabled'] = TRUE;
     }
   }

@@ -28,9 +28,9 @@ class SettingsForm extends ConfigFormBase {
   /**
    * SettingsForm constructor.
    *
-   * @param CacheBackendInterface $cacheRender
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheRender
    *   CacheBackendInterface.
-   * @param ModuleHandlerInterface $moduleHandler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   ModuleHandlerInterface.
    */
   public function __construct(CacheBackendInterface $cacheRender, ModuleHandlerInterface $moduleHandler) {

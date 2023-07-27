@@ -246,7 +246,7 @@ class AccessCheck {
 
   private function dispatchDeniedEvent($nodeId): void {
     $accessDeniedEvent = new PermissionsByTermDeniedEvent($nodeId);
-    $this->eventDispatcher->dispatch(PermissionsByTermDeniedEvent::NAME, $accessDeniedEvent);
+    $this->eventDispatcher->dispatch($accessDeniedEvent, PermissionsByTermDeniedEvent::NAME);
   }
 
   public function isAnyTaxonomyTermFieldDefinedInNodeType(string $nodeType) {

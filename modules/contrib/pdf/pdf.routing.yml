@@ -4,6 +4,6 @@ pdf.config_form:
     _form: '\Drupal\pdf\Form\ConfigForm'
     _title: 'PDF.js Configuration'
   requirements:
-    _permission: 'access administration pages'
+    _permission: 'administer pdfjs'
   options:
     _admin_route: TRUE

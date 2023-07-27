@@ -5,7 +5,6 @@
  * Contains storage.module.
  */
 
-use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -103,16 +102,6 @@ function storage_views_query_substitutions(ViewExecutable $view) {
     '***VIEW_OWN_UNPUBLISHED_STORAGE***' => (int) $account->hasPermission('view own unpublished storage entities'),
     '***ADMINISTER_STORAGE_ENTITIES***' => (int) $account->hasPermission('administer storage entities'),
   ];
-}
-
-/**
- * Implements hook_entity_base_field_info().
- */
-function storage_entity_base_field_info(EntityTypeInterface $entity_type) {
-  if ($entity_type->id() == 'storage' && \Drupal::hasService('rabbit_hole.entity_extender')) {
-    return \Drupal::service('rabbit_hole.entity_extender')
-      ->getRabbitHoleFields('storage');
-  }
 }
 
 /**

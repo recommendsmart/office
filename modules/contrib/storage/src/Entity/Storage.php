@@ -24,7 +24,7 @@ use Drupal\user\UserInterface;
  *   bundle_label = @Translation("Storage type"),
  *   handlers = {
  *     "storage" = "Drupal\storage\StorageStorage",
- *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
+ *     "view_builder" = "Drupal\storage\StorageViewBuilder",
  *     "list_builder" = "Drupal\storage\StorageListBuilder",
  *     "views_data" = "Drupal\storage\Entity\StorageViewsData",
  *     "translation" = "Drupal\storage\StorageTranslationHandler",
@@ -44,6 +44,7 @@ use Drupal\user\UserInterface;
  *   data_table = "storage_field_data",
  *   revision_table = "storage_revision",
  *   revision_data_table = "storage_field_revision",
+ *   show_revision_ui = TRUE,
  *   translatable = TRUE,
  *   common_reference_target = TRUE,
  *   permission_granularity = "bundle",
@@ -229,7 +230,7 @@ class Storage extends EditorialContentEntityBase implements StorageInterface {
       }
     }
     if (!empty($name_pattern)) {
-      $string = (string) \Drupal::token()->replace($name_pattern, ['storage' => $this], [
+      $string = (string) \Drupal::token()->replacePlain($name_pattern, ['storage' => $this], [
         'langcode' => $this->language()->getId(),
         'clear' => TRUE,
       ]);

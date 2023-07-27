@@ -1,0 +1,19 @@
+condition.plugin.node_field:
+  type: condition.plugin
+  label: Node Field
+  mapping:
+    entity_type_id:
+      type: string
+      label: Entity Type ID
+    entity_bundle:
+      type: string
+      label: Entity Bundle
+    field:
+      type: string
+      label: Field Name
+    value_source:
+      type: string
+      label: Value Source
+    value:
+      type: string
+      label: Value to be compared

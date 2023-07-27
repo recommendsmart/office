@@ -41,6 +41,7 @@ class FormFieldGetValue extends ConfigurableActionBase {
       '#description' => $this->t('The field value will be loaded into this specified token.'),
       '#required' => TRUE,
       '#weight' => -45,
+      '#eca_token_reference' => TRUE,
     ];
     return $this->buildFormFieldConfigurationForm($form, $form_state);
   }

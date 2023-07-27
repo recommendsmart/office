@@ -166,8 +166,8 @@ class PdfDefault extends FormatterBase {
     $query = UrlHelper::buildQuery($extra_options);
     foreach ($items as $delta => $item) {
       if ($item->entity->getMimeType() == 'application/pdf') {
-        $file_url = file_create_url($item->entity->getFileUri());
-        $iframe_src = file_create_url($viewer_path) . '?file=' . rawurlencode($file_url);
+        $file_url = \Drupal::service('file_url_generator')->generateAbsoluteString($item->entity->getFileUri());
+        $iframe_src = \Drupal::service('file_url_generator')->generateAbsoluteString($viewer_path) . '?file=' . rawurlencode($file_url);
         $iframe_src = !empty($query) && $keep_pdfjs ? $iframe_src . '#' . $query : $iframe_src;
         $html = [
           '#theme' => 'file_pdf',

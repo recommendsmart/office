@@ -65,10 +65,16 @@ class Unserialize extends Serialize {
 
     $format = $this->configuration['format'];
     $type = $this->configuration['type'];
-    if (($type !== 'array') && $this->entityTypeManager->hasDefinition($type)) {
-      $type = $this->entityTypeManager->getDefinition($type)->getClass();
+    if ($type === 'array') {
+      $data = $this->serializer->decode($serialized, $format);
     }
-    $data = $this->serializer->deserialize($serialized, $type, $format);
+    elseif ($this->entityTypeManager->hasDefinition($type)) {
+      $type = $this->entityTypeManager->getDefinition($type)->getClass();
+      $data = $this->serializer->deserialize($serialized, $type, $format);
+    }
+    else {
+      throw new \InvalidArgumentException(sprintf("The provided data type %s is not supported for being unserialized.", $type));
+    }
     $build = [
       '#theme' => 'eca_serialized',
       '#method' => 'unserialize',

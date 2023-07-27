@@ -11,8 +11,10 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * An access check that only adds cacheability.
+ *
+ * @internal
  */
-class RouteOverrideAccessCacheability implements AccessInterface {
+final class RouteOverrideAccessCacheability implements AccessInterface {
 
   const KEY = '_route_override_cacheability';
 

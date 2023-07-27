@@ -108,9 +108,13 @@ class ProductVariationTest extends CommerceKernelTestBase {
     $variation->setTitle('My title');
     $this->assertEquals('My title', $variation->getTitle());
 
+    $this->assertNull($variation->getListPrice());
+
     $list_price = new Price('19.99', 'USD');
     $variation->setListPrice($list_price);
     $this->assertEquals($list_price, $variation->getListPrice());
+
+    $this->assertNull($variation->getPrice());
 
     $price = new Price('9.99', 'USD');
     $variation->setPrice($price);

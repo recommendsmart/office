@@ -3,6 +3,7 @@ quote.settings_form:
   defaults:
     _form: '\Drupal\quote\Form\SettingsForm'
     _title: 'Quote settings'
+    _title_context: 'Quote module settings'
   requirements:
     _permission: 'administer quote'
   options:

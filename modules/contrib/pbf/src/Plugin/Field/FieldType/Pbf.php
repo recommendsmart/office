@@ -346,13 +346,12 @@ class Pbf extends EntityReferenceItem {
    *   The list of operations.
    */
   public function getOperations() {
-    $operations = [
+    return [
       'grant_public' => $this->t('Public'),
       'grant_view' => $this->t('Grant View'),
       'grant_update' => $this->t('Grant Update'),
       'grant_delete' => $this->t('Grant Delete'),
     ];
-    return $operations;
   }
 
   /**

@@ -127,6 +127,7 @@ class NodeField extends ConditionPluginBase implements ContainerFactoryPluginInt
       '#options' => [
         'null' => $this->t('Is NULL'),
         'specified' => $this->t('Specified'),
+        'contains' => $this->t('Contains'),
       ],
       '#default_value' => $this->configuration['value_source'],
     ];
@@ -317,12 +318,16 @@ class NodeField extends ConditionPluginBase implements ContainerFactoryPluginInt
         $value_to_compare = $value;
       }
 
-      // Compare if null.
-      if ($this->configuration['value_source'] === 'null') {
-        return is_null($value_to_compare);
+      switch ($this->configuration['value_source']) {
+        case 'null':
+          return is_null($value_to_compare);
+
+        case 'specified':
+          return $value_to_compare === $this->configuration['value'];
+
+        case 'contains':
+          return preg_match('/' . $this->configuration['value'] . '/', $value_to_compare);
       }
-      // Regular comparison.
-      return $value_to_compare === $this->configuration['value'];
     }
 
     return FALSE;
@@ -350,11 +355,18 @@ class NodeField extends ConditionPluginBase implements ContainerFactoryPluginInt
       }
     }
 
-    return $this->t('@entity_type "@entity_bundle" field "@field" is "@value"', [
+    $textVarsSource = [
+        'null' => 'is',
+        'specified' => 'is',
+        'contains' => 'contains'
+    ];
+
+    return $this->t('@entity_type "@entity_bundle" field "@field" @source "@value"', [
       '@entity_type' => $entity_type_definition->getLabel(),
       '@entity_bundle' => $entity_bundle,
       '@field' => $field_label,
-      '@value' => $this->configuration['value_source'] === 'null' ? 'is NULL' : $this->configuration['value'],
+      '@source' => $textVarsSource[$this->configuration['value_source']],
+      '@value' => $this->configuration['value_source'] === 'null' ? 'NULL' : $this->configuration['value'],
     ]);
   }
 

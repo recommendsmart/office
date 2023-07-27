@@ -102,6 +102,8 @@ class EcaRenderViewsFieldEvent extends EcaRenderEventBase implements Conditional
           'machine-name' => RenderEvents::VIEWS_FIELD,
           'entity' => $this->entity,
           'relationships' => $this->relationshipEntities,
+          'view-id' => $this->fieldPlugin->view->id(),
+          'view-display' => $this->fieldPlugin->view->current_display ?? NULL,
         ]);
       }
 

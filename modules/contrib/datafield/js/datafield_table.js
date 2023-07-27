@@ -63,7 +63,7 @@
                 });
               }
             });
-            return FALSE;
+            return false;
           });
         }
       });

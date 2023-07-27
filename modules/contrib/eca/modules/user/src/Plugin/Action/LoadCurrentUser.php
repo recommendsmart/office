@@ -33,6 +33,7 @@ class LoadCurrentUser extends ConfigurableActionBase {
       '#title' => $this->t('Name of token'),
       '#description' => $this->t('The loaded current user will be stored into this token.'),
       '#default_value' => $this->configuration['token_name'],
+      '#eca_token_reference' => TRUE,
     ];
     return $form;
   }

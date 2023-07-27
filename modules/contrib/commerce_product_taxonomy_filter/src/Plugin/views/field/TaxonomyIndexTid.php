@@ -60,12 +60,18 @@ class TaxonomyIndexTid extends PrerenderList {
   public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
     parent::init($view, $display, $options);
 
-    // @todo: Wouldn't it be possible to use $this->base_table and no if here?
+    // @todo Wouldn't it be possible to use $this->base_table and no if here?
     if ($view->storage->get('base_table') == 'commerce_product_field_revision') {
-      $this->additional_fields['product_id'] = ['table' => 'commerce_product_field_revision', 'field' => 'product_id'];
+      $this->additional_fields['product_id'] = [
+        'table' => 'commerce_product_field_revision',
+        'field' => 'product_id',
+      ];
     }
     else {
-      $this->additional_fields['product_id'] = ['table' => 'commerce_product_field_data', 'field' => 'product_id'];
+      $this->additional_fields['product_id'] = [
+        'table' => 'commerce_product_field_data',
+        'field' => 'product_id',
+      ];
     }
   }
 
@@ -185,7 +191,7 @@ class TaxonomyIndexTid extends PrerenderList {
    */
   protected function addSelfTokens(&$tokens, $item) {
     foreach (['tid', 'name', 'vocabulary_vid', 'vocabulary'] as $token) {
-      $tokens['{{ ' . $this->options['id'] . '__' . $token . ' }}'] = isset($item[$token]) ? $item[$token] : '';
+      $tokens['{{ ' . $this->options['id'] . '__' . $token . ' }}'] = $item[$token] ?? '';
     }
   }
 

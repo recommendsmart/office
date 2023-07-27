@@ -84,6 +84,8 @@ class ExpiredCollector {
    *   The tokens.
    */
   public function collectForAccount(AccountInterface $account): array {
+    $clients = [];
+    $output = [];
     $query = $this->tokenStorage->getQuery();
     $query->accessCheck();
     $query->condition('auth_user_id', $account->id());

@@ -2,12 +2,12 @@ name: Commerce Product taxonomy filter
 type: module
 description: 'Enables the categorization of commerce product.'
 package: Commerce
-core_version_requirement: ^8.8 || ^9.0
+core_version_requirement: ^9.0 || ^10.0
 dependencies:
   - commerce:commerce
   - commerce:commerce_product
 
-# Information added by Drupal.org packaging script on 2021-10-31
-version: '1.0.5'
+# Information added by Drupal.org packaging script on 2023-06-06
+version: '1.0.6'
 project: 'commerce_product_taxonomy_filter'
-datestamp: 1635661937
+datestamp: 1686031362

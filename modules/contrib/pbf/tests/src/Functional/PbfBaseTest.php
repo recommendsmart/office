@@ -26,7 +26,7 @@ abstract class PbfBaseTest extends BrowserTestBase {
    *
    * @var array
    */
-  public static $modules = array(
+  protected static $modules = array(
     'system',
     'language',
     'user',
@@ -153,12 +153,12 @@ abstract class PbfBaseTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'olivero';
 
   /**
    * Setup and Rebuild node access.
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->drupalCreateContentType(['type' => 'article']);
@@ -222,13 +222,14 @@ abstract class PbfBaseTest extends BrowserTestBase {
    *   Expected result count.
    */
   protected function checkSearchResults($search_query, $expected_result_count) {
-    $this->drupalPostForm('search/node', array('keys' => $search_query), 'Search');
+    $this->drupalGet('search/node');
+    $this->submitForm(array('keys' => $search_query), 'Search');
     $search_results = $this->xpath("//ol[contains(@class, 'search-results')]/li");
-    $this->assertEqual(count($search_results), $expected_result_count, t('Found the expected number of search results'));
+    $this->assertEquals(count($search_results), $expected_result_count, t('Found the expected number of search results'));
   }
 
   /**
-   * Creates a field of an Pbf field storage on the specified bundle.
+   * Creates a field of a Pbf field storage on the specified bundle.
    *
    * @param string $entity_type
    *   The type of entity the field will be attached to.
@@ -310,7 +311,6 @@ abstract class PbfBaseTest extends BrowserTestBase {
     if ($field_name) {
       User::load($uid)->set($field_name, $value)->save();
     }
-
   }
 
   /**
@@ -322,16 +322,24 @@ abstract class PbfBaseTest extends BrowserTestBase {
    *   The entity type name.
    * @param string $bundle
    *   The bundle name.
-   * @param string $mode
-   *   The mode name.
    * @param string $field_name
    *   The field name to set.
    * @param string $widget_id
    *   The widget id to set.
    * @param array $settings
    *   The settings of widget.
+   * @param string $mode
+   *   The mode name.
    */
-  protected function setFormDisplay($form_display_id, $entity_type, $bundle, $mode = 'default', $field_name, $widget_id, $settings) {
+  protected function setFormDisplay(
+    $form_display_id,
+    $entity_type,
+    $bundle,
+    $field_name,
+    $widget_id,
+    $settings,
+    $mode = 'default'
+  ): void {
     // Set article's form display.
     $this->formDisplay = EntityFormDisplay::load($form_display_id);
 
@@ -361,16 +369,24 @@ abstract class PbfBaseTest extends BrowserTestBase {
    *   The entity type name.
    * @param string $bundle
    *   The bundle name.
-   * @param string $mode
-   *   The mode name.
    * @param string $field_name
    *   The field name to set.
    * @param string $formatter_id
    *   The formatter id to set.
    * @param array $settings
    *   The settings of widget.
+   * @param string $mode
+   *   The mode name.
    */
-  protected function setViewDisplay($form_display_id, $entity_type, $bundle, $mode = 'default', $field_name, $formatter_id, $settings) {
+  protected function setViewDisplay(
+    $form_display_id,
+    $entity_type,
+    $bundle,
+    $field_name,
+    $formatter_id,
+    $settings,
+    $mode = 'default'
+  ): void {
     // Set article's view display.
     $this->viewDisplay = EntityViewDisplay::load($form_display_id);
     if (!$this->viewDisplay) {
@@ -388,7 +404,6 @@ abstract class PbfBaseTest extends BrowserTestBase {
         'settings' => $settings,
       ])->save();
     }
-
   }
 
   /**
@@ -417,15 +432,47 @@ abstract class PbfBaseTest extends BrowserTestBase {
       'size' => 30,
       'placeholder' => '',
     ];
-    $this->setFormDisplay('node.article.default', 'node', 'article', 'default', $field_name, 'pbf_widget', $settings);
-    $this->setFormDisplay('user.user.default', 'user', 'user', 'default', $field_name, 'pbf_widget', $settings);
+    $this->setFormDisplay(
+      'node.article.default',
+      'node',
+      'article',
+      $field_name,
+      'pbf_widget',
+      $settings,
+      'default'
+    );
+    $this->setFormDisplay(
+      'user.user.default',
+      'user',
+      'user',
+      $field_name,
+      'pbf_widget',
+      $settings,
+      'default'
+    );
 
     // Set the view display.
     $settings = [
       'link' => TRUE,
     ];
-    $this->setViewDisplay('node.article.default', 'node', 'article', 'default', $field_name, 'pbf_formatter_default', $settings);
-    $this->setViewDisplay('user.user.default', 'user', 'user', 'default', $field_name, 'pbf_formatter_default', $settings);
+    $this->setViewDisplay(
+      'node.article.default',
+      'node',
+      'article',
+      $field_name,
+      'pbf_formatter_default',
+      $settings,
+      'default'
+    );
+    $this->setViewDisplay(
+      'user.user.default',
+      'user',
+      'user',
+      $field_name,
+      'pbf_formatter_default',
+      $settings,
+      'default'
+    );
 
   }
 
@@ -466,17 +513,65 @@ abstract class PbfBaseTest extends BrowserTestBase {
       'size' => 30,
       'placeholder' => '',
     ];
-    $this->setFormDisplay('node.article.default', 'node', 'article', 'default', $field_name, 'pbf_widget', $settings);
-    $this->setFormDisplay('node.group.default', 'node', 'group', 'default', $group_field_name, 'pbf_widget', $settings);
-    $this->setFormDisplay('user.user.default', 'user', 'user', 'default', $field_name, 'pbf_widget', $settings);
+    $this->setFormDisplay(
+      'node.article.default',
+      'node',
+      'article',
+      $field_name,
+      'pbf_widget',
+      $settings,
+      'default'
+    );
+    $this->setFormDisplay(
+      'node.group.default',
+      'node',
+      'group',
+      $group_field_name,
+      'pbf_widget',
+      $settings,
+      'default'
+    );
+    $this->setFormDisplay(
+      'user.user.default',
+      'user',
+      'user',
+      $field_name,
+      'pbf_widget',
+      $settings,
+      'default'
+    );
 
     // Set the view display.
     $settings = [
       'link' => TRUE,
     ];
-    $this->setViewDisplay('node.article.default', 'node', 'article', 'default', $field_name, 'pbf_formatter_default', $settings);
-    $this->setViewDisplay('node.group.default', 'node', 'group', 'default', $group_field_name, 'pbf_formatter_default', $settings);
-    $this->setViewDisplay('user.user.default', 'user', 'user', 'default', $field_name, 'pbf_formatter_default', $settings);
+    $this->setViewDisplay(
+      'node.article.default',
+      'node',
+      'article',
+      $field_name,
+      'pbf_formatter_default',
+      $settings,
+      'default'
+    );
+    $this->setViewDisplay(
+      'node.group.default',
+      'node',
+      'group',
+      $group_field_name,
+      'pbf_formatter_default',
+      $settings,
+      'default'
+    );
+    $this->setViewDisplay(
+      'user.user.default',
+      'user',
+      'user',
+      $field_name,
+      'pbf_formatter_default',
+      $settings,
+      'default'
+    );
 
   }
 
@@ -507,15 +602,47 @@ abstract class PbfBaseTest extends BrowserTestBase {
       'size' => 30,
       'placeholder' => '',
     ];
-    $this->setFormDisplay('node.article.default', 'node', 'article', 'default', $field_name, 'pbf_widget', $settings);
-    $this->setFormDisplay('user.user.default', 'user', 'user', 'default', $field_name, 'pbf_widget', $settings);
+    $this->setFormDisplay(
+      'node.article.default',
+      'node',
+      'article',
+      $field_name,
+      'pbf_widget',
+      $settings,
+      'default'
+    );
+    $this->setFormDisplay(
+      'user.user.default',
+      'user',
+      'user',
+      $field_name,
+      'pbf_widget',
+      $settings,
+      'default'
+    );
 
     // Set the view display.
     $settings = [
       'link' => TRUE,
     ];
-    $this->setViewDisplay('node.article.default', 'node', 'article', 'default', $field_name, 'pbf_formatter_default', $settings);
-    $this->setViewDisplay('user.user.default', 'user', 'user', 'default', $field_name, 'pbf_formatter_default', $settings);
+    $this->setViewDisplay(
+      'node.article.default',
+      'node',
+      'article',
+      $field_name,
+      'pbf_formatter_default',
+      $settings,
+      'default'
+    );
+    $this->setViewDisplay(
+      'user.user.default',
+      'user',
+      'user',
+      $field_name,
+      'pbf_formatter_default',
+      $settings,
+      'default'
+    );
   }
 
   /**
@@ -542,18 +669,50 @@ abstract class PbfBaseTest extends BrowserTestBase {
       'size' => 30,
       'placeholder' => '',
     ];
-    $this->setFormDisplay('node.article.default', 'node', 'article', 'default', $field_name, 'pbf_widget', $settings);
+    $this->setFormDisplay(
+      'node.article.default',
+      'node',
+      'article',
+      $field_name,
+      'pbf_widget',
+      $settings,
+      'default'
+    );
     // Set the view display.
     $settings = [
       'link' => TRUE,
     ];
-    $this->setViewDisplay('node.article.default', 'node', 'article', 'default', $field_name, 'pbf_formatter_default', $settings);
+    $this->setViewDisplay(
+      'node.article.default',
+      'node',
+      'article',
+      $field_name,
+      'pbf_formatter_default',
+      $settings,
+      'default'
+    );
 
     if ($user_method == 'ref_user') {
       // Add a pbf field to user entity which reference term.
       $this->createPbfField('user', 'user', $field_name, 'User related to user', 'user', 'default', $handler_settings, -1);
-      $this->setFormDisplay('user.user.default', 'user', 'user', 'default', $field_name, 'pbf_widget', $settings);
-      $this->setViewDisplay('user.user.default', 'user', 'user', 'default', $field_name, 'pbf_formatter_default', $settings);
+      $this->setFormDisplay(
+        'user.user.default',
+        'user',
+        'user',
+        $field_name,
+        'pbf_widget',
+        $settings,
+        'default'
+      );
+      $this->setViewDisplay(
+        'user.user.default',
+        'user',
+        'user',
+        $field_name,
+        'pbf_formatter_default',
+        $settings,
+        'default'
+      );
     }
 
   }
@@ -580,13 +739,29 @@ abstract class PbfBaseTest extends BrowserTestBase {
       'size' => 30,
       'placeholder' => '',
     ];
-    $this->setFormDisplay('node.article.default', 'node', 'article', 'default', $field_name, 'pbf_widget', $settings);
+    $this->setFormDisplay(
+      'node.article.default',
+      'node',
+      'article',
+      $field_name,
+      'pbf_widget',
+      $settings,
+      'default'
+    );
 
     // Set the view display.
     $settings = [
       'link' => FALSE,
     ];
-    $this->setViewDisplay('node.article.default', 'node', 'article', 'default', $field_name, 'pbf_formatter_default', $settings);
+    $this->setViewDisplay(
+      'node.article.default',
+      'node',
+      'article',
+      $field_name,
+      'pbf_formatter_default',
+      $settings,
+      'default'
+    );
   }
 
 

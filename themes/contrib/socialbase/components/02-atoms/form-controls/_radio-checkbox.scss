@@ -67,11 +67,8 @@
 }
 
 .form-no-label.checkbox {
-  [type="radio"], [type="checkbox"] {
-    opacity: 1;
-    left: 0;
-    margin: 0;
-    position: static;
+  label {
+    font-size: 0;
   }
 }
 

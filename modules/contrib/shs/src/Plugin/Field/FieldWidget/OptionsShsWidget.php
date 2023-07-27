@@ -295,8 +295,7 @@ class OptionsShsWidget extends OptionsSelectWidget implements ContainerFactoryPl
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     if (!isset($values[0]['target_id']) || ($values[0]['target_id'] === '')) {
-      // Return original values.
-      return $values;
+      return NULL;
     }
 
     $exploded_values = [];

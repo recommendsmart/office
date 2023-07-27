@@ -81,3 +81,7 @@ Issue #2107455: Image field default value not shown when upload destination set 
 Source: https://www.drupal.org/files/issues/2022-06-24/2107455-75.patch
 
 
+Issue #3052115: Mark an entity as 'syncing' during a migration update
+Source: https://www.drupal.org/files/issues/2023-02-01/3052115-59.patch
+
+

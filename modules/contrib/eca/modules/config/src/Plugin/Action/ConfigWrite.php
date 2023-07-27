@@ -7,6 +7,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\eca\Plugin\Action\ActionBase;
+use Drupal\eca\Plugin\DataType\DataTransferObject;
 use Drupal\eca\Service\YamlParser;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -58,7 +59,10 @@ class ConfigWrite extends ConfigActionBase {
     }
     else {
       $config_value = $token->getOrReplace($config_value);
-      if ($config_value instanceof ComplexDataInterface) {
+      if ($config_value instanceof DataTransferObject) {
+        $config_value = $config_value->count() ? $config_value->toArray() : $config_value->getString();
+      }
+      elseif ($config_value instanceof ComplexDataInterface) {
         $config_value = $config_value->toArray();
       }
       elseif ($config_value instanceof TypedDataInterface) {

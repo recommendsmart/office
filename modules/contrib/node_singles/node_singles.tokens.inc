@@ -61,7 +61,7 @@ function node_singles_tokens(string $type, array $tokens, array $data = [], arra
 
     if ($split[1] === 'url') {
       $canonical = '/node/' . $node->id();
-      $alias = $pathAliasManager->getAliasByPath($canonical, $options['langcode']);
+      $alias = $pathAliasManager->getAliasByPath($canonical, $options['langcode'] ?? NULL);
 
       if ($alias !== $canonical) {
         $replace = $alias;

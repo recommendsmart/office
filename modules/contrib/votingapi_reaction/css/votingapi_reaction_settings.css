@@ -3,6 +3,10 @@
   flex-wrap: wrap;
   margin: 0 -3px;
 }
+.votingapi-reaction-settings .form-checkboxes input {
+  float: none;
+  margin: 0;
+}
 .votingapi-reaction-settings .form-checkboxes .form-item {
   display: flex;
   align-items: center;

@@ -99,6 +99,11 @@ services:
     parent: eca.default_event_subscriber
     tags:
       - { name: event_subscriber }
+  eca.execution.render_subscriber:
+    class: Drupal\eca\EventSubscriber\EcaExecutionRenderSubscriber
+    parent: eca.default_event_subscriber
+    tags:
+      - { name: event_subscriber }
   eca.execution.switch_account_subscriber:
     class: Drupal\eca\EventSubscriber\EcaExecutionSwitchAccountSubscriber
     parent: eca.default_event_subscriber

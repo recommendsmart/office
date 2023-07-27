@@ -123,7 +123,12 @@ class EcaBlock extends BlockBase implements ContainerFactoryPluginInterface {
    */
   public function getCacheContexts(): array {
     // Add some sensible defaults for cache contexts.
-    return array_unique(array_merge(['url.path', 'url.query_args', 'user'], parent::getCacheContexts()));
+    return array_unique(array_merge([
+      'url.path',
+      'url.query_args',
+      'user',
+      'user.permissions',
+    ], parent::getCacheContexts()));
   }
 
   /**

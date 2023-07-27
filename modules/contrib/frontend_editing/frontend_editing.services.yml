@@ -1,0 +1,4 @@
+services:
+  frontend_editing.paragraphs_helper:
+    class: Drupal\frontend_editing\ParagraphsHelper
+    arguments: ['@paragraphs_edit.lineage.inspector', '@paragraphs_edit.lineage.revisioner']

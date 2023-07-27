@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * @file
+ * The rh_storage module file.
+ */
+
+use Drupal\Core\Entity\EntityTypeInterface;
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function rh_storage_entity_base_field_info(EntityTypeInterface $entity_type) {
+  if ($entity_type->id() == 'storage') {
+    return \Drupal::service('rabbit_hole.entity_extender')
+      ->getRabbitHoleFields('storage');
+  }
+}

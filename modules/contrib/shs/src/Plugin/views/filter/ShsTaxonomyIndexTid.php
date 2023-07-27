@@ -116,7 +116,6 @@ class ShsTaxonomyIndexTid extends TaxonomyIndexTid {
     }
 
     if (!empty($default_value)) {
-      /** @var Drupal\shs\WidgetDefaultsInterface $widget_defaults */
       $widget_defaults = \Drupal::service('shs.widget_defaults');
       $parents = $widget_defaults->getParentDefaults($default_value, $settings_additional, 'taxonomy_term');
     }

@@ -160,7 +160,7 @@ class PaymentIntegrationTest extends OrderKernelTestBase {
     $this->reloadEntity($payment);
 
     // Check the payment become authorized log.
-    $payment->setState('authorized');
+    $payment->setState('authorization');
     $payment->save();
     $logs = $this->logStorage->loadMultipleByEntity($this->order);
     $this->assertEquals(2, count($logs));
@@ -223,7 +223,7 @@ class PaymentIntegrationTest extends OrderKernelTestBase {
         'number' => '39.99',
         'currency_code' => 'USD',
       ],
-      'state' => 'authorized',
+      'state' => 'authorization',
       'test' => TRUE,
     ]);
 

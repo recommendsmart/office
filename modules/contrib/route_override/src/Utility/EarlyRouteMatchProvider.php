@@ -20,6 +20,10 @@ use Symfony\Component\Routing\RouteCollection;
  * @see \Symfony\Component\HttpKernel\EventListener\RouterListener::onKernelRequest
  * @see \Drupal\Core\Routing\Router::matchRequest
  * @see \Drupal\Core\Routing\CurrentRouteMatch::getRouteMatch
+ *
+ * @internal
+ *
+ * @todo Find a better way to do this.
  */
 class EarlyRouteMatchProvider {
 

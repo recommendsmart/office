@@ -195,10 +195,6 @@ symfony_mailer.email_adjuster_plugin.email_transport:
       type: label
       label: 'Email body'
 
-symfony_mailer.email_adjuster_plugin.mailer_default_headers:
-  type: mapping
-  label: 'Default headers'
-
 symfony_mailer.email_adjuster_plugin.mailer_inline_css:
   type: mapping
   label: 'Inline CSS'

@@ -11,6 +11,9 @@ use Drupal\consumers\AccessControlHandler;
  */
 class AccessTokenAccessControlHandler extends AccessControlHandler {
 
+  /**
+   * {@inheritdoc}
+   */
   public static $name = 'simple_oauth';
 
 }

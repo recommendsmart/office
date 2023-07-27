@@ -150,7 +150,9 @@
       optionsFilter.showAllWidgets(index);
       optionsFilter.filterWidgetsSearched(index);
       optionsFilter.filterWidgetsDeprecated(index);
-      optionsFilter.showSelectedWidget(index);
+      if (optionsFilter.getSelectedWidget(index) !== undefined) {
+        optionsFilter.showSelectedWidget(index);
+      }
     },
 
     renderSelectedWidget: function(index = 0) {

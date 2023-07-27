@@ -7,10 +7,12 @@
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\Entity\File;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\votingapi\Entity\VoteType;
 
 /**
  * Implements hook_theme().
@@ -37,11 +39,11 @@ function votingapi_reaction_entity_base_field_info(EntityTypeInterface $entity_t
   if ($entity_type->id() == 'vote') {
     return [
       'field_name' => BaseFieldDefinition::create('string')
-        ->setLabel(t('Field name'))
+        ->setLabel(new TranslatableMarkup('Field name'))
         ->setName('field_name')
         ->setRevisionable(FALSE)
         ->setRequired(FALSE)
-        ->setDescription(t('Holds the field name.'))
+        ->setDescription(new TranslatableMarkup('Holds the field name.'))
         ->setPropertyConstraints('value', ['Length' => ['max' => FieldStorageConfig::NAME_MAX_LENGTH]]),
     ];
   }
@@ -53,9 +55,9 @@ function votingapi_reaction_entity_base_field_info(EntityTypeInterface $entity_t
  * Implements hook_form_FORM_ID_alter().
  */
 function votingapi_reaction_form_field_storage_config_edit_form_alter(&$form, FormStateInterface $form_state) {
-  if ($form_state->getFormObject()
-    ->getEntity()
-    ->bundle() == 'votingapi_reaction') {
+  /** @var \Drupal\Core\Entity\EntityForm $form_object */
+  $form_object = $form_state->getFormObject();
+  if ($form_object->getEntity()->bundle() == 'votingapi_reaction') {
     // We only support posting one reaction at the time so it doesn't make sense
     // to let the site builder choose anything else.
     $form['cardinality_container']['cardinality']['#default_value'] = 1;
@@ -74,20 +76,22 @@ function votingapi_reaction_entity_type_build(array &$entity_types) {
  * Implements hook_form_alter().
  */
 function votingapi_reaction_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  /** @var \Drupal\Core\Entity\EntityForm $form_object */
+  $form_object = $form_state->getFormObject();
   if (in_array($form_id, ['vote_type_add_form', 'vote_type_edit_form'])) {
-    /* @var \Drupal\votingapi\Entity\VoteType $entity */
-    $entity = $form_state->getFormObject()->getEntity();
+    /** @var \Drupal\votingapi\Entity\VoteType $entity */
+    $entity = $form_object->getEntity();
 
     $form['reaction'] = [
       '#type' => 'checkbox',
-      '#title' => t('Use as a reaction'),
-      '#description' => t('If checked, this vote type will be considered as a reaction and used by Voting API Reaction module.'),
+      '#title' => new TranslatableMarkup('Use as a reaction'),
+      '#description' => new TranslatableMarkup('If checked, this vote type will be considered as a reaction and used by Voting API Reaction module.'),
       '#default_value' => $entity->getThirdPartySetting('votingapi_reaction', 'reaction'),
     ];
 
     $form['icon'] = [
       '#type' => 'fieldset',
-      '#title' => t('Reaction settings'),
+      '#title' => new TranslatableMarkup('Reaction settings'),
       '#states' => [
         'visible' => [
           ':input[name="reaction"]' => ['checked' => TRUE],
@@ -103,27 +107,29 @@ function votingapi_reaction_form_alter(&$form, FormStateInterface $form_state, $
         'src' => \Drupal::service('votingapi_reaction.manager')
           ->getIcon($entity, $default),
         'width' => 30,
-        'alt' => t('Current icon for this reaction'),
+        'alt' => new TranslatableMarkup('Current icon for this reaction'),
       ],
     ];
     $form['icon']['current'] = [
       '#type' => 'item',
-      '#title' => t('Current'),
+      '#title' => new TranslatableMarkup('Current icon'),
       '#markup' => \Drupal::service('renderer')->render($image),
     ];
 
     if (!$default) {
       $form['icon']['remove'] = [
         '#type' => 'checkbox',
-        '#title' => t('Remove'),
-        '#description' => t('If checked, current icon will be removed. You can upload a new one using the field below.'),
+        '#title' => new TranslatableMarkup('Remove icon'),
+        '#description' => new TranslatableMarkup('If checked, current icon will be removed. You can upload a new one using the field below.'),
       ];
     }
 
     $form['icon']['new'] = [
       '#type' => 'managed_file',
-      '#title' => $default ? t('Upload') : t('Replace'),
-      '#description' => t('Image will be used by Voting API Reaction module as an icon for reaction.'),
+      '#title' => $default
+        ? new TranslatableMarkup('Upload a new icon')
+        : new TranslatableMarkup('Replace current icon'),
+      '#description' => new TranslatableMarkup('Image will be used by Voting API Reaction module as an icon for reaction.'),
       '#upload_location' => 'public://votingapi_reaction',
       '#upload_validators' => [
         'file_validate_extensions' => ['svg', 'png'],
@@ -145,12 +151,13 @@ function votingapi_reaction_form_alter(&$form, FormStateInterface $form_state, $
  * @throws \Drupal\Core\Entity\EntityStorageException
  */
 function votingapi_reaction_form_vote_type_form_submit(array &$form, FormStateInterface $form_state) {
-  $form_file = $form_state->getValue('new', 0);
-  /* @var \Drupal\votingapi\Entity\VoteType $entity */
-  $entity = $form_state->getFormObject()->getEntity();
-  $entity->setThirdPartySetting('votingapi_reaction', 'reaction', $form_state->getValue('reaction'));
+  /** @var \Drupal\Core\Entity\EntityForm $form_object */
+  $form_object = $form_state->getFormObject();
+  /** @var \Drupal\votingapi\Entity\VoteType $entity */
+  $entity = $form_object->getEntity();
 
   // Delete current icon if needed.
+  $form_file = $form_state->getValue('new', 0);
   if (!empty($form_file[0]) || $form_state->getValue('remove')) {
     $icon = $entity->getThirdPartySetting('votingapi_reaction', 'icon');
     if ($icon && $file = File::load($icon)) {
@@ -166,6 +173,7 @@ function votingapi_reaction_form_vote_type_form_submit(array &$form, FormStateIn
     $entity->setThirdPartySetting('votingapi_reaction', 'icon', $file->id());
   }
 
+  $entity->setThirdPartySetting('votingapi_reaction', 'reaction', $form_state->getValue('reaction'));
   $entity->save();
 }
 
@@ -173,8 +181,7 @@ function votingapi_reaction_form_vote_type_form_submit(array &$form, FormStateIn
  * Implements hook_entity_delete().
  */
 function votingapi_reaction_entity_delete(EntityInterface $entity) {
-  if ($entity->getEntityTypeId() == 'vote_type'
-    && $entity->getThirdPartySetting('votingapi_reaction', 'reaction')) {
+  if ($entity instanceof VoteType && $entity->getThirdPartySetting('votingapi_reaction', 'reaction')) {
 
     // Delete icon along with the vote type.
     $icon = $entity->getThirdPartySetting('votingapi_reaction', 'icon');

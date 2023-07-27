@@ -618,6 +618,9 @@ abstract class ModellerBpmnBase extends ModellerBase {
           'name' => $field['name'],
         ],
       ];
+      if (!empty($field['required'])) {
+        $property['constraints']['notEmpty'] = TRUE;
+      }
       if (isset($field['description'])) {
         $property['description'] = (string) $field['description'];
       }
@@ -748,6 +751,7 @@ abstract class ModellerBpmnBase extends ModellerBase {
       $value = $definition['#default_value'] ?? '';
       $weight = $definition['#weight'] ?? 0;
       $type = 'String';
+      $required = $definition['#required'] ?? FALSE;
       if (isset($definition['#type'])) {
         // @todo Map to more proper property types of bpmn-js.
         switch ($definition['#type']) {
@@ -769,7 +773,7 @@ abstract class ModellerBpmnBase extends ModellerBase {
           case 'checkboxes':
           case 'radios':
           case 'select':
-            $fields[] = $this->optionsField($key, $label, $weight, $description, $definition['#options'], (string) $value, $definition['#required'] ?? FALSE);
+            $fields[] = $this->optionsField($key, $label, $weight, $description, $definition['#options'], (string) $value, $required);
             continue 2;
 
         }
@@ -787,6 +791,7 @@ abstract class ModellerBpmnBase extends ModellerBase {
         'weight' => $weight,
         'type' => $type,
         'value' => $value,
+        'required' => $required,
       ];
       if ($description !== NULL) {
         $field['description'] = $description;
@@ -848,6 +853,7 @@ abstract class ModellerBpmnBase extends ModellerBase {
       'weight' => $weight,
       'type' => 'Dropdown',
       'value' => $value,
+      'required' => $required,
       'extras' => [
         'choices' => $choices,
       ],

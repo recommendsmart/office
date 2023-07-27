@@ -4,7 +4,7 @@ package: Fields
 type: module
 core_version_requirement: ^8.7.7 || ^9 || ^10
 
-# Information added by Drupal.org packaging script on 2023-02-05
-version: '8.x-1.5'
+# Information added by Drupal.org packaging script on 2023-05-05
+version: '8.x-1.6'
 project: 'form_filter_fields'
-datestamp: 1675605854
+datestamp: 1683280817

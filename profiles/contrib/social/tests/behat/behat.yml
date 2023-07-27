@@ -17,6 +17,7 @@ default:
       contexts:
         - Drupal\DrupalExtension\Context\BatchContext
         - Drupal\DrupalExtension\Context\ConfigContext
+        - Drupal\social\Behat\AlbumContext
         - Drupal\social\Behat\BookContext
         - Drupal\social\Behat\CKEditorContext
         - Drupal\social\Behat\DatabaseContext:
@@ -36,6 +37,7 @@ default:
         - Drupal\social\Behat\SocialMinkContext
         - Drupal\social\Behat\ThemeContext
         - Drupal\social\Behat\TopicContext
+        - Drupal\social\Behat\UserContext
   extensions:
     Drupal\social\Behat\Chrome\ChromeExtension: ~
     Drupal\MinkExtension:

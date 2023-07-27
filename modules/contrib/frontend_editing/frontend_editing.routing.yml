@@ -18,3 +18,27 @@ frontend_editing.form:
     id: \d+
   options:
     _admin_route: 'TRUE'
+
+frontend_editing.paragraph_up:
+  path: '/frontend-editing/paragraphs/{paragraph}/up'
+  defaults:
+    _title: 'Up'
+    _controller: '\Drupal\frontend_editing\Controller\FrontendEditingController::up'
+  requirements:
+    _custom_access: '\Drupal\frontend_editing\Controller\FrontendEditingController::accessUp'
+  options:
+    parameters:
+      paragraph:
+        type: 'entity:paragraph'
+
+frontend_editing.paragraph_down:
+  path: '/frontend-editing/paragraphs/{paragraph}/down'
+  defaults:
+    _title: 'Down'
+    _controller: '\Drupal\frontend_editing\Controller\FrontendEditingController::down'
+  requirements:
+    _custom_access: '\Drupal\frontend_editing\Controller\FrontendEditingController::accessDown'
+  options:
+    parameters:
+      paragraph:
+        type: 'entity:paragraph'

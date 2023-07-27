@@ -64,6 +64,7 @@ class FormBuildEntity extends ConfigurableActionBase {
       '#description' => $this->t('The built entity will be stored into this specified token. Please note: An entity can only be built when a form got submitted. Example events where it works: <em>Validate form</em>, <em>Submit form</em>.'),
       '#required' => TRUE,
       '#weight' => -45,
+      '#eca_token_reference' => TRUE,
     ];
     return $form;
   }
@@ -97,11 +98,13 @@ class FormBuildEntity extends ConfigurableActionBase {
       return;
     }
 
+    $triggering_element = &$form_state->getTriggeringElement();
+
     // For incomplete submissions, simulate a complete form build. Only that
     // way we are able to receive normalized form input values, and then we
     // are finally able to build an entity from user input.
     $needs_manual_build = !$form_state->has('eca_skip_manual_build')
-      && (!empty($form_state->getUserInput()) && (empty($form_state->getValues()) || !$form_state->isValidationComplete()));
+      && (!empty($form_state->getUserInput()) && (empty($form_state->getValues()) || !$form_state->isValidationComplete() || ($triggering_element && FALSE !== ($triggering_element['#limit_validation_errors'] ?? FALSE))));
 
     if ($needs_manual_build) {
       unset($form);
@@ -110,7 +113,16 @@ class FormBuildEntity extends ConfigurableActionBase {
       // This is important to not interfere with Drupal's form caching.
       unset($user_input['form_build_id']);
 
-      // Keep the current errors mind.
+      // Make sure to never submit using the Save button.
+      unset($user_input['op']);
+      if (isset($user_input['_triggering_element_name'])) {
+        // The triggering element will be replaced by a simulated one below.
+        $user_input['_triggering_element_name'] = '_eca_simulated_submit';
+        $user_input['_triggering_element_value'] = '_eca_simulated_submit';
+        $user_input['_eca_simulated_submit'] = '_eca_simulated_submit';
+      }
+
+      // Keep the current errors in mind.
       $any_errors = FormState::hasAnyErrors();
       $current_errors = $form_state->getErrors();
       $form_state->clearErrors();
@@ -136,8 +148,26 @@ class FormBuildEntity extends ConfigurableActionBase {
 
       try {
         $form = $this->formBuilder->retrieveForm($form_object->getFormId(), $form_state);
+
+        // The form is being build up without ECA involved, because skip_eca was
+        // set above. It may now be the case, that a custom button was added
+        // with ECA, meaning that button would not be available here anymore.
+        // That may lead to errors, especially known with file and image
+        // fields. To prevent that, the following section makes sure, that a
+        // triggering element always exists.
+        $form['_eca_simulated_submit'] = [
+          '#type' => 'submit',
+          '#name' => '_eca_simulated_submit',
+          '#value' => '_eca_simulated_submit',
+        ];
+        // Remove action submit buttons, to make sure the save button will not
+        // be involved by any means.
+        unset($form['actions']);
+
         $this->formBuilder->prepareForm($form_object->getFormId(), $form, $form_state);
+        $form_state->setTriggeringElement($form['_eca_simulated_submit']);
         $this->formBuilder->processForm($form_object->getFormId(), $form, $form_state);
+        $form_state->cleanValues();
       }
       finally {
          // Make sure that the real form state will have its errors restored.

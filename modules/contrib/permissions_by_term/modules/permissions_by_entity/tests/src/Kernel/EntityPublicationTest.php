@@ -18,7 +18,7 @@ class EntityPublicationTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'pbt_entity_test',
     'dynamic_page_cache',
     'taxonomy',
@@ -45,7 +45,7 @@ class EntityPublicationTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('test_entity');
     $this->installEntitySchema('user');
@@ -74,7 +74,7 @@ class EntityPublicationTest extends KernelTestBase {
   public function testAnonymousCanViewPublishedNodesWithoutTermPermissions(): void {
     $this->assertTrue($this->nodes['node_published']->isPublished());
     $this->assertEquals(AccessResult::neutral(), permissions_by_entity_entity_access($this->nodes['node_published'], 'view', $this->anonymousUser));
-    $this->assertNotEqual(AccessResult::forbidden(), $this->nodes['node_published']->access('view', $this->anonymousUser, TRUE));
+    $this->assertNotEquals(AccessResult::forbidden(), $this->nodes['node_published']->access('view', $this->anonymousUser, TRUE));
   }
 
   /**

@@ -109,7 +109,7 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
   /**
    * The builder definition.
    *
-   * @var string[]
+   * @var array
    */
   protected $builderDefinition;
 
@@ -149,9 +149,9 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
     [$this->type, $this->subType, $this->entityId] = array_pad(explode('.', $this->id), 3, NULL);
     $this->builderDefinition = $this->emailBuilderManager->getDefinition($this->type, FALSE);
     if (!$this->builderDefinition) {
-      $this->builderDefinition = ['label' => $this->labelUnknown];
+      $this->builderDefinition = (new EmailBuilder(['label' => $this->labelUnknown]))->get();
     }
-    if ($this->entityId && !empty($this->builderDefinition['has_entity'])) {
+    if ($this->entityId && $this->builderDefinition['has_entity']) {
       $this->entity = $this->entityTypeManager()->getStorage($this->type)->load($this->entityId);
     }
   }
@@ -189,7 +189,7 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
    */
   public function getSubTypeLabel() {
     if ($this->subType) {
-      if ($sub_types = $this->builderDefinition['sub_types'] ?? []) {
+      if ($sub_types = $this->builderDefinition['sub_types']) {
         return $sub_types[$this->subType] ?? $this->labelUnknown;
       }
       return $this->subType;
@@ -201,7 +201,7 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
    * {@inheritdoc}
    */
   public function getEntityLabel() {
-    if (empty($this->builderDefinition['has_entity'])) {
+    if (!$this->builderDefinition['has_entity']) {
       return '';
     }
     if ($this->entity) {
@@ -284,7 +284,7 @@ class MailerPolicy extends ConfigEntityBase implements EntityWithPluginCollectio
    * {@inheritdoc}
    */
   public function getCommonAdjusters() {
-    return $this->builderDefinition ? $this->builderDefinition['common_adjusters'] : [];
+    return $this->builderDefinition['common_adjusters'];
   }
 
   /**

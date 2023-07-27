@@ -8,6 +8,9 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Component\EventDispatcher\Event;
 use Drupal\eca\Event\AccessEventInterface;
 use Drupal\eca\Event\ConditionalApplianceInterface;
+use Drupal\eca\Plugin\DataType\DataTransferObject;
+use Drupal\eca\Token\DataProviderInterface;
+use Drupal\eca_access\AccessEvents;
 
 /**
  * Dispatched when being asked for access to create an entity.
@@ -16,7 +19,7 @@ use Drupal\eca\Event\ConditionalApplianceInterface;
  *   This class is not meant to be used as a public API. It is subject for name
  *   change or may be removed completely, also on minor version updates.
  */
-class CreateAccess extends Event implements AccessEventInterface, ConditionalApplianceInterface {
+class CreateAccess extends Event implements AccessEventInterface, ConditionalApplianceInterface, DataProviderInterface {
 
   /**
    * An associative array of additional context values.
@@ -45,6 +48,13 @@ class CreateAccess extends Event implements AccessEventInterface, ConditionalApp
    * @var \Drupal\Core\Access\AccessResultInterface|null
    */
   protected ?AccessResultInterface $accessResult = NULL;
+
+  /**
+   * An instance holding event data accessible as Token.
+   *
+   * @var \Drupal\eca\Plugin\DataType\DataTransferObject|null
+   */
+  protected ?DataTransferObject $eventData = NULL;
 
   /**
    * Constructs a new EntityAccess object.
@@ -175,6 +185,43 @@ class CreateAccess extends Event implements AccessEventInterface, ConditionalApp
   public function setAccessResult(AccessResultInterface $result): CreateAccess {
     $this->accessResult = $result;
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getData(string $key): ?DataTransferObject {
+    if ($key === 'event') {
+      if (!isset($this->eventData)) {
+        $data = [
+          'machine-name' => AccessEvents::CREATE,
+          'uid' => $this->getAccount()->id(),
+          'context' => [],
+        ];
+        $context = $this->getContext();
+        foreach ($context as $k => $v) {
+          if (is_scalar($v)) {
+            $data['context'][$k] = $v;
+          }
+        }
+        if (isset($context['entity_type_id'])) {
+          $data['entity-type'] = $context['entity_type_id'];
+        }
+        $data['entity-bundle'] = $this->getEntityBundle();
+        $this->eventData = DataTransferObject::create($data);
+      }
+
+      return $this->eventData;
+    }
+
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasData(string $key): bool {
+    return $this->getData($key) !== NULL;
   }
 
 }

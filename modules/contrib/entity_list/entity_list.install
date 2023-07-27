@@ -18,3 +18,16 @@ function entity_list_install() {
     user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, ['view entity list']);
   }
 }
+
+/**
+ * Implements hook_update_N().
+ */
+function entity_list_update_8001(&$sandbox) {
+  $configFactory = \Drupal::service('config.factory');
+  $configNames = \Drupal::service('config.storage')->listAll('entity_list');
+  foreach ($configNames as $configName) {
+    $config = $configFactory->getEditable($configName);
+    $config->set('step', 'finish');
+    $config->save();
+  }
+}

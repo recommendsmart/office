@@ -90,10 +90,32 @@ class EntityFieldValueChangedTest extends KernelTestBase {
     $node_type->save();
     node_add_body_field($node_type);
 
+    // Create a boolean field.
+    $this->fieldStorage = FieldStorageConfig::create([
+      'field_name' => 'field_boolean_test',
+      'entity_type' => 'node',
+      'type' => 'boolean',
+    ]);
+
+    $this->fieldStorage->save();
+    $this->field = FieldConfig::create([
+      'field_name' => 'field_boolean_test',
+      'entity_type' => 'node',
+      'bundle' => 'article',
+      'label' => 'A Boolean field.',
+      'required' => TRUE,
+      'settings' => [
+        'on_label' => 'on',
+        'off_label' => 'off',
+      ],
+    ]);
+    $this->field->save();
+
     $this->node = Node::create([
       'type' => 'article',
       'uid' => 1,
       'title' => 'First article',
+      'field_boolean_test' => 0,
     ]);
     $this->node->save();
 
@@ -121,6 +143,34 @@ class EntityFieldValueChangedTest extends KernelTestBase {
     /** @var \Drupal\eca_content\Plugin\ECA\Condition\EntityFieldValueChanged $condition */
     $this->condition = $this->conditionManager->createInstance('eca_entity_field_value_changed', [
       'field_name' => 'title.value',
+    ]);
+    $this->condition->setContextValue('entity', $this->node);
+    $this->assertTrue($this->condition->evaluate());
+  }
+
+  /**
+   * Tests an entity, where the Boolean field has changed without strict data.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\ContextException
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   */
+  public function testBooleanValueChangedNoStrictDataTypes(): void {
+    /**
+     * @var \Drupal\eca_content\Plugin\ECA\Condition\EntityFieldValueChanged $condition
+     */
+    $this->condition = $this->conditionManager->createInstance('eca_entity_field_value_changed', [
+      'field_name' => 'field_boolean_test',
+    ]);
+
+    $this->node->field_boolean_test = 1;
+    $this->condition->setContextValue('entity', $this->node);
+    $this->assertTrue($this->condition->evaluate());
+
+    /**
+     * @var \Drupal\eca_content\Plugin\ECA\Condition\EntityFieldValueChanged $condition
+     */
+    $this->condition = $this->conditionManager->createInstance('eca_entity_field_value_changed', [
+      'field_name' => 'field_boolean_test.value',
     ]);
     $this->condition->setContextValue('entity', $this->node);
     $this->assertTrue($this->condition->evaluate());
@@ -157,6 +207,27 @@ class EntityFieldValueChangedTest extends KernelTestBase {
     $this->condition->setContextValue('entity', $this->node);
     $this->assertFalse($this->condition->evaluate());
   }
+
+  /**
+   * Tests an entity, where the Boolean field has changed, but with negation.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\ContextException
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   */
+  public function testBooleanValueChangedNoStrictDataTypesWithNegation(): void {
+    /**
+     * @var \Drupal\eca_content\Plugin\ECA\Condition\EntityFieldValueChanged $condition
+     */
+    $this->condition = $this->conditionManager->createInstance('eca_entity_field_value_changed', [
+      'field_name' => 'field_boolean_test',
+      'negate' => 'yes',
+    ]);
+
+    $this->node->field_boolean_test = 1;
+    $this->condition->setContextValue('entity', $this->node);
+    $this->assertFalse($this->condition->evaluate());
+  }
+
 
   /**
    * Tests an entity, where the title has not changed.

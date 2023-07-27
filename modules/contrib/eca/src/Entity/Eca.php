@@ -6,6 +6,7 @@ use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use Drupal\Component\Utility\Random;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -447,6 +448,12 @@ class Eca extends ConfigEntityBase implements EntityWithPluginCollectionInterfac
    *   TRUE, if configuration form validation has no errors. FALSE otherwise.
    */
   protected function validatePlugin(PluginFormInterface $plugin, array &$fields, string $type, string $plugin_id, string $label): bool {
+    $replaced_fields = [];
+    $eca_validation_error = FALSE;
+    $messenger = $this->messenger();
+    $plugin_label = $plugin instanceof PluginInspectionInterface ?
+      $plugin->getPluginDefinition()['label'] : 'unknown';
+
     if ($plugin instanceof ConfigurableInterface) {
       foreach ($plugin->defaultConfiguration() + ['replace_tokens' => FALSE] as $key => $value) {
         // Convert potential strings from pseudo-checkboxes (for example a
@@ -467,24 +474,51 @@ class Eca extends ConfigEntityBase implements EntityWithPluginCollectionInterfac
         }
       }
 
-      // Identify number fields and replace them with a valid numeric value if
+      // Identify number or email fields and replace them with a valid value if
       // the field is configured with a token. This is important to get those
       // fields through form validation without issues.
       // @todo Add support for nested form fields like e.g. in container/fieldset.
-      $numeric_fields = [];
       $form = [];
       $form_state = new FormState();
       foreach ($plugin->buildConfigurationForm($form, $form_state) as $key => $form_field) {
+        if (!empty($form_field['#eca_token_reference']) &&
+          isset($fields[$key]) &&
+          $this->valueIsToken($fields[$key])
+        ) {
+          $eca_validation_error = TRUE;
+          $errorMsg = sprintf('%s "%s" (%s): %s', $type, $plugin_label, $label, 'This field requires a token name, not a token; please remove the brackets.');
+          $messenger->addError($errorMsg);
+        }
         if (isset($form_field['#type'], $fields[$key]) &&
-          ($form_field['#type'] === 'number') &&
-          (mb_substr((string) $fields[$key], 0, 1) === '[') &&
-          (mb_substr((string) $fields[$key], -1, 1) === ']') &&
-          (mb_strlen((string) $fields[$key]) <= 255)) {
+          in_array($form_field['#type'], ['number', 'email', 'machine_name'], TRUE) &&
+          $this->valueIsToken($fields[$key])
+        ) {
           // Remember the original configuration value.
-          $numeric_fields[$key] = $fields[$key];
-          // The value "0" with a required field would cause a form error,
-          // let's use "1" instead.
-          $fields[$key] = $form_field['#min'] ?? 1;
+          $replaced_fields[$key] = $fields[$key];
+
+          switch ($form_field['#type']) {
+
+            case 'number':
+              // Set a valid value for the form element type 'number'
+              // to pass the validation. Also if the field is required
+              // the value "0" would cause a form error, let's use "1" instead.
+              $fields[$key] = $form_field['#min'] ?? 1;
+              break;
+
+            case 'email':
+              // Set a valid value for the form element type 'email'
+              // to pass validation.
+              $fields[$key] = 'lorem@eca.local';
+              break;
+
+            case 'machine_name':
+              // Set a valid value for the form element type 'machine_name'
+              // to pass validation. Needs to append a random value, so that
+              // it passes "exists" callbacks.
+              $fields[$key] = 'eca_' . mb_strtolower((new Random())->name(8, TRUE));
+              break;
+
+          }
         }
       }
     }
@@ -505,7 +539,6 @@ class Eca extends ConfigEntityBase implements EntityWithPluginCollectionInterfac
       // Keep the currently stored list of messages in mind.
       // The form build will add messages to the messenger, which we want
       // to clear from the runtime.
-      $messenger = $this->messenger();
       $messages_by_type = $messenger->all();
 
       // Keep the current "has any errors" flag in mind, and reset this flag
@@ -546,11 +579,18 @@ class Eca extends ConfigEntityBase implements EntityWithPluginCollectionInterfac
       $form = $plugin->buildConfigurationForm([], $form_state);
       $plugin->submitConfigurationForm($form, $form_state);
     }
+
+    // If there have been any ECA specific validation errors but no other form
+    // error, we end up here but won't proceed, as the model is not valid.
+    if ($eca_validation_error) {
+      return FALSE;
+    }
+
     // Collect the resulting form field values.
     $fields = ($plugin instanceof ConfigurableInterface ? $plugin->getConfiguration() : []) + $fields;
 
     // Restore tokens for numeric configuration fields.
-    foreach ($numeric_fields as $key => $original_value) {
+    foreach ($replaced_fields as $key => $original_value) {
       $fields[$key] = $original_value;
     }
     return TRUE;
@@ -777,6 +817,21 @@ class Eca extends ConfigEntityBase implements EntityWithPluginCollectionInterfac
     $this->memoryCache()->invalidateAll();
     $storage->resetCache();
     parent::postSave($storage, $update);
+  }
+
+  /**
+   * Checks if a given value has the patterns of a token.
+   *
+   * @param string $value
+   *   The field value.
+   *
+   * @return bool
+   *  Wether TRUE or FALSE based on the pattern.
+   */
+  protected function valueIsToken($value) {
+    return (mb_substr((string) $value, 0, 1) === '[') &&
+    (mb_substr((string) $value, -1, 1) === ']') &&
+    (mb_strlen((string) $value) <= 255);
   }
 
 }

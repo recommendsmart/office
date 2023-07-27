@@ -46,7 +46,7 @@ abstract class PBTKernelTestBase extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['taxonomy', 'node', 'user', 'text', 'field', 'system', 'permissions_by_term', 'language'];
+  protected static $modules = ['taxonomy', 'node', 'user', 'text', 'field', 'system', 'permissions_by_term', 'language'];
 
   /**
    * @var AccessStorage
@@ -61,7 +61,7 @@ abstract class PBTKernelTestBase extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->installEntitySchema('user');

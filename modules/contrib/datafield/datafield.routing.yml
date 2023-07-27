@@ -8,7 +8,7 @@ datafield.add_form:
       entity:
         type: entity:{entity_type}
   requirements:
-    _permission: 'access content'
+    _datafield_access: 'TRUE'
 
 datafield.delete_form:
   path: '/datafield/{entity_type}/{entity}/{field_name}/{delta}/delete'
@@ -20,7 +20,7 @@ datafield.delete_form:
       entity:
         type: entity:{entity_type}
   requirements:
-    _permission: 'access content'
+    _datafield_access: 'TRUE'
 
 datafield.clone_form:
   path: '/datafield/{entity_type}/{entity}/{field_name}/{delta}/clone'
@@ -32,7 +32,7 @@ datafield.clone_form:
       entity:
         type: entity:{entity_type}
   requirements:
-    _permission: 'access content'
+    _datafield_access: 'TRUE'
 
 datafield.edit_form:
   path: '/datafield/{entity_type}/{entity}/{field_name}/{delta}/edit'
@@ -44,7 +44,7 @@ datafield.edit_form:
       entity:
         type: entity:{entity_type}
   requirements:
-    _permission: 'access content'
+    _datafield_access: 'TRUE'
 
 datafield.edit_all_form:
   path: '/datafield/{entity_type}/{entity}/{field_name}/edit'
@@ -56,4 +56,14 @@ datafield.edit_all_form:
       entity:
         type: entity:{entity_type}
   requirements:
-    _permission: 'access content'
+    _datafield_access: 'TRUE'
+
+datafield.hierarchical:
+  path: '/ajax/datafield/hierarchical/{vocabulary}'
+  defaults:
+    _title: 'Hierarchical'
+    _controller: '\Drupal\datafield\Controller\HierarchicalSelectController::ajax'
+  methods: [POST]
+  requirements:
+    # Request from widget form get terms list.
+    _access: 'TRUE'

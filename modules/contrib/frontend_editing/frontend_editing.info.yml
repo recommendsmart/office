@@ -7,7 +7,7 @@ configure: frontend_editing.settings_form
 dependencies:
   - paragraphs_edit:paragraphs_edit
 
-# Information added by Drupal.org packaging script on 2023-01-09
-version: '1.1.0-rc4'
+# Information added by Drupal.org packaging script on 2023-07-13
+version: '1.1.1'
 project: 'frontend_editing'
-datestamp: 1673262933
+datestamp: 1689255576

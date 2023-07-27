@@ -83,6 +83,7 @@ class LockAcquire extends ConfigurableActionBase implements CleanupInterface {
       '#default_value' => $this->configuration['token_name'],
       '#weight' => -20,
       '#description' => $this->t('Optionally define a token name to store the result of lock acquiry. The result value is <strong>1</strong> when acquiry was successful, and is set to <strong>0</strong> when it was not successful.'),
+      '#eca_token_reference' => TRUE,
     ];
     return $form;
   }

@@ -140,7 +140,8 @@ form:not(.layout-builder-configure-block) {
     }
   }
 
-  &.enroll-invite-email-form {
+  &.enroll-invite-email-form,
+  &.social-event-managers-enrollment-add {
     fieldset:first-child {
       margin-top: 0;
     }
@@ -150,6 +151,15 @@ form:not(.layout-builder-configure-block) {
   fieldset {
     fieldset {
       margin-top: 0;
+    }
+  }
+
+  // VBO form.
+  &.views-bulk-operations-configure-action {
+    .btn {
+      &:hover {
+        background-color: #ccc;
+      }
     }
   }
 

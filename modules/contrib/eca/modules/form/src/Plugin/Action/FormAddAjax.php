@@ -139,6 +139,16 @@ class FormAddAjax extends FormFieldActionBase {
       $element['#limit_validation_errors'] = [];
     }
 
+    if (in_array(
+      $element['#type'] ?? NULL,
+      ['textfield', 'textarea', 'text_format'],
+      TRUE
+    )) {
+      // Re-focus on text-based fields could mean that you will never get away
+      // from them. To avoid this, use the option to disable refocus.
+      $element['#ajax']['disable-refocus'] = TRUE;
+    }
+
     $validate_fields = trim($this->configuration['validate_fields']) !== '' ? DataTransferObject::buildArrayFromUserInput((string) $this->tokenServices->replace($this->configuration['validate_fields'])) : [];
     if (!empty($validate_fields)) {
       // These are the supported separators. The first one is the official one,

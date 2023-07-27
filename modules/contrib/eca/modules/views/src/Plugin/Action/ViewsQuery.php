@@ -106,6 +106,7 @@ class ViewsQuery extends ConfigurableActionBase {
       '#default_value' => $this->configuration['token_name'],
       '#description' => $this->t('Name of the token available after view execution. Contains an indexed list of elements that the view returns.'),
       '#weight' => -60,
+      '#eca_token_reference' => TRUE,
     ];
     $form['view_id'] = [
       '#type' => 'select',
@@ -124,10 +125,11 @@ class ViewsQuery extends ConfigurableActionBase {
       '#weight' => -40,
     ];
     $form['arguments'] = [
-      '#type' => 'textarea',
+      '#type' => 'textfield',
       '#title' => $this->t('Arguments'),
       '#default_value' => $this->configuration['arguments'],
-      '#description' => $this->t('Provide the Contextual filters of the view in order and one by line.'),
+      '#description' => $this->t('Provide the values for contextual filters in the same order as they are defined in the view. Separate multiple values with the <code>/</code> character.'),
+      '#maxlength' => 512,
       '#weight' => -30,
     ];
     return $form;

@@ -1089,9 +1089,9 @@ YAML;
     ]));
     $form_state = new FormState();
     $form_builder->buildForm($form_object, $form_state);
-    $form_state->setValues([
+    $form_state->setUserInput([
       'custom_value' => 'Should get overwritten...',
-    ] + $form_state->getValues());
+    ] + $form_state->getUserInput());
     $form_builder->submitForm($form_object, $form_state);
 
     $this->assertTrue($access_result);

@@ -26,7 +26,7 @@ class EntityAccessCheckTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'pbt_entity_test',
     'permissions_by_entity',
     'taxonomy',
@@ -70,7 +70,7 @@ class EntityAccessCheckTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('user');
     $this->installSchema('system', ['key_value_expire', 'sequences']);
@@ -105,7 +105,7 @@ class EntityAccessCheckTest extends KernelTestBase {
     $dispatcher = $this->getPopulatedDispatcher();
 
     $this->expectException(AccessDeniedHttpException::class);
-    $dispatcher->dispatch(KernelEvents::REQUEST, $this->getRequestEvent());
+    $dispatcher->dispatch($this->getRequestEvent(), KernelEvents::REQUEST);
   }
 
   /**
@@ -115,7 +115,7 @@ class EntityAccessCheckTest extends KernelTestBase {
     $dispatcher = $this->getPopulatedDispatcher();
 
     $this->container->get('current_user')->setAccount($this->terms['term_user_a']['user']);
-    $dispatcher->dispatch(KernelEvents::REQUEST, $this->getRequestEvent());
+    $dispatcher->dispatch($this->getRequestEvent(), KernelEvents::REQUEST);
   }
 
   /**
@@ -126,8 +126,8 @@ class EntityAccessCheckTest extends KernelTestBase {
 
     // Execute first request for allowed user.
     $this->container->get('current_user')->setAccount($this->terms['term_user_a']['user']);
-    $dispatcher->dispatch(KernelEvents::REQUEST, $this->getRequestEvent());
-    $dispatcher->dispatch(KernelEvents::RESPONSE, $this->getCacheableResponseEvent());
+    $dispatcher->dispatch($this->getRequestEvent(), KernelEvents::REQUEST);
+    $dispatcher->dispatch($this->getCacheableResponseEvent(), KernelEvents::RESPONSE);
 
     // Reset the cache to emulate a new request.
     $this->container->get('permissions_by_entity.checked_entity_cache')->clear();
@@ -135,7 +135,7 @@ class EntityAccessCheckTest extends KernelTestBase {
     // Execute second request for disallowed user.
     $this->container->get('current_user')->setAccount($this->terms['term_user_b']['user']);
     $this->expectException(AccessDeniedHttpException::class);
-    $dispatcher->dispatch(KernelEvents::REQUEST, $this->getRequestEvent());
+    $dispatcher->dispatch($this->getRequestEvent(), KernelEvents::REQUEST);
   }
 
   /**

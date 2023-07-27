@@ -37,6 +37,7 @@ class TokenExists extends ConditionBase {
       '#default_value' => $this->configuration['token_name'],
       '#weight' => -10,
       '#required' => TRUE,
+      '#eca_token_reference' => TRUE,
     ];
     return parent::buildConfigurationForm($form, $form_state);
   }

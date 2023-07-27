@@ -20,6 +20,13 @@ trait FormFieldPluginTrait {
   use FormPluginTrait;
 
   /**
+   * Whether the lookup automatically jumps to a real field element as target.
+   *
+   * @var bool
+   */
+  protected bool $automaticJumpToFieldElement = TRUE;
+
+  /**
    * The lookup keys to use, respecting their occurring order.
    *
    * Values are either one of "parents" or "array_parents".
@@ -71,7 +78,7 @@ trait FormFieldPluginTrait {
     $form['field_name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Field name'),
-      '#description' => $this->t('The input name of the form field. This is mostly found in the "name" attribute of an &lt;input&gt; form element. This property supports tokens.'),
+      '#description' => $this->t('The input name of the form field. This is mostly found in the "name" attribute of an &lt;input&gt; form element. <em>For submit buttons within content forms:</em> Use "submit" for the labeled "Save" button, and "preview" for the labeled "Preview" button. This property supports tokens.'),
       '#default_value' => $this->configuration['field_name'],
       '#required' => TRUE,
       '#weight' => -50,
@@ -189,7 +196,7 @@ trait FormFieldPluginTrait {
     foreach ($this->lookupFormElements($form, $key) as &$element) {
       if (empty($name_array) || (isset($element['#parents']) && array_intersect($name_array, $element['#parents']) === $name_array) || (isset($element['#array_parents']) && array_intersect($name_array, $element['#array_parents']) === $name_array)) {
         // Found an element due to defined parents or array_parents.
-        if (!isset($element['#type']) && Element::children($element)) {
+        if (!isset($element['#type']) && $this->automaticJumpToFieldElement && Element::children($element)) {
           // Some field widgets are additionally nested. And since we need
           // a form field element here, catch the first defined child element.
           $element = &$this->jumpToFirstFieldChild($element);
@@ -218,8 +225,17 @@ trait FormFieldPluginTrait {
           }
         }
         else {
+          $top_name = (string) reset($name_array);
           foreach (Element::children($elements) as $c_key) {
-            $lookup($elements[$c_key], $name_array);
+            if ($top_name === (string) $c_key) {
+              $sub_name_array = $name_array;
+              array_shift($sub_name_array);
+              $lookup($elements[$c_key], $sub_name_array);
+              break;
+            }
+            else {
+              $lookup($elements[$c_key], $name_array);
+            }
           }
         }
       };
@@ -301,11 +317,14 @@ trait FormFieldPluginTrait {
    *   The current element in scope.
    * @param mixed $key
    *   The key to lookup.
+   * @param bool $is_root_call
+   *   (optional) This is a recursive function, and this flag indicates whether
+   *   the invokation is the root one.
    *
    * @return array
    *   The found element candidates.
    */
-  protected function lookupFormElements(&$element, $key): array {
+  protected function lookupFormElements(&$element, $key, bool $is_root_call = TRUE): array {
     $found = [];
     $lookup_keys = $this->lookupKeys;
     foreach ($lookup_keys as $lookup_key) {
@@ -319,7 +338,7 @@ trait FormFieldPluginTrait {
             }
             else {
               /* @noinspection SlowArrayOperationsInLoopInspection */
-              $found = array_merge($found, $this->lookupFormElements($element[$child_key], $key));
+              $found = array_merge($found, $this->lookupFormElements($element[$child_key], $key, FALSE));
             }
           }
           break;
@@ -328,12 +347,12 @@ trait FormFieldPluginTrait {
           $this->lookupKeys = ['array_parents'];
           // Alternatively, traverse along the keys of the form build array.
           foreach (Element::children($element) as $child_key) {
-            if (($child_key === $key) || (isset($element[$child_key]['#array_parents']) && in_array($key, $element[$child_key]['#array_parents'], TRUE))) {
+            if (((string) $child_key === (string) $key) || (isset($element[$child_key]['#array_parents']) && in_array($key, $element[$child_key]['#array_parents'], TRUE))) {
               $found[] = &$element[$child_key];
             }
             else {
               /* @noinspection SlowArrayOperationsInLoopInspection */
-              $found = array_merge($found, $this->lookupFormElements($element[$child_key], $key));
+              $found = array_merge($found, $this->lookupFormElements($element[$child_key], $key, FALSE));
             }
           }
           break;
@@ -346,6 +365,17 @@ trait FormFieldPluginTrait {
     }
 
     $this->lookupKeys = $lookup_keys;
+
+    if ($is_root_call) {
+      // Sort the found elements from the smallest number of parents to the
+      // highest number of parents. When a specified form element key defines
+      // a subset of parent keys, then this sorting makes sure, that the element
+      // with the highest probability of exact match will be used.
+      uasort($found, function ($a, $b) {
+        return count($a['#parents'] ?? []) - count($b['#parents'] ?? []);
+      });
+    }
+
     return $found;
   }
 
@@ -359,19 +389,27 @@ trait FormFieldPluginTrait {
    *   The submitted value. May return NULL if no submitted value exists.
    */
   protected function &getSubmittedValue(&$found = NULL) {
+    // Initialize the value and found state.
+    $value = NULL;
+    if ($found === NULL) {
+      $found = FALSE;
+    }
+
     if (!($form_state = $this->getCurrentFormState())) {
-      $nothing = NULL;
-      return $nothing;
+      return $value;
     }
 
     $field_name_array = $this->getFieldNameAsArray();
-    $values = &$form_state->getValues();
-    if (!$values) {
-      $values = &$form_state->getUserInput();
-    }
 
-    $found = FALSE;
-    $value = &$this->getFirstNestedOccurrence($field_name_array, $values, $found);
+    $values = &$form_state->getValues();
+    $user_input = &$form_state->getUserInput();
+
+    if (!$found && $values) {
+      $value = &$this->getFirstNestedOccurrence($field_name_array, $values, $found);
+    }
+    if (!$found && $user_input) {
+      $value = &$this->getFirstNestedOccurrence($field_name_array, $user_input, $found);
+    }
 
     if (!$found) {
       // Although not officially supported, try to get a submitted value using

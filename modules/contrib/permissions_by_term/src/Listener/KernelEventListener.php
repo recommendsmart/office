@@ -78,7 +78,7 @@ class KernelEventListener implements EventSubscriberInterface
    * Access restriction on kernel request.
    */
   public function onKernelRequest(RequestEvent $event): void {
-    if ($event->isMasterRequest()) {
+    if ($event->isMainRequest()) {
 
       $this->handleAccessToNodePages($event);
 
@@ -164,7 +164,7 @@ class KernelEventListener implements EventSubscriberInterface
       $node = $event->getRequest()->attributes->get('node');
       if (!$this->accessCheckService->canUserAccessByNode($node, false, $this->accessStorageService->getLangCode($node->id()))) {
         $accessDeniedEvent = new PermissionsByTermDeniedEvent($node->id());
-        $this->eventDispatcher->dispatch(PermissionsByTermDeniedEvent::NAME, $accessDeniedEvent);
+        $this->eventDispatcher->dispatch($accessDeniedEvent, PermissionsByTermDeniedEvent::NAME);
 
         if ($this->disabledNodeAccessRecords) {
           $this->pageCacheKillSwitch->trigger();

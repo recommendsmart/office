@@ -42,6 +42,7 @@ abstract class ListOperationBase extends ConfigurableActionBase {
       '#description' => $this->t('Provide the name of the token that contains a list of items. If the list does not exist yet, a new one will be created.'),
       '#default_value' => $this->configuration['list_token'],
       '#weight' => -20,
+      '#eca_token_reference' => TRUE,
     ];
     return $form;
   }

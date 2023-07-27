@@ -95,6 +95,7 @@ class TokenSetValue extends ConfigurableActionBase {
       '#default_value' => $this->configuration['token_name'],
       '#weight' => -30,
       '#description' => $this->t('Provide the name of a token where the value should be stored.'),
+      '#eca_token_reference' => TRUE,
     ];
     $form['token_value'] = [
       '#type' => 'textarea',

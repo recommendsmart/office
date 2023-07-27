@@ -159,9 +159,9 @@ abstract class Base extends FormatterBase {
   public function settingsForm(array $form, FormStateInterface $form_state): array {
     $formatter_settings_default = self::formatterDefault();
     $settings = $this->getSetting('formatter_settings');
-    $field_settings = $this->getFieldSettings();
+    $fieldSettings = $this->getFieldSettings();
     $types = DataFieldItem::subfieldTypes();
-    $subfields = $field_settings["columns"];
+    $subfields = $fieldSettings["columns"];
     if (!empty($settings) && count($subfields) == count($settings)) {
       uasort($settings, [
         'Drupal\Component\Utility\SortArray',
@@ -194,7 +194,7 @@ abstract class Base extends FormatterBase {
     ];
     // General settings.
     foreach (array_keys($subfields) as $subfield) {
-      $item = $field_settings["columns"][$subfield];
+      $item = $fieldSettings["columns"][$subfield];
       if (empty($settings[$subfield])) {
         $settings[$subfield] = $formatter_settings_default;
       }
@@ -203,7 +203,7 @@ abstract class Base extends FormatterBase {
       }
       $type = $item['type'];
       $title = $item['name'] . ' - ' . $types[$type];
-      if (!empty($field_settings['field_settings']) && $field_settings['field_settings'][$subfield]['list']) {
+      if (!empty($fieldSettings['field_settings']) && $fieldSettings['field_settings'][$subfield]['list']) {
         $title .= ' (' . $this->t('list') . ')';
       }
 
@@ -283,7 +283,7 @@ abstract class Base extends FormatterBase {
         '#default_value' => $settings[$subfield]['show_label'],
       ];
 
-      if (!empty($field_settings['field_settings']) && !empty($field_settings['field_settings'][$subfield]['list'])) {
+      if (!empty($fieldSettings['field_settings']) && !empty($fieldSettings['field_settings'][$subfield]['list'])) {
         $element['formatter_settings'][$subfield]['key'] = [
           '#type' => 'checkbox',
           '#title' => $this->t('Display key instead of label'),
@@ -346,42 +346,84 @@ abstract class Base extends FormatterBase {
         ];
       }
       if ($type == 'entity_reference') {
+        $entityType = $fieldSettings["field_settings"][$subfield]["entity_reference_type"];
+        $entityRefOptions = [
+          'entity_reference_label' => $this->t('Entity label'),
+          'entity_reference_entity_view' => $this->t('Rendered entity'),
+          'entity_reference_entity_id' => $this->t('Entity ID'),
+        ];
+        if (in_array($entityType, ['taxonomy_term'])) {
+          $entityRefOptions['entity_reference_hierarchical_term'] = $this->t('Hierarchical label');
+        }
         $element['formatter_settings'][$subfield]['plugin_type'] = [
           '#type' => 'select',
           '#title' => $this->t('Formatter'),
-          '#options' => [
-            'entity_reference_label' => $this->t('Entity label'),
-            'entity_reference_entity_view' => $this->t('Rendered entity'),
-            'entity_reference_entity_id' => $this->t('Entity ID'),
-          ],
+          '#options' => $entityRefOptions,
           '#empty_option' => $this->t('- Select -'),
           '#default_value' => $settings[$subfield]['plugin_type'],
         ];
-        $extract = explode(':', $field_settings["field_settings"][$subfield]["entity_reference_type"]);
-        $options = $this->entityDisplayRepository->getViewModeOptions(end($extract));
-        $element['formatter_settings'][$subfield]['view_mode'] = [
-          '#type' => 'select',
-          '#options' => $options,
-          '#title' => $this->t('View mode'),
-          '#description' => $this->t('Output entity in this view mode.'),
-          '#empty_option' => $this->t('- Select -'),
-          '#default_value' => $settings[$subfield]['view_mode'],
-          '#states' => [
-            'visible' => [
-              'select[name$="[' . $subfield . '][plugin_type]"]' => ['value' => 'entity_reference_entity_view'],
+
+        if (in_array($entityType, ['file', 'image'])) {
+          $element['formatter_settings'][$subfield]['plugin_type']['#options'] = [
+            'file_default' => $this->t("Generic file"),
+            'file_table' => $this->t("Table of files"),
+            'file_url_plain' => $this->t("URL to file"),
+            'image' => $this->t("Image"),
+            'image_url' => $this->t("URL to image"),
+          ];
+          if ($entityType == 'file') {
+            unset($element['formatter_settings'][$subfield]['plugin_type']['#options']['image']);
+            unset($element['formatter_settings'][$subfield]['plugin_type']['#options']['image_url']);
+          }
+          $image_styles = image_style_options(FALSE);
+          $description_link = Link::fromTextAndUrl(
+            $this->t('Configure Image Styles'),
+            Url::fromRoute('entity.image_style.collection')
+          );
+          $element['formatter_settings'][$subfield]['image_style'] = [
+            '#title' => $this->t('Image style'),
+            '#type' => 'select',
+            '#empty_option' => $this->t('None (original image)'),
+            '#options' => $image_styles,
+            '#description' => $description_link->toRenderable(),
+            '#default_value' => $settings[$subfield]['image_style'],
+            '#states' => [
+              'visible' => [
+                'select[name$="[' . $subfield . '][plugin_type]"]' => [
+                  ['value' => 'image'],
+                  ['value' => 'image_url'],
+                ],
+              ],
             ],
-          ],
-        ];
-        $element['formatter_settings'][$subfield]['link'] = [
-          '#title' => $this->t('Link label to the referenced entity'),
-          '#type' => 'checkbox',
-          '#default_value' => $settings[$subfield]['link'],
-          '#states' => [
-            'visible' => [
-              'select[name$="[' . $subfield . '][plugin_type]"]' => ['value' => 'entity_reference_label'],
+          ];
+        }
+        else {
+          $extract = explode(':', $fieldSettings["field_settings"][$subfield]["entity_reference_type"]);
+          $options = $this->entityDisplayRepository->getViewModeOptions(end($extract));
+          $element['formatter_settings'][$subfield]['view_mode'] = [
+            '#type' => 'select',
+            '#options' => $options,
+            '#title' => $this->t('View mode'),
+            '#description' => $this->t('Output entity in this view mode.'),
+            '#empty_option' => $this->t('- Select -'),
+            '#default_value' => $settings[$subfield]['view_mode'],
+            '#states' => [
+              'visible' => [
+                'select[name$="[' . $subfield . '][plugin_type]"]' => ['value' => 'entity_reference_entity_view'],
+              ],
             ],
-          ],
-        ];
+          ];
+          $element['formatter_settings'][$subfield]['link'] = [
+            '#title' => $this->t('Link label to the referenced entity'),
+            '#type' => 'checkbox',
+            '#default_value' => $settings[$subfield]['link'],
+            '#states' => [
+              'visible' => [
+                'select[name$="[' . $subfield . '][plugin_type]"]' => ['value' => 'entity_reference_label'],
+              ],
+            ],
+          ];
+        }
       }
 
       if ($type == 'file') {
@@ -439,22 +481,22 @@ abstract class Base extends FormatterBase {
    */
   public function settingsSummary(): array {
     $settings = $this->getSetting('formatter_settings');
-    $field_settings = $this->getFieldSettings();
+    $fieldSettings = $this->getFieldSettings();
 
     $subfield_types = DataFieldItem::subfieldTypes();
 
     $summary = [];
-    foreach ($field_settings["columns"] as $subfield => $item) {
+    foreach ($fieldSettings["columns"] as $subfield => $item) {
       $subfield_type = $item['type'];
-      if (empty($settings[$subfield]) || empty($field_settings["field_settings"])) {
+      if (empty($settings[$subfield]) || empty($fieldSettings["field_settings"])) {
         continue;
       }
       $summary[] = new FormattableMarkup(
         '<b>@subfield - @subfield_type@list</b>',
         [
-          '@subfield' => $field_settings["field_settings"][$subfield]["label"],
+          '@subfield' => $fieldSettings["field_settings"][$subfield]["label"],
           '@subfield_type' => strtolower($subfield_types[$subfield_type]),
-          '@list' => $field_settings["field_settings"][$subfield]["list"] ? ' (' . $this->t('list') . ')' : '',
+          '@list' => $fieldSettings["field_settings"][$subfield]["list"] ? ' (' . $this->t('list') . ')' : '',
         ]
       );
       if (isset($settings[$subfield]['format_type']) && $subfield_type == 'datetime_iso8601') {
@@ -466,7 +508,7 @@ abstract class Base extends FormatterBase {
       if (isset($settings[$subfield]['hidden'])) {
         $summary[] = $this->t('Hidden: @value', ['@value' => $settings[$subfield]['hidden'] ? $this->t('yes') : $this->t('no')]);
       }
-      if (!empty($field_settings[$subfield]["list"])) {
+      if (!empty($fieldSettings[$subfield]["list"])) {
         // @todo Remove the fallback in 5.x.
         $display_key = $settings[$subfield]['key'] ?? FALSE;
         $summary[] = $this->t('Display key: @value', ['@value' => $display_key ? $this->t('yes') : $this->t('no')]);
@@ -509,9 +551,9 @@ abstract class Base extends FormatterBase {
    */
   protected function prepareItems(FieldItemListInterface $items, $langcode = NULL): void {
 
-    $field_settings = $this->getFieldSettings();
+    $fieldSettings = $this->getFieldSettings();
     $settings = $this->getSettings();
-    $subfields = $columns = $field_settings["columns"];
+    $subfields = $columns = $fieldSettings["columns"];
     if (!empty($setting = $settings['formatter_settings'])) {
       uasort($setting, [
         'Drupal\Component\Utility\SortArray',
@@ -524,18 +566,22 @@ abstract class Base extends FormatterBase {
         if (empty($columns[$subfield])) {
           continue;
         }
-        $storage = $field_settings["columns"][$subfield];
-        $field_setting = $field_settings["field_settings"][$subfield];
+        $storage = $fieldSettings["columns"][$subfield];
+        $field_setting = $fieldSettings["field_settings"][$subfield];
         $setting = $settings['formatter_settings'][$subfield] ?? self::formatterDefault();
         if ($setting['hidden']) {
           $item->{$subfield} = NULL;
         }
         else {
-
           $type = $storage['type'];
+          $entityType = $fieldSettings["field_settings"][$subfield]['entity_reference_type'] ?? '';
+          $checkEntityType = in_array($entityType, ['file', 'image']);
+          if ($type == 'entity_reference' && $checkEntityType) {
+            $type = $entityType;
+          }
 
           if ($type == 'boolean') {
-            $item->{$subfield} = $field_settings[$subfield][$item->{$subfield} ? 'on_label' : 'off_label'];
+            $item->{$subfield} = $fieldSettings[$subfield][$item->{$subfield} ? 'on_label' : 'off_label'];
           }
 
           // Empty string should already be converted into NULL.
@@ -583,7 +629,7 @@ abstract class Base extends FormatterBase {
             if ($storage["datetime_type"] == 'timestamp' && is_numeric($item->{$subfield})) {
               $date = $this->dateFormatter->format($timestamp, $formatType);
             }
-            if ($field_settings["columns"][$subfield]["datetime_type"] == 'time' && $type == 'date') {
+            if ($fieldSettings["columns"][$subfield]["datetime_type"] == 'time' && $type == 'date') {
               $date = $this->dateFormatter->format($timestamp, 'custom', 'H:i:s');
             }
             $item->{$subfield} = [
@@ -599,7 +645,7 @@ abstract class Base extends FormatterBase {
           }
 
           $original_value[$subfield] = $item->{$subfield};
-          if (!empty($field_settings["field_settings"]) && $field_setting['list']) {
+          if (!empty($fieldSettings["field_settings"]) && $field_setting['list']) {
             // @todo Remove the fallback in 5.x.
             $display_key = $setting['key'] ?? FALSE;
             if (!$display_key) {
@@ -644,7 +690,7 @@ abstract class Base extends FormatterBase {
           }
 
           if ($type == 'entity_reference' && !empty($setting['plugin_type'])) {
-            $explode = explode(':', $field_settings['field_settings'][$subfield]["entity_reference_type"]);
+            $explode = explode(':', $fieldSettings['field_settings'][$subfield]["entity_reference_type"]);
             $reference_type = end($explode);
             $entity_id = $item->{$subfield};
             $entity = $this->entityTypeManager->getStorage($reference_type)->load($entity_id);
@@ -677,6 +723,32 @@ abstract class Base extends FormatterBase {
                 }
                 break;
 
+              case  'entity_reference_hierarchical_term':
+                $taxonomyTermStorage = $this->entityTypeManager->getStorage('taxonomy_term');
+                $term_tree = array_reverse($taxonomyTermStorage->loadAllParents($entity->id()));
+                $item->{$subfield} = [
+                  '#theme' => 'item_list',
+                  '#list_type' => 'ul',
+                  '#items' => array_map(function ($term) {
+                    $term_url = Url::fromRoute('entity.taxonomy_term.canonical', ['taxonomy_term' => $term->id()]);
+                    return [
+                      '#type' => 'link',
+                      '#title' => $term->label(),
+                      '#url' => $term_url,
+                      '#wrapper_attributes' => [
+                        'class' => ['list-inline-item'],
+                      ],
+                    ];
+                  }, $term_tree),
+                  '#attributes' => [
+                    'class' => ['inline', 'links', 'list-inline'],
+                  ],
+                  '#cache' => [
+                    'tags' => $this->entityTypeManager->getDefinition('taxonomy_term')->getListCacheTags(),
+                  ],
+                ];
+                break;
+
               default:
                 $item->{$subfield} = [
                   '#plain_text' => $entity->id(),
@@ -690,7 +762,7 @@ abstract class Base extends FormatterBase {
 
           }
 
-          if ($type == 'file' && !empty($fid = $item->{$subfield})) {
+          if (in_array($type, ['file', 'image']) && !empty($fid = $item->{$subfield})) {
             $file = $this->fileStorage->load($fid);
             if (empty($file)) {
               $item->{$subfield} = NULL;

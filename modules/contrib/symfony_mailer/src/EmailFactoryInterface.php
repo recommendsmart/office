@@ -12,8 +12,8 @@ interface EmailFactoryInterface {
   /**
    * Sends an email of a specific type, unrelated to a config entity.
    *
-   * @param string $module
-   *   The module name.
+   * @param string $type
+   *   Type. @see \Drupal\symfony_mailer\EmailInterface::getType()
    * @param string $sub_type
    *   Sub-type. @see \Drupal\symfony_mailer\EmailInterface::getSubType()
    * @param mixed $params
@@ -22,7 +22,7 @@ interface EmailFactoryInterface {
    * @return \Drupal\symfony_mailer\EmailInterface
    *   A new email object.
    */
-  public function sendTypedEmail(string $module, string $sub_type, ...$params);
+  public function sendTypedEmail(string $type, string $sub_type, ...$params);
 
   /**
    * Sends an email related to a config entity.
@@ -46,8 +46,8 @@ interface EmailFactoryInterface {
    * Normally it is recommended to call ::sendModuleMail() instead, and allow
    * the EmailBuilder to create the mail.
    *
-   * @param string $module
-   *   The module name.
+   * @param string $type
+   *   Type. @see \Drupal\symfony_mailer\EmailInterface::getType()
    * @param string $sub_type
    *   Sub-type. @see \Drupal\symfony_mailer\EmailInterface::getSubType()
    * @param mixed $params
@@ -56,7 +56,7 @@ interface EmailFactoryInterface {
    * @return \Drupal\symfony_mailer\EmailInterface
    *   A new email object.
    */
-  public function newTypedEmail(string $module, string $sub_type, ...$params);
+  public function newTypedEmail(string $type, string $sub_type, ...$params);
 
   /**
    * Creates an email related to a config entity.

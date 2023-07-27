@@ -8,6 +8,7 @@
 use Drupal\calendar_view\Plugin\views\style\CalendarViewInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
+use Drupal\views\ViewExecutable;
 
 /**
  * Implements hook_theme().
@@ -68,74 +69,74 @@ function template_preprocess_views_view_calendar(array &$variables) {
  */
 function template_preprocess_calendar_view_day(array &$variables) {
   $elements = $variables['elements'];
+  $view = $elements['#view'];
 
-  $variables['empty'] = empty($elements['#children'] ?? []);
-  $variables['count'] = count($elements['#children'] ?? []);
-
-  $variables['date_format'] = $elements['#date_format'] ?? 'custom';
-  $variables['date_pattern'] = $elements['#date_pattern'] ?? 'd';
+  // Expose this day's timestamp for easier theming in Twig.
   $variables['timestamp'] = $elements['#timestamp'] ?? NULL;
 
-  // Helpful $content variable for templates.
+  // Automatically cast variables from the Calendar plugin to content.
+  // Empty by default but might be helpful later if a Calendar style arbitrary
+  // passes something into ['#theme' => 'calendar_view_day'].
   foreach (Element::children($elements) as $key) {
     $variables['content'][$key] = $variables['elements'][$key];
   }
 
-  $variables['rows'] = [];
-  foreach ($elements['#children'] ?? [] as $result) {
-    $renderable = [];
-    $renderable['view'] = $result['#view'];
-    $renderable['rows'] = [$result];
+  $list = [];
+  foreach ($elements['#children'] ?? [] as $id => $result) {
+    $values = $result['#values'] ?? [];
+    unset($result['#values']);
 
     // Fake preprocessing of result rows to mimic Views.
     // See issue: https://www.drupal.org/project/calendar_view/issues/3295385.
+    $renderable = [];
+    $renderable['view'] = $view;
+    // Get original index so Views generate tokens correctly.
+    // See issue: https://www.drupal.org/project/calendar_view/issues/3356693.
+    $index = $result['#row']->index ?? 0;
+    $renderable['rows'] = [];
+    $renderable['rows'][$index] = $result;
     template_preprocess_views_view_unformatted($renderable);
-
-    $values = $result['#calendar_view'] ?? [];
-
-    // Identify multi-day-spanning events.
     $row = reset($renderable['rows']);
-    $row['parent'] = $values['parent'] ?? NULL;
-    $row['instance'] = $row_instance = $values['instance'] ?? 0;
-    $row['instances'] = $row_instance_total = $values['instances'] ?? 0;
+
+    $row['#values'] = $values;
+
+    // Helpful information on hover.
+    $row['attributes']->setAttribute('title', $values['title'] ?? NULL);
+
+    // Helpful information for multiday events (e.g. multiday.js)
+    $row_instance = $values['instance'] ?? 0;
+    $row_instance_total = $values['instances'] ?? 0;
     $row['attributes']->setAttribute('data-calendar-view-instance', $row_instance);
     $row['attributes']->setAttribute('data-calendar-view-instances', $row_instance_total);
     $row['attributes']->setAttribute('data-calendar-view-hash', $values['hash'] ?? NULL);
 
-    // Helpful information on hover.
-    if ($calendar_field = $values['calendar_field'] ?? NULL) {
-      $row['attributes']->setAttribute('title', $calendar_field->label());
-    }
-
     $row_instance_classes = [];
     if ($row_instance_total > 0) {
       $row_instance_classes[] = 'is-multi';
-      if ($row_instance === 0) {
+      if ($row_instance == 0) {
         $row_instance_classes[] = 'is-multi--first';
-      }
-      elseif ($row_instance == $row_instance_total) {
+      } elseif ($row_instance == $row_instance_total) {
         $row_instance_classes[] = 'is-multi--last';
-      }
-      else {
+      } else {
         $row_instance_classes[] = 'is-multi--middle';
       }
       $row['attributes']->addClass($row_instance_classes);
     }
 
-    // Update row content.
-    $row_timestamp = $values['from'] ?? 0;
-    $variables['rows'][$row_timestamp][] = $row;
+    $list[] = $row;
   }
 
-  // Reorder rows in cell.
-  $sort_order_option = $elements['#options']['calendar_sort_order'] ?? 'ASC';
-  $sort_order = $sort_order_option == 'ASC' ? SORT_ASC : SORT_DESC;
-  $list = &$variables['rows'];
+  // Sort events in each cells to keep order of multiday events.
   if (count($list) > 1) {
-    array_multisort(array_map(function ($element) {
-      return $element[0]['parent'];
-    }, $list), $sort_order);
+    $array = array_map(function ($row) {
+      return $row['#values']['first_instance'] ?? NULL;
+    }, $list);
+    array_multisort($array, SORT_ASC, $list);
   }
+
+
+  // Expose ordered results to Twig now.
+  $variables['rows'] = $list;
 }
 
 /**
@@ -156,6 +157,11 @@ function template_preprocess_calendar_view_day(array &$variables) {
  */
 function template_preprocess_calendar_view_pager(array &$variables) {
   $parameters = $variables['parameters'] ?? [];
+  $previous = $parameters['previous'] ?? NULL;
+  $current = $parameters['current'] ?? NULL;
+  $next = $parameters['next'] ?? NULL;
+
+  /** @var \Drupal\views\ViewExecutable|null */
   $view = $variables['view'] ?? NULL;
   $route_name = !$view || !empty($view->live_preview) ? '<current>' : '<none>';
 
@@ -163,13 +169,12 @@ function template_preprocess_calendar_view_pager(array &$variables) {
   $date_format = $parameters['date_format'] ?? 'custom';
   $date_pattern = $parameters['date_pattern'] ?? 'F';
 
-  $previous_label = $date_formatter->format($parameters['previous'], $date_format, $date_pattern);
-  $current_label = $date_formatter->format($parameters['current'], $date_format, $date_pattern);
-  $next_label = $date_formatter->format($parameters['next'], $date_format, $date_pattern);
+  $previous_label = $date_formatter->format($previous, $date_format, $date_pattern);
+  $current_label = $date_formatter->format($current, $date_format, $date_pattern);
+  $next_label = $date_formatter->format($next, $date_format, $date_pattern);
 
   if ($parameters['use_previous_next'] ?? FALSE) {
     $previous_label = t('Previous');
-    $current_label = t('Now');
     $next_label = t('Next');
   }
 
@@ -180,7 +185,7 @@ function template_preprocess_calendar_view_pager(array &$variables) {
     '#type' => 'link',
     '#title' => $previous_label,
     '#url' => Url::fromRoute($route_name, [], [
-      'query' => ['calendar_timestamp' => $parameters['previous']] + $parameters,
+      'query' => ['calendar_timestamp' => $previous] + $parameters,
     ]),
     '#attributes' => [
       'aria-label' => t('Previous month, @date', [
@@ -199,39 +204,31 @@ function template_preprocess_calendar_view_pager(array &$variables) {
     '#type' => 'item',
     '#markup' => $current_label,
     '#attributes' => [
-      'aria-label' => t('Current month, @date', [
-        '@date' => $date_formatter->format(
-          $parameters['current'],
-          'custom',
-          'F Y'
-        ),
+      'aria-label' => t('Current @date', [
+        '@date' => $date_formatter->format($current, 'custom', 'F Y'),
       ]),
     ],
   ];
 
   // Reset button.
-  if ($parameters['display_reset'] ?? FALSE) {
+  if ($parameters['display_reset'] ?? NULL) {
     $date_time_now = new \DateTime();
     $date_time_now->setTimestamp(time());
     $now = strtotime($date_time_now->format('Y-m-01'));
-    if ($now !== (int) $parameters['current']) {
+    if ($now !== (int) $current) {
+      $reset_title = t('Go back to @date', [
+        '@date' => $date_formatter->format($now, $date_format, $date_pattern),
+      ]);
+
       $variables['items']['reset'] = [
         '#type' => 'link',
-        '#title' => t('Today'),
+        '#title' => t('Reset'),
         '#url' => Url::fromRoute($route_name, [], [
-          'query' => ['calendar_timestamp' => $now] + $parameters,
+          'query' => ['calendar_timestamp' => 'today'] + $parameters,
         ]),
         '#attributes' => [
-          'title' => t('Back to @today', [
-            '@today' => $date_formatter->format($now, $date_format, $date_pattern),
-          ]),
-          'aria-label' => t('Back to @today', [
-            '@today' => $date_formatter->format(
-              $now,
-              'custom',
-              'F Y'
-            ),
-          ]),
+          'title' => $reset_title,
+          'aria-label' =>  $reset_title,
           'class' => ['pager__reset'],
         ],
       ];
@@ -242,7 +239,7 @@ function template_preprocess_calendar_view_pager(array &$variables) {
     '#type' => 'link',
     '#title' => $next_label,
     '#url' => Url::fromRoute($route_name, [], [
-      'query' => ['calendar_timestamp' => $parameters['next']] + $parameters,
+      'query' => ['calendar_timestamp' => $next] + $parameters,
     ]),
     '#attributes' => [
       'aria-label' => t('Next month, @date', [
@@ -256,6 +253,10 @@ function template_preprocess_calendar_view_pager(array &$variables) {
     // @todo limit in future?
     '#access' => TRUE,
   ];
+
+  /** @var \Drupal\Core\Render\RendererInterface $renderer */
+  $renderer = \Drupal::service('renderer');
+  $renderer->addCacheableDependency($variables, $view->storage);
 
   // Month navigation varies depending on the user selection.
   $variables['#cache']['contexts'][] = 'url.query_args:calendar_timestamp';
@@ -303,4 +304,16 @@ function calendar_view_theme_suggestions_calendar_view_pager_alter(&$suggestions
     $suggestions[] = 'calendar_view_pager__' . $view->id() . '__' . $view->current_display;
   }
   return $suggestions;
+}
+
+/**
+ * Implements hook_views_pre_view().
+ */
+function calendar_view_views_pre_view(ViewExecutable $view) {
+  $display_id = $view->current_display;
+  /** @var \Drupal\calendar_view\Plugin\views\style\CalendarViewBase $style */
+  $style = $view->displayHandlers->get($display_id)->getPlugin('style');
+  if ($style instanceof CalendarViewInterface) {
+    $style->makeFilterValuesRelative();
+  }
 }

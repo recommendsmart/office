@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Controller argument resolver trait.
  *
+ * @api
+ *
  * It seems Drupal has 2 ArgumentResolver architectures.
  * This is for @access_arguments_resolver_factory
  * used in @access_manager and @access_check.custom.

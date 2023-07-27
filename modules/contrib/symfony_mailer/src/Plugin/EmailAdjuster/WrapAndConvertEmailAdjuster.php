@@ -146,8 +146,8 @@ class WrapAndConvertEmailAdjuster extends EmailAdjusterBase implements Container
       'swiftmailer' => $this->t('Emulate swiftmailer'),
     ];
     foreach ($this->configuration as $id => $value) {
-      if ($id) {
-        $summary[] = $value;
+      if ($value) {
+        $summary[] = $titles[$id];
       }
     }
 

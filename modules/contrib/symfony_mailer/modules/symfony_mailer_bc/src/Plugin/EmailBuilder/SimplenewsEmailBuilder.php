@@ -16,7 +16,7 @@ use Drupal\symfony_mailer\Entity\MailerPolicy;
  *     "subscribe" = @Translation("Subscription confirmation"),
  *     "validate" = @Translation("Validate"),
  *   },
- *   proxy = TRUE,
+ *   proxy = {"simplenews.subscribe_combined", "simplenews.validate"},
  *   common_adjusters = {"email_subject", "email_body"},
  *   import = @Translation("Simplenews subscriber settings"),
  *   import_warning = @Translation("This overrides the default HTML messages with imported plain text versions."),
@@ -41,11 +41,6 @@ class SimplenewsEmailBuilder extends SimplenewsEmailBuilderBase {
    * {@inheritdoc}
    */
   public function fromArray(EmailFactoryInterface $factory, array $message) {
-    if ($message['key'] == 'node' || $message['key'] == 'test') {
-      $mail = $message['params']['simplenews_mail'];
-      return $factory->newEntityEmail($mail->getNewsletter(), 'node', $mail->getIssue(), $mail->getSubscriber(), ($mail->getKey() == 'test'));
-    }
-
     $key = ($message['key'] == 'subscribe_combined') ? 'subscribe' : 'validate';
     return $factory->newTypedEmail('simplenews', $key, $message['params']['context']['simplenews_subscriber']);
   }
@@ -64,7 +59,12 @@ class SimplenewsEmailBuilder extends SimplenewsEmailBuilderBase {
     foreach ($convert as $from => $to) {
       $config = [
         'email_subject' => ['value' => $subscription["{$from}_subject"]],
-        'email_body' => ['value' => $subscription["{$from}_body"]],
+        'email_body' => [
+          'content' => [
+            'value' => $subscription["{$from}_body"],
+            'format' => 'plain_text',
+          ],
+        ],
       ];
       MailerPolicy::import("simplenews.$to", $config);
     }

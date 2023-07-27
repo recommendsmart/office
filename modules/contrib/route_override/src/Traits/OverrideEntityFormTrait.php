@@ -13,6 +13,8 @@ use Symfony\Component\Routing\Route;
 
 /**
  * Override entity forms.
+ *
+ * @api
  */
 trait OverrideEntityFormTrait {
 

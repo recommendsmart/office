@@ -24,6 +24,6 @@
     "source": "http://cgit.drupalcode.org/entity_field_condition"
   },
   "require": {
-    "drupal/core": "^8.7.7 || ^9.0"
+    "drupal/core": "^8.7.7 || ^9.0 || ^10"
   }
 }

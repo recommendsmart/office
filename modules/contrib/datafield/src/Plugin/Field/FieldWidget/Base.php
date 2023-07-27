@@ -6,13 +6,17 @@ use Drupal\Component\Plugin\PluginManagerBase;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldFilteredMarkup;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\Email;
+use Drupal\Core\Url;
 use Drupal\datafield\Plugin\Field\FieldType\DataField as FieldItem;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -44,6 +48,13 @@ abstract class Base extends WidgetBase {
   protected $moduleHandler;
 
   /**
+   * The selection plugin manager.
+   *
+   * @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface
+   */
+  protected $selectionManager;
+
+  /**
    * Constructs a WidgetBase object.
    *
    * @param string $plugin_id
@@ -62,12 +73,15 @@ abstract class Base extends WidgetBase {
    *   The entity type manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   Module handler service.
+   * @param \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface $selection_manager
+   *   The selection plugin manager.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, PluginManagerBase $plugin_manager, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, PluginManagerBase $plugin_manager, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, SelectionPluginManagerInterface $selection_manager) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
     $this->pluginManager = $plugin_manager;
     $this->entityTypeManager = $entity_type_manager;
     $this->moduleHandler = $module_handler;
+    $this->selectionManager = $selection_manager;
   }
 
   /**
@@ -79,7 +93,8 @@ abstract class Base extends WidgetBase {
       $configuration['third_party_settings'],
       $container->get('plugin.manager.field.widget'),
       $container->get('entity_type.manager'),
-      $container->get('module_handler')
+      $container->get('module_handler'),
+      $container->get('plugin.manager.entity_reference_selection'),
     );
   }
 
@@ -151,14 +166,17 @@ abstract class Base extends WidgetBase {
         '#title' => ($field_settings[$subfield]['label'] ?? $subfield) . ' - ' . $types[$type],
         '#open' => FALSE,
       ];
-
+      $typeWidget = $item['datetime_type'] ?? FALSE;
+      if ($item['type'] == 'entity_reference') {
+        $typeWidget = $field_settings[$subfield]["entity_reference_type"];
+      }
       $element['widget_settings'][$subfield]['type'] = [
         '#type' => 'select',
         '#title' => $this->t('Widget'),
         '#default_value' => $widget_settings[$subfield]["type"] ?? $widget_settings_default['type'],
         '#required' => TRUE,
         '#empty_option' => $this->t('- Select -'),
-        '#options' => $this->getSubwidgets($type, $field_settings[$subfield]['list'] ?? FALSE, $item['datetime_type'] ?? FALSE),
+        '#options' => $this->getSubwidgets($type, $field_settings[$subfield]['list'] ?? FALSE, $typeWidget),
       ];
 
       $options = [
@@ -370,19 +388,27 @@ abstract class Base extends WidgetBase {
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state): array {
     $storage_settings = $this->getFieldSettings();
     foreach ($values as $delta => &$value) {
+      $checkEmpty = [];
       foreach ($storage_settings['columns'] as $subfield => $item) {
+        $checkEmpty[$subfield] = $value[$subfield] ?? NULL;
         if (!empty($value[$subfield]) && is_array($value[$subfield])) {
           if (isset($value[$subfield]['value'])) {
             $value[$subfield] = $value[$subfield]['value'];
           }
-          if ($item['type'] == 'file' && is_array($value[$subfield])) {
+          $isFile = $item['type'] == 'file';
+          $entityType = $storage_settings["field_settings"][$subfield]["entity_reference_type"];
+          $checkEntityFile = in_array($entityType, ['file', 'image']);
+          if ($item['type'] == 'entity_reference' && $checkEntityFile) {
+            $isFile = TRUE;
+          }
+          if ($isFile && is_array($value[$subfield])) {
             $value[$subfield] = current($value[$subfield]);
           }
         }
-        if (!is_numeric($values[$delta][$subfield]) && empty($value[$subfield])) {
+        if (isset($values[$delta][$subfield]) && !is_numeric($values[$delta][$subfield]) && empty($value[$subfield])) {
           $values[$delta][$subfield] = NULL;
         }
-        elseif ($value[$subfield] instanceof DrupalDateTime) {
+        elseif (isset($value[$subfield]) && $value[$subfield] instanceof DrupalDateTime) {
           $date = $value[$subfield];
           $storage_timezone = new \DateTimezone(FieldItem::DATETIME_STORAGE_TIMEZONE);
           $storage_format = $item['datetime_type'] == 'datetime'
@@ -412,8 +438,11 @@ abstract class Base extends WidgetBase {
             ->format($storage_format);
         }
       }
+      if (count(array_filter($checkEmpty)) == 0) {
+        unset($values[$delta]);
+      }
     }
-
+    $values = array_values($values);
     return $values;
   }
 
@@ -493,7 +522,7 @@ abstract class Base extends WidgetBase {
   /**
    * Returns available subwidgets.
    */
-  public function getSubwidgets($subfield_type, bool $list = FALSE, $datetime_type = FALSE): array {
+  public function getSubwidgets($subfield_type, bool $list = FALSE, $type = FALSE): array {
     $subwidgets = [];
 
     if (!empty($list)) {
@@ -555,33 +584,44 @@ abstract class Base extends WidgetBase {
       case 'date':
       case 'datetime_iso8601':
         $subwidgets['datetime'] = $this->t('Date time');
-        if ($datetime_type == 'date') {
+        if ($type == 'date') {
           $subwidgets['date'] = $this->t('Date only');
         }
-        if ($datetime_type == 'time') {
+        if ($type == 'time') {
           $subwidgets['time'] = $this->t('Time');
         }
-        if ($datetime_type == 'week') {
+        if ($type == 'week') {
           $subwidgets['week'] = $this->t('Week');
         }
-        if ($datetime_type == 'month') {
+        if ($type == 'month') {
           $subwidgets['month_year'] = $this->t('Month year');
         }
-        if ($datetime_type == 'year') {
+        if ($type == 'year') {
           $subwidgets['year'] = $this->t('Year');
         }
-        if ($datetime_type == 'timestamp') {
+        if ($type == 'timestamp') {
           $subwidgets['timestamp'] = $this->t('Timestamp');
         }
         break;
 
       case 'entity_reference':
+        if ($type == 'file') {
+          $subwidgets['managed_file'] = $this->t('Uploading and saving file');
+          break;
+        }
+        if ($type == 'image') {
+          $subwidgets['image_image'] = $this->t('Image');
+          break;
+        }
         $pluginsWidget = $this->pluginManager->getOptions('entity_reference');
         foreach ($pluginsWidget as $option => $label) {
           // $plugin_class = DefaultFactory::getPluginClass($option,
           // $pluginManager->getDefinition($option));
-          // it must be check isApplicable for entity reference.
+          // it must be checked is applicable for entity reference.
           $subwidgets[$option] = $label;
+        }
+        if ($type == 'taxonomy_term') {
+          $subwidgets['hierarchical_select'] = $this->t('Hierarchical select');
         }
         break;
 
@@ -604,8 +644,8 @@ abstract class Base extends WidgetBase {
         break;
 
     }
-    if ($subfield_type == 'date' && $datetime_type) {
-      switch ($datetime_type) {
+    if ($subfield_type == 'date' && $type) {
+      switch ($type) {
         case 'timestamp':
           $subwidgets = [
             'timestamp' => $this->t('Timestamp'),
@@ -654,10 +694,13 @@ abstract class Base extends WidgetBase {
     $settings = parent::getSettings();
     $field_settings = $this->getFieldSettings();
     foreach ($field_settings['columns'] as $subfield => $item) {
-      $widget_types = $this->getSubwidgets($item['type'], $field_settings["field_settings"][$subfield]['list'] ?? FALSE, $item["datetime_type"] ?? FALSE);
+      if ($item['type'] == 'entity_reference') {
+        $item["datetime_type"] = $field_settings["field_settings"][$subfield]["entity_reference_type"] ?? '';
+      }
+      $widget_types = (array) $this->getSubwidgets($item['type'], $field_settings["field_settings"][$subfield]['list'] ?? FALSE, $item["datetime_type"] ?? FALSE);
       // Use the first eligible widget type unless it is set explicitly.
       if (empty($settings['widget_settings'][$subfield]['type'])) {
-        $settings['widget_settings'][$subfield]['type'] = key($widget_types);
+        $settings['widget_settings'][$subfield]['type'] = array_key_first($widget_types);
       }
     }
 
@@ -682,22 +725,14 @@ abstract class Base extends WidgetBase {
       $subfields = array_keys($setting);
     }
     $widget = [];
-    $widget_settings_default = [
-      'type' => NULL,
-      'label_display' => 'block',
-      'field_display' => TRUE,
-      'size' => 30,
-      'placeholder' => '',
-      'label' => $this->t('Ok'),
-      'cols' => 10,
-      'rows' => 5,
-    ];
+    $widget_settings_default = self::widgetDefault();
+    $hierarchical_select = [];
     foreach ($subfields as $subfield) {
       if (empty($storage[$subfield])) {
         continue;
       }
-      if (!empty($settings["widget_settings"][$subfield]) && count($settings["widget_settings"][$subfield]) <= 1) {
-        $settings["widget_settings"][$subfield] = self::widgetDefault();
+      if (empty($settings["widget_settings"][$subfield])) {
+        $settings["widget_settings"][$subfield] = $widget_settings_default;
       }
       // $item = $storage[$subfield];
       $field_default = !empty($field_widget_default[$delta]) ? $field_widget_default[$delta][$subfield] : '';
@@ -744,42 +779,35 @@ abstract class Base extends WidgetBase {
           '#type' => $widget_type ?? $this->convertWidgetType($storage[$subfield]),
           '#default_value' => $default_value,
         ];
+        $bundle = $field_settings[$subfield]["target_bundles"] ?? '';
+        $checkView = explode(':', $bundle);
+        if (count($checkView) > 1) {
+          [$view_name, $display_name] = $checkView;
+          $view_arguments = $field_settings[$subfield]["view_arguments"] ?? '';
+          $widget[$delta][$subfield]['#selection_handler'] = 'views';
+          $widget[$delta][$subfield]['#selection_settings'] = [
+            'view' => [
+              'view_name' => $view_name,
+              'display_name' => $display_name,
+              'arguments' => explode(',', str_replace(' ', '', $view_arguments)),
+            ],
+          ];
+        }
         switch ($widget_type) {
           case 'options_buttons':
           case 'options_select':
-            $entity_storage = $this->entityTypeManager->getStorage($reference_type);
-            if ($reference_type == 'taxonomy_term' && !empty($field_settings[$subfield]["target_bundles"])) {
-              $entities = $entity_storage->loadByProperties([
-                'vid' => $field_settings[$subfield]["target_bundles"],
-              ]);
+            // Check if is views reference.
+            $optionsView = [
+              'target_type' => $reference_type,
+              'entity' => $items->getEntity(),
+            ];
+            if ($reference_type != 'user') {
+              $optionsView['target_bundles'] = [$bundle];
             }
-            elseif ($reference_type == 'user') {
-              $entities = $entity_storage->loadByProperties([
-                'status' => 1,
-              ]);
+            if (!empty($widget[$delta][$subfield]['#selection_settings'])) {
+              $optionsView += ['handler' => $widget[$delta][$subfield]['#selection_handler']] + $widget[$delta][$subfield]['#selection_settings'];
             }
-            elseif (!empty($field_settings[$subfield]["target_bundles"])) {
-              $entities = $entity_storage->loadByProperties(['type' => $field_settings[$subfield]["target_bundles"]]);
-            }
-            $options = [];
-            if (!empty($entities)) {
-              foreach ($entities as $id => $entity) {
-                switch ($reference_type) {
-                  case 'user':
-                    $options[$id] = $entity->getDisplayName();
-                    break;
-
-                  case 'taxonomy_term':
-                    $options[$id] = $entity->getName();
-                    break;
-
-                  default:
-                    $options[$id] = $entity->getTitle();
-                    break;
-
-                }
-              }
-            }
+            $options = $this->getOptions($optionsView['entity'], $optionsView);
             $widget[$delta][$subfield]['#type'] = $widget_type == 'options_select' ? 'select' : 'radios';
             $widget[$delta][$subfield]['#options'] = $options;
             $widget[$delta][$subfield]['#empty_option'] = $this->t('- Select -');
@@ -800,26 +828,55 @@ abstract class Base extends WidgetBase {
               $field_settings[$subfield]["label"],
             ]);
             $widget[$delta][$subfield]['#target_type'] = $reference_type;
-            $widget[$delta][$subfield]['#selection_handler'] = 'default';
+            if (empty($widget[$delta][$subfield]['#selection_handler'])) {
+              $widget[$delta][$subfield]['#selection_handler'] = 'default';
+            }
             if ($reference_type == 'user') {
               $widget[$delta][$subfield]['#selection_settings'] = [
                 'include_anonymous' => FALSE,
               ];
             }
             else {
-              $widget[$delta][$subfield]['#autocreate'] = [
-                'bundle' => $bundle = $field_settings[$subfield]["target_bundles"],
-              ];
-              $widget[$delta][$subfield]['#selection_settings'] = [
-                'target_bundles' => [$bundle],
-              ];
+              if (!empty($bundle)) {
+                $widget[$delta][$subfield]['#autocreate'] = [
+                  'bundle' => $bundle,
+                ];
+              }
+              if (empty($widget[$delta][$subfield]['#selection_settings'])) {
+                $widget[$delta][$subfield]['#selection_settings'] = [
+                  'target_bundles' => [$bundle],
+                ];
+              }
+            }
+            break;
+
+          case 'hierarchical_select':
+            $widget[$delta][$subfield]['#type'] = 'hidden';
+            if (!empty($default_value)) {
+              $parents = $this->entityTypeManager->getStorage('taxonomy_term')
+                ->loadAllParents($default_value);
+              if (!empty($parents)) {
+                $parentsTerms = array_keys($parents);
+                $parentsTerms = array_reverse($parentsTerms);
+                $widget[$delta][$subfield]['#attributes']['data-parents'] = implode('-', $parentsTerms);
+              }
+            }
+            $widget[$delta][$subfield]['#attributes']['data-vocabulary'] = $bundle;
+            $widget[$delta][$subfield]['#attributes']['class'][] = $widget_type;
+            if (!empty($bundle) && empty($hierarchical_select[$bundle])) {
+              $widget[$delta][$subfield]['#attached']['library'] = ['datafield/hierarchical_select'];
+              $hierarchical_select[$bundle] = $this->getTaxonomyParent($bundle);
+              $form['#attached']['drupalSettings']['datafieldHierarchicalSelect'][$bundle] = [$hierarchical_select[$bundle]];
+              $url = Url::fromRoute('datafield.hierarchical', ['vocabulary' => $bundle], ['absolute' => TRUE])
+                ->toString();
+              $form['#attached']['drupalSettings']['datafieldHierarchicalAjax'][$bundle] = $url;
             }
             break;
 
           default:
-            if ($reference_type == 'taxonomy_term' && !empty($field_settings[$subfield]["target_bundles"])) {
+            if ($reference_type == 'taxonomy_term' && !empty($bundle)) {
               $widget[$delta][$subfield]['#type'] = 'select';
-              $widget[$delta][$subfield]['#options'] = $this->loadVoc($field_settings[$subfield]["target_bundles"]);
+              $widget[$delta][$subfield]['#options'] = $this->loadVoc($bundle);
               $widget[$delta][$subfield]['#empty_option'] = $this->t('- Select -');
             }
             break;
@@ -998,6 +1055,10 @@ abstract class Base extends WidgetBase {
             $widget[$delta][$subfield]['#upload_location'] = 'public://' . $field_settings[$subfield]["file_directory"] . '/';
           }
           if (!empty($field_settings[$subfield]["file_extensions"])) {
+            $field_settings[$subfield]["file_extensions"] = str_replace(
+              [',', '  '], ' ',
+              $field_settings[$subfield]["file_extensions"]
+            );
             $widget[$delta][$subfield]['#upload_validators'] = [
               'file_validate_extensions' => [$field_settings[$subfield]["file_extensions"]],
             ];
@@ -1085,6 +1146,66 @@ abstract class Base extends WidgetBase {
         }
       }
     }
+  }
+
+  /**
+   * Get taxonomy by parent.
+   *
+   * @param mixed $vocabulary
+   *   Taxnomy vocabulary.
+   * @param int $parent
+   *   Parent term id.
+   *
+   * @return array
+   *   List taxonomy by parent.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
+  private function getTaxonomyParent(mixed $vocabulary, int $parent = 0): array {
+    $tree = [];
+    $terms = $this->entityTypeManager->getStorage('taxonomy_term')->loadTree($vocabulary, $parent, 1, TRUE);
+    foreach ($terms as $term) {
+      $tree[$term->id()] = $term->getName();
+    }
+    return $tree;
+  }
+
+  /**
+   * Returns the array of options for the widget.
+   *
+   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   *   The entity for which to return options.
+   * @param array $selection_options
+   *   Selection options.
+   *
+   * @return array
+   *   The array of options for the widget.
+   */
+  protected function getOptions(FieldableEntityInterface $entity, array $selection_options) {
+    $handler = $this->selectionManager->getInstance($selection_options);
+    $options = $handler->getReferenceableEntities();
+    if (!empty($options)) {
+      $options = reset($options);
+    }
+    $context = [
+      'fieldDefinition' => $this->fieldDefinition,
+      'entity' => $entity,
+    ];
+    $this->moduleHandler->alter('options_list', $options, $context);
+    array_walk_recursive($options, [$this, 'sanitizeLabel']);
+    return $options;
+  }
+
+  /**
+   * Sanitizes a string label to display as an option.
+   *
+   * @param string $label
+   *   The label to sanitize.
+   */
+  protected function sanitizeLabel(&$label) {
+    // Allow a limited set of HTML tags.
+    $label = FieldFilteredMarkup::create($label);
   }
 
 }

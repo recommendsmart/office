@@ -22,7 +22,7 @@ shs.form:
     - core/drupal
     - core/drupalSettings
     - core/backbone
-    - core/jquery.once
+    - core/once
 
 shs.formatter:
   version: VERSION

@@ -131,8 +131,11 @@ class ShsTaxonomyIndexTidDepth extends ShsTaxonomyIndexTid {
       $this->tableAlias = $this->relationship;
     }
     // If no relationship, then use the alias of the base table.
-    else {
+    else if (method_exists($this->query, 'ensureTable')) {
       $this->tableAlias = $this->query->ensureTable($this->view->storage->get('base_table'));
+    }
+    else {
+      return;
     }
 
     // Now build the subqueries.
@@ -160,7 +163,12 @@ class ShsTaxonomyIndexTidDepth extends ShsTaxonomyIndexTid {
     }
 
     $subquery->condition($where);
-    $this->query->addWhere($this->options['group'], "$this->tableAlias.$this->realField", $subquery, 'IN');
+    if (method_exists($this->query, 'addWhere')) {
+      $this->query->addWhere($this->options['group'], "$this->tableAlias.$this->realField", $subquery, 'IN');
+    }
+    else {
+      return;
+    }
   }
 
 }

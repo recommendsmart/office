@@ -80,6 +80,7 @@ class ReferenceSelection extends FieldSelectionBase {
     }
 
     $candidates = ['*::*::*'];
+    $candidates[] = '*::*::' . trim($field_name);
     $candidates[] = $entity->getEntityTypeId() . '::*::*';
     $candidates[] = $entity->getEntityTypeId() . '::' . $entity->bundle() . '::*';
     $candidates[] = $entity->getEntityTypeId() . '::*::' . trim($field_name);

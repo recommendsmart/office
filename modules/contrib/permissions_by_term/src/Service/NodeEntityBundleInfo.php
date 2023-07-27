@@ -86,7 +86,8 @@ class NodeEntityBundleInfo {
       $users = User::loadMultiple($uids);
     }
 
-    $template = $this->twig->loadTemplate($viewFilePath);
+    $templateClass = $this->twig->getTemplateClass($viewFilePath);
+    $template = $this->twig->loadTemplate($templateClass, $viewFilePath);
 
     return $template->render(['roles' => $roles, 'users' => $users]);
 

@@ -14,8 +14,6 @@ interface ResourceServerFactoryInterface {
    *
    * @return \League\OAuth2\Server\ResourceServer
    *   Returns the League Resource Server.
-   *
-   * @throws \League\OAuth2\Server\Exception\OAuthServerException
    */
   public function get(): ResourceServer;
 

@@ -1,6 +1,6 @@
 name: Route Override
 description: Provides an API to override routes.
 type: module
-core_version_requirement: ^8.8 || ^9 || 10
+core_version_requirement: ^8.8 || ^9 || ^10
 dependencies:
   - route_override:route_override

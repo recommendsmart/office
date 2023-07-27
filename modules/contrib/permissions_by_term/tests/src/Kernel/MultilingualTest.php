@@ -26,7 +26,7 @@ class MultilingualTest extends PBTKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->nodeEntityBundleInfo = $this->container->get('permissions_by_term.node_entity_bundle_info');
   }

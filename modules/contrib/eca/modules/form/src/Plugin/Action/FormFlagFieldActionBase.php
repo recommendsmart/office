@@ -18,6 +18,11 @@ abstract class FormFlagFieldActionBase extends FormFieldActionBase {
   protected bool $useFilters = FALSE;
 
   /**
+   * {@inheritdoc}
+   */
+  protected bool $automaticJumpToFieldElement = FALSE;
+
+  /**
    * Get the name of the flagging method.
    *
    * @param bool $human_readable

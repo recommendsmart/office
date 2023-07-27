@@ -16,8 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @Action(
  *   id = "eca_new_entity",
  *   label = @Translation("Entity: create new"),
- *   description = @Translation("Create a new content entity without saving it."),
- *   type = "entity"
+ *   description = @Translation("Create a new content entity without saving it.")
  * )
  */
 class NewEntity extends ConfigurableActionBase {
@@ -70,6 +69,7 @@ class NewEntity extends ConfigurableActionBase {
       '#default_value' => $this->configuration['token_name'],
       '#description' => $this->t('Provide the name of a token that holds the new entity.'),
       '#weight' => -60,
+      '#eca_token_reference' => TRUE,
     ];
     $form['type'] = [
       '#type' => 'select',

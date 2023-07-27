@@ -77,6 +77,20 @@ class AccessEvent extends EventBase {
       '#markup' => $this->t('For any successor of this event, the account that asks for access is available under the <strong>[account]</strong> token. Example: <strong>[account:uid]</strong> provides the user ID of the account.'),
       '#weight' => 0,
     ];
+    if ($is_field_event) {
+      $form['event_token_info'] = [
+        '#type' => 'container',
+        '#markup' => $this->t('Furthermore, following data of the event is available:<ul><li><strong>[event:operation]</strong> holds the requested operation, such as "view".</li><li><strong>[event:field]</strong> holds the machine name of the field.</li></ul>'),
+        '#weight' => 1,
+      ];
+    }
+    elseif (!$is_field_event) {
+      $form['event_token_info'] = [
+        '#type' => 'container',
+        '#markup' => $this->t('Furthermore, following data of the event is available:<ul><li><strong>[event:operation]</strong> holds the requested operation, such as "view".</li></ul>'),
+        '#weight' => 1,
+      ];
+    }
     $form['entity_type_id'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Restrict by entity type ID'),

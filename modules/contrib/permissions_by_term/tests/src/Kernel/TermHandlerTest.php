@@ -13,7 +13,7 @@ class TermHandlerTest extends PBTKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
   }
 

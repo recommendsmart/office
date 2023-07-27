@@ -274,7 +274,7 @@ abstract class DateBase extends NumericFilter {
     }
 
     $value = $input[$this->options['expose']['identifier']];
-    if (\array_key_exists('date', $value)) {
+    if (\is_array($value) && \array_key_exists('date', $value)) {
       $value = [
         'value' => $value,
       ];
@@ -285,6 +285,7 @@ abstract class DateBase extends NumericFilter {
       $one_has_value = FALSE;
       foreach (['min', 'max'] as $key) {
         if (
+          \is_array($value) &&
           \array_key_exists($key, $value) &&
           \array_key_exists('date', $value[$key])
         ) {
@@ -295,6 +296,7 @@ abstract class DateBase extends NumericFilter {
       return $one_has_value;
     }
     elseif (
+      \is_array($value) &&
       \array_key_exists('value', $value) &&
       \array_key_exists('date', $value['value'])
     ) {

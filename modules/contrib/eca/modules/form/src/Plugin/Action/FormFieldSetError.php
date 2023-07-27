@@ -38,6 +38,7 @@ class FormFieldSetError extends FormFieldValidateActionBase {
       '#weight' => -49,
     ];
     $form['field_name']['#description'] .= ' ' . $this->t("Leave empty to set a global error on the form.");
+    $form['field_name']['#required'] = FALSE;
     return $form;
   }
 

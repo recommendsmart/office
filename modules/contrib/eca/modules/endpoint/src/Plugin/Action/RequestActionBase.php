@@ -67,6 +67,7 @@ abstract class RequestActionBase extends ConfigurableActionBase {
       '#default_value' => $this->configuration['token_name'],
       '#weight' => -30,
       '#required' => TRUE,
+      '#eca_token_reference' => TRUE,
     ];
     return $form;
   }

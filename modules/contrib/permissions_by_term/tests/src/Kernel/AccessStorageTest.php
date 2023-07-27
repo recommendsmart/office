@@ -13,13 +13,12 @@ class AccessStorageTest extends PBTKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
   }
 
   private function mockFormState(string $langcode, array $accessOutput) {
-    $formStateStub = $this->getMockBuilder(FormStateInterface::class)
-      ->getMock();
+    $formStateStub = $this->createMock(FormStateInterface::class);
 
     $map = [
       [

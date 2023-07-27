@@ -49,7 +49,7 @@ class CurrentFormDataProvider implements DataProviderInterface {
           'base-id' => $form_object instanceof BaseFormIdInterface ? $form_object->getBaseFormId() : NULL,
           'operation' => $form_object instanceof EntityFormInterface ? $form_object->getOperation() : NULL,
           'mode' => $form_object instanceof ContentEntityFormInterface ? $form_object->getFormDisplay($form_state)->id() : NULL,
-          'dangerous_raw_values' => $form_state->getValues() ?: $form_state->getUserInput(),
+          'dangerous_raw_values' => array_merge($form_state->getUserInput(), $form_state->getValues()),
           'triggered' => NULL,
         ];
         if ($triggering_element = $form_state->getTriggeringElement()) {
@@ -72,8 +72,13 @@ class CurrentFormDataProvider implements DataProviderInterface {
           ]);
           if (!empty($dto_values['dangerous_raw_values'])) {
             $values_sanitized = $dto_values['dangerous_raw_values'];
-            array_walk_recursive($values_sanitized, function (&$value) {
-              $value = trim(Xss::filter(strip_tags((string) $value)));
+            array_walk_recursive($values_sanitized, static function (&$value) {
+              if (!$value) {
+                return;
+              }
+              if (is_scalar($value) || (is_object($value) && method_exists($value, '__toString' ))) {
+                $value = trim(Xss::filter(strip_tags((string) $value)));
+              }
             });
             $dto->set('values', $values_sanitized);
           }

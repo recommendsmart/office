@@ -31,6 +31,7 @@
 
 // teaser item in an overview
 .teaser {
+  position: relative;
   display: flex;
   flex-wrap: nowrap;
   flex-direction: column;

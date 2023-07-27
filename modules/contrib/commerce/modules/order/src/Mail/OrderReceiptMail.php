@@ -69,7 +69,7 @@ class OrderReceiptMail implements OrderReceiptMailInterface {
       'resend' => $resend,
     ];
     $customer = $order->getCustomer();
-    if ($customer->isAuthenticated()) {
+    if (!$customer->isAnonymous()) {
       $params['langcode'] = $customer->getPreferredLangcode();
     }
 

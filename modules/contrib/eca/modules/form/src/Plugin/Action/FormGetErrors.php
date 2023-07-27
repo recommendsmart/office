@@ -54,6 +54,7 @@ class FormGetErrors extends FormActionBase {
       '#default_value' => $this->configuration['token_name'],
       '#required' => TRUE,
       '#weight' => -49,
+      '#eca_token_reference' => TRUE,
     ];
     return $form;
   }

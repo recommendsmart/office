@@ -12,6 +12,8 @@ use Drupal\votingapi\VoteResultFunctionManager;
 use Drupal\votingapi_reaction\Plugin\Field\FieldType\VotingApiReactionItemInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Extension\ExtensionPathResolver;
+use Drupal\Core\File\FileUrlGeneratorInterface;
 
 /**
  * Manages reactions through Voting API entities.
@@ -68,6 +70,20 @@ class VotingApiReactionManager implements ContainerInjectionInterface {
   protected $configFactory;
 
   /**
+   * Path resolver service.
+   *
+   * @var \Drupal\Core\Extension\ExtensionPathResolver
+   */
+  protected $pathResolver;
+
+  /**
+   * File URL generator service.
+   *
+   * @var \Drupal\Core\File\FileUrlGeneratorInterface
+   */
+  protected $fileUrlGenerator;
+
+  /**
    * Class constructor.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
@@ -80,8 +96,20 @@ class VotingApiReactionManager implements ContainerInjectionInterface {
    *   Renderer service.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   Configuration factory service.
+   * @param \Drupal\Core\Extension\ExtensionPathResolver $path_resolver
+   *   Path resolver service.
+   * @param \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator
+   *   File URL generator service.
    */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager, AccountProxy $currentUser, VoteResultFunctionManager $votingApiResults, Renderer $renderer, ConfigFactoryInterface $configFactory) {
+  public function __construct(
+    EntityTypeManagerInterface $entityTypeManager,
+    AccountProxy $currentUser,
+    VoteResultFunctionManager $votingApiResults,
+    Renderer $renderer,
+    ConfigFactoryInterface $configFactory,
+    ExtensionPathResolver $path_resolver,
+    FileUrlGeneratorInterface $file_url_generator
+  ) {
     $this->voteStorage = $entityTypeManager->getStorage('vote');
     $this->voteTypeStorage = $entityTypeManager->getStorage('vote_type');
     $this->fileStorage = $entityTypeManager->getStorage('file');
@@ -89,6 +117,8 @@ class VotingApiReactionManager implements ContainerInjectionInterface {
     $this->votingApiResults = $votingApiResults;
     $this->renderer = $renderer;
     $this->configFactory = $configFactory;
+    $this->pathResolver = $path_resolver;
+    $this->fileUrlGenerator = $file_url_generator;
   }
 
   /**
@@ -100,7 +130,9 @@ class VotingApiReactionManager implements ContainerInjectionInterface {
       $container->get('current_user'),
       $container->get('plugin.manager.votingapi.resultfunction'),
       $container->get('renderer'),
-      $container->get('config.factory')
+      $container->get('config.factory'),
+      $container->get('extension.path.resolver'),
+      $container->get('file_url_generator'),
     );
   }
 
@@ -117,6 +149,7 @@ class VotingApiReactionManager implements ContainerInjectionInterface {
    */
   public function lastReaction(Vote $entity, array $settings) {
     $query = $this->voteStorage->getQuery()
+      ->accessCheck()
       ->condition('entity_id', $entity->getVotedEntityId())
       ->condition('entity_type', $entity->getVotedEntityType())
       ->condition('field_name', $entity->get('field_name')->value)
@@ -125,7 +158,15 @@ class VotingApiReactionManager implements ContainerInjectionInterface {
     if ($this->currentUser->isAnonymous()) {
       // Filter by Cookie method.
       if (in_array(VotingApiReactionItemInterface::BY_COOKIES, $settings['anonymous_detection'])) {
-        $query->condition('id', $this->recallReaction($entity));
+        $recallReaction = $this->recallReaction($entity);
+        // Only Cookie method used and no reaction for entity.
+        if (
+          !in_array(VotingApiReactionItemInterface::BY_IP, $settings['anonymous_detection']) &&
+          is_null($recallReaction)
+        ) {
+          return NULL;
+        }
+        $query->condition('id', $recallReaction);
       }
       // Filter by IP method.
       if (in_array(VotingApiReactionItemInterface::BY_IP, $settings['anonymous_detection'])) {
@@ -227,9 +268,7 @@ class VotingApiReactionManager implements ContainerInjectionInterface {
       }
 
       if ($settings['show_count']) {
-        $reaction['#count'] = isset($results[$entity->id()]['vote_sum'])
-          ? $results[$entity->id()]['vote_sum']
-          : 0;
+        $reaction['#count'] = $results[$entity->id()]['vote_sum'] ?? 0;
       }
 
       return $reaction;
@@ -238,10 +277,8 @@ class VotingApiReactionManager implements ContainerInjectionInterface {
     // Sorting.
     if ($settings['sort_reactions'] != 'none') {
       uasort($reactions, function ($a, $b) use ($settings, $results) {
-        $count_a = isset($results[$a['#reaction']]['vote_count'])
-          ? $results[$a['#reaction']]['vote_count'] : 0;
-        $count_b = isset($results[$b['#reaction']]['vote_count'])
-          ? $results[$b['#reaction']]['vote_count'] : 0;
+        $count_a = $results[$a['#reaction']]['vote_count'] ?? 0;
+        $count_b = $results[$b['#reaction']]['vote_count'] ?? 0;
 
         if ($settings['sort_reactions'] == 'desc') {
           return $count_a > $count_b ? -1 : 1;
@@ -319,16 +356,18 @@ class VotingApiReactionManager implements ContainerInjectionInterface {
    */
   public function getIcon(VoteType $entity, &$default = TRUE) {
     $path = implode('/', [
-      drupal_get_path('module', 'votingapi_reaction'),
+      $this->pathResolver->getPath('module', 'votingapi_reaction'),
       'svg',
-      '', // Trailing slash.
+      // Trailing slash.
+      '',
     ]);
 
     // Fallback icon.
     $url = $path . 'reaction_noicon.svg';
     // User defined icon.
-    $icon = $entity->getThirdPartySetting('votingapi_reaction', 'icon');
-    if ($icon && $file = $this->fileStorage->load($icon)) {
+    $icon = $entity->getThirdPartySetting('votingapi_reaction', 'icon', '');
+    if ($file = $this->fileStorage->load($icon)) {
+      /** @var \Drupal\file\FileInterface $file */
       $url = $file->getFileUri();
       $default = FALSE;
     }
@@ -337,7 +376,7 @@ class VotingApiReactionManager implements ContainerInjectionInterface {
       $url = $path . $entity->id() . '.svg';
     }
 
-    return file_create_url($url);
+    return $this->fileUrlGenerator->generateAbsoluteString($url);
   }
 
 }

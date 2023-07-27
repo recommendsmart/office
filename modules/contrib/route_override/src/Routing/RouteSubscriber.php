@@ -2,10 +2,8 @@
 
 namespace Drupal\route_override\Routing;
 
-use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Routing\RouteSubscriberBase;
+use Drupal\route_override\RouteOverride;
 use Drupal\route_override\RouteOverride\RouteOverrideControllerManager;
 use Drupal\route_override\RoutingAccess\RouteOverrideAccessCacheability;
 use Drupal\route_override\RoutingCacheability\RouteCacheability;
@@ -13,13 +11,12 @@ use Drupal\route_override\Traits\ThrowMethodTrait;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-class RouteSubscriber extends RouteSubscriberBase {
+/**
+ * @internal
+ */
+final class RouteSubscriber extends RouteSubscriberBase {
 
   use ThrowMethodTrait;
-
-  protected const ROUTE_OPTION_ORIGINAL_ROUTE_NAME = 'route_override_original';
-
-  protected const ROUTE_OPTION_OVERRIDE_SERVICE_ID = 'route_override_service_id';
 
   protected RouteOverrideControllerManager $routeOverrideControllerManager;
 
@@ -28,11 +25,13 @@ class RouteSubscriber extends RouteSubscriberBase {
   }
 
   public static function extractOriginalRouteName(Route $route): ?string {
-    return $route->getOption(static::ROUTE_OPTION_ORIGINAL_ROUTE_NAME) ?? NULL;
+    // @todo Deprecate in favor of called method.
+    return RouteOverride::getOriginalRouteName($route);
   }
 
   public static function extractOverrideControllerServiceId(Route $route): ?string {
-    return $route->getOption(static::ROUTE_OPTION_OVERRIDE_SERVICE_ID);
+    // @todo Deprecate in favor of called method.
+    return RouteOverride::getOverrideServiceId($route);
   }
 
   /**
@@ -80,9 +79,10 @@ class RouteSubscriber extends RouteSubscriberBase {
         $overrideRoute->setRequirement(RouteOverrideAccessCacheability::KEY, implode('+', $collectedOverrideServiceIds));
 
         // @see \Drupal\route_override\RouteOverrideController
-        $overrideRoute->setOption(self::ROUTE_OPTION_ORIGINAL_ROUTE_NAME, $originalRouteName);
-        $overrideRoute->setOption(self::ROUTE_OPTION_OVERRIDE_SERVICE_ID, $overrideServiceId);
+        RouteOverride::setOriginalRouteName($overrideRoute, $originalRouteName);
+        RouteOverride::setOverrideServiceId($overrideRoute, $overrideServiceId);
 
+        // This route name can change anytime.
         $overrideRouteName = "route_override.$overrideServiceId._.$originalRouteName";
         $collection->add($overrideRouteName, $overrideRoute);
       }
@@ -134,6 +134,8 @@ class RouteSubscriber extends RouteSubscriberBase {
     foreach ($this->routeOverrideControllerManager->getSortedRouteOverrideControllers()
              as $routeOverrideServiceId => $routeOverrideController) {
       foreach ($collection as $routeName => $route) {
+        // @todo Deprecate this in favor of ::appliesToRoute($route, $routeName)
+        RouteOverride::setRouteName($route, $routeName);
         $applies = $routeOverrideController->appliesToRoute($route);
         if ($applies->value()) {
           $presorted[$routeName][$routeOverrideServiceId] = $routeOverrideController;

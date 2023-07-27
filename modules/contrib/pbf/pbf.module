@@ -186,14 +186,14 @@ function pbf_node_access_records(NodeInterface $node) {
   // and so we return an empty array. We set this realm only if anonymous user
   // is not the node's owner.
   if ($grants && $node->getOwnerId()) {
-    $grants[] = array(
+    $grants[] = [
       'realm' => 'pbf_author',
       'gid' => $node->getOwnerId(),
       'grant_view' => 1,
       'grant_update' => ($node->getOwner()->hasPermission('edit own ' . $node->bundle() . ' content')) ? 1 : 0,
       'grant_delete' => ($node->getOwner()->hasPermission('delete own ' . $node->bundle() . ' content')) ? 1 : 0,
       'priority' => 0,
-    );
+    ];
   }
 
   return $grants;
@@ -214,14 +214,14 @@ function pbf_node_access_records(NodeInterface $node) {
  */
 function pbf_create_grant($value, $field_name, $priority = 0) {
   // @todo support langcode
-  $grant = array(
+  $grant = [
     'realm' => 'pbf_' . $field_name,
     'gid' => $value['target_id'],
     'grant_view' => $value['grant_view'],
     'grant_update' => $value['grant_update'],
     'grant_delete' => $value['grant_delete'],
     'priority' => $priority,
-  );
+  ];
   return $grant;
 }
 

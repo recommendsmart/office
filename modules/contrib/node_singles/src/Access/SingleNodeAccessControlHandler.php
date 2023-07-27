@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\node\NodeAccessControlHandler;
+use Drupal\node\NodeTypeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -44,7 +45,12 @@ class SingleNodeAccessControlHandler extends NodeAccessControlHandler {
    */
   public function access(EntityInterface $entity, $operation, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
     $account = $this->prepareUser($account);
-    $isSingle = $this->singles->isSingle($entity->type->entity);
+    $nodeType = $entity->type->entity;
+    $isSingle = FALSE;
+
+    if ($nodeType instanceof NodeTypeInterface) {
+      $isSingle = $this->singles->isSingle($nodeType);
+    }
 
     if ($isSingle && $operation === 'delete' && !$account->hasPermission('administer node singles')) {
       $result = AccessResult::forbidden('Singles cannot be deleted manually.')->cachePerPermissions();

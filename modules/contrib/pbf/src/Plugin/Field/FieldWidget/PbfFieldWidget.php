@@ -38,8 +38,6 @@ class PbfFieldWidget extends EntityReferenceAutocompleteWidget {
     $field_definition = $item->getFieldDefinition();
     $field_name = $field_definition->getName();
 
-    $grant_global = $this->getSettings();
-
     foreach ($operations as $key => $label) {
       // If a value has not been yet set, we fetch the default grant access
       // settings definied in the form settings widget.
@@ -55,7 +53,7 @@ class PbfFieldWidget extends EntityReferenceAutocompleteWidget {
         '#return_value' => 1,
         '#empty' => 0,
         '#weight' => $delta + 1,
-        '#access' => $this->getSetting('grant_global') ? FALSE : TRUE,
+        '#access' => !$this->getSetting('grant_global'),
       ];
 
       // We hide other $key than grant_public because these keys are not used
@@ -73,17 +71,17 @@ class PbfFieldWidget extends EntityReferenceAutocompleteWidget {
     $element['help'] = [
       '#type' => 'details',
       '#title' => 'Help about permissions',
-      '#markup' => $this->t('The public checkbox checked means that standard 
+      '#markup' => $this->t('The public checkbox checked means that standard
       permissions will be applied. With this option checked you can simply
-      reference an entity without any custom permissions applied to this current 
-      node. 
-      If you want to apply custom permissions for this node, permissions related 
-      to the entity referenced, uncheck public option, 
-      and then choose relevant permissions. If none of custom permissions are 
+      reference an entity without any custom permissions applied to this current
+      node.
+      If you want to apply custom permissions for this node, permissions related
+      to the entity referenced, uncheck public option,
+      and then choose relevant permissions. If none of custom permissions are
       checked, only the node\'s author will have access to the node.'),
       '#attributes' => ['class' => ['description', 'pbf-help']],
       '#weight' => 5,
-      '#access' => $this->getSetting('grant_global') ? FALSE : TRUE,
+      '#access' => !$this->getSetting('grant_global'),
     ];
 
     $element['#attached']['library'][] = 'pbf/widget';
@@ -95,13 +93,13 @@ class PbfFieldWidget extends EntityReferenceAutocompleteWidget {
    * {@inheritdoc}
    */
   public static function defaultSettings() {
-    return array(
+    return [
       'grant_global' => 0,
       'grant_public' => 1,
       'grant_view' => 0,
       'grant_update' => 0,
       'grant_delete' => 0,
-    ) + parent::defaultSettings();
+      ] + parent::defaultSettings();
   }
 
   /**
@@ -110,7 +108,6 @@ class PbfFieldWidget extends EntityReferenceAutocompleteWidget {
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $element = parent::settingsForm($form, $form_state);
     $field_name = $this->fieldDefinition->getName();
-    $field_definition = $this->fieldDefinition;
 
     $options = [
       0 => $this->t('Set default grant access per node'),

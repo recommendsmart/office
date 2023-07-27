@@ -273,7 +273,12 @@ class EndpointController implements ContainerInjectionInterface {
     if ($route && ($route->getDefault('_controller') === 'Drupal\eca_endpoint\Controller\EndpointController::handle')) {
       // Let ::handle decide whether access is allowed.
       return AccessResult::allowed()
-        ->addCacheContexts(['url.path', 'url.query_args', 'user']);
+        ->addCacheContexts([
+          'url.path',
+          'url.query_args',
+          'user',
+          'user.permissions',
+        ]);
     }
 
     $account = $account ?? $this->currentUser;

@@ -4,6 +4,7 @@ symfony_mailer_legacy_test.send:
     _form: 'Drupal\symfony_mailer_legacy_test\Form\LegacyTestEmailForm'
     _title: 'Send legacy test email'
   requirements:
+    # Test code - no access check needed.
     _access: 'TRUE'
   options:
     _admin_route: TRUE

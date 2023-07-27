@@ -74,6 +74,13 @@ class ConfigurableLoggerChannel extends LoggerChannel {
   protected ModuleHandlerInterface $moduleHandler;
 
   /**
+   * Indicates when logging is in progress to prevent recurions.
+   * 
+   * @var bool 
+   */
+  protected bool $alreadyLogging = FALSE;
+
+  /**
    * The ConfigurableLoggerChannel constructor.
    *
    * @param string $channel_name
@@ -142,6 +149,10 @@ class ConfigurableLoggerChannel extends LoggerChannel {
    * {@inheritdoc}
    */
   public function log($level, $message, array $context = []): void {
+    if ($this->alreadyLogging) {
+      return;
+    }
+    $this->alreadyLogging = TRUE;
     if (is_string($level)) {
       // Convert to integer equivalent for consistency with RFC 5424.
       $level = $this->levelTranslation[$level];
@@ -173,6 +184,7 @@ class ConfigurableLoggerChannel extends LoggerChannel {
         $this->dataCurrentRequest[] = [$level, $fullMessage, $tokens, $context];
       }
     }
+    $this->alreadyLogging = FALSE;
   }
 
   /**

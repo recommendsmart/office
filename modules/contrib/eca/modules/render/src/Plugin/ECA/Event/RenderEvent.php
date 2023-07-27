@@ -53,6 +53,13 @@ class RenderEvent extends EventBase implements PluginUsageInterface {
   protected ModuleHandlerInterface $moduleHandler;
 
   /**
+   * A list of cache backends for invalidation.
+   *
+   * @var \Drupal\Core\Cache\CacheBackendInterface[]
+   */
+  protected array $cacheBackends = [];
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): EcaPluginBase {
@@ -61,6 +68,10 @@ class RenderEvent extends EventBase implements PluginUsageInterface {
     $instance->blockManager = $container->get('plugin.manager.block');
     $instance->entityFieldManager = $container->get('entity_field.manager');
     $instance->moduleHandler = $container->get('module_handler');
+    $instance->cacheBackends[] = $container->get('cache.render');
+    if ($instance->moduleHandler->moduleExists('page_cache')) {
+      $instance->cacheBackends[] = $container->get('cache.page');
+    }
     return $instance;
   }
 
@@ -397,6 +408,9 @@ class RenderEvent extends EventBase implements PluginUsageInterface {
     }
     if ($this->eventClass() === EcaRenderExtraFieldEvent::class) {
       $this->entityFieldManager->clearCachedFieldDefinitions();
+    }
+    foreach ($this->cacheBackends as $cache) {
+      $cache->invalidateAll();
     }
   }
 

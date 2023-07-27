@@ -179,7 +179,7 @@ class Oauth2AuthorizeController extends ControllerBase {
       'query' => ['destination' => $destination->toString()],
     ]);
     // Client ID and secret may be passed as Basic Auth.
-    return RedirectResponse::create($url->toString());
+    return new RedirectResponse($url->toString());
   }
 
 }

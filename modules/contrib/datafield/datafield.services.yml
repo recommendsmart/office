@@ -1,0 +1,6 @@
+services:
+  datafield.access_check.entity:
+    class: Drupal\datafield\Access\EntityAccessCheck
+    tags:
+      - { name: access_check, applies_to: _datafield_access }
+    arguments: ['@module_handler']

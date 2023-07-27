@@ -39,6 +39,7 @@ function type_tray_form_node_type_form_alter(array &$form, FormStateInterface $f
     '#title' => t('Thumbnail'),
     // @todo Improve this description.
     '#description' => t('The webroot-relative path where the thumbnail file is stored, such as "/themes/custom/foo_bar/assets/images/thumbnails/Content-thumb-Book.png".'),
+    '#maxlength' => NULL,
     '#default_value' => $settings['type_thumbnail'] ?? '',
   ];
   $form['type_tray']['type_icon'] = [
@@ -46,6 +47,7 @@ function type_tray_form_node_type_form_alter(array &$form, FormStateInterface $f
     '#title' => t('Icon'),
     // @todo Improve this description.
     '#description' => t('The webroot-relative path where the icon file is stored, such as "/themes/custom/foo_bar/assets/images/icons/Content-icon-Book.png".'),
+    '#maxlength' => NULL,
     '#default_value' => $settings['type_icon'] ?? '',
   ];
   $text_format = \Drupal::config('type_tray.settings')->get('text_format') ?? 'plain_text';

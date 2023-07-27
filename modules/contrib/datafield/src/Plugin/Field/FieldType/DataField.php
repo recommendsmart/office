@@ -12,6 +12,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\Email;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\views\Views;
 
 /**
  * Plugin implementation of the 'data_field' field type.
@@ -348,6 +349,7 @@ class DataField extends FieldItemBase {
       'off_label' => $this->t('Off'),
       'entity_reference_type' => '',
       'target_bundles' => '',
+      'view_arguments' => '',
       'file_directory' => '',
       'file_extensions' => 'jpg jpeg gif png txt doc xls pdf ppt pps odt ods odp',
     ];
@@ -370,6 +372,13 @@ class DataField extends FieldItemBase {
       '#type' => 'fieldset',
       '#title' => $this->t('Data Items'),
     ];
+    $repository = \Drupal::service('entity_type.repository')->getEntityTypeLabels(TRUE);
+    $bundleInfo = \Drupal::service('entity_type.bundle.info');
+    $entityTypeManager = \Drupal::entityTypeManager();
+    $contentType = $repository['Content'] ?? [];
+    $contentType['image'] = $this->t('Image');
+    $view_storage = $entityTypeManager->getStorage('view');
+    $displaysViewsRef = Views::getApplicableViews('entity_reference_display');
     foreach ($settings["columns"] as $subfield => $item) {
       if (empty($field_settings[$subfield])) {
         $field_settings[$subfield] = $field_setting_default;
@@ -505,16 +514,10 @@ class DataField extends FieldItemBase {
       }
 
       if ($type == 'entity_reference') {
-        $field_type_options = [];
-        $field_types = \Drupal::service('plugin.manager.field.field_type');
-        $fieldTypes = $field_types->getGroupedDefinitions($field_types->getUiDefinitions());
-        foreach ($fieldTypes['Reference'] as $name => $field_type) {
-          $field_type_options[$name] = $field_type['label'];
-        }
         $element['field_settings'][$subfield]['entity_reference_type'] = [
           '#type' => 'select',
           '#title' => $this->t('Entity reference type'),
-          '#options' => $field_type_options,
+          '#options' => $contentType,
           '#empty_option' => $this->t('- Select a field type -'),
           '#default_value' => $field_settings[$subfield]['entity_reference_type'],
           '#description' => $this->t('Save and back again to select bundle'),
@@ -522,15 +525,35 @@ class DataField extends FieldItemBase {
         if (!empty($entity_reference_type = $field_settings[$subfield]['entity_reference_type'])) {
           $explode = explode(':', $entity_reference_type);
           $entity_type_id = end($explode);
-          $entity_type = \Drupal::entityTypeManager()
-            ->getDefinition($entity_type_id);
+          if ($entity_type_id == 'image') {
+            $entity_type_id = 'file';
+          }
+          $entity_type = $entityTypeManager->getDefinition($entity_type_id);
           $titleBundle = $entity_type->getBundleLabel() ?? $this->t('Wait after select type');
-          $bundles = \Drupal::service('entity_type.bundle.info')
-            ->getBundleInfo($entity_type_id);
+          $bundles = $bundleInfo->getBundleInfo($entity_type_id);
           if (!empty($bundles)) {
             $bundle_options = [];
             foreach ($bundles as $bundle_name => $bundle_info) {
               $bundle_options[$bundle_name] = $bundle_info['label'];
+            }
+          }
+          if (!empty($displaysViewsRef)) {
+            // Filter views that list the entity type we want,
+            // and group the separate displays by view.
+            $optionsViewRef = [];
+            foreach ($displaysViewsRef as $data) {
+              [$view_id, $display_id] = $data;
+              $view = $view_storage->load($view_id);
+              if (in_array($view->get('base_table'), [
+                $entity_type->getBaseTable(),
+                $entity_type->getDataTable(),
+              ])) {
+                $display = $view->get('display');
+                $optionsViewRef[$view_id . ':' . $display_id] = $view_id . ' - ' . $display[$display_id]['display_title'];
+              }
+            }
+            if (!empty($optionsViewRef)) {
+              $bundle_options['views'] = $optionsViewRef;
             }
           }
           $element['field_settings'][$subfield]['target_bundles'] = [
@@ -541,6 +564,16 @@ class DataField extends FieldItemBase {
             '#default_value' => $field_settings[$subfield]['target_bundles'] ?? '',
             '#required' => TRUE,
           ];
+          $tmp = explode(':', $element['field_settings'][$subfield]['target_bundles']['#default_value']);
+          // Check if the entity type is a view reference.
+          if (count($tmp) > 1) {
+            $element['field_settings'][$subfield]['view_arguments'] = [
+              '#type' => 'textfield',
+              '#title' => $this->t('View arguments'),
+              '#default_value' => $field_settings[$subfield]['view_arguments'] ?? '',
+              '#description' => $this->t('Provide a comma separated list of arguments to pass to the view.'),
+            ];
+          }
         }
       }
 

@@ -298,6 +298,9 @@ blockquote footer, blockquote small, blockquote .small {
 .dxpr-theme-boxed-container .nav-tabs >li.active a {
   border-bottom-color: white;
 }
+.az-tabs .nav-tabs > li.active > a[role="tab"] {
+  background-color: #ffffff;
+}
 
 .region-content nav.tabs:after {
   content:" ";
@@ -318,19 +321,27 @@ blockquote footer, blockquote small, blockquote .small {
       padding: 0;
       border: none;
       a {
-        background-color: white;
+        background-color: $header-color;
+        color: $header-text-color;
         padding: 8px;
         text-transform: uppercase;
         font-size: 12px;
         margin: 0;
         border: none;
         pointer-events: auto;
+        &:hover,
+        &:focus {
+          text-decoration: underline;
+        }
       }
       &.active {
         bottom: auto !important;
         a {
           border: none;
         }
+      }
+      &.active a {
+        color: $primary;
       }
     }
   }
@@ -373,16 +384,16 @@ blockquote footer, blockquote small, blockquote .small {
   padding: 20px;
 }
 
-.html .tabs-left .nav-tabs .active>a {
+.html .tabs-left > .nav-tabs .active>a {
   border-right-color: $body-background;
 }
-.dxpr-theme-boxed-container .tabs-left .nav-tabs .active>a {
+.dxpr-theme-boxed-container .tabs-left > .nav-tabs .active>a {
   border-right-color: white;
 }
-.html .tabs-right .nav-tabs .active>a {
+.html .tabs-right > .nav-tabs .active>a {
   border-left-color: $body-background;
 }
-.dxpr-theme-boxed-container .tabs-right .nav-tabs .active>a {
+.dxpr-theme-boxed-container .tabs-right > .nav-tabs .active>a {
   border-left-color: white;
 }
 

@@ -9,7 +9,7 @@ dependencies:
   - drupal:user
   - drupal:file
 
-# Information added by Drupal.org packaging script on 2023-02-15
-version: '1.5.14'
+# Information added by Drupal.org packaging script on 2023-06-02
+version: '1.5.15'
 project: 'widget_type'
-datestamp: 1676456175
+datestamp: 1685716550

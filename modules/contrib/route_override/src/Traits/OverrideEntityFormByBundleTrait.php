@@ -14,6 +14,8 @@ use Symfony\Component\Routing\Route;
 /**
  * Override entity form by bundle.
  *
+ * @api
+ *
  * Note: Nothing to do here concerning ::appliesToRouteMatch.
  *   We do not know where config is stored.
  *   Best we can do: provide ::getMaybeBundleConfigOfEntity for convenience.

@@ -43,6 +43,11 @@ function quote_node_links_alter(array &$links, NodeInterface $entity, array &$co
         $link['node-quote-sel'] = [
           'title' => t('quote selected'),
           'url' => Url::fromUserInput('#', ['fragment' => '#']),
+          'attributes' => [
+            'class' => [
+              'node-quote-sel-link',
+            ],
+          ],
         ];
         $links['node']['#links']['node-quote-sel'] = $link['node-quote-sel'];
       }
@@ -51,6 +56,11 @@ function quote_node_links_alter(array &$links, NodeInterface $entity, array &$co
         $link['node-quote-all'] = [
           'title' => t('quote all'),
           'url' => Url::fromUserInput('#', ['fragment' => '#']),
+          'attributes' => [
+            'class' => [
+              'node-quote-all-link',
+            ],
+          ],
         ];
         $links['node']['#links']['node-quote-all'] = $link['node-quote-all'];
       }
@@ -73,6 +83,11 @@ function quote_comment_links_alter(array &$links, CommentInterface $entity, arra
       $link['comment-quote-sel'] = [
         'title' => t('quote selected'),
         'url' => Url::fromUserInput('#', ['fragment' => '#']),
+        'attributes' => [
+          'class' => [
+            'comment-quote-sel-link',
+          ],
+        ],
       ];
       $links['comment']['#links']['comment-quote-sel'] = $link['comment-quote-sel'];
     }
@@ -81,6 +96,11 @@ function quote_comment_links_alter(array &$links, CommentInterface $entity, arra
       $link['comment-quote-all'] = [
         'title' => t('quote all'),
         'url' => Url::fromUserInput('#', ['fragment' => '#']),
+        'attributes' => [
+          'class' => [
+            'comment-quote-all-link',
+          ],
+        ],
       ];
       $links['comment']['#links']['comment-quote-all'] = $link['comment-quote-all'];
     }
@@ -93,6 +113,11 @@ function quote_comment_links_alter(array &$links, CommentInterface $entity, arra
         'title' => t('reply and quote all'),
         'url' => Url::fromUserInput('/comment/reply/node/' . $nid . '/' . $comment_field_name . '/' . $cid),
         'query' => ['comment-quote-all-reply' => $cid],
+        'attributes' => [
+          'class' => [
+            'comment-quote-all-reply-link',
+          ],
+        ],
       ];
       $links['comment']['#links']['comment-quote-all-reply'] = $link['comment-quote-all-reply'];
     }

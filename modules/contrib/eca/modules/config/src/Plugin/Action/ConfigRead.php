@@ -102,6 +102,7 @@ class ConfigRead extends ConfigActionBase {
       '#default_value' => $this->configuration['token_name'],
       '#description' => $this->t('The targeted configuration value will be loaded into this specified token.'),
       '#weight' => -60,
+      '#eca_token_reference' => TRUE,
     ];
     return $form;
   }

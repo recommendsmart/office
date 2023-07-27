@@ -12,11 +12,12 @@ use Drupal\symfony_mailer\EmailInterface;
  *
  * @EmailBuilder(
  *   id = "contact",
+ *   label = @Translation("Personal contact form"),
  *   sub_types = {
  *     "mail" = @Translation("Message"),
  *     "copy" = @Translation("Sender copy"),
  *   },
- *   proxy = TRUE,
+ *   proxy = {"contact.user_mail", "contact.user_copy"}
  * )
  *
  * @todo Notes for adopting Symfony Mailer into Drupal core. This builder can
@@ -49,14 +50,8 @@ class ContactEmailBuilder extends ContactEmailBuilderBase {
   public function fromArray(EmailFactoryInterface $factory, array $message) {
     $sender = $message['params']['sender'];
     $contact_message = $message['params']['contact_message'];
-
-    // There are two separate email types, so no need for the key to contain
-    // page_ or user_.
+    // Remove user_.
     $key = substr($message['key'], 5);
-
-    if (isset($message['params']['contact_form'])) {
-      return $factory->newEntityEmail($message['params']['contact_form'], $key, $contact_message, $sender);
-    }
     return $factory->newTypedEmail('contact', $key, $contact_message, $sender, $message['params']['recipient']);
   }
 

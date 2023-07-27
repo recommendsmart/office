@@ -10,6 +10,7 @@ namespace Drupal\calendar_view\Plugin\views\style;
  * @ViewsStyle(
  *   id = "calendar_month",
  *   title = @Translation("Calendar by month"),
+ *   short_title = @Translation("Month"),
  *   help = @Translation("Displays rows in a calendar by month."),
  *   theme = "views_view_calendar",
  *   display_types = {"normal"}
@@ -69,7 +70,7 @@ class CalendarViewMonth extends CalendarViewBase {
           $time_now = strtotime($previous_year . '-' . $previous_month . '-' . $day_number);
 
           $cells[$time_now] = $this->getCell($time_now);
-          $cells[$time_now]['class'] = ['previous-month'];
+          $cells[$time_now]['class'][] = 'previous-month';
         }
 
         // Pending days of this month's first week.
@@ -85,7 +86,7 @@ class CalendarViewMonth extends CalendarViewBase {
           $time_now = strtotime($year . '-' . $month . '-' . $day_number);
 
           $cells[$time_now] = $this->getCell($time_now);
-          $cells[$time_now]['class'] = ['current-month'];
+          $cells[$time_now]['class'][] = 'current-month';
         } while ($x >= 1);
 
         // Populate table row.
@@ -108,7 +109,7 @@ class CalendarViewMonth extends CalendarViewBase {
           $time_now = strtotime($next_year . '-' . $next_month . '-' . $daynum);
 
           $cells[$time_now] = $this->getCell($time_now);
-          $cells[$time_now]['class'] = ['next-month'];
+          $cells[$time_now]['class'][] = 'next-month';
           continue;
         }
 
@@ -122,13 +123,14 @@ class CalendarViewMonth extends CalendarViewBase {
         $time_now = strtotime($year . '-' . $month . '-' . $day_number);
 
         $cells[$time_now] = $this->getCell($time_now);
-        $cells[$time_now]['class'] = ['current-month'];
+        $cells[$time_now]['class'][] = 'current-month';
       }
 
       // Populate table row.
       $rows[] = ['data' => $cells];
     }
 
+    // @todo Make this configurable.
     $caption = $this->dateFormatter->format($month_start, 'custom', 'F Y');
 
     $build = [

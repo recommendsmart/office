@@ -7,6 +7,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Plugin implementation of the 'votingapi_reaction' field type.
@@ -49,7 +50,7 @@ class VotingApiReactionItem extends FieldItemBase implements VotingApiReactionIt
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     return [
       'status' => DataDefinition::create('integer')
-        ->setLabel(t('Reaction status'))
+        ->setLabel(new TranslatableMarkup('Reaction status'))
         ->setRequired(TRUE),
     ];
   }
@@ -151,7 +152,7 @@ class VotingApiReactionItem extends FieldItemBase implements VotingApiReactionIt
    * {@inheritdoc}
    */
   public function isEmpty() {
-    // @TODO check if Voting API tables have records for this field
+    // @todo check if Voting API tables have records for this field
     return FALSE;
   }
 

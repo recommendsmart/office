@@ -106,6 +106,7 @@ class LoadEntity extends ConfigurableActionBase {
       '#default_value' => $this->configuration['token_name'],
       '#description' => $this->t('Provide the name of a token that holds the loaded entity.'),
       '#weight' => -90,
+      '#eca_token_reference' => TRUE,
     ];
     return $this->entityLoader()->buildConfigurationForm($this->configuration, $form, $form_state);
   }

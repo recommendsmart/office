@@ -156,8 +156,57 @@
   @include button-variant(#fff, #0077b5, #0077b5);
 }
 
-.btn--google {
-  @include button-variant(#fff, #d34836, #d34836);
+.btn.btn--google {
+  // The Google button styles according to OpenSocial.
+  //@include button-variant(#fff, #d34836, #d34836);
+
+  // The Google button styles according to the Google sign-in branding guidelines.
+  box-shadow: 0 2px 4px 0 rgba(#000, .25);
+  color: rgba(#000, .54);
+  background: url('../../components/02-atoms/button/icons/google_signin_buttons/google-sign-in.svg') no-repeat 9px center;
+
+  &:hover,
+  &:focus {
+    outline: 4px solid rgba(66, 133, 244, .3);
+  }
+
+  &:active {
+    background-color: #eee;
+  }
+
+  &:disabled,
+  &[disabled] {
+    color: rgba(#000, .4);
+    background-color: rgba(#000, .08);
+    background-image: url('../../components/02-atoms/button/icons/google_signin_buttons/google-sign-in-disabled.svg');
+  }
+
+  &:disabled,
+  &[disabled],
+  &:active {
+    &:hover,
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+// Social auth buttons.
+.social-auth-buttons {
+  > .card__block {
+    @include for-phone-only {
+      display: flex;
+      flex-direction: column;
+
+      .btn {
+        order: 1;
+
+        &.btn--google {
+          order: 0;
+        }
+      }
+    }
+  }
 }
 
 .btn--twitter {

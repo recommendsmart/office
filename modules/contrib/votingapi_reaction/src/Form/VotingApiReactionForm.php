@@ -77,7 +77,7 @@ class VotingApiReactionForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function getFormId() {
-    /* @var \Drupal\votingapi\Entity\Vote $entity */
+    /** @var \Drupal\votingapi\Entity\Vote $entity */
     $entity = $this->getEntity();
 
     return implode('_', [
@@ -102,7 +102,7 @@ class VotingApiReactionForm extends ContentEntityForm {
     $form['#attached']['library'][] = 'votingapi_reaction/scripts';
     $form['#attributes']['class'][] = 'votingapi-reaction-form';
     $form['#attributes']['autocomplete'] = 'off';
-    $form['#cache']['max-age'] = 0;
+    $form['#cache']['contexts'][] = 'session';
 
     // Try to get the last reaction.
     if ($entity = $this->reactionManager->lastReaction($this->entity, $settings)) {
@@ -119,13 +119,19 @@ class VotingApiReactionForm extends ContentEntityForm {
     if ($settings['show_summary']) {
       $total = array_sum(array_column($results, 'vote_sum'));
       $form['summary'] = [
-        '#type' => '#markup',
+        '#type' => 'item',
         '#markup' => $this->formatPlural($total, '@count reaction', '@count reactions'),
       ];
     }
 
     // Display reactions.
-    $form['type'] = [
+    $form['wrapper'] = [
+      '#type' => 'container',
+      '#attributes' => [
+        'class' => ['votingapi-reaction-radios'],
+      ],
+    ];
+    $form['wrapper']['type'] = [
       '#type' => 'radios',
       '#options' => $this->reactionManager->getReactions($settings, $results),
       '#default_value' => $this->entity->bundle(),
@@ -142,7 +148,9 @@ class VotingApiReactionForm extends ContentEntityForm {
     // Store reactions order, so we can persist it for AJAX.
     $form['reactions'] = [
       '#type' => 'value',
-      '#value' => $form_state->hasValue('reactions') ? $form_state->getValue('reactions') : array_keys($form['type']['#options']),
+      '#value' => $form_state->hasValue('reactions')
+        ? $form_state->getValue('reactions')
+        : array_keys($form['wrapper']['type']['#options']),
     ];
 
     // Re-purpose entity submit button.
@@ -201,8 +209,10 @@ class VotingApiReactionForm extends ContentEntityForm {
     // If new reaction was selected.
     $reaction = NULL;
     $trigger = $form_state->getTriggeringElement();
-    if ($this->entity->bundle() != $form_state->getValue('type')
-      && array_search('reset', $trigger['#parents']) === FALSE) {
+    if (
+      $this->entity->bundle() != $form_state->getValue('type')
+      && array_search('reset', $trigger['#parents']) === FALSE
+    ) {
       parent::submitForm($form, $form_state);
       parent::save($form, $form_state);
 
@@ -245,11 +255,11 @@ class VotingApiReactionForm extends ContentEntityForm {
     }
 
     // Update reactions.
-    $form['type']['#options'] = $this->reactionManager->getReactions($settings, $results);
+    $form['wrapper']['type']['#options'] = $this->reactionManager->getReactions($settings, $results);
     foreach ($form['reactions']['#value'] as $weight => $id) {
-      $form['type'][$id]['#title'] = $form['type']['#options'][$id];
-      $form['type'][$id]['#value'] = $reaction;
-      $form['type'][$id]['#weight'] = $weight / 100;
+      $form['wrapper']['type'][$id]['#title'] = $form['wrapper']['type']['#options'][$id];
+      $form['wrapper']['type'][$id]['#value'] = $reaction;
+      $form['wrapper']['type'][$id]['#weight'] = $weight / 100;
     }
   }
 
@@ -314,9 +324,10 @@ class VotingApiReactionForm extends ContentEntityForm {
       return NULL;
     }
 
-    return $this->currentUser->hasPermission($modify
-      ? 'modify reaction on ' . $instance
-      : 'create reaction on ' . $instance
+    return $this->currentUser->hasPermission(
+      $modify instanceof Vote && !$modify->isNew()
+        ? 'modify reaction on ' . $instance
+        : 'create reaction on ' . $instance
     );
   }
 

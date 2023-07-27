@@ -58,7 +58,7 @@ class PaymentEventSubscriber implements EventSubscriberInterface {
     $state = $payment->getState();
     // Set template based on payment state.
     $template_id = match ($state->getId()) {
-      'authorized' => 'payment_authorized',
+      'authorization' => 'payment_authorized',
       'completed' => 'payment_completed',
       default => 'payment_added',
     };
@@ -100,7 +100,7 @@ class PaymentEventSubscriber implements EventSubscriberInterface {
     $gateway = $payment->getPaymentGateway();
 
     // For changed state to the authorized use another template.
-    if ($state->getId() === 'authorized' && $original_state !== 'authorized') {
+    if ($state->getId() === 'authorization' && $original_state !== 'authorization') {
       $template_id = 'payment_authorized';
     }
 

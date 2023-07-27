@@ -10,27 +10,29 @@
  */
 function votingapi_reaction_install() {
   $reactions = _votingapi_reaction_get_reactions();
-  $voteTypeStorage = \Drupal::service('entity_type.manager')
+  $vote_type_storage = \Drupal::service('entity_type.manager')
     ->getStorage('vote_type');
 
   // Create reactions.
-  $voteTypes = $voteTypeStorage->loadMultiple(
-    $voteTypeStorage->getQuery()
+  $vote_types = $vote_type_storage->loadMultiple(
+    $vote_type_storage->getQuery()
+      ->accessCheck(FALSE)
       ->condition('id', array_keys($reactions), 'IN')
       ->execute()
   );
   foreach ($reactions as $key => $label) {
-    $voteType = empty($voteTypes[$key])
-      ? $voteTypeStorage->create([
+    /** @var \Drupal\votingapi\VoteTypeInterface $vote_type */
+    $vote_type = empty($vote_types[$key])
+      ? $vote_type_storage->create([
         'id' => $key,
         'label' => $label,
         'value_type' => 'points',
         'description' => 'Automatically created reaction',
       ])
-      : $voteTypes[$key];
-    $voteType->setThirdPartySetting('votingapi_reaction', 'reaction', TRUE);
-    $voteType->setThirdPartySetting('votingapi_reaction', 'icon', '');
-    $voteType->save();
+      : $vote_types[$key];
+    $vote_type->setThirdPartySetting('votingapi_reaction', 'reaction', TRUE);
+    $vote_type->setThirdPartySetting('votingapi_reaction', 'icon', '');
+    $vote_type->save();
   }
 }
 
@@ -39,17 +41,19 @@ function votingapi_reaction_install() {
  */
 function votingapi_reaction_uninstall() {
   $reactions = _votingapi_reaction_get_reactions();
-  $voteTypeStorage = \Drupal::service('entity_type.manager')
+  $vote_type_storage = \Drupal::service('entity_type.manager')
     ->getStorage('vote_type');
 
   // Remove reactions.
-  $voteTypes = $voteTypeStorage->loadMultiple(
-    $voteTypeStorage->getQuery()
+  $vote_types = $vote_type_storage->loadMultiple(
+    $vote_type_storage->getQuery()
+      ->accessCheck(FALSE)
       ->condition('id', array_keys($reactions), 'IN')
       ->execute()
   );
-  foreach ($voteTypes as $voteType) {
-    $voteType->delete();
+  foreach ($vote_types as $vote_type) {
+    /** @var \Drupal\votingapi\VoteTypeInterface $vote_type */
+    $vote_type->delete();
   }
 }
 

@@ -73,11 +73,13 @@ class VotingApiReactionWidget extends WidgetBase implements ContainerFactoryPlug
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $entity = $items->getEntity();
 
+    $status = $items->status ?? VotingApiReactionItemInterface::OPEN;
+
     $element['status'] = [
       '#type' => 'radios',
       '#title' => $this->t('Reactions'),
       '#title_display' => 'invisible',
-      '#default_value' => !is_null($items->status) ? $items->status : VotingApiReactionItemInterface::OPEN,
+      '#default_value' => $status,
       '#options' => [
         VotingApiReactionItemInterface::OPEN => $this->t('Open'),
         VotingApiReactionItemInterface::CLOSED => $this->t('Closed'),
@@ -110,7 +112,7 @@ class VotingApiReactionWidget extends WidgetBase implements ContainerFactoryPlug
         '#type' => 'details',
         // Open the details when the selected value is different to the stored
         // default values for the field.
-        '#open' => ($items->status != $default_values[0]['status']),
+        '#open' => $status != $default_values[0]['status'],
         '#group' => 'advanced',
         '#attributes' => [
           'class' => ['votingapi-reaction-' . Html::getClass($entity->getEntityTypeId()) . '-settings-form'],

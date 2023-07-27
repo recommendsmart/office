@@ -61,6 +61,13 @@ trait FormFieldSetOptionsTrait {
       $options = $this->buildOptionsArray($options);
     }
 
+    // For entity fields, the "_none" option represents an empty value. It needs
+    // to be retained, when the default value is not something else. Otherwise,
+    // previous selections may lead to an unintended illegal choice error.
+    if ((empty($element['#default_value']) || $element['#default_value'] === '_none') && !isset($options['_none']) && isset($element['#options']['_none'])) {
+      $options = ['_none' => $element['#options']['_none']] + $options;
+    }
+
     $element['#options'] = $options;
   }
 

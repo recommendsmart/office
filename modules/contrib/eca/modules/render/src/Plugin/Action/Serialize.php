@@ -25,7 +25,7 @@ class Serialize extends Build {
   /**
    * The serializer.
    *
-   * @var \Symfony\Component\Serializer\SerializerInterface
+   * @var \Symfony\Component\Serializer\Serializer
    */
   protected SerializerInterface $serializer;
 

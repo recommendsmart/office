@@ -3,10 +3,8 @@ type: module
 description: Add multi data for field
 package: Fields
 core_version_requirement: ^9 || ^10
-dependencies:
-  - drupal:field_ui
 
-# Information added by Drupal.org packaging script on 2023-03-08
-version: '1.0.11'
+# Information added by Drupal.org packaging script on 2023-07-04
+version: '1.0.18'
 project: 'datafield'
-datestamp: 1678296018
+datestamp: 1688504444

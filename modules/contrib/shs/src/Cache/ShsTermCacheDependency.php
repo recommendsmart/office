@@ -10,6 +10,7 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
  */
 class ShsTermCacheDependency implements CacheableDependencyInterface {
 
+  protected $contexts, $tags, $maxAge;
   /**
    * {@inheritdoc}
    */

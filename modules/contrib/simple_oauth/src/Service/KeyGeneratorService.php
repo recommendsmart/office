@@ -9,7 +9,7 @@ use Drupal\simple_oauth\Service\Filesystem\FilesystemValidator;
 use Drupal\simple_oauth\Service\Filesystem\FilesystemValidatorInterface;
 
 /**
- * Generates the signature keys.
+ * Provides a service to generate the signature keys.
  *
  * @internal
  */

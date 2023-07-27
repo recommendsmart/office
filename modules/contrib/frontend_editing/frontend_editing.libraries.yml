@@ -5,3 +5,19 @@ frontend_editing:
       css/frontend_editing.css: {}
   js:
     js/frontend_editing.js: {}
+  dependencies:
+    - core/drupal.ajax
+
+# This was added for Drupal 10 compatibility.
+# See more here https://www.drupal.org/node/3293156.
+jquery.form:
+  remote: https://github.com/jquery-form/form
+  version: "4.3.0"
+  license:
+    name: GNU-GPL-2.0-or-later
+    url: https://raw.githubusercontent.com/jquery-form/form/master/LICENSE
+    gpl-compatible: true
+  js:
+    js/jquery.form.min.js: { minified: true }
+  dependencies:
+    - core/jquery

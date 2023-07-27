@@ -34,7 +34,7 @@ class ShsCacheableJsonResponse extends CacheableJsonResponse {
    * @param bool $alterable
    *   TRUE if the data should be alterable by other modules.
    */
-  public function setData($data = [], $alterable = FALSE) {
+  public function setData($data = [], $alterable = FALSE): static {
     if ($alterable === TRUE) {
       $identifier = str_replace('-', '_', $this->context['identifier']);
 
@@ -47,12 +47,13 @@ class ShsCacheableJsonResponse extends CacheableJsonResponse {
       \Drupal::moduleHandler()->alter($hooks, $data, $this->context);
     }
     parent::setData($data);
+    return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function sendContent() {
+  public function sendContent(): static {
     $identifier = str_replace('-', '_', $this->context['identifier']);
 
     $hooks = [

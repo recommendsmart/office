@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Route;
  *
  * @internal
  */
-class RouteOverrideControllerManager {
+final class RouteOverrideControllerManager {
 
   use ThrowMethodTrait;
 

@@ -52,6 +52,7 @@ class EcaStateRead extends ConfigurableActionBase {
       '#default_value' => $this->configuration['token_name'],
       '#weight' => -10,
       '#description' => $this->t('The name of the token, the value is stored into.'),
+      '#eca_token_reference' => TRUE,
     ];
     return $form;
   }

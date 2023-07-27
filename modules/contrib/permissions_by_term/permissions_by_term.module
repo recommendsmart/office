@@ -1,5 +1,6 @@
 <?php
 
+use Drupal\user\Entity\User;
 /**
  * @file
  * Allows access to terms in a vocabulary to be limited by user or role.
@@ -165,7 +166,7 @@ function permissions_by_term_form_taxonomy_term_form_alter(&$form, FormStateInte
 
     $aAllowedUsers = $access_storage->getAllowedUserIds($termId, $langcode);
     if (!empty($aAllowedUsers)) {
-      $aAllowedUsers = \Drupal\user\Entity\User::loadMultiple($aAllowedUsers);
+      $aAllowedUsers = User::loadMultiple($aAllowedUsers);
       $sUserFormValue = $access_storage->getUserFormValue($aAllowedUsers);
     }
     else {
@@ -341,7 +342,7 @@ function permissions_by_term_form_alter(&$form, FormStateInterface $formState, $
       }
     }
 
-    $viewFilePath = drupal_get_path('module', 'permissions_by_term') . '/src/View/node-details.html.twig';
+    $viewFilePath = \Drupal::service('extension.list.module')->getPath('permissions_by_term') . '/src/View/node-details.html.twig';
     /**
      * @var \Drupal\permissions_by_term\Service\NodeEntityBundleInfo $nodeEntityBundleInfo
      */

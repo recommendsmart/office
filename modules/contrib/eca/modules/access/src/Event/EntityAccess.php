@@ -11,6 +11,9 @@ use Drupal\eca\Event\AccessEventInterface;
 use Drupal\eca\Event\ConditionalApplianceInterface;
 use Drupal\eca\Event\EntityApplianceTrait;
 use Drupal\eca\Event\EntityEventInterface;
+use Drupal\eca\Plugin\DataType\DataTransferObject;
+use Drupal\eca\Token\DataProviderInterface;
+use Drupal\eca_access\AccessEvents;
 
 /**
  * Dispatched when an entity is being asked for access.
@@ -19,7 +22,7 @@ use Drupal\eca\Event\EntityEventInterface;
  *   This class is not meant to be used as a public API. It is subject for name
  *   change or may be removed completely, also on minor version updates.
  */
-class EntityAccess extends Event implements AccessEventInterface, ConditionalApplianceInterface, EntityEventInterface {
+class EntityAccess extends Event implements AccessEventInterface, ConditionalApplianceInterface, EntityEventInterface, DataProviderInterface {
 
   use EntityApplianceTrait;
 
@@ -50,6 +53,13 @@ class EntityAccess extends Event implements AccessEventInterface, ConditionalApp
    * @var \Drupal\Core\Access\AccessResultInterface|null
    */
   protected ?AccessResultInterface $accessResult = NULL;
+
+  /**
+   * An instance holding event data accessible as Token.
+   *
+   * @var \Drupal\eca\Plugin\DataType\DataTransferObject|null
+   */
+  protected ?DataTransferObject $eventData = NULL;
 
   /**
    * Constructs a new EntityAccess object.
@@ -152,6 +162,38 @@ class EntityAccess extends Event implements AccessEventInterface, ConditionalApp
   public function setAccessResult(AccessResultInterface $result): EntityAccess {
     $this->accessResult = $result;
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getData(string $key): ?DataTransferObject {
+    if ($key === 'event') {
+      if (!isset($this->eventData)) {
+        $data = [
+          'machine-name' => AccessEvents::ENTITY,
+          'operation' => $this->getOperation(),
+          'uid' => $this->getAccount()->id(),
+          'entity-type' => $this->entity->getEntityTypeId(),
+          'entity-bundle' => $this->entity->bundle(),
+        ];
+        if (!$this->entity->isNew()) {
+          $data['entity-id'] = $this->entity->id();
+        }
+        $this->eventData = DataTransferObject::create($data);
+      }
+
+      return $this->eventData;
+    }
+
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasData(string $key): bool {
+    return $this->getData($key) !== NULL;
   }
 
 }

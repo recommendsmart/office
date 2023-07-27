@@ -4,7 +4,7 @@ user.admin_create_form:
     _controller: '\Drupal\user_bundle\Controller\TypedUserController::adminCreateForm'
     _title_callback: '\Drupal\user_bundle\Controller\TypedUserController::adminCreateFormPageTitle'
   requirements:
-    _permission: 'administer users'
+    _entity_create_access: 'user'
   options:
     parameters:
       user_type:

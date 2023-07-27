@@ -7,8 +7,6 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\simple_oauth\Oauth2ScopeInterface;
-use Drupal\user\Entity\Role;
 use Drupal\user\EntityOwnerTrait;
 
 /**

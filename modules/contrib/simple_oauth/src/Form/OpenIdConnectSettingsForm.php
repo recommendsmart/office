@@ -91,9 +91,9 @@ class OpenIdConnectSettingsForm extends ConfigFormBase {
       '#type' => 'container',
       'customize' => [
         '#markup' => '<p>' . $this->t('Check the <a href="@href" rel="noopener" target="_blank">Simple OAuth guide</a> for OpenID Connect to learn how to customize the user claims for OpenID Connect.', [
-            '@href' => Url::fromUri('https://www.drupal.org/node/3172149')
-              ->toString(),
-          ]) . '</p>',
+          '@href' => Url::fromUri('https://www.drupal.org/node/3172149')
+            ->toString(),
+        ]) . '</p>',
       ],
       'claims' => [
         '#type' => 'checkboxes',

@@ -74,7 +74,12 @@ function template_preprocess_eca_serialized(array &$variables = []) {
     $attributes = $variables['attributes'];
     if (!isset($attributes['id'])) {
       $attributes['id'] = Html::getUniqueId('eca-serialized');
-      $attributes['class'][] = 'eca-serialized';
+      if ($attributes instanceof Attribute) {
+        $attributes->addClass('eca-serialized');
+      }
+      else {
+        $attributes['class'][] = 'eca-serialized';
+      }
     }
   }
 }

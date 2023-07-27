@@ -12,7 +12,25 @@ use Drupal\Core\Url;
 use Drupal\node\Entity\NodeType;
 use Drupal\node_singles\Access\SingleNodeAccessControlHandler;
 use Drupal\node_singles\Form\SingleNodeTypeDeleteConfirm;
+use Drupal\Core\Routing\RouteMatchInterface;
 
+/**
+ * Implements hook_help().
+ */
+function node_singles_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the node_singles module.
+    case 'help.page.node_singles':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Singles are node types used for one-off pages that have unique content requirements') . '</p>';
+      $output .= '<h3>' . t('More Information') . '</h3>';
+      $output .= '<p>' . t('For more information about this module please visit the <a href="@link">module page</a>.', ['@link' => 'https://www.drupal.org/project/node_singles']) . '</p>';
+      return $output;
+
+    default:
+  }
+}
 /**
  * Implements @see hook_entity_operation_alter().
  */

@@ -271,6 +271,7 @@ class ContentEntityEvent extends EventBase implements CleanupInterface {
           '#title' => $this->t('Token name holding the selection'),
           '#default_value' => $this->configuration['token_name'],
           '#description' => $this->t('The name of the token to hold the selection.'),
+          '#eca_token_reference' => TRUE,
         ];
       }
     }
@@ -319,7 +320,7 @@ class ContentEntityEvent extends EventBase implements CleanupInterface {
         $config = $ecaEvent->getConfiguration();
         $type = $config['type'] ?? ContentEntityTypes::ALL;
         if ($type === ContentEntityTypes::ALL) {
-          $wildcard = '*';
+          $wildcard = '*::*';
         }
         else {
           [$entityType, $bundle] = array_merge(explode(' ', $type), [ContentEntityTypes::ALL]);

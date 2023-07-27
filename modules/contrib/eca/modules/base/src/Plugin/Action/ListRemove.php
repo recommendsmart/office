@@ -62,6 +62,7 @@ class ListRemove extends ListRemoveBase {
       '#description' => $this->t('Provide the name of a token that holds the removed item.'),
       '#default_value' => $this->configuration['token_name'],
       '#weight' => 30,
+      '#eca_token_reference' => TRUE,
     ];
     return $form;
   }

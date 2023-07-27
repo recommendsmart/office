@@ -30,7 +30,8 @@ class CalendarViewWeekPager extends CalendarViewPagerBase {
    */
   public function getDatetimePrevious(\Datetime $now): \Datetime {
     $date = clone $now;
-    $date->modify('-1 week');
+    $date->modify('-7 days');
+    $date->setTime(0, 0, 0);
     return $date;
   }
 
@@ -39,7 +40,8 @@ class CalendarViewWeekPager extends CalendarViewPagerBase {
    */
   public function getDatetimeNext(\Datetime $now): \Datetime {
     $date = clone $now;
-    $date->modify('+1 week');
+    $date->modify('+7 days');
+    $date->setTime(0, 0, 0);
     return $date;
   }
 

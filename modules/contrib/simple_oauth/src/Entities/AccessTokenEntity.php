@@ -20,6 +20,7 @@ class AccessTokenEntity implements AccessTokenEntityInterface {
   /**
    * {@inheritdoc}
    */
+  // phpcs:ignore
   public function convertToJWT() {
     $private_claims = [];
     \Drupal::moduleHandler()

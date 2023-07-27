@@ -6,7 +6,7 @@ dependencies:
   - 'drupal:comment'
 configure: quote.settings_form
 
-# Information added by Drupal.org packaging script on 2022-08-06
-version: '3.0.1'
+# Information added by Drupal.org packaging script on 2023-06-23
+version: '3.0.2'
 project: 'quote'
-datestamp: 1659785091
+datestamp: 1687515652

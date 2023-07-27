@@ -35,6 +35,7 @@ class OpenIdConnectScopeEntity implements ScopeEntityInterface {
   /**
    * {@inheritdoc}
    */
+  #[\ReturnTypeWillChange]
   public function jsonSerialize() {
     return $this->getIdentifier();
   }

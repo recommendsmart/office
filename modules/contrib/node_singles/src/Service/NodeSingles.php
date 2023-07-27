@@ -79,6 +79,7 @@ class NodeSingles implements NodeSinglesInterface {
     $storage = $this->entityTypeManager->getStorage('node');
     $nodes = $storage->getQuery()
       ->condition('type', $type->id())
+      ->accessCheck(FALSE)
       ->execute();
 
     // There are multiple nodes, this shouldn't happen.

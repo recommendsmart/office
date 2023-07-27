@@ -146,10 +146,8 @@ class VotingApiReactionFormatter extends FormatterBase implements ContainerFacto
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
 
-    if (is_null($items->status)) {
-      $default_value = $items->getFieldDefinition()->getDefaultValue($items->getEntity());
-      $items->status = $default_value[0]['status'];
-    }
+    $default_value = $items->getFieldDefinition()->getDefaultValue($items->getEntity());
+    $items->status = $items->status ?? $default_value[0]['status'];
 
     $extras = [
       'field_items' => $items,

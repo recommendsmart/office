@@ -139,3 +139,16 @@ function symfony_mailer_update_10006() {
     }
   }
 }
+
+/**
+ * "Default headers" email policy element is now automatic.
+ */
+function symfony_mailer_update_10007() {
+  foreach (MailerPolicy::loadMultiple() as $policy) {
+    $config = $policy->getConfiguration();
+    if (isset($config['mailer_default_headers'])) {
+      unset($config['mailer_default_headers']);
+      $policy->setConfiguration($config)->save();
+    }
+  }
+}

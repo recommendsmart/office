@@ -140,8 +140,8 @@ function header_theme_settings(array &$form, $theme) {
     ],
     '#description' => t('Hide menu before or after scrolling. Turn on "Overlay Mode" to prevent your menu creating an empty space at the top of your layout.'),
     '#states' => [
-      'unchecked' => [
-        ':input[name="header_top_fixed"]' => ['checked' => FALSE],
+      'visible' => [
+        ':input[name="header_top_fixed"]' => ['checked' => TRUE],
         ':input[name="header_top_sticky"]' => ['checked' => TRUE],
       ],
     ],
@@ -458,6 +458,15 @@ function header_theme_settings(array &$form, $theme) {
     '#type' => 'checkbox',
     '#title' => t('Mark items with children'),
     '#default_value' => ((theme_get_setting('mark_menu_with_children') !== NULL)) ? theme_get_setting('mark_menu_with_children') : FALSE,
+  ];
+
+  $form['dxpr_theme_settings']['header']['menu']['dropdown_width'] = [
+    '#type' => 'textfield',
+    '#title' => t('Dropdown width'),
+    '#default_value' => ((theme_get_setting('dropdown_width') !== NULL)) ? theme_get_setting('dropdown_width') : '160',
+    '#type' => 'textfield',
+    '#size' => 9,
+    '#maxlength' => 9,
   ];
 
   $form['dxpr_theme_settings']['header']['menu']['menu_type'] = [

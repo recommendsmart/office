@@ -122,6 +122,7 @@ class TermHandler {
    */
   public function getTermIdByName($sTermName) {
     $resultArray = $this->termStorage->getQuery()
+      ->accessCheck(FALSE)
       ->condition('name', $sTermName)
       ->execute();
 
@@ -139,6 +140,7 @@ class TermHandler {
    */
   public function getTermNameById($term_id) {
     $term_name = $this->termStorage->getQuery()
+      ->accessCheck(FALSE)
       ->condition('id', $term_id)
       ->execute();
     return key($term_name);

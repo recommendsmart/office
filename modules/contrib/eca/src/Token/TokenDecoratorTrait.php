@@ -351,7 +351,7 @@ trait TokenDecoratorTrait {
     // or from the Contrib token service (if available). Just in case we
     // actually received a decorated service that differs from these two
     // implementation variants, give it a chance to execute its own logic.
-    if (get_parent_class($this) !== get_class($this->token)) {
+    if (!in_array(get_class($this->token), ['Drupal\Core\Utility\Token', 'Drupal\token\Token'], TRUE)) {
       $text = $this->token->replace($text, $data, $options, $bubbleable_metadata);
     }
     return $text;

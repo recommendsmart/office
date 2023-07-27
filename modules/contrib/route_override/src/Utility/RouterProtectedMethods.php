@@ -23,6 +23,9 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @see \Drupal\Core\Routing\Router
  * @see \Drupal\route_override\Utility\EarlyRouteMatchProvider
+ *
+ * @internal
+ * 
  * @todo Find a better way to access these methods upstream.
  */
 class RouterProtectedMethods {

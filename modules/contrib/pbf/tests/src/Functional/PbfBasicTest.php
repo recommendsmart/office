@@ -12,7 +12,7 @@ class PbfBasicTest extends PbfBaseTest {
   /**
    * Setup and Rebuild node access.
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->article1 = $this->createSimpleArticle('Article 1');
     $this->article2 = $this->createSimpleArticle('Article 2');
@@ -30,20 +30,20 @@ class PbfBasicTest extends PbfBaseTest {
     $this->drupalLogin($this->normalUser);
 
     $this->drupalGet('node/' . $this->article1->id());
-    $this->assertResponse(200);
-    $this->assertTitle('Article 1 | Drupal', t('Correct title for article 1 found'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->titleEquals('Article 1 | Drupal', t('Correct title for article 1 found'));
 
     $this->drupalGet('node/' . $this->article2->id());
-    $this->assertResponse(200);
-    $this->assertTitle('Article 2 | Drupal', t('Correct title for article 2 found'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->titleEquals('Article 2 | Drupal', t('Correct title for article 2 found'));
 
     $this->drupalGet('node/' . $this->group1->id());
-    $this->assertResponse(200);
-    $this->assertTitle('Group 1 | Drupal', t('Correct title for group 1 found'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->titleEquals('Group 1 | Drupal', t('Correct title for group 1 found'));
 
     $this->drupalGet('node/' . $this->group2->id());
-    $this->assertResponse(200);
-    $this->assertTitle('Group 2 | Drupal', t('Correct title for group 2 found'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->titleEquals('Group 2 | Drupal', t('Correct title for group 2 found'));
 
     // Build the search index.
     $this->container->get('cron')->run();
@@ -52,9 +52,9 @@ class PbfBasicTest extends PbfBaseTest {
 
     $this->drupalLogout();
     $this->drupalGet('node/' . $this->article1->id());
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
     $this->drupalGet('node/' . $this->article2->id());
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
 
   }
 

@@ -6,8 +6,8 @@
  */
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
@@ -17,12 +17,56 @@ function datafield_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {
     // Main module help for the datafield module.
     case 'help.page.datafield':
-      $output = '<h3>' . t('About') . '</h3>';
-      $output .= '<p>' . t('Create a field with multiple values under default table form.
-      Base on module triple field and paragraphs table but there is more features.') . '</p>';
+      $output = '<h3>' . t('About Module: Multiple Data Field') . '</h3>';
+      $output .= '<p>' . t('Multiple Data Field is a Drupal module that allows you to create custom fields with multiple values under the default table form. This module is based on the Triple Field and Paragraphs table modules, but it offers additional features.') . '</p>';
+      $output .= '<p>' . t("<b>Please note:</b> all custom fields are not entity fields, so you cannot benefit from field widget, field renderer, or the entity formatter. It's just for the data.") . '</p>';
+
+      $output .= '<h3>' . t('How it Works') . '</h3>';
+      $output .= '<p>' . t('To use the Data Field module, follow these steps:') . '</p>';
+      $output .= '<ol><li>' . t('Define the storage column machine name with an unlimited value.') . '</li>';
+      $output .= '<li>' . t('Define field column settings.') . '</li>';
+      $output .= '<li>' . t('Define a field widget for each column.') . '</li>';
+      $output .= '<li>' . t('Define a field display for each column.') . '</li></ol>';
+
+      $output .= '<h3>' . t('Supported Storage Types.') . '</h3>';
+      $output .= '<p>' . t('Data Field supports various storage types, including:') . '</p>';
+      $output .= '<ul><li>' . t('Numeric: Int, float, decimal') . '</li>';
+      $output .= '<li>' . t('Text: Varchar, Text, Json') . '</li>';
+      $output .= '<li>' . t('Boolean') . '</li>';
+      $output .= '<li>' . t('Date iso format: varchar (22)') . '</li>';
+      $output .= '<li>' . t('Date mysql format: Date, datetime, time, Year') . '</li>';
+      $output .= '<li>' . t('Entity reference: Taxonomy, Node, User') . '</li>';
+      $output .= '<li>' . t('File') . '</li></ul>';
+
+      $output .= '<h3>' . t('Supported Widgets.') . '</h3>';
+      $output .= '<p>' . t('Data Field supports various widgets, including:') . '</p>';
+      $output .= '<ul><li>' . t('Numeric: Textfield, range, number, select list, hidden') . '</li>';
+      $output .= '<li>' . t('Text: Textfield, Textarea, Text full html, Json editor, hidden') . '</li>';
+      $output .= '<li>' . t('Boolean: Checkbox') . '</li>';
+      $output .= '<li>' . t('Date iso format: Date, datetime, month, week, year') . '</li>';
+      $output .= '<li>' . t('Date format: Date, datetime, timestamp, time, year') . '</li>';
+      $output .= '<li>' . t('Entity reference: List, autocomplete, radiobutton') . '</li>';
+      $output .= '<li>' . t('File: File manager') . '</li></ul>';
+
+      $output .= '<h3>' . t('Supported Formatters.') . '</h3>';
+      $output .= '<p>' . t('Data Field supports various formatters, including:') . '</p>';
+      $output .= '<ul><li>' . t('Table (Bootstrap-table, datatable) with support for field permission for creating and editing on the fly') . '</li>';
+      $output .= '<li>' . t('Chart Google chart, Hightchart') . '</li>';
+      $output .= '<li>' . t('Unformatted list order') . '</li>';
+      $output .= '<li>' . t('Details') . '</li></ul>';
+
+      $output .= '<h3>' . t('Known Issues.') . '</h3>';
+      $output .= '<ul><li>' . t('The time of the field date (iso and unix date), which has a widget time, needs to be checked with the time zone. It has not been tested in all cases.') . '</li>';
+      $output .= '<li>' . t('Field file may have problems when deleting old files, and an ajax call must be sent to remove the fid in field columns.') . '</li></ul>';
+
+      $output .= '<h3>' . t('In Progress.') . '</h3>';
+      $output .= '<p>' . t('Multiple Field is still in development, and the following features are currently in progress:') . '</p>';
+      $output .= '<ul><li>' . t('Edit in the field (in display mode).') . '</li>';
+      $output .= '<li>' . t('Any help you can give will be greatly appreciated.') . '</li></ul>';
+
       return $output;
+
     default:
-      break;
   }
 }
 

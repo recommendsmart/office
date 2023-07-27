@@ -71,7 +71,7 @@ class EnqueueTaskDelayed extends EnqueueTask {
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
-    $this->configuration['delay_value'] = $form_state->getValue('task_name');
+    $this->configuration['delay_value'] = $form_state->getValue('delay_value');
     $this->configuration['delay_unit'] = $form_state->getValue('delay_unit');
     parent::submitConfigurationForm($form, $form_state);
   }

@@ -4,6 +4,8 @@ namespace Drupal\eca_access\Event;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\eca\Plugin\DataType\DataTransferObject;
+use Drupal\eca_access\AccessEvents;
 
 /**
  * Dispatched when an entity field is being asked for access.
@@ -77,6 +79,32 @@ class FieldAccess extends EntityAccess {
    */
   public function getFieldName(): string {
     return $this->fieldName;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getData(string $key): ?DataTransferObject {
+    if ($key === 'event') {
+      if (!isset($this->eventData)) {
+        $data = [
+          'machine-name' => AccessEvents::FIELD,
+          'operation' => $this->getOperation(),
+          'uid' => $this->getAccount()->id(),
+          'field' => $this->getFieldName(),
+          'entity-type' => $this->entity->getEntityTypeId(),
+          'entity-bundle' => $this->entity->bundle(),
+        ];
+        if (!$this->entity->isNew()) {
+          $data['entity-id'] = $this->entity->id();
+        }
+        $this->eventData = DataTransferObject::create($data);
+      }
+
+      return $this->eventData;
+    }
+
+    return NULL;
   }
 
 }

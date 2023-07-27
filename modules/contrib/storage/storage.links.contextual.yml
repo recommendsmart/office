@@ -1,0 +1,10 @@
+entity.storage.edit_form:
+  route_name: entity.storage.edit_form
+  group: storage
+  title: Edit
+
+entity.storage.delete_form:
+  route_name: entity.storage.delete_form
+  group: storage
+  title: Delete
+  weight: 10

@@ -2,8 +2,8 @@
 
 namespace Drupal\calendar_view\Plugin\views\style;
 
-use Drupal\calendar_view\Plugin\views\pager\CalendarViewPagerInterface;
-use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Component\Datetime\DateTimePlus;
+use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
@@ -16,6 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Defines a base class for Calendar View style plugin.
  */
 abstract class CalendarViewBase extends DefaultStyle implements CalendarViewInterface {
+
+  const DATE_FIELD_TYPES = ['created', 'changed', 'datetime', 'daterange', 'smartdate', 'timestamp'];
 
   /**
    * The date formatter service.
@@ -39,13 +41,6 @@ abstract class CalendarViewBase extends DefaultStyle implements CalendarViewInte
   protected $entityFieldManager;
 
   /**
-   * A list of already processed result by field.
-   *
-   * @var array
-   */
-  protected $processedResultsByField = [];
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -62,11 +57,11 @@ abstract class CalendarViewBase extends DefaultStyle implements CalendarViewInte
    * @param mixed $value
    *   A given value.
    *
-   * @return mixed
+   * @return int
    *   The timestamp or the original value.
    */
-  public function isTimestampValue($value) {
-    return !empty($value) && !ctype_digit(strval($value)) ? strtotime($value) : $value;
+  public function ensureTimestampValue($value) {
+    return !empty($value) && !ctype_digit(strval($value)) ? strtotime($value) : (int) $value;
   }
 
   /**
@@ -80,34 +75,30 @@ abstract class CalendarViewBase extends DefaultStyle implements CalendarViewInte
    */
   public function isDateField($field) {
     $definition = NULL;
-    $field_storages = [];
 
     if ($field instanceof EntityField) {
       $entity_type_id = $field->configuration['entity_type'] ?? NULL;
-      $field_name = $field->configuration['entity field'] ??
-        $field->configuration['field_name'] ?? NULL;
-
-      // Improve performance with static variables.
-      $field_storages = &drupal_static(__FUNCTION__);
-      if (!isset($field_storages) || !($field_storages[$entity_type_id] ?? NULL)) {
-        $field_storages[$entity_type_id] = $this->entityFieldManager->getFieldStorageDefinitions($entity_type_id);
-      }
-
-      $definition = $field_storages[$entity_type_id][$field_name] ?? NULL;
+      $field_name = $field->configuration['entity field'] ?? $field->configuration['field_name'] ?? NULL;
+      $field_storages = $this->entityFieldManager->getFieldStorageDefinitions($entity_type_id);
+      $definition = $field_storages[$field_name] ?? NULL;
     }
 
-    return !$definition ? FALSE : in_array($definition->getType(), [
-      'created', 'changed', 'datetime', 'daterange', 'smartdate',
-    ]);
+    return !$definition ? FALSE : in_array($definition->getType(), self::DATE_FIELD_TYPES);
   }
 
   /**
    * A scientific methods to get the list of days of the week.
    *
-   * @return array
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup[]
    *   The list of days, keyed by their number.
    */
   public function getOrderedDays() {
+    // Avoid unnecessary calls with static variable.
+    $days = &drupal_static(__METHOD__);
+    if (isset($days)) {
+      return $days;
+    }
+
     $days = [
       0 => $this->t('Sunday'),
       1 => $this->t('Monday'),
@@ -133,7 +124,7 @@ abstract class CalendarViewBase extends DefaultStyle implements CalendarViewInte
    */
   public function getFields() {
     // Improve performance with static variables.
-    $view_fields = &drupal_static(__FUNCTION__);
+    $view_fields = &drupal_static(__METHOD__);
     if (isset($view_fields)) {
       return $view_fields;
     }
@@ -150,7 +141,7 @@ abstract class CalendarViewBase extends DefaultStyle implements CalendarViewInte
    */
   public function getDateFields() {
     // Improve performance with static variables.
-    $date_fields = &drupal_static(__FUNCTION__);
+    $date_fields = &drupal_static(__METHOD__);
     if (isset($date_fields)) {
       return $date_fields;
     }
@@ -165,37 +156,35 @@ abstract class CalendarViewBase extends DefaultStyle implements CalendarViewInte
   /**
    * {@inheritDoc}
    */
-  public function getCalendarTimestamp(): string {
+  public function getCalendarTimestamp($use_cache = TRUE): int {
     // Avoid unnecessary calls with static variable.
-    $timestamp = &drupal_static(__FUNCTION__);
-    if (isset($timestamp)) {
-      return $timestamp;
+    $timestamp = &drupal_static(__METHOD__);
+    if (isset($timestamp) && $use_cache) {
+      return $this->ensureTimestampValue($timestamp);
     }
 
     // Allow user to pass query string.
-    // (i.e "<url>?calendar_timestamp=2022-12-31").
+    // (i.e "<url>?calendar_timestamp=2022-12-31" or "<url>?calendar_timestamp=tomorrow").
     $selected_timestamp = $this->view->getExposedInput()['calendar_timestamp'] ?? NULL;
 
     // Get date (default: today).
     $default_timestamp = !empty($this->options['calendar_timestamp']) ? $this->options['calendar_timestamp'] : NULL;
-    if ($default_timestamp && !ctype_digit(strval($default_timestamp))) {
-      $default_timestamp = strtotime($default_timestamp);
-    }
 
     // Get first result's timestamp.
     $first_timestamp = NULL;
     if (empty($this->options['calendar_timestamp'])) {
-      if ($first_result = $this->view->result[0] ?? NULL) {
-        $available_date_fields = $this->getDateFields();
-        $rows = $this->processResult($first_result, reset($available_date_fields));
-        $timestamps = array_keys($rows);
-        $first_timestamp = reset($timestamps) ?? NULL;
+      $available_date_fields = $this->getDateFields();
+      $field = reset($available_date_fields) ?? NULL;
+      $first_result = reset($this->view->result) ?? NULL;
+      if ($first_result instanceof ResultRow && $field instanceof EntityField) {
+        $row_values = $this->getRowValues($first_result, $field);
+        $first_timestamp = $row_values['value'] ?? NULL;
       }
     }
 
     $timestamp = $selected_timestamp ?? $default_timestamp ?? $first_timestamp ?? date('U');
 
-    return $this->isTimestampValue($timestamp);
+    return $this->ensureTimestampValue($timestamp);
   }
 
   /**
@@ -240,7 +229,6 @@ abstract class CalendarViewBase extends DefaultStyle implements CalendarViewInte
       '#theme' => 'calendar_view_day',
       '#timestamp' => $timestamp,
       '#children' => $children,
-      '#options' => $this->options,
       '#view' => $this->view,
     ];
 
@@ -248,9 +236,16 @@ abstract class CalendarViewBase extends DefaultStyle implements CalendarViewInte
     $cell['data-calendar-view-month'] = date('m', $timestamp);
     $cell['data-calendar-view-year'] = date('y', $timestamp);
 
-    if (date('U', $timestamp) == strtotime('today')) {
-      $cell['data-calendar-today'] = TRUE;
+    $relation = (date('Ymd', $timestamp) <=> date('Ymd'));
+    $cell['class'][] = $relation === 0 ? 'today' : ($relation === 1 ? 'future' : 'past');
+
+    if ($relation === 0) {
+      $cell['data-calendar-view-today'] = TRUE;
     }
+
+    $cell['class'][] = strtolower(
+      $this->getOrderedDays()[date('w', $timestamp)]->getUntranslatedString()
+    );
 
     return $cell;
   }
@@ -269,8 +264,6 @@ abstract class CalendarViewBase extends DefaultStyle implements CalendarViewInte
       'calendar_weekday_start' => 1,
       'calendar_sort_order' => 'ASC',
       'calendar_timestamp' => 'this month',
-      // Allow user to reduce page load.
-      'calendar_query_filtering' => 1,
     ];
   }
 
@@ -332,142 +325,23 @@ abstract class CalendarViewBase extends DefaultStyle implements CalendarViewInte
       '#default_value' => $this->options['calendar_weekday_start'] ?? 1,
     ];
 
-    $form['calendar_sort_order'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Default sort order'),
-      '#options' => [
-        'ASC' => $this->t('Chronological'),
-        'DESC' => $this->t('Antichronological'),
-      ],
-      '#description' => $this->t('Sort results ASC or DESC inside a day.'),
-      '#default_value' => $this->options['calendar_sort_order'] ?? 'ASC',
-      '#required' => TRUE,
-    ];
-
     $form['calendar_timestamp'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Default date'),
       '#description' => $this->t('Default starting date of this calendar, in any machine readable format.') . '<br>' .
-      $this->t('Leave empty to use the date of the first result out of the first selected Date filter above.') . '<br>' .
-      $this->t('NB: The first result is controlled by the <em>@sort_order</em> on this View.', [
-        '@sort_order' => $this->t('Sort order'),
-      ]),
+        $this->t('Leave empty to use the date of the first result out of the first selected Date filter above.') . '<br>' .
+        $this->t('NB: The first result is controlled by the <em>@sort_order</em> on this View.', [
+          '@sort_order' => $this->t('Sort order'),
+        ]),
       '#default_value' => $this->options['calendar_timestamp'] ?? 'this month',
     ];
-
-    $form['calendar_query_filtering'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Performance: filter query by dates'),
-      '#description' => $this->t('If enabled, this View query will be filtered by +/- one month/week, depending on the selected calendar display.') . '<br>' .
-        $this->t('It is recommended to enable this option as it greatly reduces page load for large results sets (e.g. recurring events).') . '<br>' .
-        $this->t('<b>Warning: does not work for date fields from a relationship (see @link)</b>', [
-          '@link' => Link::fromTextAndUrl($this->t('this bug'), Url::fromUri('https://www.drupal.org/i/3350219', [
-            'attributes' => ['target' => '_blank'],
-          ]))->toString()
-        ]) . '<br>' .
-        $this->t('Leave this option uncheck if your Calendar date fields are attached through a relationship (e.g. a date from a pararaph).'),
-      '#default_value' => $this->options['calendar_query_filtering'] ?? 0,
-    ];
-
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
-  public function processResult(ResultRow $result, EntityField $field): array {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-    $entity = $field->getEntity($result);
-
-    $config = $field->configuration ?? [];
-    $field_id = $config['field_name'] ?? $config['entity field'] ?? $config['id'] ?? NULL;
-    $items = $entity->hasField($field_id) ? $entity->get($field_id) : NULL;
-
-    // Get values from entity or default method from EntityField View plugin.
-    $field_values = $items instanceof FieldItemListInterface ? $items->getValue() : $field->getValue($result);
-
-    // Always wrap field values in a list for consistency in the process below.
-    $field_values = !\is_array($field_values) ? [$field_values] : $field_values;
-
-    // Skip already processed field values.
-    $key = $entity->getEntityTypeId() . ':' . $entity->id() . ':' . $field_id;
-    if (in_array($key, $this->processedResultsByField)) {
-      return [];
-    }
-
-    // Skip empty result.
-    if ($field->isValueEmpty($field_values, TRUE)) {
-      return [];
-    }
-
-    $rows = [];
-    $values = [];
-    foreach ($field_values as $delta => $value) {
-      $values[$delta] = [];
-      $values[$delta]['entity'] = $entity;
-      $values[$delta]['calendar_field'] = $field;
-
-      // Get a unique identifier for this event.
-      $result_hash = md5(serialize($result) . $field_id . $delta);
-      $values[$delta]['hash'] = $result_hash;
-
-      // Get event timestamp(s).
-      $from = $values[$delta]['from'] = $this->isTimestampValue($value['value'] ?? $value);
-      $to = $values[$delta]['to'] = $this->isTimestampValue($value['end_value'] ?? NULL);
-
-      // Calculate days span.
-      $values[$delta]['instance'] = 0;
-      $values[$delta]['instances'] = 0;
-      if ($to && $to > $from) {
-        $date_time_from = new \DateTime();
-        $date_time_from->setTimestamp($from);
-        $date_time_to = new \DateTime();
-        $date_time_to->setTimestamp($to);
-        $interval = $date_time_to->diff($date_time_from);
-        $values[$delta]['instances'] = $interval->d;
-      }
-
-      // Insert first event in calendar content.
-      if ($from) {
-        // Content is keyed by start of day (i.e. timestamp at 00:00:00).
-        $date_time_from = new \DateTime();
-        $date_time_from->setTimestamp($from);
-        $date_time_from->modify('midnight');
-        $timestamp_from = $date_time_from->getTimestamp();
-
-        // Know about the first event for reordering in cell.
-        $values[$delta]['parent'] = $timestamp_from;
-
-        // Keep track of thing for later use.
-        // @see template_preprocess_calendar_view_day()
-        $result->calendar_view[$field_id][$timestamp_from] = $values[$delta];
-
-        $rows[$timestamp_from][] = $result;
-      }
-
-      // Insert all other events in calendar content.
-      for ($i = $values[$delta]['instances']; $i > 0; $i--) {
-        $date_time_from->modify('+1 day');
-        $date_time_from->modify('midnight');
-        $timestamp_to = $date_time_from->getTimestamp();
-
-        // Next event in the series.
-        $values[$delta]['instance'] = ($interval->d - ($i - 1));
-
-        // Create a duplicate result.
-        // Keep track of thing for later use.
-        // @see template_preprocess_calendar_view_day()
-        $cloned_result = clone $result;
-        $cloned_result->calendar_view[$field_id][$timestamp_to] = $values[$delta];
-
-        $rows[$timestamp_to][] = $cloned_result;
-        unset($cloned_result);
-      }
-    }
-
-    // Reduce work and avoid duplicates (e.g. recurring events).
-    $this->processedResultsByField[] = $key;
-
-    return $rows;
+  public function evenEmpty() {
+    return TRUE;
   }
 
   /**
@@ -475,6 +349,9 @@ abstract class CalendarViewBase extends DefaultStyle implements CalendarViewInte
    */
   public function preRender($results) {
     parent::preRender($results);
+
+    // Build calendars.
+    $this->view->calendars = $this->buildCalendars($this->getCalendarTimestamp());
 
     // Build calendar by fields.
     $available_date_fields = $this->getDateFields();
@@ -491,61 +368,18 @@ abstract class CalendarViewBase extends DefaultStyle implements CalendarViewInte
       return;
     }
 
-    $list = [];
-    foreach ($calendar_fields as $field_id) {
-      foreach ($results as &$result) {
-        $field = $available_date_fields[$field_id];
+    // Populate calendars.
+    foreach ($results as $result) {
+      foreach ($calendar_fields as $field_id) {
+        $field = $available_date_fields[$field_id] ?? NULL;
         if (!$field instanceof EntityField) {
           continue;
         }
 
-        // Prepare calendar rows.
-        $rows = $this->processResult($result, $field);
-        foreach ($rows as $timestamp => $processed_rows) {
-          foreach ($processed_rows as $row) {
-            $list[$field_id][$timestamp][] = $row;
-          }
-        }
-      }
-
-      if (!empty($list[$field_id] ?? [])) {
-        // Sort results in each cell.
-        $sort_order = $this->options['calendar_sort_order'] ?? 'ASC';
-        if ($sort_order == 'DESC') {
-          krsort($list[$field_id]);
-        }
-        else {
-          ksort($list[$field_id]);
-        }
+        $row_values = $this->getRowValues($result, $field);
+        $this->populateCalendar($result, $row_values);
       }
     }
-
-    // Build calendars.
-    $calendars = $this->buildCalendars($this->getCalendarTimestamp());
-
-    // Populate calendar cells.
-    foreach ($calendars as $i => $table) {
-      foreach (($table['#rows'] ?? []) as $delta => $rows) {
-        foreach (array_keys($rows['data'] ?? []) as $timestamp) {
-          foreach (array_keys($list) as $field_id) {
-            foreach (($list[$field_id][$timestamp] ?? []) as $result) {
-              // Render row and keep track of values for later use.
-              // @see template_preprocess_calendar_view_day()
-              $renderable_row = $this->view->rowPlugin->render($result);
-              $renderable_row['#calendar_view'] = $result->calendar_view[$field_id][$timestamp] ?? [];
-              $renderable_row['#timestamp'] = $timestamp;
-              $renderable_row['#view'] = $this->view;
-
-              // Insert content in cell.
-              $cell = &$calendars[$i]['#rows'][$delta]['data'][$timestamp];
-              $cell['data']['#children'][] = $renderable_row;
-            }
-          }
-        }
-      }
-    }
-
-    $this->view->calendars = $calendars;
   }
 
   /**
@@ -563,120 +397,167 @@ abstract class CalendarViewBase extends DefaultStyle implements CalendarViewInte
   }
 
   /**
-   * {@inheritdoc}
+   * Get the value out of a view Result for a given date field.
+   *
+   * @param \Drupal\views\ResultRow $result
+   *   A given view result.
+   * @param \Drupal\views\Plugin\views\field\EntityField $field
+   *   A given date field.
+   *
+   * @return array
+   *   Either the timestamp or nothing.
    */
-  public function evenEmpty() {
-    return TRUE;
+  public function getRowValues(ResultRow $row, EntityField $field) {
+    $delta = 0;
+    if ($delta_field = $field->aliases['delta'] ?? NULL) {
+      $delta = $row->{$delta_field} ?? 0;
+    }
+
+    // Get the result we need from the entity.
+    $this->view->row_index = $row->index ?? 0;
+    $items = $field->getItems($row) ?? [];
+    $item = $items[$delta]['raw'] ?? $items[0]['raw'] ?? NULL;
+    $values = $item instanceof FieldItemInterface ? $item->getValue() : [];
+    unset($this->view->row_index);
+
+    // Skip empty fields.
+    if (empty($values) || empty($values['value'])) {
+      return [];
+    }
+
+    // Make sure values are timestamps.
+    $values['value'] = $this->ensureTimestampValue($values['value']);
+    $values['end_value'] = $this->ensureTimestampValue($values['end_value'] ?? $values['value']);
+
+    // Get first item value to reorder multiday events in cells.
+    $all_values = $field->getValue($row);
+    $all_values = \is_array($all_values) ? $all_values : [$all_values];
+    $values['first_instance'] = reset($all_values);
+
+    // Expose the date field if other modules need it in preprocess.
+    $config = $field->configuration ?? [];
+    $field_id = $config['field_name'] ?? $config['entity field'] ?? $config['id'] ?? NULL;
+    $values['field'] = $field_id;
+
+    // Get a unique identifier for this event.
+    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    $entity = $field->getEntity($row);
+    $key = $entity->getEntityTypeId() . ':' . $entity->id() . ':' . $field_id;
+    $values['hash'] = md5($key . $delta);
+
+    // Prepare a title by default (e.g. on hover).
+    $start = $values['value'];
+    $end = $values['end_value'] ?? $start;
+    $title_string = $start && ($start !== $end) ? '@title from @start to @end' : '@field: @title @date';
+    $values['title'] = $this->t($title_string, [
+      '@field' => $field->label(),
+      '@title' => $entity->label(),
+      '@date' => $this->dateFormatter->format($start, 'long'),
+      '@start' => $this->dateFormatter->format($start, 'short'),
+      '@end' => $this->dateFormatter->format($end, 'short'),
+    ]);
+
+    return $values;
   }
 
   /**
-   * {@inheritdoc}
+   * Fill calendar with View results.
+   *
+   * @param \Drupal\views\ResultRow $result
+   *   A given view result.
+   * @param int $row_timestamp
+   *   (optional) The timestamp value of this result.
    */
-  public function query() {
-    parent::query();
-
-    $fields = $this->view->style_plugin->options['calendar_fields'] ?? [];
-    if (empty($fields)) {
+  public function populateCalendar(ResultRow $result, array $values = []) {
+    // Skip empty rows.
+    if (empty($values)) {
       return;
     }
 
-    // @todo To be removed when https://www.drupal.org/i/3350219 is fixed.
-    if (!($this->view->style_plugin->options['calendar_query_filtering'] ?? TRUE)) {
-      return;
+    $start = $values['value'];
+    $start_day = new \DateTime();
+    $start_day->setTimestamp($start);
+    $start_day->setTime(0, 0, 0);
+
+    $end = $values['end_value'] ?? $start;
+    $end_day = new \DateTime();
+    $end_day->setTimestamp($end);
+    $end_day->setTime(0, 0, 0);
+
+    $interval = $start_day->diff($end_day);
+    $instances = $interval->format('%a');
+    $values['instances'] = $instances;
+
+    $timestamps = [];
+    $day = clone $start_day;
+    for ($i = 0; $i <= $instances; $i++) {
+      $timestamps[] = $day->getTimestamp();
+      $day->modify('+1 day');
     }
 
-    // Filter query only for our custom pagers.
-    $pager = $this->view->display_handler->getPlugin('pager');
-    if (!$pager instanceof CalendarViewPagerInterface) {
-      return;
+    // Render row and insert content in cell.
+    // @see template_preprocess_calendar_view_day()
+    $renderable_row = $this->view->rowPlugin->render($result);
+    foreach ($this->view->calendars ?? [] as $t => $table) {
+      foreach ($table['#rows'] as $r => $rows) {
+        foreach (array_keys($rows['data']) as $timestamp) {
+          if (in_array($timestamp, $timestamps)) {
+            $today = new \DateTime();
+            $today->setTimestamp($timestamp);
+            $today->setTime(0, 0, 0);
+            $interval = $start_day->diff($today);
+            $values['instance'] = $interval->format('%a');
+            $renderable_row['#values'] = $values;
+
+            $cell = &$this->view->calendars[$t]['#rows'][$r]['data'][$timestamp];
+            $cell['data']['#children'][$start] = $renderable_row;
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Make filter date values relative to the calendar's timestamp.
+   */
+  public function makeFilterValuesRelative() {
+    $display_id = $this->view->current_display;
+    $timestamp = $this->getCalendarTimestamp(FALSE);
+    $filters = $this->view->displayHandlers->get($display_id)->getOption('filters');
+
+    $date_fields = [];
+    foreach ($this->getDateFields() as $field) {
+      $date_fields[] = $field->realField;
     }
 
-    $now = new \DateTime();
-    $now->setTimestamp($this->getCalendarTimestamp());
-
-    $start = $this->getQueryDatetimeStart($now);
-    $end = $this->getQueryDatetimeEnd($now);
-
-    // Multiple search fields are ORed together.
-    $conditions = $this->view->query->getConnection()->condition('OR');
-
-    foreach ($fields as $field_id) {
-      /** @var \Drupal\views\Plugin\views\field\EntityField $field */
-      $field = $this->view->field[$field_id] ?? NULL;
-      if (!$field) {
+    foreach ($filters as $filter_id => $filter) {
+      // @todo Better check date filter/fields.
+      if (!in_array($filter['field'] ?? NULL, $date_fields)) {
         continue;
       }
 
-      // This ensures $alias includes the table name.
-      $field->ensureMyTable();
-      $alias = $field->getField();
-
-      // Workaround for missing suffix.
-      // @todo Find a better fix and contribute to bookable_calendar module.
-      if (in_array($field->tableAlias, ['bookable_calendar_opening_inst'])) {
-        $alias .= '__value';
+      // Relative dates only for offset filters (e.g. `-1 week`).
+      if (($filter['value']['type'] ?? NULL) !== 'offset') {
+        continue;
       }
 
-      if ($base_field = $field->options['relationship']) {
-        $relationship = $this->view->relationship[$base_field] ?? NULL;
+      foreach (['min', 'max', 'value'] as $key) {
+        $offset = $filter['value'][$key];
+        if (empty($offset)) {
+          continue;
+        }
+
+        $date = new \DateTime();
+        $date->setTimestamp($timestamp);
+        $date->modify($offset);
+        $relative_date = $date->format(DateTimePlus::FORMAT);
+        $filters[$filter_id]['value'][$key] = $relative_date;
       }
 
-      // Add an OR condition for the field.
-      $and = $this->view->query->getConnection()->condition('AND');
-      $and->condition($alias, $start->getTimestamp(), '>');
-      $and->condition($alias, $end->getTimestamp(), '<');
-      $conditions->condition($and);
+      $filters[$filter_id]['value']['type'] = 'date';
     }
 
-    $this->view->query->addWhere(0, $conditions);
+    // Update view filters with new values.
+    $this->view->displayHandlers->get($display_id)->overrideOption('filters', $filters);
   }
-
-  /**
-   * Start value used in the query() method to restrict results.
-   *
-   * Get results in the current month only by default.
-   *
-   * @param \Datetime $now
-   *   A given datetime.
-   *
-   * @return \Datetime
-   *   A new datetime object.
-   */
-  public function getQueryDatetimeStart(\Datetime $now): \Datetime {
-    $start = clone $now;
-
-    $start
-      ->modify('-1 month')
-      ->modify('last day of this month')
-      // Potential first days of previous month month appearing in calendar.
-      ->modify('-6 days')
-      ->setTime(23, 59, 59);
-
-    return $start;
-  }
-
-  /**
-   * End value used in the query() method to restrict results.
-   *
-   * Get results in the current month only by default.
-   *
-   * @param \Datetime $now
-   *   A given datetime.
-   *
-   * @return \Datetime
-   *   A new datetime object.
-   */
-  public function getQueryDatetimeEnd(\Datetime $now): \Datetime {
-    $end = clone $now;
-
-    $end
-      ->modify('+1 month')
-      ->modify('first day of this month')
-      // Potential first days of next month appearing in calendar.
-      ->modify('+6 days')
-      ->setTime(0, 0, 0);
-
-    return $end;
-  }
-
 }

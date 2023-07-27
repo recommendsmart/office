@@ -9,7 +9,7 @@ dependencies:
   - drupal:node
   - drupal:filter
 
-# Information added by Drupal.org packaging script on 2023-03-15
-version: '1.2.1'
+# Information added by Drupal.org packaging script on 2023-07-26
+version: '1.2.4'
 project: 'type_tray'
-datestamp: 1678886689
+datestamp: 1690376968

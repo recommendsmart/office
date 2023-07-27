@@ -46,7 +46,7 @@ class PolicyAddForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $types = [];
     foreach ($this->builderManager->getDefinitions() as $id => $definition) {
-      if (empty($definition['sub_type'])) {
+      if (!$definition['sub_type']) {
         $types[$id] = $definition['label'];
       }
     }

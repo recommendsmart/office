@@ -37,6 +37,13 @@ class EmailAdjusterManager extends DefaultPluginManager implements EmailAdjuster
     $suggestions = $email->getSuggestions('', '.');
     $policy_config = MailerPolicy::loadInheritedConfig(end($suggestions));
 
+    // Include automatic adjusters.
+    foreach ($this->getDefinitions() as $id => $definition) {
+      if ($definition['automatic']) {
+        $policy_config[$id] = [];
+      }
+    }
+
     // Add adjusters.
     foreach ($policy_config as $plugin_id => $config) {
       if ($this->hasDefinition($plugin_id)) {

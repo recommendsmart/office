@@ -12,7 +12,7 @@ dependencies:
   - drupal:datetime
   - drupal:views
 
-# Information added by Drupal.org packaging script on 2023-03-31
-version: '8.x-2.35'
+# Information added by Drupal.org packaging script on 2023-06-01
+version: '8.x-2.36'
 project: 'commerce'
-datestamp: 1680276963
+datestamp: 1685624439

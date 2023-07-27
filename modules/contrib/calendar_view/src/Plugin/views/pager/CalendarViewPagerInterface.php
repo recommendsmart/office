@@ -10,9 +10,9 @@ interface CalendarViewPagerInterface {
   /**
    * Retrieve the calendar date from Calendar style plugin.
    *
-   * @return string
+   * @return int
    *   The timestamp (default: now).
    */
-  public function getCalendarTimestamp(): string;
+  public function getCalendarTimestamp(): int;
 
 }

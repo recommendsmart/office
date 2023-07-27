@@ -1,4 +1,4 @@
-(function ($, Drupal) {
+(function ($, Drupal, once) {
 
   'use strict';
 
@@ -67,14 +67,14 @@
         }
       }
 
-      $('.comment-quote-sel a').once().click(function (e) {
+      $(once('comment-quote-sel', '.comment-quote-sel-link')).click(function (e) {
         e.preventDefault();
         let selected = getSelectedText();
         if (selected.length) {
           let commentArea = getCommentArea();
           let curValue = getCommentAreaCurValue(commentArea);
           let parent = $(this).closest('.comment');
-          let username = parent.find('a.username').text();
+          let username = parent.find('.comment__author a').text();
           let value = curValue + '<blockquote><strong>' + Drupal.t('@author wrote:', {'@author': username}) + '</strong> ' + selected + '</blockquote><p><br/></p>';
           setCommentAreaValue(commentArea, value);
           commentArea.focus();
@@ -82,12 +82,12 @@
 
       });
 
-      $('.comment-quote-all a').once().click(function (e) {
+      $(once('comment-quote-all', '.comment-quote-all-link')).click(function (e) {
         e.preventDefault();
         let commentArea = getCommentArea();
         let curValue = getCommentAreaCurValue(commentArea);
         let parent = $(this).closest('.comment');
-        let username = parent.find('a.username').text();
+        let username = parent.find('.comment__author a').text();
         let alltext;
 
         if (quoteHtml) {
@@ -101,26 +101,26 @@
         commentArea.focus();
       });
 
-      $('.node-quote-sel a').once().click(function (e) {
+      $(once('node-quote-sel', '.node-quote-sel-link')).click(function (e) {
         e.preventDefault();
         let selected = getSelectedText();
         if (selected.length) {
           let commentArea = getCommentArea();
           let curValue = getCommentAreaCurValue(commentArea);
           let parent = $(this).closest('.node');
-          let username = parent.find('a.username').first().text();
+          let username = parent.find('.node__meta a').first().text();
           let value = curValue + '<blockquote><strong>' + Drupal.t('@author wrote:', {'@author': username}) + '</strong> ' + selected + '</blockquote><p><br/></p>';
           setCommentAreaValue(commentArea, value);
           commentArea.focus();
         }
       });
 
-      $('.node-quote-all a').once().click(function (e) {
+      $(once('node-quote-all', '.node-quote-all-link')).click(function (e) {
         e.preventDefault();
         let commentArea = getCommentArea();
         let curValue = getCommentAreaCurValue(commentArea);
         let parent = $(this).closest('.node');
-        let username = parent.find('a.username').first().text();
+        let username = parent.find('.node__meta a').first().text();
         let alltext;
 
         if (quoteHtml) {
@@ -137,4 +137,4 @@
     }
   };
 
-})(jQuery, Drupal);
+})(jQuery, Drupal, once);

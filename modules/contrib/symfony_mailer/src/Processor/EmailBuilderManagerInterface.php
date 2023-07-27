@@ -67,4 +67,12 @@ interface EmailBuilderManagerInterface extends PluginManagerInterface {
    */
   public function setImportState(string $id, int $state);
 
+  /**
+   * Creates a plugin instance from a legacy message array.
+   *
+   * @param array $message
+   *   The message.
+   */
+  public function createInstanceFromMessage(array $message);
+
 }

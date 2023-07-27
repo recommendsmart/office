@@ -3,6 +3,7 @@
 namespace Drupal\Tests\eca_access\Kernel;
 
 use Drupal\eca\Entity\Eca;
+use Drupal\eca_access\AccessEvents;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
@@ -132,6 +133,23 @@ class AccessExecutionChainTest extends KernelTestBase {
     $ecaConfig->trustData()->save();
     \Drupal::entityTypeManager()->getAccessControlHandler('node')->resetCache();
 
+    /**
+     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+     */
+    $event_dispatcher = \Drupal::service('event_dispatcher');
+
+    $event_token_data = [];
+    /**
+     * @var \Drupal\eca\Token\TokenInterface $token_services
+     */
+    $token_services = \Drupal::service('eca.token_services');
+    $event_dispatcher->addListener(AccessEvents::ENTITY, static function ($event) use (&$event_token_data, $token_services) {
+      $token_services->addTokenDataProvider($event);
+      $event_token_data['operation'] = \Drupal::token()->replace('[event:operation]');
+      $event_token_data['uid'] = \Drupal::token()->replace('[event:uid]');
+      $token_services->removeTokenDataProvider($event);
+    }, -1000);
+
     $article = Node::create([
       'type' => 'article',
       'title' => $this->randomMachineName(),
@@ -139,6 +157,8 @@ class AccessExecutionChainTest extends KernelTestBase {
     ]);
     $article->save();
     $this->assertTrue($article->access('view'));
+    $this->assertEquals('view', $event_token_data['operation']);
+    $this->assertEquals('2', $event_token_data['uid']);
 
     $page = Node::create([
       'type' => 'page',
@@ -215,6 +235,24 @@ class AccessExecutionChainTest extends KernelTestBase {
     $ecaConfig->trustData()->save();
     \Drupal::entityTypeManager()->getAccessControlHandler('node')->resetCache();
 
+    /**
+     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+     */
+    $event_dispatcher = \Drupal::service('event_dispatcher');
+
+    $event_token_data = [];
+    /**
+     * @var \Drupal\eca\Token\TokenInterface $token_services
+     */
+    $token_services = \Drupal::service('eca.token_services');
+    $event_dispatcher->addListener(AccessEvents::FIELD, static function ($event) use (&$event_token_data, $token_services) {
+      $token_services->addTokenDataProvider($event);
+      $event_token_data['operation'] = \Drupal::token()->replace('[event:operation]');
+      $event_token_data['uid'] = \Drupal::token()->replace('[event:uid]');
+      $event_token_data['field'] = \Drupal::token()->replace('[event:field]');
+      $token_services->removeTokenDataProvider($event);
+    }, -1000);
+
     $article = Node::create([
       'type' => 'article',
       'title' => $this->randomMachineName(),
@@ -224,7 +262,11 @@ class AccessExecutionChainTest extends KernelTestBase {
     $article->save();
     $this->assertTrue($article->access('view'));
     $this->assertTrue($article->title->access('edit'));
+    $this->assertEquals('title', $event_token_data['field']);
     $this->assertFalse($article->body->access('edit'));
+    $this->assertEquals('body', $event_token_data['field']);
+    $this->assertEquals('edit', $event_token_data['operation']);
+    $this->assertEquals('2', $event_token_data['uid']);
 
     $page = Node::create([
       'type' => 'page',

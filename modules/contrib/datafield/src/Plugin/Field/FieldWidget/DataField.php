@@ -40,7 +40,7 @@ class DataField extends Base {
     foreach ($storage[$delta] as $subfield => $item) {
       $widget[$subfield] = $item;
       $widget_type = $item['#type'];
-      $label_display = $field_settings["field_settings"][$subfield]['label_display'];
+      $label_display = $field_settings["field_settings"][$subfield]['label_display'] ?? 'hidden';
       $label = $field_settings["field_settings"][$subfield]['label'];
       if ($label_display != 'hidden' && parent::isLabelSupported($widget_type)) {
         $widget[$subfield]['#title'] = $label;

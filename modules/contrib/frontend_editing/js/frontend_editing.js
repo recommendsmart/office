@@ -13,11 +13,9 @@
       const editingClick = function (e) {
         e.preventDefault();
         // Setup container
-          //Frontend-editing sidebar and full widths
-          const wideClassWidth = document.querySelector('.frontend-editing')
-              .getAttribute('data-full-width') + '%';
-          const sidebarClassWidth = document.querySelector('.frontend-editing')
-              .getAttribute('data-sidebar-width') + '%';
+        //Frontend-editing sidebar and full widths
+        const wideClassWidth = settings.full_width + '%';
+        const sidebarClassWidth = settings.sidebar_width + '%';
 
         let editContainer = document.getElementById('editing-container');
         if (!editContainer) {
@@ -73,39 +71,76 @@
         else {
           containerElement.classList.add(setupClass);
         }
-
-        // Get url and create editing link
-        const editingUrl = containerElement.getAttribute('data-editing-url');
-        let editingElement = document.createElement('a');
-        editingElement.href = editingUrl;
-        editingElement.classList.add('frontend-editing__action', 'frontend-editing__action--hidden');
-        // Prepend editing link
-        containerElement.prepend(editingElement);
         // Add wrapper class to container
         containerElement.classList.add('frontend-editing');
-        // Add hover function to editing link
-        editingElement.addEventListener('mouseover', function () {
-          containerElement.classList.add('frontend-editing--outline');
-        });
-        editingElement.addEventListener('mouseout', function () {
-          containerElement.classList.remove('frontend-editing--outline');
-        });
-        editingElement.addEventListener('click', editingClick);
+
+        const urls = [];
+        // Get url and create editing link
+        urls.push(containerElement.getAttribute('data-editing-url'));
+        if (containerElement.hasAttribute('data-move-up')) {
+          urls.push(containerElement.getAttribute('data-move-up'));
+        }
+        if (containerElement.hasAttribute('data-move-down')) {
+          urls.push(containerElement.getAttribute('data-move-down'));
+        }
+        for (let i = 0; i < urls.length; i++) {
+          let editingElement = document.createElement('a');
+          editingElement.href = urls[i];
+          editingElement.classList.add('frontend-editing__action', 'frontend-editing__action--hidden', 'frontend-editing__action--' + i);
+          let url_parts = urls[i].split('/');
+          if (isNaN(url_parts[url_parts.length - 1])) {
+            editingElement.classList.add('frontend-editing__action--' + url_parts[url_parts.length - 1]);
+          }
+          // Prepend editing link
+          containerElement.prepend(editingElement);
+          // Add hover function to editing link
+          editingElement.addEventListener('mouseover', function () {
+            containerElement.classList.add('frontend-editing--outline');
+          });
+          editingElement.addEventListener('mouseout', function () {
+            containerElement.classList.remove('frontend-editing--outline');
+          });
+          if (i === 0) {
+            editingElement.addEventListener('click', editingClick);
+          }
+        }
       });
 
     }
   };
 
-  Drupal.behaviors.closeiFrame = {
+  /**
+   * Implements frontend editing toggle behaviour.
+   *
+   * @type {{attach: Drupal.behaviors.cancelFrontendEditing.attach}}
+   */
+  Drupal.behaviors.cancelFrontendEditing = {
     attach: function (context, settings) {
-      if (window.location !== window.parent.location) {
-        if (window.document.querySelector('.messages--status')) {
-          // Reload the page
-          window.parent.location.reload();
-          // Remove iframe while we wait for the reload
-          window.parent.document.getElementById('editing-container').remove();
-        }
+      const cancelButton = context.querySelector('#edit-cancel');
+      if (!cancelButton || cancelButton.length === 0) {
+        return;
       }
+      cancelButton.addEventListener('click', function (e) {
+        e.preventDefault();
+        // Close the side panel
+        Drupal.AjaxCommands.prototype.closeSidePanel({}, {}, 'success');
+      });
+    }
+  }
+
+  /**
+   * Ajax command closeSidePanel.
+   *
+   * @param ajax
+   * @param response
+   * @param status
+   */
+  Drupal.AjaxCommands.prototype.closeSidePanel = function (ajax, response, status) {
+    if (status === 'success') {
+      // Reload the page
+      window.parent.location.reload();
+      // Remove iframe while we wait for the reload
+      window.parent.document.getElementById('editing-container').remove();
     }
   }
 

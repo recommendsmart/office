@@ -48,6 +48,7 @@ class ListCount extends ListOperationBase {
       '#description' => $this->t('Provide the name of a new token where the counting result should be stored.'),
       '#default_value' => $this->configuration['token_name'],
       '#weight' => -10,
+      '#eca_token_reference' => TRUE,
     ];
     return $form;
   }

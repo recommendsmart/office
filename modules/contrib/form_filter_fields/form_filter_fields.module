@@ -197,14 +197,21 @@ function _form_filter_fields_work(&$form, &$form_state, $all_form_filter_field_d
           "wrapper" => "form_filter_fields_container",
         ];
 
-        // If it's previously set then we need to filter out the values.
         $state_values = $form_state->getValues();
-        if (!empty($state_values[$control_field][0]['target_id'])) {
-          // Call the function that does all the work.
+        if (!empty($state_values[$control_field][0]["target_id"])) {
+          // If the form chanded.
           $form = _form_filter_fields_populate_form(
             $form,
             $all_form_filter_field_dependencies[$entity_type][$entity_bundle][$control_field],
-            $state_values[$control_field][0]['target_id']
+            $state_values[$control_field][0]["target_id"]
+          );
+        }
+        elseif (!empty($form[$control_field]["widget"]["#default_value"][0])) {
+          // If it's the default.
+          $form = _form_filter_fields_populate_form(
+            $form,
+            $all_form_filter_field_dependencies[$entity_type][$entity_bundle][$control_field],
+            $form[$control_field]["widget"]["#default_value"][0]
           );
         }
       }

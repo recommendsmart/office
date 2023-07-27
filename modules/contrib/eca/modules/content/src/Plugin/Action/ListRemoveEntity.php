@@ -72,6 +72,7 @@ class ListRemoveEntity extends ListRemoveBase {
       '#description' => $this->t('Provide the name of a token that holds the removed entity.'),
       '#default_value' => $this->configuration['token_name'],
       '#weight' => 30,
+      '#eca_token_reference' => TRUE,
     ];
     $form['method']['#options']['value'] = $this->t('Drop specified entity');
     return $form;

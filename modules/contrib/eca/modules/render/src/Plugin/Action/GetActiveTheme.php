@@ -39,6 +39,7 @@ class GetActiveTheme extends ActiveThemeActionBase {
       '#default_value' => $this->configuration['token_name'],
       '#weight' => -25,
       '#required' => TRUE,
+      '#eca_token_reference' => TRUE,
     ];
     return $form;
   }

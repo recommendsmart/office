@@ -17,3 +17,7 @@ Embed Preview throws 403 forbidden
 Source: https://www.drupal.org/files/issues/2023-03-17/url_embed-preview-403-3285139-10.patch
 
 
+3360661 - preg_split in _filter_url breaks for long html tags
+Source: https://www.drupal.org/files/issues/2023-05-16/3360661-url_embed-preg-split.patch
+
+

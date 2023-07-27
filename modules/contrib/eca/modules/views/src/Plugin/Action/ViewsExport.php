@@ -40,7 +40,7 @@ class ViewsExport extends ViewsQuery {
       $this->view->preExecute();
       $this->view->execute();
     }
-    $this->view->display_handler->buildRenderable($this->view->args, FALSE);
+    $build = $this->view->display_handler->buildRenderable($this->view->args, FALSE);
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
     $output = (string) $renderer->renderRoot($build);

@@ -50,7 +50,7 @@ class PdfPages extends FormatterBase {
     foreach ($items as $delta => $item) {
       if ($item->entity->getMimeType() == 'application/pdf') {
         $scale = $this->getSetting('scale');
-        $file_url = file_create_url($item->entity->getFileUri());
+        $file_url = \Drupal::service('file_url_generator')->generateAbsoluteString($item->entity->getFileUri());
         $html = [
           '#type' => 'html_tag',
           '#tag' => 'div',
@@ -72,7 +72,7 @@ class PdfPages extends FormatterBase {
       }
     }
     $elements['#attached']['library'][] = 'pdf/drupal.pdf';
-    $worker = file_create_url(base_path() . 'libraries/pdf.js/build/pdf.worker.js');
+    $worker = \Drupal::service('file_url_generator')->generateAbsoluteString(base_path() . 'libraries/pdf.js/build/pdf.worker.js');
     $elements['#attached']['drupalSettings'] = [
       'pdf' => [
         'workerSrc' => $worker,

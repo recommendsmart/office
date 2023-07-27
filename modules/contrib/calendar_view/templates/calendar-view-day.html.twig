@@ -7,16 +7,11 @@
  * - elements: Original variables passed to this template.
  * - attributes: HTML attributes for the wrapper.
  * - timestamp: The datetime value.
- * - date: The formatted date value.
  * - empty: Wether or not this day as content.
  * - content: Custom content.
  * - rows: A list of view rows including the following:
  *   - content: The content as a render array.
  *   - attributes: The date field name used to get this content.
- *   - from: A timestamp.
- *   - to: Another timestamp (empty for single value date field).
- *   - item: The date field item. Useful to get date type.
- *   - calendar_filter: The date field used to retrieve this content.
  *
  * @see template_preprocess_calendar_view_day()
  *
@@ -32,7 +27,7 @@
 
 <div{{ attributes.addClass(classes) }}>
   {% set html_date = timestamp|format_date('html_date') %}
-
+  {% set count = not rows ? 0 : rows|length %}
   {% set day_title %}
     {% trans %}
       {{ count }} result for {{ html_date }}
@@ -41,7 +36,7 @@
     {% endtrans %}
   {% endset %}
 
-	{# Calendar day #}
+	{# The day #}
 	{% block day_number %}
     <time class="calendar-view-day__number" datetime="{{ timestamp|date('Y-m-d\TH:i:s') }}" title="{{ day_title|trim }}">
       {{ timestamp|date('j') }}
@@ -49,18 +44,17 @@
 	{% endblock %}
 
   {% block day_content %}
-   {# Empty #}
-    {% if not rows or rows|length == 0 %}
+    {% if empty %}
+      {# Empty #}
       <div class="calendar-view-day__rows empty"></div>
     {% else %}
+      {# Events #}
       <ul class="calendar-view-day__rows">
-        {% for timestamp,results in rows %}
-          {% for row in results %}
-            {% set row_classes = [ default_row_class ? 'views-row'] %}
-            <li{{ row.attributes.addClass(row_classes,'calendar-view-day__row') }}>
-              {{- row.content -}}
-            </li>
-          {% endfor %}
+        {% for row in rows %}
+          {% set row_classes = [default_row_class ? 'views-row'] %}
+          <li{{ row.attributes.addClass(row_classes,'calendar-view-day__row') }}>
+            {{- row.content -}}
+          </li>
         {% endfor %}
       </ul>
     {% endif %}

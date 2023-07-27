@@ -8,7 +8,7 @@
         </a>
     {% endset %}
     {% set text %}
-        {% spaceless %}
+        {% apply spaceless %}
             <div class="sf-toolbar-info-piece sf-toolbar-info-php-ext">
                 <b>{{ 'Log entries'|t }}</b>
                 <span>{{ collector.numberoflogentries }}</span>
@@ -17,7 +17,7 @@
                 <b>Token</b>
                 <span>{{ token }}</span>
             </div>
-        {% endspaceless %}
+        {% endapply %}
     {% endset %}
 
     <div class="sf-toolbar-block">

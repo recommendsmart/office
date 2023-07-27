@@ -14,8 +14,10 @@ use Symfony\Component\Routing\Route;
  * Patched copy of \Drupal\Core\Access\CustomAccessCheck
  *
  * Workaround for https://www.drupal.org/project/drupal/issues/2786941
+ *
+ * @internal
  */
-class CustomAccessCheck implements RoutingAccessInterface {
+final class CustomAccessCheck implements RoutingAccessInterface {
 
   /**
    * The controller resolver.

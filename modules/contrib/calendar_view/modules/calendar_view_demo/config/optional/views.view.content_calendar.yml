@@ -229,7 +229,7 @@ display:
           hide_alter_empty: true
           destination: true
       pager:
-        type: calendar
+        type: calendar_month
         options:
           offset: 0
           label_format: F
@@ -506,7 +506,7 @@ display:
         groups:
           1: AND
       style:
-        type: calendar
+        type: calendar_month
         options:
           grouping: {  }
           row_class: ''
@@ -515,8 +515,7 @@ display:
           calendar_fields:
             changed: changed
           calendar_weekday_start: '1'
-          calendar_sort_order: ASC
-          calendar_timestamp: 'this month'
+          calendar_timestamp: 'today'
       row:
         type: fields
       query:

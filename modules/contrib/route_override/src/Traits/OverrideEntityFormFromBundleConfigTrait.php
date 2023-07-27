@@ -14,6 +14,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Override entity forms, override config stored in bundle config TPS.
+ *
+ * @api
  */
 trait OverrideEntityFormFromBundleConfigTrait {
 

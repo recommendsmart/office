@@ -128,7 +128,7 @@ display:
           separator: ', '
           field_api_classes: false
       pager:
-        type: calendar
+        type: calendar_month
         options:
           offset: 0
           label_format: F
@@ -217,7 +217,7 @@ display:
             default_group_multiple: {  }
             group_items: {  }
       style:
-        type: calendar
+        type: calendar_month
         options:
           grouping: {  }
           row_class: ''
@@ -226,8 +226,7 @@ display:
           calendar_fields:
             created: created
           calendar_weekday_start: '1'
-          calendar_sort_order: ASC
-          calendar_timestamp: 'this month'
+          calendar_timestamp: 'today'
       row:
         type: fields
       query:

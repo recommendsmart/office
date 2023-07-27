@@ -59,6 +59,7 @@ class FormStateGetPropertyValue extends FormStatePropertyActionBase {
       '#description' => $this->t('The name of the token the property value should be stored into.'),
       '#required' => TRUE,
       '#weight' => -49,
+      '#eca_token_reference' => TRUE,
     ];
     return $form;
   }

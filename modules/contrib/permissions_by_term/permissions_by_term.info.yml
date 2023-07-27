@@ -6,12 +6,12 @@ dependencies:
   - 'drupal:taxonomy'
   - 'drupal:path_alias'
 type: module
-core_version_requirement: '^9'
+core_version_requirement: '^9 || ^10'
 # version: '3.1.9'
 package: 'Permissions by Term'
 configure: permissions_by_term.settings
 
-# Information added by Drupal.org packaging script on 2022-11-09
-version: '3.1.21'
+# Information added by Drupal.org packaging script on 2023-04-13
+version: '3.1.22'
 project: 'permissions_by_term'
-datestamp: 1668009537
+datestamp: 1681402066

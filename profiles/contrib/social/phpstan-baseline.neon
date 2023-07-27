@@ -2186,21 +2186,6 @@ parameters:
 			path: modules/custom/sitewide_js/src/Form/SiteWideJSForm.php
 
 		-
-			message: "#^Function social_admin_menu_toolbar_alter\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: modules/custom/social_admin_menu/social_admin_menu.module
-
-		-
-			message: "#^Function social_admin_menu_toolbar_alter\\(\\) has parameter \\$items with no type specified\\.$#"
-			count: 1
-			path: modules/custom/social_admin_menu/social_admin_menu.module
-
-		-
-			message: "#^Parameter \\#1 \\$menu_name of method Drupal\\\\Core\\\\Menu\\\\MenuLinkTree\\:\\:load\\(\\) expects string, null given\\.$#"
-			count: 1
-			path: modules/custom/social_admin_menu/src/Menu/SocialAdminMenuAdministratorMenuLinkTreeManipulators.php
-
-		-
 			message: "#^Function social_advanced_queue_install\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: modules/custom/social_advanced_queue/social_advanced_queue.install
@@ -8878,11 +8863,6 @@ parameters:
 			path: modules/social_features/social_follow_taxonomy/modules/social_follow_tag/social_follow_tag.install
 
 		-
-			message: "#^Call to an undefined method object\\:\\:create\\(\\)\\.$#"
-			count: 1
-			path: modules/social_features/social_follow_taxonomy/modules/social_follow_tag/social_follow_tag.module
-
-		-
 			message: "#^Function social_follow_tag_entity_update\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: modules/social_features/social_follow_taxonomy/modules/social_follow_tag/social_follow_tag.module
@@ -9164,11 +9144,6 @@ parameters:
 
 		-
 			message: "#^Method Drupal\\\\social_footer\\\\Plugin\\\\Block\\\\SocialFooterPoweredByBlock\\:\\:blockSubmit\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: modules/social_features/social_footer/src/Plugin/Block/SocialFooterPoweredByBlock.php
-
-		-
-			message: "#^Variable \\$file in PHPDoc tag @var does not match assigned variable \\$media\\.$#"
 			count: 1
 			path: modules/social_features/social_footer/src/Plugin/Block/SocialFooterPoweredByBlock.php
 
@@ -12833,11 +12808,6 @@ parameters:
 			path: modules/social_features/social_post/social_post.admin.inc
 
 		-
-			message: "#^Function _social_post_mass_update_batch_process\\(\\) has parameter \\$context with generic interface ArrayAccess but does not specify its types\\: TKey, TValue$#"
-			count: 1
-			path: modules/social_features/social_post/social_post.admin.inc
-
-		-
 			message: "#^Function social_post_mass_update\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: modules/social_features/social_post/social_post.admin.inc
@@ -14265,11 +14235,6 @@ parameters:
 		-
 			message: "#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityStorageInterface\\:\\:loadByUser\\(\\)\\.$#"
 			count: 2
-			path: modules/social_features/social_profile/modules/social_profile_organization_tag/social_profile_organization_tag.module
-
-		-
-			message: "#^Function social_profile_organization_tag_fetch\\(\\) has no return type specified\\.$#"
-			count: 1
 			path: modules/social_features/social_profile/modules/social_profile_organization_tag/social_profile_organization_tag.module
 
 		-

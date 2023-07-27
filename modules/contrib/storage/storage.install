@@ -95,3 +95,16 @@ function storage_update_8103() {
     $storage_type->save();
   }
 }
+
+/**
+ * Rabbit Hole integration got moved into a sub-module.
+ *
+ * This installs the sub-module "rh_storage" when Rabbit Hole is installed.
+ * Please export your configuration after this update was applied, so that the
+ * module will not get uninstalled on the next configuration import.
+ */
+function storage_update_8104() {
+  if (\Drupal::moduleHandler()->moduleExists('rabbit_hole')) {
+    \Drupal::service('module_installer')->install(['rh_storage'], FALSE);
+  }
+}

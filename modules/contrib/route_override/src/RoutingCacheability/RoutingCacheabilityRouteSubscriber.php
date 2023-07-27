@@ -26,13 +26,13 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @internal
  */
-class RoutingCacheabilityRouteSubscriber extends RouteSubscriberBase {
+final class RoutingCacheabilityRouteSubscriber extends RouteSubscriberBase {
 
   const FAKE_ROUTE_NAME = 'route_override.cacheability';
 
   public function __construct() {}
 
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     $events[RoutingEvents::ALTER] = ['onAlterRoutes', -999];
     return $events;
   }

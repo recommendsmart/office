@@ -47,13 +47,6 @@ class Conditions {
   protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
-   * Current user account.
-   *
-   * @var \Drupal\user\Entity\User
-   */
-  protected $currentUser;
-
-  /**
    * Language manager service.
    *
    * @var \Drupal\Core\Language\LanguageManagerInterface
@@ -90,7 +83,6 @@ class Conditions {
     $this->conditionManager = $condition_manager;
     $this->logger = $logger;
     $this->entityTypeManager = $entity_type_manager;
-    $this->currentUser = $entity_type_manager->getStorage('user')->load($account_proxy->id());
     $this->languageManager = $language_manager;
     $this->token = $token;
   }
@@ -175,10 +167,6 @@ class Conditions {
         // current process.
         if (empty($pluginConfig[$key])) {
           switch ($definition->getDataType()) {
-            case 'entity:user':
-              $token = $this->currentUser;
-              break;
-
             case 'language':
               $token = $this->languageManager->getCurrentLanguage();
               break;

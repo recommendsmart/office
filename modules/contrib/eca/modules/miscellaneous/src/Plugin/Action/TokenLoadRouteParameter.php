@@ -80,6 +80,7 @@ class TokenLoadRouteParameter extends ConfigurableActionBase {
       '#description' => $this->t('The name of the token, the parameter value gets stored into.'),
       '#default_value' => $this->configuration['token_name'],
       '#weight' => -10,
+      '#eca_token_reference' => TRUE,
     ];
     return $form;
   }

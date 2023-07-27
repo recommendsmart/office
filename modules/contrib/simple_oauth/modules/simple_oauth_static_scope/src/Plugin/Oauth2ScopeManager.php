@@ -215,6 +215,7 @@ class Oauth2ScopeManager extends DefaultPluginManager implements Oauth2ScopeMana
       }
       // Make grant type description translatable.
       if (isset($grant_type['description'])) {
+        // phpcs:ignore
         $definition['grant_types'][$grant_type_key]['description'] = $this->t($grant_type['description'], [], ['context' => 'grant_type']);
       }
     }

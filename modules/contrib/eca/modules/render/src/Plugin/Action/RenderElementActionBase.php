@@ -62,7 +62,12 @@ abstract class RenderElementActionBase extends RenderActionBase {
     // Collect cache metatdata, and add some sensible defaults.
     $metadata = BubbleableMetadata::createFromRenderArray($target)
       ->merge(BubbleableMetadata::createFromRenderArray($build))
-      ->addCacheContexts(['url.path', 'url.query_args', 'user'])
+      ->addCacheContexts([
+        'url.path',
+        'url.query_args',
+        'user',
+        'user.permissions',
+      ])
       ->addCacheTags(['config:eca_list']);
 
     $name = trim((string) $this->tokenServices->replaceClear($this->configuration['name']));
@@ -176,6 +181,7 @@ abstract class RenderElementActionBase extends RenderActionBase {
       '#default_value' => $this->configuration['token_name'],
       '#required' => FALSE,
       '#weight' => -28,
+      '#eca_token_reference' => TRUE,
     ];
     $form['weight'] = [
       '#type' => 'textfield',

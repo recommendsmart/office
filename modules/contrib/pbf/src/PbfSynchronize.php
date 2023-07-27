@@ -226,8 +226,7 @@ class PbfSynchronize implements PbfSynchronizeInterface {
     $entity_original = isset($entity->original) ? $entity->original : $entity;
     $target_field_name = $target_field->getName();
     $target_ids = $this->getReferenceIds($entity, $field);
-    // Param added not used. We synchronize always the referenced entities.
-    $added = array_diff($this->getReferenceIds($entity, $field), $this->getReferenceIds($entity_original, $field));
+
     // We synchronize all targeted entities.
     if ($target_ids) {
       $target_entities = $this->entityTypeManager->getStorage($target_entity_type_id)->loadMultiple($target_ids);

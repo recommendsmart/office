@@ -154,6 +154,7 @@ class Translate extends ConfigurableActionBase {
       '#description' => $this->t('The translation result will be stored in this token.'),
       '#default_value' => $this->configuration['token_name'],
       '#weight' => -50,
+      '#eca_token_reference' => TRUE,
     ];
     $form['value'] = [
       '#type' => 'textarea',

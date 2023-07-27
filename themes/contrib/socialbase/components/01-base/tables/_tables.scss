@@ -299,10 +299,6 @@ form:not(.layout-builder-configure-block) .select-all.checkbox {
   display: table-cell;
 }
 
-.vbo-table .form-type-checkbox {
-  padding-top: 1rem;
-}
-
 .vbo-table.table td {
   vertical-align: inherit;
 }
@@ -322,7 +318,15 @@ form:not(.layout-builder-configure-block) .select-all.checkbox {
 }
 
 .vbo-table .form-no-label.checkbox label {
-  display: none;
+  font-size: 0;
+
+  &.sr-only {
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding-left: 0;
+    overflow: visible;
+  }
 }
 
 .vbo-table .views-table-row-vbo-select-all {

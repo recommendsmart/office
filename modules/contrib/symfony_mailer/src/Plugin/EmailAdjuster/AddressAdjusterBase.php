@@ -91,7 +91,6 @@ abstract class AddressAdjusterBase extends EmailAdjusterBase {
   public function getSummary() {
     foreach ($this->configuration['addresses'] as $item) {
       $value = $item['value'];
-      $display = $item['display'];
 
       if ($value === '<site>') {
         $summary[] = $this->t('Site email address');

@@ -37,6 +37,7 @@ class CacheRead extends CacheActionBase {
       '#description' => $this->t('The cache item value will be loaded into this specified token.'),
       '#required' => TRUE,
       '#weight' => -30,
+      '#eca_token_reference' => TRUE,
     ];
     return $form;
   }

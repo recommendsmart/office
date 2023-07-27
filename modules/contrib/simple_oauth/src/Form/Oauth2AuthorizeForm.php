@@ -82,7 +82,7 @@ class Oauth2AuthorizeForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state, AuthorizationServer $server = NULL, AuthorizationRequest $auth_request = NULL) {
     $client = $auth_request->getClient()->getDrupalEntity();
-    $remember_approval = (bool) $client->get('remember_approval');
+    $remember_approval = $client->get('remember_approval')->value;
     // Store the data temporarily.
     $form_state->set('server', $server);
     $form_state->set('remember_approval', $remember_approval);

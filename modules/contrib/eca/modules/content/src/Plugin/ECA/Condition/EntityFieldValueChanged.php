@@ -6,6 +6,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\eca\Plugin\ECA\Condition\ConditionBase;
 use Drupal\eca\TypedData\PropertyPathTrait;
+use Drupal\field\Entity\FieldConfig;
 
 /**
  * Plugin implementation of the ECA condition for changed entity field value.
@@ -31,7 +32,41 @@ class EntityFieldValueChanged extends ConditionBase {
     $field_name = $this->tokenServices->replaceClear($this->configuration['field_name']);
     $options = ['access' => FALSE, 'auto_item' => FALSE];
     if (($entity instanceof EntityInterface) && isset($entity->original) && ($entity->original instanceof EntityInterface) && ($property = $this->getTypedProperty($entity->getTypedData(), $field_name, $options)) && ($original_property = $this->getTypedProperty($entity->original->getTypedData(), $field_name, $options))) {
-      return $this->negationCheck($property->getValue() !== $original_property->getValue());
+      $value = $property->getValue();
+      $original_value = $original_property->getValue();
+      if (is_countable($value) && count($value) !== count($original_value)) {
+        return $this->negationCheck(TRUE);
+      }
+
+      if (($dataDefinition = $property->getDataDefinition()) && $dataDefinition instanceof FieldConfig) {
+        $type = $dataDefinition->getFieldStorageDefinition()->getType();
+        if (in_array($type, ['boolean', 'entity_reference'], TRUE)) {
+          foreach ($value as $key => $item) {
+            switch ($type) {
+              case 'boolean':
+                $value[$key]['value'] = (bool) $item['value'];
+                $original_value[$key]['value'] = (bool) $original_value[$key]['value'];
+                break;
+
+              case 'entity_reference':
+                $value[$key] = [
+                  'target_id' => $item['target_id'],
+                  'weight' => $item['weight'] ?? 0,
+                ];
+                $original_value[$key] = [
+                  'target_id' => $original_value[$key]['target_id'],
+                  'weight' => $original_value[$key]['weight'] ?? $value[$key]['weight'],
+                ];
+                break;
+
+              default:
+                ksort($value[$key]);
+
+            }
+          }
+        }
+      }
+      return $this->negationCheck($value !== $original_value);
     }
     return FALSE;
   }

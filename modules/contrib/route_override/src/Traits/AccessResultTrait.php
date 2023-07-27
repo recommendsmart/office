@@ -9,6 +9,11 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\CacheableTypes\CacheableBool;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Access result resolver trait.
+ *
+ * @api
+ */
 trait AccessResultTrait {
 
   abstract protected function boolAccess(RouteMatchInterface $route_match, AccountInterface $account, Request $request = NULL): CacheableBool;

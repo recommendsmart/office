@@ -6,6 +6,7 @@ use Drupal\contact\Entity\ContactForm;
 use Drupal\contact\MessageInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use Drupal\symfony_mailer\EmailFactoryInterface;
 use Drupal\symfony_mailer\EmailInterface;
 use Drupal\symfony_mailer\Entity\MailerPolicy;
 
@@ -14,13 +15,18 @@ use Drupal\symfony_mailer\Entity\MailerPolicy;
  *
  * @EmailBuilder(
  *   id = "contact_form",
+ *   label = @Translation("Contact form"),
  *   sub_types = {
  *     "mail" = @Translation("Message"),
  *     "copy" = @Translation("Sender copy"),
  *     "autoreply" = @Translation("Auto-reply"),
  *   },
  *   has_entity = TRUE,
- *   proxy = TRUE,
+ *   proxy = {
+ *     "contact.page_mail",
+ *     "contact.page_copy",
+ *     "contact.page_autoreply",
+ *   },
  *   common_adjusters = {"email_subject", "email_body", "email_to"},
  *   import = @Translation("Contact form recipients"),
  * )
@@ -44,6 +50,17 @@ class ContactPageEmailBuilder extends ContactEmailBuilderBase {
     assert($sender != NULL);
     $email->setParam('contact_message', $message)
       ->setParam('sender', $sender);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fromArray(EmailFactoryInterface $factory, array $message) {
+    $sender = $message['params']['sender'];
+    $contact_message = $message['params']['contact_message'];
+    // Remove page_.
+    $key = substr($message['key'], 5);
+    return $factory->newEntityEmail($message['params']['contact_form'], $key, $contact_message, $sender);
   }
 
   /**
